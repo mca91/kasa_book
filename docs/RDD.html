@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.3.290">
@@ -97,15 +97,15 @@ div.csl-indent {
   "type": "textbox",
   "limit": 20,
   "language": {
-    "search-no-results-text": "No results",
-    "search-matching-documents-text": "matching documents",
-    "search-copy-link-title": "Copy link to search",
-    "search-hide-matches-text": "Hide additional matches",
-    "search-more-match-text": "more match in this document",
-    "search-more-matches-text": "more matches in this document",
-    "search-clear-button-title": "Clear",
-    "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-no-results-text": "Keine Treffer",
+    "search-matching-documents-text": "Treffer",
+    "search-copy-link-title": "Link in die Suche kopieren",
+    "search-hide-matches-text": "Zusätzliche Treffer verbergen",
+    "search-more-match-text": "weitere Treffer in diesem Dokument",
+    "search-more-matches-text": "weitere Treffer in diesem Dokument",
+    "search-clear-button-title": "Zurücksetzen",
+    "search-detached-cancel-button-title": "Abbrechen",
+    "search-submit-button-title": "Abschicken"
   }
 }</script><script type="module" src="site_libs/quarto-ojs/quarto-ojs-runtime.js"></script><link href="site_libs/quarto-ojs/quarto-ojs.css" rel="stylesheet">
 <script type="ojs-define">
@@ -123,13 +123,13 @@ div.csl-indent {
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
       <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./RDD.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span></a></li></ol></nav>
-      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
-      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+      <button type="button" class="btn quarto-search-button" aria-label="Suchen" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
@@ -139,7 +139,7 @@ div.csl-indent {
     <div class="sidebar-title mb-0 py-0">
       <a href="./"></a><a href="./index.html">Kausalanalyse mit R</a> 
         <div class="sidebar-tools-main">
-  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Lesemodus umschalten">
   <div class="quarto-reader-toggle-btn">
   <i class="bi"></i>
   </div>
@@ -149,7 +149,7 @@ div.csl-indent {
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
         <div class="sidebar-search">
-        <div id="quarto-search" class="" title="Search"></div>
+        <div id="quarto-search" class="" title="Suchen"></div>
         </div>
         </div>
     <div class="sidebar-menu-container"> 
@@ -258,7 +258,7 @@ div.csl-indent {
 <div class="cell">
 
 </div>
-<p>Regression Discontinuity Design (RDD) ist ein Ansatz für die Schätzung von Treatment-Effekten mit Regression, wenn durch einen experimentell oder natürlich gegebenen Umstand die Behandlung an einem Schwellenwert (<span class="math inline">\(C\)</span>) einer <em>Laufvariable</em> (<span class="math inline">\(X\)</span>) sprunghaft beeinflusst wird. Ein RDD-Schätzer brücksichtigt lediglich Beobachtungen mit Ausprägungen von <span class="math inline">\(X\)</span>, die knapp ober- oder knapp unterhalb von <span class="math inline">\(C\)</span> liegen. Die zentrale Idee hierbei ist, dass Individuen nahe bei <span class="math inline">\(C\)</span> im Durchschnitt ähnliche Merkmale aufweisen. RDD isoliert Variation auf dem Pfad <em>Oberhalb C → Treatment → Y</em>. Somit können Backdoor-Pfade über <span class="math inline">\(X\)</span> oder weitere (möglichweise unbeobachtbare) Confounder (<span class="math inline">\(Z\)</span>) vermieden werden, siehe <a href="#fig-CDRDD">Figure&nbsp;<span>2.1</span></a>.</p>
+<p>Regression Discontinuity Design (RDD) ist ein Ansatz für die Schätzung von Treatment-Effekten mit Regression, wenn durch einen experimentell oder natürlich gegebenen Umstand die Behandlung an einem Schwellenwert (<span class="math inline">\(C\)</span>) einer <em>Laufvariable</em> (<span class="math inline">\(X\)</span>) sprunghaft beeinflusst wird. Ein RDD-Schätzer brücksichtigt lediglich Beobachtungen mit Ausprägungen von <span class="math inline">\(X\)</span>, die knapp ober- oder knapp unterhalb von <span class="math inline">\(C\)</span> liegen. Die zentrale Idee hierbei ist, dass Individuen nahe bei <span class="math inline">\(C\)</span> im Durchschnitt ähnliche Merkmale aufweisen. RDD isoliert Variation auf dem Pfad <em>Oberhalb C → Treatment → Y</em>. Somit können Backdoor-Pfade über <span class="math inline">\(X\)</span> oder weitere (möglichweise unbeobachtbare) Confounder (<span class="math inline">\(Z\)</span>) vermieden werden, siehe <a href="#fig-CDRDD">Abbildung&nbsp;<span>2.1</span></a>.</p>
 <div class="cell page-columns page-full" data-fig-width="5" data-fig-height="3" data-layout-align="center">
 <div class="cell-output-display page-columns page-full">
 <div id="fig-CDRDD" class="quarto-figure quarto-figure-center anchored page-columns page-full">
@@ -301,7 +301,7 @@ Treatment-&gt;Y
 </title>
 <path fill="none" stroke="black" d="M207.71,-18C229.19,-18 256.24,-18 277.81,-18"></path><polygon fill="black" stroke="black" points="277.91,-21.5 287.91,-18 277.91,-14.5 277.91,-21.5"></polygon></g></g></svg>
 </div>
-<p></p><figcaption class="figure-caption margin-caption">Figure&nbsp;2.1: Causal Diagram für RDD</figcaption><p></p>
+<p></p><figcaption class="figure-caption margin-caption">Abbildung&nbsp;2.1: Causal Diagram für RDD</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -327,7 +327,7 @@ Y_i = \beta_0 + \beta_1 D_i + \beta_2 (X_i - C) + \beta_3(X_i-C)\times D_i + u_i
 <p><strong>Bandweite</strong></p>
 <div class="page-columns page-full"><p>Neben der funktionalen Form muss spezifiziert werden, welche Beobachtungen hinreichend nahe am Schwellenwert C liegen. Hierfür verwenden wir eine sogenannte Bandweite <span class="math inline">\(h\)</span>, wobei <span class="math display">\[\begin{align}
   \lvert(X_i-C)\rvert\leq h \label{eq:bwc}
-\end{align}\]</span> das Kriterium für eine Berücksichtigung von Beobachtung <span class="math inline">\(i\)</span> bei der Schätzung ist. Unter Berücksichtigung einer Bandweite <span class="math inline">\(h\)</span> wird der Regressionsansatz <span class="math inline">\(\eqref{eq:linearSRDD}\)</span> als <em>local linear regression</em> mit Uniform-Kernelfunktion bezeichnet.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> Der Uniform-Kernel ist neben dem Triangular-Kernel eine häufig in der Praxis genutzte lineare Kernelfunktion.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> Der nachstehende Code plottet die Uniform- (grün) sowie die Triangular-Kernelfunktion (blau) wie in <a href="#fig-linearkern">Figure&nbsp;<span>2.2</span></a> dargestellt.</p><div class="no-row-height column-margin column-container"><li id="fn2"><p><sup>2</sup>&nbsp;<em>Local regression</em> ist ein nicht-parametrisches Verfahren. Hierbei kann die Beziehung zwischen Variablen flexibel modelliert werden.</p></li><li id="fn3"><p><sup>3</sup>&nbsp;In der Praxis wird oftmals local linear regression mit linearen Kernelfunktionen zurückgegriffen und die Robustheit der Ergebnisse anhand flexiblerer Spezifikationen geprüft.</p></li></div></div>
+\end{align}\]</span> das Kriterium für eine Berücksichtigung von Beobachtung <span class="math inline">\(i\)</span> bei der Schätzung ist. Unter Berücksichtigung einer Bandweite <span class="math inline">\(h\)</span> wird der Regressionsansatz <span class="math inline">\(\eqref{eq:linearSRDD}\)</span> als <em>local linear regression</em> mit Uniform-Kernelfunktion bezeichnet.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> Der Uniform-Kernel ist neben dem Triangular-Kernel eine häufig in der Praxis genutzte lineare Kernelfunktion.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> Der nachstehende Code plottet die Uniform- (grün) sowie die Triangular-Kernelfunktion (blau) wie in <a href="#fig-linearkern">Abbildung&nbsp;<span>2.2</span></a> dargestellt.</p><div class="no-row-height column-margin column-container"><li id="fn2"><p><sup>2</sup>&nbsp;<em>Local regression</em> ist ein nicht-parametrisches Verfahren. Hierbei kann die Beziehung zwischen Variablen flexibel modelliert werden.</p></li><li id="fn3"><p><sup>3</sup>&nbsp;In der Praxis wird oftmals local linear regression mit linearen Kernelfunktionen zurückgegriffen und die Robustheit der Ergebnisse anhand flexiblerer Spezifikationen geprüft.</p></li></div></div>
 <div class="cell page-columns page-full">
 <details><summary>Code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/">cowplot</a></span><span class="op">)</span></span>
@@ -344,16 +344,16 @@ Y_i = \beta_0 + \beta_1 D_i + \beta_2 (X_i - C) + \beta_3(X_i-C)\times D_i + u_i
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span><span class="op">(</span><span class="st">"K(x)"</span>, </span>
 <span>                       breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, </span>
 <span>                       limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_cowplot</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>    <span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_cowplot</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="no-row-height column-margin column-container"><div class="cell-output-display">
 <div id="fig-linearkern" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure"><p><img src="RDD_files/figure-html/fig-linearkern-1.png" class="quarto-discovered-preview-image img-fluid figure-img" width="288"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;2.2: Uniform-Kernel auf [-h, h]</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Abbildung&nbsp;2.2: Uniform-Kernel auf [-h, h]</figcaption><p></p>
 </figure>
 </div>
 </div></div></div>
-<p>Die Wahl der Bandweite ist eine wichtige Komponente der RDD-Schätzung. Falls der wahre Zusammenhang nicht-linear ist, erlauben kleine Bandweiten eine Schätzung der Regressionsfunktion nahe des Schwellenwertes mit wenig Verzerrung. Allerdings kann diese Schätzung unpräzise sein, wenn nur wenige Beobachtungen <span class="math inline">\(\eqref{eq:bwc}\)</span> erfüllen. In der Praxis wird <span class="math inline">\(h\)</span> daher anhand einer Schätzfunktion <span class="citation" data-cites="ImbensKalyanaraman2012">(<a href="Literatur.html#ref-ImbensKalyanaraman2012" role="doc-biblioref">G. Imbens and Kalyanaraman 2012</a>)</span> oder anhand von <em>Cross Validation</em> <span class="citation" data-cites="ImbensLemieux2008">(bspw. <a href="Literatur.html#ref-ImbensLemieux2008" role="doc-biblioref">G. W. Imbens and Lemieux 2008</a>)</span> bestimmt. Die später in diesem Kapitel betrachteten R-Pakete halten diese Methoden bereit.</p>
+<p>Die Wahl der Bandweite ist eine wichtige Komponente der RDD-Schätzung. Falls der wahre Zusammenhang nicht-linear ist, erlauben kleine Bandweiten eine Schätzung der Regressionsfunktion nahe des Schwellenwertes mit wenig Verzerrung. Allerdings kann diese Schätzung unpräzise sein, wenn nur wenige Beobachtungen <span class="math inline">\(\eqref{eq:bwc}\)</span> erfüllen. In der Praxis wird <span class="math inline">\(h\)</span> daher anhand einer Schätzfunktion <span class="citation" data-cites="ImbensKalyanaraman2012">(<a href="Literatur.html#ref-ImbensKalyanaraman2012" role="doc-biblioref">G. Imbens und Kalyanaraman 2012</a>)</span> oder anhand von <em>Cross Validation</em> <span class="citation" data-cites="ImbensLemieux2008">(bspw. <a href="Literatur.html#ref-ImbensLemieux2008" role="doc-biblioref">G. W. Imbens und Lemieux 2008</a>)</span> bestimmt. Die später in diesem Kapitel betrachteten R-Pakete halten diese Methoden bereit.</p>
 <section id="beispiel-amtsinhaber-vorteil-lee2008" class="level3 page-columns page-full" data-number="2.1.1"><h3 data-number="2.1.1" class="anchored" data-anchor-id="beispiel-amtsinhaber-vorteil-lee2008">
 <span class="header-section-number">2.1.1</span> Beispiel: Amtsinhaber-Vorteil <span class="citation" data-cites="Lee2008">(<a href="Literatur.html#ref-Lee2008" role="doc-biblioref">Lee 2008</a>)</span>
 </h3>
@@ -741,7 +741,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
 <span id="cb2-358"><a href="#cb2-358" aria-hidden="true" tabindex="-1"></a><span class="vs">  display: none;</span></span>
 <span id="cb2-359"><a href="#cb2-359" aria-hidden="true" tabindex="-1"></a><span class="vs">} </span></span>
 <span id="cb2-360"><a href="#cb2-360" aria-hidden="true" tabindex="-1"></a><span class="vs">&lt;/style&gt;</span></span>
-<span id="cb2-361"><a href="#cb2-361" aria-hidden="true" tabindex="-1"></a><span class="vs">`</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-361"><a href="#cb2-361" aria-hidden="true" tabindex="-1"></a><span class="vs">`</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <div id="ojs-cell-1-1" data-nodetype="expression">
@@ -787,7 +787,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
 <span id="cb3-398"><a href="#cb3-398" aria-hidden="true" tabindex="-1"></a>loessRegression <span class="op">=</span> d3<span class="op">.</span><span class="fu">regressionLoess</span>()</span>
 <span id="cb3-399"><a href="#cb3-399" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">x</span>(d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">StimmenTm1</span>)</span>
 <span id="cb3-400"><a href="#cb3-400" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">y</span>(d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">StimmenT</span>)</span>
-<span id="cb3-401"><a href="#cb3-401" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">bandwidth</span>(bandwidth)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-401"><a href="#cb3-401" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">bandwidth</span>(bandwidth)<span class="op">;</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <div id="ojs-cell-1-2" data-nodetype="declaration">
@@ -924,12 +924,12 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
 <span id="cb4-453"><a href="#cb4-453" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">style</span>(<span class="st">"stroke-width"</span><span class="op">,</span> <span class="st">"1"</span>)<span class="op">;</span></span>
 <span id="cb4-454"><a href="#cb4-454" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-455"><a href="#cb4-455" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> svg<span class="op">.</span><span class="fu">node</span>()<span class="op">;</span></span>
-<span id="cb4-456"><a href="#cb4-456" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-456"><a href="#cb4-456" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div id="fig-ojs-cell-2" class="quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="figure page-columns page-full"><div id="ojs-cell-2" data-nodetype="expression">
 
 </div>
-<p></p><figcaption class="figure-caption margin-caption">Figure&nbsp;2.3: Nicht-parametrische Regression auf beiden Seiten des Cut-offs.</figcaption><p></p>
+<p></p><figcaption class="figure-caption margin-caption">Abbildung&nbsp;2.3: Nicht-parametrische Regression auf beiden Seiten des Cut-offs.</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -1380,10 +1380,10 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://haven.tidyverse.org">haven</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://nickch-k.github.io/vtable/">vtable</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">rdrobust</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">rdrobust</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">BastenBetz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://haven.tidyverse.org/reference/read_dta.html">read_dta</a></span><span class="op">(</span><span class="st">'BastenBetz.dta'</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">BastenBetz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://haven.tidyverse.org/reference/read_dta.html">read_dta</a></span><span class="op">(</span><span class="st">'BastenBetz.dta'</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Table 1</span></span>
@@ -1408,13 +1408,13 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
 <span>      <span class="op">-</span><span class="va">group</span>, </span>
 <span>      names_to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"variable"</span>, <span class="st">"statistic"</span><span class="op">)</span>, </span>
 <span>      names_sep <span class="op">=</span> <span class="st">"_"</span></span>
-<span>    <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>    <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">T1_wider</span> <span class="op">&lt;-</span> <span class="va">T1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> </span>
 <span>    <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html">pivot_wider</a></span><span class="op">(</span></span>
 <span>        names_from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"group"</span>, <span class="st">"statistic"</span><span class="op">)</span></span>
-<span>    <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>    <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell page-columns page-full" data-layout-align="center">
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">T1_wider</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
@@ -1422,7 +1422,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
 <span>  <span class="fu">tab_spanner_delim</span><span class="op">(</span></span>
 <span>    delim <span class="op">=</span> <span class="st">"_"</span>,</span>
 <span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span> <span class="va">tabopts</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span> <span class="va">tabopts</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display page-columns page-full">
 <div id="tbl-sumstat" class="anchored page-columns page-full">
 
@@ -1962,7 +1962,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
 </tr>
 </tbody>
 </table>
-<div class="quarto-table-caption margin-caption">Table&nbsp;2.1:  <p>Datensatz <code>BastenBetz</code> – Zusammenfassende Statistiken</p> </div></div>
+<div class="quarto-table-caption margin-caption">Tabelle&nbsp;2.1:  <p>Datensatz <code>BastenBetz</code> – Zusammenfassende Statistiken</p> </div></div>
 </div>
 </div>
 </div>
@@ -1975,7 +1975,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
 <span>  bwselect <span class="op">=</span> <span class="st">"mserd"</span>, </span>
 <span>  kernel <span class="op">=</span> <span class="st">"uniform"</span><span class="op">)</span> </span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">bw_selection</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">bw_selection</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Call: rdbwselect
 
@@ -1996,7 +1996,7 @@ Unique Obs.                      97          261
      mserd     5.078      5.078     10.905     10.905
 =======================================================</code></pre>
 </div>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">OB</span> <span class="op">&lt;-</span> <span class="va">bw_selection</span><span class="op">$</span><span class="va">bws</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">OB</span> <span class="op">&lt;-</span> <span class="va">bw_selection</span><span class="op">$</span><span class="va">bws</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Table 2: First stage results </span></span>
@@ -2017,14 +2017,14 @@ Unique Obs.                      97          261
 <span><span class="va">FS3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span></span>
 <span>  formula <span class="op">=</span> <span class="va">prot1980s</span> <span class="op">~</span> <span class="va">vaud</span> <span class="op">+</span> <span class="va">borderdis</span> <span class="op">+</span> <span class="va">vaud</span> <span class="op">*</span> <span class="va">borderdis</span>, </span>
 <span>  data <span class="op">=</span> <span class="va">BastenBetz</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">borderdis</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">20</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">modelsummary</span><span class="fu">::</span><span class="fu"><a href="https://vincentarelbundock.github.io/modelsummary/reference/modelsummary.html">modelsummary</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">FS1</span>, <span class="va">FS2</span>, <span class="va">FS3</span><span class="op">)</span>, </span>
 <span>  vcov <span class="op">=</span> <span class="st">"HC1"</span>, stars <span class="op">=</span> <span class="cn">T</span>, gof_map <span class="op">=</span> <span class="st">"nobs"</span>, output <span class="op">=</span> <span class="st">"gt"</span></span>
 <span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">tabopts</span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu">tabopts</span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div id="ynvehotuyd" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2561,7 +2561,7 @@ Unique Obs.                      97          261
 <span>                 x <span class="op">=</span> <span class="va">BastenBetz</span><span class="op">$</span><span class="va">borderdis</span>, </span>
 <span>                 p <span class="op">=</span> <span class="fl">1</span>, </span>
 <span>                 nbins <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">14</span><span class="op">)</span>,</span>
-<span>                 masspoints <span class="op">=</span> <span class="st">"off"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>                 masspoints <span class="op">=</span> <span class="st">"off"</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell quarto-layout-panel">
 <div class="quarto-layout-row quarto-layout-valign-top">
 <div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
@@ -2597,16 +2597,16 @@ Unique Obs.                      97          261
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
 <div id="ref-CarpenterDobkin2009" class="csl-entry" role="listitem">
-Carpenter, Christopher, and Carlos Dobkin. 2009. <span>“The Effect of Alcohol Consumption on Mortality: Regression Discontinuity Evidence from the Minimum Drinking Age.”</span> <em>American Economic Journal: Applied Economics</em> 1 (1): 164–82.
+Carpenter, Christopher, und Carlos Dobkin. 2009. <span>„The effect of alcohol consumption on mortality: regression discontinuity evidence from the minimum drinking age“</span>. <em>American Economic Journal: Applied Economics</em> 1 (1): 164–82.
 </div>
 <div id="ref-ImbensLemieux2008" class="csl-entry" role="listitem">
-Imbens, G. W., and Thomas Lemieux. 2008. <span>“Regression Discontinuity Designs: A Guide to Practice.”</span> <em>Journal of Econometrics</em> 142 (2): 615–35.
+Imbens, G. W., und Thomas Lemieux. 2008. <span>„Regression discontinuity designs: A guide to practice“</span>. <em>Journal of econometrics</em> 142 (2): 615–35.
 </div>
 <div id="ref-ImbensKalyanaraman2012" class="csl-entry" role="listitem">
-Imbens, Guido, and Karthik Kalyanaraman. 2012. <span>“Optimal Bandwidth Choice for the Regression Discontinuity Estimator.”</span> <em>The Review of Economic Studies</em> 79 (3): 933–59.
+Imbens, Guido, und Karthik Kalyanaraman. 2012. <span>„Optimal bandwidth choice for the regression discontinuity estimator“</span>. <em>The Review of economic studies</em> 79 (3): 933–59.
 </div>
 <div id="ref-Lee2008" class="csl-entry" role="listitem">
-Lee, David S. 2008. <span>“Randomized Experiments from Non-Random Selection in US House Elections.”</span> <em>Journal of Econometrics</em> 142 (2): 675–97.
+Lee, David S. 2008. <span>„Randomized experiments from non-random selection in US House elections“</span>. <em>Journal of Econometrics</em> 142 (2): 675–97.
 </div>
 </div>
 </section></main><!-- /main --><script type="ojs-module-contents">
@@ -2672,12 +2672,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // flash "checked"
     button.classList.add('code-copy-button-checked');
     var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
+    button.setAttribute("title", "Kopiert");
     let tooltip;
     if (window.bootstrap) {
       button.setAttribute("data-bs-toggle", "tooltip");
       button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
+      button.setAttribute("data-bs-title", "Kopiert");
       tooltip = new bootstrap.Tooltip(button, 
         { trigger: "manual", 
           customClass: "code-copy-button-tooltip",
