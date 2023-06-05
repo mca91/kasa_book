@@ -1,0 +1,51 @@
+# Summary
+
+In summary, this book has no content whatsoever.
+
+```{r}
+1 + 1
+```
+
+```{=html}
+ <div class="quizdown">
+            # What is the capital of Berlin? (**SC**)
+            
+            In this question you are asked a **very** difficult question. 
+            
+            > Do some research! 
+            
+            - [x] Berlin
+                > This is the correct answer. 
+            - [ ] Stuttgart 
+            - [ ] Cologne 
+                > Cologne is the fourth largest city. 
+            - [ ] Düsseldorf 
+            
+            # Please bring the following into order! 
+            
+            Below you find the steps of the machine learning workflow. 
+            Do you find the **correct order**? 
+            
+            > The model selection happens before the `final model evaluation`!
+            
+            1. Get the data 
+            2. Explore the data 
+            3. Train test split with `train_test_split()` 
+            4. Feature engineering 
+            5. Model selection 
+            6. Model evaluation 
+            7. Deployment 
+            
+            # Welchen Wert hat `y`? 
+            
+            ```r
+            y <- 5 
+            y + 123
+            ``` 
+            
+            - [ ] `2` 
+            - [x] `5` 
+            - [ ] `NULL` 
+            - [ ] `9`
+        </div>
+```

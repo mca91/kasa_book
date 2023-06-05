@@ -1,0 +1,671 @@
+# Regression Discontiniuty Designs
+
+```{CSS, echo = F}
+svg {
+  margin-left: auto;
+  margin-right: auto;
+}
+```
+
+```{=html}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
+<style>
+  .CodeMirror pre {
+    background-color: unset !important;
+    font-size: 14px;
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/r/r.js"></script>
+
+<script type="module">
+  import { WebR } from "https://webr.r-wasm.org/v0.1.0/webr.mjs";
+  globalThis.webR = new WebR({
+    SW_URL: "/"
+  });
+  await globalThis.webR.init();
+  
+  let dataset = await new webR.RList(house);
+  let dataset_binned = await new webR.RList(house_binned);
+
+
+  await globalThis.webR.objs.globalEnv.bind('house', dataset);
+  await globalThis.webR.objs.globalEnv.bind('house_binned', dataset_binned);
+
+
+  await globalThis.webR.installPackages(['dplyr', 'tidyr', 'ggplot2']);
+  await globalThis.webR.evalRVoid('library(dplyr); library(tidyr); library(ggplot2); house <- as.data.frame(house) %>% mutate(across(everything(), as.numeric)); house_binned <- as.data.frame(house_binned) %>% mutate(across(everything(), as.numeric))');
+
+  
+  globalThis.webRCodeShelter = await new globalThis.webR.Shelter();
+  document.querySelectorAll(".btn-webr").forEach((btn) => {
+    btn.innerText = "R-Code ausführen";
+    btn.disabled = false;
+  });
+</script>
+
+<!-- datasets -->
+<script type="text/javascript" src="/datasets/house.js"></script>
+<script type="text/javascript" src="/datasets/house_binned.js"></script>
+```
+
+```{r}
+#| results: asis
+#| echo: false
+webr_counter = 0
+
+cat("importScripts('https://webr.r-wasm.org/v0.1.0/webr-worker.js');", file = "webr-worker.js")
+cat("importScripts('https://webr.r-wasm.org/v0.1.0/webr-serviceworker.js');", file = "webr-serviceworker.js")
+
+webr_editor = function(code = I(encodeString(code, quote = '`')), width, height) { 
+webr_counter <<- webr_counter + 1
+
+output = glue::glue('
+<button class="btn btn-outline-primary btn-sm btn-webr run" disabled type="button" id="webr-run-button-{{ webr_counter }}" style="width:100%; border-radius:15px 15px 0 0;">R lädt. Etwas Geduld bitte...<i class="fas fa-cog fa-spin"></i></button>
+<div id="webr-editor-{{ webr_counter }}"></div>
+<div id="webr-code-output-{{ webr_counter }}"><pre style="visibility: hidden"></pre></div>
+<script type="module">
+  const runButton = document.getElementById("webr-run-button-{{ webr_counter }}");
+  const outputDiv = document.getElementById("webr-code-output-{{ webr_counter }}");
+  const editorDiv = document.getElementById("webr-editor-{{ webr_counter }}");
+
+  const editor = CodeMirror((elt) => {
+    elt.style.border = "2px solid #eee";
+    elt.style.borderRadius = "0 0 15px 15px";
+    elt.style.height = "auto";
+    elt.style.fontSize = "15px";
+    editorDiv.append(elt);
+  },{
+    value: {{code}},
+    lineNumbers: true,
+    mode: "r",
+    theme: "light default",
+    viewportMargin: Infinity,
+  });
+
+  runButton.onclick = async () => {
+    runButton.disabled = true;
+    let canvas = undefined;
+    await globalThis.webR.init();
+    await webR.evalRVoid("canvas(width={{width}}, height={{height}})");
+    const result = await webRCodeShelter.captureR(editor.getValue(), {
+      withAutoprint: true,
+      captureStreams: true,
+      captureConditions: false,
+      env: webR.objs.emptyEnv,
+    });
+    try {
+      await webR.evalRVoid("dev.off()");
+      const out = result.output.filter(
+        evt => evt.type == "stdout" || evt.type == "stderr"
+      ).map((evt) => evt.data).join("\\n");
+
+      const msgs = await webR.flush();
+      msgs.forEach(msg => {
+        if (msg.type === "canvasExec"){
+          if (!canvas) {
+            canvas = document.createElement("canvas");
+            canvas.setAttribute("width", 2 * {{width}});
+            canvas.setAttribute("height", 2 * {{height}});
+            canvas.style.width="700px";
+            canvas.style.display="block";
+            canvas.style.margin="auto";
+          }
+          Function(`this.getContext("2d").${msg.data}`).bind(canvas)();
+        }
+      });
+
+      outputDiv.innerHTML = "";
+      const pre = document.createElement("pre");
+      if (/\\S/.test(out)) {
+        const code = document.createElement("code");
+        code.innerText = out;
+        pre.appendChild(code);
+      } else {
+        pre.style.visibility = "hidden";
+      }
+      outputDiv.appendChild(pre);
+
+      if (canvas) {
+        const p = document.createElement("p");
+        p.appendChild(canvas);
+        outputDiv.appendChild(p);
+      }
+    } finally {
+      webRCodeShelter.purge();
+      runButton.disabled = false;
+    }
+  }
+
+  await globalThis.webR.init();
+</script>
+', .open = "{{", .close = "}}")
+}
+```
+
+```{r}
+#| echo: false
+knitr::knit_engines$set(webr = function(options) {
+  code = paste(options$code, collapse = "\n")
+  w = knitr::opts_current$get('fig.width') * 72
+  h = knitr::opts_current$get('fig.height') * 72
+  options$results = 'asis'
+  
+  form = webr_editor(code = I(encodeString(code, quote = '`')), width = w, height = h)
+  
+  form
+}
+)
+```
+
+```{r, echo=F}
+library(gt)
+# Formatierung von gt-Tabellen
+tabopts <- function(x) {
+    fmt_number(x, decimals = 3, drop_trailing_zeros = T) %>%
+  tab_options(table_body.hlines.color = "white", 
+              column_labels.border.bottom.color = "black", 
+             column_labels.border.top.color = "black",
+             table_body.border.bottom.color = "black",
+             column_labels.font.weight = "bold", 
+             table.font.color = "black", table.font.size = 16)
+}
+```
+
+Regression Discontinuity Design (RDD) ist ein Ansatz für die Schätzung von Treatment-Effekten mit Regression, wenn durch einen experimentell oder natürlich gegebenen Umstand die Behandlung an einem Schwellenwert ($C$) einer *Laufvariable* ($X$) sprunghaft beeinflusst wird. Ein RDD-Schätzer brücksichtigt lediglich Beobachtungen mit Ausprägungen von $X$, die knapp ober- oder knapp unterhalb von $C$ liegen. Die zentrale Idee hierbei ist, dass Individuen nahe bei $C$ im Durchschnitt ähnliche Merkmale aufweisen. RDD isoliert Variation auf dem Pfad *Oberhalb C &rarr; Treatment &rarr; Y*. Somit können Backdoor-Pfade über $X$ oder weitere (möglichweise unbeobachtbare) Confounder ($Z$) vermieden werden, siehe @fig-CDRDD.
+
+```{dot}
+//| fig-width: 5
+//| fig-height: 3
+//| fig-align: 'center'
+//| fig-cap: "Causal Diagram für RDD"
+//| label: "fig-CDRDD" 
+digraph "Causal Diagramm RDD" {
+  layout=neato
+  fontname="Helvetica,Arial,sans-serif"
+  node [fontname="Helvetica,Arial,sans-serif"]
+  edge [fontname="Helvetica,Arial,sans-serif"]
+  node [shape=none];
+  "X" [pos="0,1!"]
+  "Y" [pos="4,-1!"]
+  "C" [pos="0,-1!"]
+  "Z" [pos="3,1!"]
+  "Treatment" [pos="2,-1!"]
+  "X" -> "Y"
+  "Z" -> "X"
+  "Z" -> "Y"
+  "X" -> "C"
+  "C" -> "Treatment"
+  "Treatment" -> "Y"
+}
+```
+
+Der kausale Effekt wird dabei als durchschnittlicher Effekt der Diskontinuität auf die Outcome-Variable ($Y$) anhand von Beobachtungen *nahe bei $C$* ermittelt. 
+
+Hinsichtlich der Beeinflussung der Behandlung unterscheiden wir zwischen *Sharp* und *Fuzzy* Regression Discontinuity Designs (SRDD/FRDD). Bei einem SRDD ist die Zuordnung *deterministisch*, d.h. der Schwellenwert in der Laufvariable ist eine harte Grenze für die Gruppenzugehörigkeit: Die *Wahrscheinlichkeit* der Behandlung springt bei $X=C$ um $p=100\%$.
+
+Bei einem FRDD wird angenommen, dass die Zuordnung nicht perfekt durch den Schwellenwert C bestimmt ist: Die *Wahrscheinlichkeit* der Behandlung springt bei $X=C$ um $p<100\%$.^[Im FRDD können also sowohl Treatment- als auch Kontroll-Beobachtungen auf beiden Seiten der Diskontinuität beobachtet werden -- die Trennung der Gruppen ist "unscharf" (engl. *fuzzy*)] Dies tritt auf, wenn das Überschreiten von $C$ nicht die einzige Determinante einer Behandlung ist. Die Wahl zwischen SRDD und FRDD hängt von der Natur der Daten und der Forschungsfrage ab.
+
+Der Geschätzte Treatment-Effekt ist ein s.g. *local average treatment effect* (LATE).
+
+## Sharp Regression Discontinuity Design
+
+**Modelle und funktionale Form**
+
+Die korrekte Spezifikation der funktionalen Form für RDD ist wichtig, um eine unverzerrte Schätzung des Effekts zu vermeiden. Die einfachste Form eines SRDD kann anhand der linearen Regression 
+\begin{align}
+Y_i = \beta_0 + \beta_1 D_i + \beta_2 (X_i - C) + u_i\label{eq-simpleSRDD}
+\end{align} geschätzt werden, wobei $D_i$ Behandlung anzeigt: $D_i$ ist eine Dummy-Variable für das Überschreiten des Schwellenwertes C, d.h.
+\begin{align*}
+  D_i=\begin{cases}
+    0 & X_i < C\\
+    1 & X_i \geq C.
+  \end{cases}
+\end{align*}
+Hierbei ist zu beachten, dass $(X_i - C)$ die um den Schwellenwert zentrierte Laufvariable ist, sodass $\beta_1$ der Effekt der Behandlung bei $(X_i - C)\geq 0$ ist.
+
+Modell \eqref{eq-simpleSRDD} unterstellt, dass $X$ links- und rechtsseitig von $C$ denselben Effekt $\beta_2$ auf $Y$ hat. Eine Alternative ist ein lineares Interaktionsmodell
+\begin{align}
+Y_i = \beta_0 + \beta_1 D_i + \beta_2 (X_i - C) + \beta_3(X_i-C)\times D_i + u_i.\label{eq:linearSRDD}
+\end{align}
+In Modell \eqref{eq:linearSRDD} erfasst $\beta_3$ den Unterschied des Effekts von $X$ auf $Y$ für Beoabachtungen oberhalb von $C$ gegenüber Beobachtungen unterhalb von $C$, sodass unterschiedliche lineare Effekte von $X$ auf $Y$ link- und rechtsseitig von $C$ modelliert werden können.
+
+**Bandweite**
+
+Neben der funktionalen Form muss spezifiziert werden, welche Beobachtungen hinreichend nahe am Schwellenwert C liegen. Hierfür verwenden wir eine sogenannte Bandweite $h$, wobei 
+\begin{align}
+  \lvert(X_i-C)\rvert\leq h \label{eq:bwc}
+\end{align}
+das Kriterium für eine Berücksichtigung von Beobachtung $i$ bei der Schätzung ist. Unter Berücksichtigung einer Bandweite $h$ wird der Regressionsansatz \eqref{eq:linearSRDD} als *local linear regression* mit Uniform-Kernelfunktion bezeichnet.^[*Local regression* ist ein nicht-parametrisches Verfahren. Hierbei kann die Beziehung zwischen Variablen flexibel modelliert werden.] Der Uniform-Kernel ist neben dem Triangular-Kernel eine häufig in der Praxis genutzte lineare Kernelfunktion.^[In der Praxis wird oftmals local linear regression mit linearen Kernelfunktionen zurückgegriffen und die Robustheit der Ergebnisse anhand flexiblerer Spezifikationen geprüft.] Der nachstehende Code plottet die Uniform- (grün) sowie die Triangular-Kernelfunktion (blau) wie in @fig-linearkern dargestellt.
+```{r}
+#| fig-column: margin
+#| fig-cap: "Uniform-Kernel auf [-h, h]"
+#| label: fig-linearkern
+#| fig-width: 3
+#| fig-height: 2.5
+#| code-fold: true
+library(ggplot2)
+library(cowplot)
+ggplot() + 
+    geom_function(
+      fun = ~ ifelse(abs(.) <= 1, 1, 0), col = "green"
+      ) + 
+    geom_function(
+      fun = ~ ifelse(abs(.) <= 1, 1-abs(.), 0), col = "blue"
+      ) + 
+    scale_x_continuous("x", limits = c(-1.5, 1.5), 
+                       labels = c("-h", 0, "h"), 
+                       breaks = c(-1, 0, 1)) +
+    scale_y_continuous("K(x)", 
+                       breaks = c(0, 1), 
+                       limits = c(0, 1.5)) +
+    theme_cowplot()
+```
+Die Wahl der Bandweite ist eine wichtige Komponente der RDD-Schätzung. Falls der wahre Zusammenhang nicht-linear ist, erlauben kleine Bandweiten eine Schätzung der Regressionsfunktion nahe des Schwellenwertes mit wenig Verzerrung. Allerdings kann diese Schätzung unpräzise sein, wenn nur wenige Beobachtungen \eqref{eq:bwc} erfüllen. In der Praxis wird $h$ daher anhand einer Schätzfunktion [@ImbensKalyanaraman2012] oder anhand von *Cross Validation* [bspw. @ImbensLemieux2008] bestimmt. Die später in diesem Kapitel betrachteten R-Pakete halten diese Methoden bereit.
+
+### Beispiel: Amtsinhaber-Vorteil [@Lee2008]
+
+@Lee2008 untersucht den Einfluss des Amtsinhaber-Vorteils auf die Wahl von Mitgliedern des US-Repräsentantenhauses. Entfällt ein Stimmenanteil von mehr als 50% auf eine Partei, hat diese Partei den Vorsitz des Repräsentantenhauses gewonnen. Durch die Analyse der 6558 Wahlen im Zeitraum 1946-1998 mit RDD kommt die Studie zu dem Ergebnis, dass die amtsinhabende im Durchschnitt einen Vorteil von etwa 8%-10% bei der Wahl hat. Dieses Ergebnis kann als Vorteil kann durch verschiedene Faktoren erklärt werden, bspw. dass die amtierende Partei höhere finanzielle Ressourcen und von einer besseren Organisation als die Opposition profitiert. Anhand der Datensätze `house` und `house_binned` illustrieren wir nachfolgend die Schätzung von SRDD-Modellen für den Wahlerfolg der demokratischen Partei, wenn diese Amtsinhaber ist.
+
+Wir verschaffen uns zunächst einen Überblick über den Datensatz `house`.
+
+```{webr}
+library(dplyr)
+
+glimpse(house)
+glimpse(house_binned)
+```
+
+Der Datensatz `house` enthält Stimmenanteile der Demokraten bei der Wahl zum Zeitpunkt $T$ (`StimmenT`) sowie um den Schwellenwert von 50% zentrierte Stimmenanteile bei der vorherigen Wahl zum Zeitpunkt $T-1$ (`StimmenTm1`). 
+
+`house_binned` ist eine aggregierte Version von `house` mit Mittelwerten von jeweils 50 gleichgroßen Intervallen oberhalb und unterhalb der Schwelle von 0. Dieser Datensatz eignet sich, um einen ersten Eindruck des funktionalen Zusammenhangs auf beiden Seiten zu gewinnen. Wir stellen die klassierten Daten mit `ggplot2` graphisch dar.
+
+```{webr}
+library(ggplot2)
+
+house_binned %>%
+  ggplot(aes(x = StimmenTm1, y = StimmenT)) +
+  geom_point() +
+  geom_vline(xintercept = 0, lty = 2)
+```
+
+Die Grafik zeigt eindeutig einen Sprung an der Stelle $StimmenTm1 = 0$. Weiterhin erkennen wir, dass der Zusammenhang nahe 0 jeweils gut durch eine lineare Funktion approximiert werden kann. Eine Modell-Spezifikation mit gleicher Steigung auf beiden Seiten des Schwellenwertes scheint hingegen ungeeignet. 
+
+Als nächstes fügen wir dem Datensatz eine Dummyvariable `D` hinzu. Diese dient als Indikator für den Wahlgewinn in der letzten Wahl.
+
+```{webr}
+house <- house %>% 
+  mutate(D = StimmenTm1 > 0)
+
+glimpse(house)
+```
+
+Als nächstes schätzen wir das Modell 
+\begin{align}
+  \text{StimmenT}_i = \beta_0 + \beta_1 D_i + \beta_2 (\text{StimmenTm1}_i - 50) + \beta_3(\text{StimmenTm1}_i - 50)\times D_i + u_i
+\end{align}
+bei einer Bandweite von $h = 1$. Aufgrund der Skalierung der Daten bedeutet dies die Verwendung des *gesamten* Datensatzes für die Schätzung.
+
+```{webr}
+house_llr1 <- lm(
+  formula = StimmenT ~ D * StimmenTm1, 
+  data = house
+)
+  
+summary(house_llr1)
+```
+
+Der geschätzte Koeffizient von $D$ (`DTRUE`) beträgt etwa 0.12 und ist hochsignifikant. Übereinstimmend mit der (oben erstellten) Grafik erhalten wir also eine positive Schätzung des Treatment-Effekts. 
+Diese Schätzung könnte jedoch invalide sein: 
+
+- Die (implizite) Wahl von $h=1$ macht die Isolation des relevanten Frontdoor-Paths ($C=0$ &rarr; Treatment &rarr; StimmenT) wenig plausibel.
+
+- Weiterhin könnte die lineare funktionale Form unser Regression für den gesamten Datensatz inadäquat sein: Die lineare Approximation könnte nur "lokal" zu 0 gut sein und anderweitig in einer verzerrten Schätzung des Effekts resultieren.
+
+
+
+```{r, echo = F}
+house_binned <-  read.csv("datasets/house_binned.csv")
+house <-  read.csv("datasets/house.csv")
+
+ojs_define(
+ house_binned = house_binned,
+ house = house
+)
+```
+
+```{ojs}
+//| echo: false
+html`
+<style>
+circle {
+  fill-opacity: .8;
+  stroke: #000;
+  stroke-opacity: 1;
+}
+.regression {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+.axis line {
+  stroke: #ddd;
+}
+.axis .baseline line {
+  stroke: #555;
+}
+.axis .domain {
+  display: none;
+} 
+</style>
+`
+
+d3 = require("d3-array@3", "d3-axis@3", "d3-regression@1", "d3-scale@4", "d3-shape@3", "d3-selection@3")
+
+margin = ({left: 33, right: 8, top: 13, bottom: 24});
+base = Math.min(width, 500);
+innerWidth = base - margin.left - margin.right;
+innerHeight = base-100 - margin.top - margin.bottom;
+
+viewof bandwidth = Inputs.range([.01, .5], {
+  label: "Bandweite LOESS",
+  step: .01,
+  value: .25
+});
+
+xScaleLoess = d3.scaleLinear()
+   .domain([-.55, .55])
+   .range([0, innerWidth]);
+   
+yScaleLoess = d3.scaleLinear()
+  .domain([.2, .8])
+  .range([innerHeight, 0]);
+
+lineLoess = d3.line()
+  .x(d => xScaleLoess(d[0]))
+  .y(d => yScaleLoess(d[1]));
+  
+xAxisLoess = d3.axisBottom(xScaleLoess)
+  .tickSize(innerHeight + 10)
+  .tickValues([-.5, -.25, 0, .25, .5])
+  .tickFormat(d => d);
+
+yAxisLoess = d3.axisLeft(yScaleLoess)
+  .tickSize(innerWidth + 10)
+  .tickValues([.2, .35, .5, .65, .8])
+  .tickFormat(d => d);
+
+loessRegression = d3.regressionLoess()
+  .x(d => d.StimmenTm1)
+  .y(d => d.StimmenT)
+  .bandwidth(bandwidth);
+```
+
+```{ojs}
+//| echo: false
+//| fig-cap: "Nicht-parametrische Regression auf beiden Seiten des Cut-offs."
+
+{
+  const svg = d3.select(DOM.svg(innerWidth + margin.left + margin.right, innerHeight + margin.top + margin.bottom))
+  
+  const g = svg.append("g")
+      .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+  g.append("g")
+      .attr("class", "axis")
+      .call(xAxisLoess);
+
+  g.append("g")
+    .attr("class", "axis")
+    .attr("transform", `translate(${innerWidth})`)
+    .call(yAxisLoess);
+
+  g.selectAll("circle")
+    .data(transpose(house_binned))
+    .enter().append("circle")
+    .attr("r", 2)
+    .attr("cx", d => xScaleLoess(d.StimmenTm1))
+    .attr("cy", d => yScaleLoess(d.StimmenT));
+
+  g.append("path")
+      .attr("class", "regression")
+      .datum(loessRegression(
+        transpose(house)
+          .filter(function(d){ return d.StimmenTm1 < 0 & d.StimmenTm1 >= -.5 })
+          )
+        )
+      .attr("d", lineLoess);
+  
+  g.append("path")
+      .attr("class", "regression")
+      .datum(loessRegression(
+        transpose(house)
+          .filter(function(d){ return d.StimmenTm1 >= 0 & d.StimmenTm1 <= .5 })
+          )
+        )
+      .attr("d", lineLoess);
+  
+  g.append("line")
+  .attr("x1", xScaleLoess(0))
+  .attr("y1", 0)
+  .attr("x2", xScaleLoess(0))
+  .attr("y2", innerHeight)
+  .style("stroke", "black")
+  .style("stroke-dasharray", "4")
+  .style("stroke-width", "1");
+
+  return svg.node();
+}
+```
+
+
+```{webr}
+mlda <- mlda %>%
+  mutate(
+    sameS_fit = predict(drink_mod)
+  )
+```
+
+```{webr}
+mlda %>% 
+    ggplot(aes(x = agecell, y = all, color = D)) +
+    geom_point() + 
+    geom_line(
+        data = mlda %>% filter(D == "Ja"), aes(y = sameS_fit)
+    ) +
+    geom_line(
+        data = mlda %>% filter(D == "Nein"), aes(y = sameS_fit)
+    )
+```
+
+```{webr}
+drink_mod_DiffSlope <- lm(
+  formula = all ~ D * I(agecell - 21),
+  data = mlda
+)
+  
+summary(drink_mod_DiffSlope)
+```
+
+```{webr}
+mlda <- mlda %>%
+  mutate(
+    diffS_fit = predict(drink_mod_DiffSlope)
+  )
+```
+
+```{webr}
+mlda %>% 
+    ggplot(aes(x = agecell, y = all, color = D)) +
+    geom_point() + 
+    geom_line(
+        data = mlda %>% filter(D == "Ja"), aes(y = diffS_fit)
+    ) +
+    geom_line(
+        data = mlda %>% filter(D == "Nein"), aes(y = diffS_fit)
+    )
+```
+
+
+Carpenter und Dobkin [-@CarpenterDobkin2009] untersuchen den Zusammenhang zwischen Alkoholkonsum und Sterblichkeit mit einem RDD.^[Die Studie sowie die Daten sind [hier](https://www.aeaweb.org/articles?id=10.1257/app.1.1.164) abrufbar.] Die Autoren nutzen Variation im gesetzliche Mindestalter für Alkoholkonsum zwischen US-Bundesstaaten: Hierbei ist Alter die Laufvariable und des Mindestalter der Schwellenwert. Personen, die knapp über dem Mindestalter liegen und daher legal Alkohol konsumieren dürfen, weisen ähnliche Merkmale auf wie Personen knapp unter dem Mindestalter, so dass Backdoors vermieden werden. 
+
+Die Ergebnisse der Studie zeigen, dass der Übergang zum legalen Alkoholkonsum im erlaubten Alter zu einem signifikanten Anstieg der Sterblichkeit führt. Insbesondere stellen die Autoren fest, dass junge Menschen, die legal Alkohol trinken dürfen, ein höheres Risiko haben, an alkoholbedingten Todesfällen zu sterben, im Vergleich zu Personen knapp unter dem Mindestalter.
+
+
+## Case Study: Protestantische Arbeitsethik
+
+```{r, echo=F}
+knitr::opts_chunk$set(fig.align = 'center', warning = F, message = F)
+```
+
+Die Studie *Beyond Work Ethic: Religion, Individual, and Political Preferences* von Christoph Basten und Frank Betz aus dem Jahr 2013 untersucht den Zusammenhang zwischen Religion, individuellen Merkmalen und politischen Präferenzen. Das Hauptaugenmerk liegt dabei auf der Rolle der Religiosität als Einflussfaktor auf politische Einstellungen.
+
+Die Autoren argumentieren, dass die Religiosität eines Individuums über den traditionellen Rahmen von Moralvorstellungen und sozialen Normen hinausgeht und auch politische Präferenzen beeinflussen kann. Sie behaupten, dass die Religion eine eigenständige Dimension darstellt, die das politische Verhalten und die Einstellungen einer Person mitgestaltet.
+
+Um ihre Hypothesen zu testen, nutzen Basten und Betz Daten aus dem World Values Survey, einer internationalen Umfrage, die verschiedene Aspekte von Werten und Einstellungen untersucht. Sie analysieren insbesondere die Zusammenhänge zwischen Religiosität, individuellen Merkmalen wie Geschlecht, Bildung und Einkommen sowie politischen Präferenzen wie links-rechts-Ausrichtung, Einstellungen zur Umverteilung und zur Einwanderung.
+
+Die Ergebnisse der Studie zeigen, dass Religiosität tatsächlich einen signifikanten Einfluss auf politische Präferenzen hat. Insbesondere stellen die Autoren fest, dass religiöse Menschen tendenziell konservativere Einstellungen haben und eher rechten politischen Parteien zuneigen. Dieser Effekt bleibt auch nach Kontrolle anderer Faktoren wie Bildung und Einkommen bestehen.
+
+Darüber hinaus betonen die Autoren, dass der Zusammenhang zwischen Religion und politischen Präferenzen nicht allein durch moralische Werte erklärt werden kann. Sie argumentieren, dass religiöse Institutionen auch eine soziale und politische Agenda verfolgen, die von den Gläubigen internalisiert wird. Diese Agenda kann beispielsweise Positionen zu Themen wie Abtreibung, gleichgeschlechtlicher Ehe, Einwanderung oder Umweltschutz umfassen.
+
+Zusammenfassend zeigt das Paper "Beyond Work Ethic: Religion, Individual, and Political Preferences" von Christoph Basten und Frank Betz, dass Religiosität einen Einfluss auf politische Präferenzen hat, der über traditionelle Moralvorstellungen hinausgeht. Es deutet darauf hin, dass religiöse Menschen eher konservative politische Ansichten haben und dass religiöse Institutionen eine Rolle bei der Formulierung dieser Ansichten spielen können.
+
+```{r, eval=TRUE}
+library(tidyverse)
+library(haven)
+library(vtable)
+library(rdrobust)
+```
+
+
+```{r}
+BastenBetz <- read_dta('BastenBetz.dta')
+```
+
+
+```{r}
+# Table 1
+T1 <- BastenBetz %>%
+    filter(abs(borderdis) < 5.0283684) %>%
+    transmute(
+        group = ifelse(vaud == 1, "T", "C"),
+        prot1980s = prot1980s * 100,
+        reineink = reineink_pc_mean * 1000,
+        noreligion1980s,
+        altitude, 
+        pfl, 
+        pfr, 
+        pfi,
+        gini = Ecoplan_gini
+    ) %>%
+    group_by(group) %>%
+    summarise(
+      across(everything(), list(Mean = mean, SD = sd, N = length))
+      ) %>%
+    pivot_longer(
+      -group, 
+      names_to = c("variable", "statistic"), 
+      names_sep = "_"
+    )
+```
+
+```{r}
+T1_wider <- T1 %>% 
+    pivot_wider(
+        names_from = c("group", "statistic")
+    )
+```
+
+```{r}
+#| label: tbl-sumstat
+#| tbl-cap: "Datensatz `BastenBetz` -- Zusammenfassende Statistiken"
+T1_wider %>%
+  gt(rowname_col = "Variable") %>% 
+  tab_spanner_delim(
+    delim = "_",
+  ) %>%
+ tabopts
+```
+
+Imbens und Kalyanaraman [-@ImbensKalyanaraman2012] zeigen
+
+```{r}
+bw_selection <- rdbwselect(
+  y = BastenBetz$pfl,
+  x = BastenBetz$borderdis,
+  fuzzy = BastenBetz$prot1980s, 
+  bwselect = "mserd", 
+  kernel = "uniform") 
+
+summary(bw_selection)
+
+OB <- bw_selection$bws[1]
+```
+
+```{r}
+# Table 2: First stage results 
+# (1) (close to the) Imbens and Kalyanaraman (2012) optimal BW of 5.01 reported in
+# the paper
+FS1 <- lm(
+  formula = prot1980s ~ vaud + borderdis + vaud * borderdis, 
+  data = BastenBetz %>% filter(abs(borderdis) < OB)
+  )
+
+# (2) Constant BW: 10
+FS2 <- lm(
+  formula = prot1980s ~ vaud + borderdis + vaud * borderdis, 
+  data = BastenBetz %>% filter(abs(borderdis) < 10)
+  )
+
+# (3)  Constant BW: 20
+FS3 <- lm(
+  formula = prot1980s ~ vaud + borderdis + vaud * borderdis, 
+  data = BastenBetz %>% filter(abs(borderdis) < 20)
+  )
+```
+
+
+```{r}
+modelsummary::modelsummary(
+  list(FS1, FS2, FS3), 
+  vcov = "HC1", stars = T, gof_map = "nobs", output = "gt"
+) %>%
+  tabopts()
+```
+
+
+```{r}
+#| layout-ncol: 2
+#| fig-width: 3
+#| fig-height: 3
+# Figure 3
+rdrobust::rdplot(y = BastenBetz$prot1980s, 
+                 x = BastenBetz$borderdis, 
+                 h = c(OB, OB), 
+                 p = 1, 
+                 nbins = c(6, 14), 
+                 masspoints = "off")
+
+rdrobust::rdplot(y = BastenBetz$prot1980s, 
+                 x = BastenBetz$borderdis, 
+                 h = c(10, 10), 
+                 p = 1, 
+                 nbins = c(6, 14),
+                  masspoints = "off")
+
+rdrobust::rdplot(y = BastenBetz$prot1980s, 
+                 x = BastenBetz$borderdis, 
+                 h = c(20, 20), 
+                 p = 1, 
+                 nbins = c(6, 14),
+                  masspoints = "off")
+
+rdrobust::rdplot(y = BastenBetz$prot1980s, 
+                 x = BastenBetz$borderdis, 
+                 p = 1, 
+                 nbins = c(6, 14),
+                 masspoints = "off")
+```
+
+
+

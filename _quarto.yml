@@ -1,0 +1,43 @@
+project:
+  type: book
+  output-dir: "_book"
+
+book:
+  title: "Kausalanalyse und Machine Learning in R"
+  subtitle: "Ein Leitfaden für reproduzierbare Forschung"
+  reader-mode: true
+  author: "Martin C. Arnold, Christoph Hanck"
+  date: "November 2022"
+  chapters:
+    - index.qmd
+    - R_Einfuehrung.qmd
+    - RDD.qmd
+    - summary.qmd
+    - Literatur.qmd
+  repo-branch: main
+  repo-actions: [edit, issue]
+  cookie-consent: false
+  sidebar:
+    title: "<a href='/index.html'>Kausalanalyse mit R</a>"
+
+bibliography: references.bib
+
+format:
+  html: 
+    grid: 
+      body-width: 890px
+    theme: cosmo
+    cap-location: margin
+    code-link: true
+    toc: true
+    toc-location: right
+    toc-title: "<a href='/index.html'>Übersicht</a>"
+    reference-location: margin
+    include-in-header:
+      file: 'mathjax.html'
+  pdf:
+    documentclass: scrreprt
+
+
+editor: visual
+

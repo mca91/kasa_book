@@ -1,0 +1,131 @@
+# Statistische Programmierung mit R
+
+```{r}
+#| results: "asis"
+#| echo: false
+source("setup.R")
+```
+
+Dieses Kapitel ist *nicht* als umfassende Einführung in R gedacht, sondern behandelt Kernkonzepte und soll der Selbsteinschätzung dienen. Wenngleich die Inhalte deutlich über ein Hallo-Welt-Beispiel^[https://de.wikipedia.org/wiki/Hallo-Welt-Programm] hinausgehen, betrachten wir hier **absolutes Basiswissen**. Dieses ist Vorraussetzung für das Verständnis fortgeschrittener Konzepte in späteren Kapitel. Falls Sie bereits über solide Grundkenntnisse im Umgang mit R verfügen, können Sie problemlos zu Kapitel XYZ springen. Sollten Sie nicht oder nur teilweise mit den hier gezeigten Befehlen vertraut sein, empfiehlt sich eine Erarbeitung bzw. Wiederholung der Grundlagen. Nachstehede Ressourcen finden wir hilfreich:
+
+- Feedbackgestütze interaktive Übungsaufgaben bei DataCamp, bspw. [Einführung in R](https://campus.datacamp.com/courses/einfuhrung-in-r/)^[Ein Teil des hier angebotenen Katalogs (exlusive *Einführung in R*) ist kostenpflichtig.]
+
+- Open-source-Literatur wie der Umfangreiche Leitfaden von [Ellis und Mayer (2023)](https://methodenlehre.github.io/einfuehrung-in-R/).
+
+```{=html}
+<button class="btn btn-outline-primary btn-sm run" disabled type="button" id="runButton" style="width:auto; border-radius:15px 15px 0 0;">
+R lädt, etwas Geduld bitte...
+</button>
+<div id="editor" style="margin-bottom:15px"></div>
+<pre><code id="out" style="font-size:16px"></code></pre>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/eclipse.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/r/r.js"></script>
+
+<script type="module">
+
+  const editor = CodeMirror((elt) => {
+    elt.style.border = '2px solid #eee';
+    elt.style.borderRadius = "0 0 15px 15px";
+    elt.style.height = 'auto';
+    elt.style.fontSize = '16px';
+    document.getElementById('editor').append(elt);
+  },{
+    value: 'fit <- lm(mpg ~ am, data=mtcars)\nsummary(123)',
+    lineNumbers: true,
+    matchBrackets: true,
+    mode: 'r',
+    theme: 'eclipse',
+    viewportMargin: Infinity,
+  });
+  
+  import { WebR } from 'https://webr.r-wasm.org/v0.1.0/webr.mjs';
+  const webR = new WebR();
+  await webR.init();
+  const shelter = await new webR.Shelter();
+  async function runR() {
+    let code = editor.getValue();
+    const result = await shelter.captureR(code, {
+      withAutoprint: true,
+      captureStreams: true,
+      captureConditions: false
+    });
+    try {
+      const out = result.output.filter(
+        evt => evt.type == 'stdout' || evt.type == 'stderr'
+      ).map((evt) => evt.data);
+      document.getElementById('out').innerText = out.join('\n');
+    } finally {
+      shelter.purge();
+    }
+  }
+  
+  document.getElementById('runButton').onclick = runR;
+  document.getElementById('runButton').innerText = 'R-Code ausführen';
+  document.getElementById('runButton').disabled = false;
+    
+</script>
+```
+
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+<i class="fa-brands fa-github"></i>
+
+```{=html}
+<button class="btn btn-outline-primary btn-sm run" id="runButton2" disabled type="button" style="width:auto; border-radius:15px 15px 0 0;">
+Lade Pakete, etwas Geduld bitte...  <i class="fas fa-cog fa-spin"></i>
+</button>
+<div id="editortwo" style="margin-bottom:15px"></div>
+<pre><code id="out2" style="font-size:16px"></code></pre>
+
+<script type="module">
+
+  const editortwo = CodeMirror((elt) => {
+    elt.style.border = '2px solid #eee';
+    elt.style.borderRadius = "0 0 15px 15px";
+    elt.style.height = 'auto';
+    elt.style.fontSize = '16px';
+    document.getElementById('editortwo').append(elt);
+  },{
+    value: 'library(ggplot2)\nhead(diamonds)',
+    lineNumbers: true,
+    matchBrackets: true,
+    mode: 'r',
+    theme: 'eclipse',
+    viewportMargin: Infinity,
+  });
+  
+  import { WebR } from 'https://webr.r-wasm.org/v0.1.0/webr.mjs';
+  const webR = new WebR();
+  await webR.init();
+  await webR.installPackages(['dplyr', 'ggplot2']);
+  const shelter = await new webR.Shelter();
+  async function runR() {
+    let code = editortwo.getValue();
+    const result = await shelter.captureR(code, {
+      withAutoprint: true,
+      captureStreams: true,
+      captureConditions: false
+    });
+    try {
+      const out = result.output.filter(
+        evt => evt.type == 'stdout' || evt.type == 'stderr'
+      ).map((evt) => evt.data);
+      document.getElementById('out2').innerText = out.join('\n');
+    } finally {
+      shelter.purge();
+    }
+  }
+  
+   document.getElementById('runButton2').onclick = runR;
+  document.getElementById('runButton2').innerText = 'R-Code ausführen';
+  document.getElementById('runButton2').disabled = false;
+  
+</script>
+```
+
+#### `r ttcode("R")` Basics {-}
+
+#### Pinguine und Pipes
+
