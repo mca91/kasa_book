@@ -3,7 +3,7 @@ runServer(host = "127.0.0.1", port = 8080,
           list(
             staticPaths = list(
               "/" = staticPath(
-                "./_book",
+                "./docs",
                 headers = list(
                   "Content-type" = "text/html; charset=utf-8",
                   "Cross-Origin-Opener-Policy" = "same-origin",
