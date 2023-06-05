@@ -43,4 +43,11 @@ write_lines(x = paste0('var house_binned = ', rjson::toJSON(house_binned), ';'),
 write_lines(x = paste0('var house = ', rjson::toJSON(house), ';'), file = 'datasets/house.js')
 
 
+lm(StimmenT ~ StimmenTm1 * D, data = house %>% mutate(D = StimmenTm1 >= 0)) %>% summary()
+lm(StimmenT ~ poly(StimmenTm1, raw = T, degree = 2) * D, 
+   data = house %>% mutate(D = StimmenTm1 >= 0))
+
+
+
+
 

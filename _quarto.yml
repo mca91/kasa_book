@@ -1,6 +1,6 @@
 project:
   type: book
-  output-dir: "_book"
+  output-dir: "_docs"
 
 book:
   title: "Kausalanalyse und Machine Learning in R"
