@@ -330,6 +330,17 @@ Diese Schätzung könnte jedoch invalide sein:
 round(rdd::IKbandwidth(X = house$StimmenTm1, Y = house$StimmenT), digits = 4)
 ```
 
+```{webr}
+IK_BW <- 0.2685
+
+house_poly_IK <- lm(
+  formula = StimmenT ~ D * poly(StimmenTm1, degree = 2, raw = T), 
+  data = house %>% filter()
+)
+  
+summary(house_poly_IK)
+```
+
 Die nachstehende interaktive Abbildung zeigt die klassierten Daten aus @Lee2008 auf dem Intervall $[-0.5,0.5]$ gemeinsam mit einer nicht-parametrischen Schätzung des Zusammenhangs von `StimmenT` und `StimmenTm1` mit LOESS.^[LOESS ist eine nicht-parametrische Regressionsmethode, die lokale Gewichte verwendet, um nicht-lineare Zusammenhänge zwischen Variablen zu modellieren und geglättete Funktionen anzupassen.] Über die Inputs kann eine gemeinsame Bandweite $l\in(0,1]$ für den LOESS-Schätzer auf beiden Seiten des Schwellenwerts 0 und die Bandweite der Daten ($h$) um den Schwellenwert angepasst werden. Beachte: 
 
 - Der geschätzte Zusammenhang ist etwa linear für die voreingestellten Parameter ($l = 1$, $h = 0.28$). 
