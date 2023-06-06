@@ -160,6 +160,7 @@ knitr::knit_engines$set(webr = function(options) {
 
 ```{r, echo=F}
 library(gt)
+library(tidyverse)
 # Formatierung von gt-Tabellen
 tabopts <- function(x) {
     fmt_number(x, decimals = 3, drop_trailing_zeros = T) %>%
@@ -170,6 +171,8 @@ tabopts <- function(x) {
              column_labels.font.weight = "bold", 
              table.font.color = "black", table.font.size = 16)
 }
+
+house <- read_csv("datasets/house.csv")
 ```
 
 Regression Discontinuity Design (RDD) ist ein Ansatz für die Schätzung von Treatment-Effekten mit Regression, wenn durch einen experimentell oder natürlich gegebenen Umstand die Behandlung an einem Schwellenwert ($C$) einer *Laufvariable* ($X$) sprunghaft beeinflusst wird. Ein RDD-Schätzer brücksichtigt lediglich Beobachtungen mit Ausprägungen von $X$, die knapp ober- oder knapp unterhalb von $C$ liegen. Die zentrale Idee hierbei ist, dass Individuen nahe bei $C$ im Durchschnitt ähnliche Merkmale aufweisen. RDD isoliert Variation auf dem Pfad *Oberhalb C &rarr; Treatment &rarr; Y*. Somit können Backdoor-Pfade über $X$ oder weitere (möglichweise unbeobachtbare) Confounder ($Z$) vermieden werden, siehe @fig-CDRDD.
@@ -244,6 +247,7 @@ das Kriterium für eine Berücksichtigung von Beobachtung $i$ bei der Schätzung
 #| fig-width: 3
 #| fig-height: 2.5
 #| code-fold: true
+#| message: false
 library(ggplot2)
 library(cowplot)
 ggplot() + 
@@ -320,9 +324,19 @@ Diese Schätzung könnte jedoch invalide sein:
 
 - Die (implizite) Wahl von $h=1$ macht die Isolation des relevanten Frontdoor-Paths ($C=0$ &rarr; Treatment &rarr; StimmenT) wenig plausibel.
 
-- Weiterhin könnte die lineare funktionale Form unser Regression für den gesamten Datensatz inadäquat sein: Die lineare Approximation könnte nur "lokal" zu 0 gut sein und anderweitig in einer verzerrten Schätzung des Effekts resultieren.
+- Weiterhin könnte die lineare funktionale Form unser Regression für den gesamten Datensatz inadäquat sein: Die lineare Approximation könnte lediglich "lokal" zu 0 gut sein und anderweitig in einer verzerrten Schätzung des Effekts resultieren.
 
+```{r}
+round(rdd::IKbandwidth(X = house$StimmenTm1, Y = house$StimmenT), digits = 4)
+```
 
+Die nachstehende interaktive Abbildung zeigt die klassierten Daten aus @Lee2008 auf dem Intervall $[-0.5,0.5]$ gemeinsam mit einer nicht-parametrischen Schätzung des Zusammenhangs von `StimmenT` und `StimmenTm1` mit LOESS.^[LOESS ist eine nicht-parametrische Regressionsmethode, die lokale Gewichte verwendet, um nicht-lineare Zusammenhänge zwischen Variablen zu modellieren und geglättete Funktionen anzupassen.] Über die Inputs kann eine gemeinsame Bandweite $l\in(0,1]$ für den LOESS-Schätzer auf beiden Seiten des Schwellenwerts 0 und die Bandweite der Daten ($h$) um den Schwellenwert angepasst werden. Beachte: 
+
+- Der geschätzte Zusammenhang ist etwa linear für die voreingestellten Parameter ($l = 1$, $h = 0.28$). 
+
+- Für kleine $l$ passt sich die Schätzung Besser an die Datenpunkte an. Zu kleine Werte führen jedoch zu *overfitting*. Insbesondere hat die geschätzte Funktion eine zu extreme Steigung nahe des Schwellenwerts &rarr; verzerrte Schätzung des Effekts!
+
+- Kleine Werte $h$ bedeuten eine geringe Datenbasis, sodass LOESS selbst bei großen $l$ zu nicht-linearen Anpassungen der Regressionsfunktion tendiert. Für solche Parameterkombinationen erfolgt die Schätzung des Effekts mit hoher Varianz. 
 
 ```{r, echo = F}
 house_binned <-  read.csv("datasets/house_binned.csv")
@@ -333,6 +347,8 @@ ojs_define(
  house = house
 )
 ```
+
+**FRDD mit Nicht-parametrischer Regression**
 
 ```{ojs}
 //| echo: false
@@ -362,15 +378,21 @@ circle {
 
 d3 = require("d3-array@3", "d3-axis@3", "d3-regression@1", "d3-scale@4", "d3-shape@3", "d3-selection@3")
 
-margin = ({left: 33, right: 8, top: 13, bottom: 24});
+margin = ({left: 55, right: 8, top: 13, bottom: 24});
 base = Math.min(width, 500);
 innerWidth = base - margin.left - margin.right;
 innerHeight = base-100 - margin.top - margin.bottom;
 
-viewof bandwidth = Inputs.range([.01, .5], {
-  label: "Bandweite LOESS",
+viewof bandwidth = Inputs.range([.01, 1], {
+  label: "Bandweite LOESS (l)",
   step: .01,
-  value: .25
+  value: 1
+});
+
+viewof bw_daten = Inputs.range([.05, .5], {
+  label: "Bandweite Daten (h)",
+  step: .01,
+  value: .28
 });
 
 xScaleLoess = d3.scaleLinear()
@@ -406,7 +428,7 @@ loessRegression = d3.regressionLoess()
 //| fig-cap: "Nicht-parametrische Regression auf beiden Seiten des Cut-offs."
 
 {
-  const svg = d3.select(DOM.svg(innerWidth + margin.left + margin.right, innerHeight + margin.top + margin.bottom))
+  const svg = d3.select(DOM.svg(innerWidth + margin.left + margin.right + 20, innerHeight + margin.top + margin.bottom + 20))
   
   const g = svg.append("g")
       .attr("transform", `translate(${margin.left}, ${margin.top})`);
@@ -420,6 +442,32 @@ loessRegression = d3.regressionLoess()
     .attr("transform", `translate(${innerWidth})`)
     .call(yAxisLoess);
 
+  // Add X axis label:
+  g.append("text")
+    .attr("text-anchor", "end")
+    .attr("font-size", 13)
+    .attr("x", innerWidth)
+    .attr("y", innerHeight + margin.top + 25)
+    .text("Stimmenanteil Demokraten letzte Wahl");
+
+  // Y axis label:
+  g.append("text")
+    .attr("text-anchor", "end")
+    .attr("transform", "rotate(-90)")
+    .attr("font-size", 13)
+    .attr("y", -margin.left+10)
+    .attr("x", -margin.top+10)
+    .text("Stimmenanteil Demokraten");
+
+  // Distance at jump
+  g.append("text")
+   .attr("x", 250) // x-Position des Textelements
+   .attr("y", 200) // y-Position des Textelements
+   .text("") // Textinhalt
+   .attr("font-size", "14px") // Schriftgröße
+   .attr("fill", "black"); // Textfarbe
+
+
   g.selectAll("circle")
     .data(transpose(house_binned))
     .enter().append("circle")
@@ -431,26 +479,49 @@ loessRegression = d3.regressionLoess()
       .attr("class", "regression")
       .datum(loessRegression(
         transpose(house)
-          .filter(function(d){ return d.StimmenTm1 < 0 & d.StimmenTm1 >= -.5 })
+          .filter(function(d){ return d.StimmenTm1 <= 0 & d.StimmenTm1 >= -bw_daten })
           )
         )
-      .attr("d", lineLoess);
-  
+      .attr("d", lineLoess)
+      .style("stroke", "red");
+
   g.append("path")
       .attr("class", "regression")
       .datum(loessRegression(
         transpose(house)
-          .filter(function(d){ return d.StimmenTm1 >= 0 & d.StimmenTm1 <= .5 })
+          .filter(function(d){ return d.StimmenTm1 > 0 & d.StimmenTm1 <= bw_daten })
           )
         )
-      .attr("d", lineLoess);
+      .attr("d", lineLoess)
+      .style("stroke", "red");
   
+  /* dashed line at cutoff */
   g.append("line")
   .attr("x1", xScaleLoess(0))
   .attr("y1", 0)
   .attr("x2", xScaleLoess(0))
   .attr("y2", innerHeight)
   .style("stroke", "black")
+  .style("stroke-dasharray", "1")
+  .style("stroke-width", "1");
+  
+  /* dashed line data bw upper */
+  g.append("line")
+  .attr("x1", xScaleLoess(bw_daten))
+  .attr("y1", 0)
+  .attr("x2", xScaleLoess(bw_daten))
+  .attr("y2", innerHeight)
+  .style("stroke", "blue")
+  .style("stroke-dasharray", "4")
+  .style("stroke-width", "1");
+  
+  /* dashed line data bw lower */
+  g.append("line")
+  .attr("x1", xScaleLoess(-bw_daten))
+  .attr("y1", 0)
+  .attr("x2", xScaleLoess(-bw_daten))
+  .attr("y2", innerHeight)
+  .style("stroke", "blue")
   .style("stroke-dasharray", "4")
   .style("stroke-width", "1");
 
@@ -458,59 +529,9 @@ loessRegression = d3.regressionLoess()
 }
 ```
 
+## Fuzzy Regression Discontinuity Design
 
-```{webr}
-mlda <- mlda %>%
-  mutate(
-    sameS_fit = predict(drink_mod)
-  )
-```
-
-```{webr}
-mlda %>% 
-    ggplot(aes(x = agecell, y = all, color = D)) +
-    geom_point() + 
-    geom_line(
-        data = mlda %>% filter(D == "Ja"), aes(y = sameS_fit)
-    ) +
-    geom_line(
-        data = mlda %>% filter(D == "Nein"), aes(y = sameS_fit)
-    )
-```
-
-```{webr}
-drink_mod_DiffSlope <- lm(
-  formula = all ~ D * I(agecell - 21),
-  data = mlda
-)
-  
-summary(drink_mod_DiffSlope)
-```
-
-```{webr}
-mlda <- mlda %>%
-  mutate(
-    diffS_fit = predict(drink_mod_DiffSlope)
-  )
-```
-
-```{webr}
-mlda %>% 
-    ggplot(aes(x = agecell, y = all, color = D)) +
-    geom_point() + 
-    geom_line(
-        data = mlda %>% filter(D == "Ja"), aes(y = diffS_fit)
-    ) +
-    geom_line(
-        data = mlda %>% filter(D == "Nein"), aes(y = diffS_fit)
-    )
-```
-
-
-Carpenter und Dobkin [-@CarpenterDobkin2009] untersuchen den Zusammenhang zwischen Alkoholkonsum und Sterblichkeit mit einem RDD.^[Die Studie sowie die Daten sind [hier](https://www.aeaweb.org/articles?id=10.1257/app.1.1.164) abrufbar.] Die Autoren nutzen Variation im gesetzliche Mindestalter für Alkoholkonsum zwischen US-Bundesstaaten: Hierbei ist Alter die Laufvariable und des Mindestalter der Schwellenwert. Personen, die knapp über dem Mindestalter liegen und daher legal Alkohol konsumieren dürfen, weisen ähnliche Merkmale auf wie Personen knapp unter dem Mindestalter, so dass Backdoors vermieden werden. 
-
-Die Ergebnisse der Studie zeigen, dass der Übergang zum legalen Alkoholkonsum im erlaubten Alter zu einem signifikanten Anstieg der Sterblichkeit führt. Insbesondere stellen die Autoren fest, dass junge Menschen, die legal Alkohol trinken dürfen, ein höheres Risiko haben, an alkoholbedingten Todesfällen zu sterben, im Vergleich zu Personen knapp unter dem Mindestalter.
-
+TBD
 
 ## Case Study: Protestantische Arbeitsethik
 
@@ -518,11 +539,11 @@ Die Ergebnisse der Studie zeigen, dass der Übergang zum legalen Alkoholkonsum i
 knitr::opts_chunk$set(fig.align = 'center', warning = F, message = F)
 ```
 
-Die Studie *Beyond Work Ethic: Religion, Individual, and Political Preferences* von Christoph Basten und Frank Betz aus dem Jahr 2013 untersucht den Zusammenhang zwischen Religion, individuellen Merkmalen und politischen Präferenzen. Das Hauptaugenmerk liegt dabei auf der Rolle der Religiosität als Einflussfaktor auf politische Einstellungen.
+Die Studie *Beyond Work Ethic: Religion, Individual, and Political Preferences* [@BastenBetz2013] untersucht den Zusammenhang zwischen Religion, individuellen Merkmalen und politischen Präferenzen. Das Hauptaugenmerk ist die Rolle von Religiosität als Einflussfaktor auf politische Einstellungen. Die Hypothese ist, das Religiosität eines Individuums über den traditionellen Rahmen von Moralvorstellungen und sozialen Normen hinaus auch politische Präferenzen beeinflusst. Diese Theorie wird prominent von Max Weber (1930) vertreten, der argumentiert, dass die protestantische Arbeitsethik einen entscheidenden Einfluss auf die Entwicklung des Kapitalismus hatte. Laut Weber führte der protestantische Glaube an harte Arbeit, ein sparsames Leben und ethisches Verhalten zur einer verbreiteten "Geisteshaltung" , die den wirtschaftlichen Erfolg förderte und den Aufstieg des Kapitalismus begünstigte.
 
-Die Autoren argumentieren, dass die Religiosität eines Individuums über den traditionellen Rahmen von Moralvorstellungen und sozialen Normen hinausgeht und auch politische Präferenzen beeinflussen kann. Sie behaupten, dass die Religion eine eigenständige Dimension darstellt, die das politische Verhalten und die Einstellungen einer Person mitgestaltet.
+@BastenBetz2013 nutzen Daten aus dem World Values Survey,
 
-Um ihre Hypothesen zu testen, nutzen Basten und Betz Daten aus dem World Values Survey, einer internationalen Umfrage, die verschiedene Aspekte von Werten und Einstellungen untersucht. Sie analysieren insbesondere die Zusammenhänge zwischen Religiosität, individuellen Merkmalen wie Geschlecht, Bildung und Einkommen sowie politischen Präferenzen wie links-rechts-Ausrichtung, Einstellungen zur Umverteilung und zur Einwanderung.
+Sie analysieren insbesondere die Zusammenhänge zwischen Religiosität, individuellen Merkmalen wie Geschlecht, Bildung und Einkommen sowie politischen Präferenzen wie links-rechts-Ausrichtung, Einstellungen zur Umverteilung und zur Einwanderung.
 
 Die Ergebnisse der Studie zeigen, dass Religiosität tatsächlich einen signifikanten Einfluss auf politische Präferenzen hat. Insbesondere stellen die Autoren fest, dass religiöse Menschen tendenziell konservativere Einstellungen haben und eher rechten politischen Parteien zuneigen. Dieser Effekt bleibt auch nach Kontrolle anderer Faktoren wie Bildung und Einkommen bestehen.
 

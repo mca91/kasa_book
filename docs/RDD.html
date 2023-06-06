@@ -199,7 +199,8 @@ div.csl-indent {
 <li><a href="#beispiel-amtsinhaber-vorteil-lee2008" id="toc-beispiel-amtsinhaber-vorteil-lee2008" class="nav-link" data-scroll-target="#beispiel-amtsinhaber-vorteil-lee2008"><span class="header-section-number">2.1.1</span> Beispiel: Amtsinhaber-Vorteil <span class="citation" data-cites="Lee2008">(Lee 2008)</span></a></li>
   </ul>
 </li>
-  <li><a href="#case-study-protestantische-arbeitsethik" id="toc-case-study-protestantische-arbeitsethik" class="nav-link" data-scroll-target="#case-study-protestantische-arbeitsethik"><span class="header-section-number">2.2</span> Case Study: Protestantische Arbeitsethik</a></li>
+  <li><a href="#fuzzy-regression-discontinuity-design" id="toc-fuzzy-regression-discontinuity-design" class="nav-link" data-scroll-target="#fuzzy-regression-discontinuity-design"><span class="header-section-number">2.2</span> Fuzzy Regression Discontinuity Design</a></li>
+  <li><a href="#case-study-protestantische-arbeitsethik" id="toc-case-study-protestantische-arbeitsethik" class="nav-link" data-scroll-target="#case-study-protestantische-arbeitsethik"><span class="header-section-number">2.3</span> Case Study: Protestantische Arbeitsethik</a></li>
   </ul></nav>
     </div>
 <!-- main -->
@@ -257,7 +258,25 @@ div.csl-indent {
 
 </div>
 <div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.2     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.0
+✔ ggplot2   3.4.2     ✔ tibble    3.2.1
+✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+✔ purrr     1.0.1     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
+Rows: 6558 Columns: 2
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+dbl (2): StimmenTm1, StimmenT
 
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
 </div>
 <p>Regression Discontinuity Design (RDD) ist ein Ansatz für die Schätzung von Treatment-Effekten mit Regression, wenn durch einen experimentell oder natürlich gegebenen Umstand die Behandlung an einem Schwellenwert (<span class="math inline">\(C\)</span>) einer <em>Laufvariable</em> (<span class="math inline">\(X\)</span>) sprunghaft beeinflusst wird. Ein RDD-Schätzer brücksichtigt lediglich Beobachtungen mit Ausprägungen von <span class="math inline">\(X\)</span>, die knapp ober- oder knapp unterhalb von <span class="math inline">\(C\)</span> liegen. Die zentrale Idee hierbei ist, dass Individuen nahe bei <span class="math inline">\(C\)</span> im Durchschnitt ähnliche Merkmale aufweisen. RDD isoliert Variation auf dem Pfad <em>Oberhalb C → Treatment → Y</em>. Somit können Backdoor-Pfade über <span class="math inline">\(X\)</span> oder weitere (möglichweise unbeobachtbare) Confounder (<span class="math inline">\(Z\)</span>) vermieden werden, siehe <a href="#fig-CDRDD">Abbildung&nbsp;<span>2.1</span></a>.</p>
 <div class="cell page-columns page-full" data-fig-width="5" data-fig-height="3" data-layout-align="center">
@@ -330,7 +349,7 @@ Y_i = \beta_0 + \beta_1 D_i + \beta_2 (X_i - C) + \beta_3(X_i-C)\times D_i + u_i
   \lvert(X_i-C)\rvert\leq h \label{eq:bwc}
 \end{align}\]</span> das Kriterium für eine Berücksichtigung von Beobachtung <span class="math inline">\(i\)</span> bei der Schätzung ist. Unter Berücksichtigung einer Bandweite <span class="math inline">\(h\)</span> wird der Regressionsansatz <span class="math inline">\(\eqref{eq:linearSRDD}\)</span> als <em>local linear regression</em> mit Uniform-Kernelfunktion bezeichnet.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> Der Uniform-Kernel ist neben dem Triangular-Kernel eine häufig in der Praxis genutzte lineare Kernelfunktion.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> Der nachstehende Code plottet die Uniform- (grün) sowie die Triangular-Kernelfunktion (blau) wie in <a href="#fig-linearkern">Abbildung&nbsp;<span>2.2</span></a> dargestellt.</p><div class="no-row-height column-margin column-container"><li id="fn2"><p><sup>2</sup>&nbsp;<em>Local regression</em> ist ein nicht-parametrisches Verfahren. Hierbei kann die Beziehung zwischen Variablen flexibel modelliert werden.</p></li><li id="fn3"><p><sup>3</sup>&nbsp;In der Praxis wird oftmals local linear regression mit linearen Kernelfunktionen zurückgegriffen und die Robustheit der Ergebnisse anhand flexiblerer Spezifikationen geprüft.</p></li></div></div>
 <div class="cell page-columns page-full">
-<details><summary>Code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
+<details><summary>Code</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/">cowplot</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_function.html">geom_function</a></span><span class="op">(</span></span>
@@ -714,35 +733,48 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
 <p>Der geschätzte Koeffizient von <span class="math inline">\(D\)</span> (<code>DTRUE</code>) beträgt etwa 0.12 und ist hochsignifikant. Übereinstimmend mit der (oben erstellten) Grafik erhalten wir also eine positive Schätzung des Treatment-Effekts. Diese Schätzung könnte jedoch invalide sein:</p>
 <ul>
 <li><p>Die (implizite) Wahl von <span class="math inline">\(h=1\)</span> macht die Isolation des relevanten Frontdoor-Paths (<span class="math inline">\(C=0\)</span> → Treatment → StimmenT) wenig plausibel.</p></li>
-<li><p>Weiterhin könnte die lineare funktionale Form unser Regression für den gesamten Datensatz inadäquat sein: Die lineare Approximation könnte nur “lokal” zu 0 gut sein und anderweitig in einer verzerrten Schätzung des Effekts resultieren.</p></li>
+<li><p>Weiterhin könnte die lineare funktionale Form unser Regression für den gesamten Datensatz inadäquat sein: Die lineare Approximation könnte lediglich “lokal” zu 0 gut sein und anderweitig in einer verzerrten Schätzung des Effekts resultieren.</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu">rdd</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rdd/man/IKbandwidth.html">IKbandwidth</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">house</span><span class="op">$</span><span class="va">StimmenTm1</span>, Y <span class="op">=</span> <span class="va">house</span><span class="op">$</span><span class="va">StimmenT</span><span class="op">)</span>, digits <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.2685</code></pre>
+</div>
+</div>
+<div class="page-columns page-full"><p>Die nachstehende interaktive Abbildung zeigt die klassierten Daten aus <span class="citation" data-cites="Lee2008">Lee (<a href="Literatur.html#ref-Lee2008" role="doc-biblioref">2008</a>)</span> auf dem Intervall <span class="math inline">\([-0.5,0.5]\)</span> gemeinsam mit einer nicht-parametrischen Schätzung des Zusammenhangs von <code>StimmenT</code> und <code>StimmenTm1</code> mit LOESS.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> Über die Inputs kann eine gemeinsame Bandweite <span class="math inline">\(l\in(0,1]\)</span> für den LOESS-Schätzer auf beiden Seiten des Schwellenwerts 0 und die Bandweite der Daten (<span class="math inline">\(h\)</span>) um den Schwellenwert angepasst werden. Beachte:</p><div class="no-row-height column-margin column-container"><li id="fn4"><p><sup>4</sup>&nbsp;LOESS ist eine nicht-parametrische Regressionsmethode, die lokale Gewichte verwendet, um nicht-lineare Zusammenhänge zwischen Variablen zu modellieren und geglättete Funktionen anzupassen.</p></li></div></div>
+<ul>
+<li><p>Der geschätzte Zusammenhang ist etwa linear für die voreingestellten Parameter (<span class="math inline">\(l = 1\)</span>, <span class="math inline">\(h = 0.28\)</span>).</p></li>
+<li><p>Für kleine <span class="math inline">\(l\)</span> passt sich die Schätzung Besser an die Datenpunkte an. Zu kleine Werte führen jedoch zu <em>overfitting</em>. Insbesondere hat die geschätzte Funktion eine zu extreme Steigung nahe des Schwellenwerts → verzerrte Schätzung des Effekts!</p></li>
+<li><p>Kleine Werte <span class="math inline">\(h\)</span> bedeuten eine geringe Datenbasis, sodass LOESS selbst bei großen <span class="math inline">\(l\)</span> zu nicht-linearen Anpassungen der Regressionsfunktion tendiert. Für solche Parameterkombinationen erfolgt die Schätzung des Effekts mit hoher Varianz.</p></li>
 </ul>
 <div class="cell">
 
 </div>
+<p><strong>FRDD mit Nicht-parametrischer Regression</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code hidden" id="cb2" data-startfrom="339" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 338;"><span id="cb2-339"><a href="#cb2-339" aria-hidden="true" tabindex="-1"></a><span class="fu">html</span><span class="vs">`</span></span>
-<span id="cb2-340"><a href="#cb2-340" aria-hidden="true" tabindex="-1"></a><span class="vs">&lt;style&gt;</span></span>
-<span id="cb2-341"><a href="#cb2-341" aria-hidden="true" tabindex="-1"></a><span class="vs">circle {</span></span>
-<span id="cb2-342"><a href="#cb2-342" aria-hidden="true" tabindex="-1"></a><span class="vs">  fill-opacity: .8;</span></span>
-<span id="cb2-343"><a href="#cb2-343" aria-hidden="true" tabindex="-1"></a><span class="vs">  stroke: #000;</span></span>
-<span id="cb2-344"><a href="#cb2-344" aria-hidden="true" tabindex="-1"></a><span class="vs">  stroke-opacity: 1;</span></span>
-<span id="cb2-345"><a href="#cb2-345" aria-hidden="true" tabindex="-1"></a><span class="vs">}</span></span>
-<span id="cb2-346"><a href="#cb2-346" aria-hidden="true" tabindex="-1"></a><span class="vs">.regression {</span></span>
-<span id="cb2-347"><a href="#cb2-347" aria-hidden="true" tabindex="-1"></a><span class="vs">  fill: none;</span></span>
-<span id="cb2-348"><a href="#cb2-348" aria-hidden="true" tabindex="-1"></a><span class="vs">  stroke: #000;</span></span>
-<span id="cb2-349"><a href="#cb2-349" aria-hidden="true" tabindex="-1"></a><span class="vs">  stroke-width: 1.5px;</span></span>
-<span id="cb2-350"><a href="#cb2-350" aria-hidden="true" tabindex="-1"></a><span class="vs">}</span></span>
-<span id="cb2-351"><a href="#cb2-351" aria-hidden="true" tabindex="-1"></a><span class="vs">.axis line {</span></span>
-<span id="cb2-352"><a href="#cb2-352" aria-hidden="true" tabindex="-1"></a><span class="vs">  stroke: #ddd;</span></span>
-<span id="cb2-353"><a href="#cb2-353" aria-hidden="true" tabindex="-1"></a><span class="vs">}</span></span>
-<span id="cb2-354"><a href="#cb2-354" aria-hidden="true" tabindex="-1"></a><span class="vs">.axis .baseline line {</span></span>
-<span id="cb2-355"><a href="#cb2-355" aria-hidden="true" tabindex="-1"></a><span class="vs">  stroke: #555;</span></span>
-<span id="cb2-356"><a href="#cb2-356" aria-hidden="true" tabindex="-1"></a><span class="vs">}</span></span>
-<span id="cb2-357"><a href="#cb2-357" aria-hidden="true" tabindex="-1"></a><span class="vs">.axis .domain {</span></span>
-<span id="cb2-358"><a href="#cb2-358" aria-hidden="true" tabindex="-1"></a><span class="vs">  display: none;</span></span>
-<span id="cb2-359"><a href="#cb2-359" aria-hidden="true" tabindex="-1"></a><span class="vs">} </span></span>
-<span id="cb2-360"><a href="#cb2-360" aria-hidden="true" tabindex="-1"></a><span class="vs">&lt;/style&gt;</span></span>
-<span id="cb2-361"><a href="#cb2-361" aria-hidden="true" tabindex="-1"></a><span class="vs">`</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code hidden" id="cb5" data-startfrom="355" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 354;"><span id="cb5-355"><a href="#cb5-355" aria-hidden="true" tabindex="-1"></a><span class="fu">html</span><span class="vs">`</span></span>
+<span id="cb5-356"><a href="#cb5-356" aria-hidden="true" tabindex="-1"></a><span class="vs">&lt;style&gt;</span></span>
+<span id="cb5-357"><a href="#cb5-357" aria-hidden="true" tabindex="-1"></a><span class="vs">circle {</span></span>
+<span id="cb5-358"><a href="#cb5-358" aria-hidden="true" tabindex="-1"></a><span class="vs">  fill-opacity: .8;</span></span>
+<span id="cb5-359"><a href="#cb5-359" aria-hidden="true" tabindex="-1"></a><span class="vs">  stroke: #000;</span></span>
+<span id="cb5-360"><a href="#cb5-360" aria-hidden="true" tabindex="-1"></a><span class="vs">  stroke-opacity: 1;</span></span>
+<span id="cb5-361"><a href="#cb5-361" aria-hidden="true" tabindex="-1"></a><span class="vs">}</span></span>
+<span id="cb5-362"><a href="#cb5-362" aria-hidden="true" tabindex="-1"></a><span class="vs">.regression {</span></span>
+<span id="cb5-363"><a href="#cb5-363" aria-hidden="true" tabindex="-1"></a><span class="vs">  fill: none;</span></span>
+<span id="cb5-364"><a href="#cb5-364" aria-hidden="true" tabindex="-1"></a><span class="vs">  stroke: #000;</span></span>
+<span id="cb5-365"><a href="#cb5-365" aria-hidden="true" tabindex="-1"></a><span class="vs">  stroke-width: 1.5px;</span></span>
+<span id="cb5-366"><a href="#cb5-366" aria-hidden="true" tabindex="-1"></a><span class="vs">}</span></span>
+<span id="cb5-367"><a href="#cb5-367" aria-hidden="true" tabindex="-1"></a><span class="vs">.axis line {</span></span>
+<span id="cb5-368"><a href="#cb5-368" aria-hidden="true" tabindex="-1"></a><span class="vs">  stroke: #ddd;</span></span>
+<span id="cb5-369"><a href="#cb5-369" aria-hidden="true" tabindex="-1"></a><span class="vs">}</span></span>
+<span id="cb5-370"><a href="#cb5-370" aria-hidden="true" tabindex="-1"></a><span class="vs">.axis .baseline line {</span></span>
+<span id="cb5-371"><a href="#cb5-371" aria-hidden="true" tabindex="-1"></a><span class="vs">  stroke: #555;</span></span>
+<span id="cb5-372"><a href="#cb5-372" aria-hidden="true" tabindex="-1"></a><span class="vs">}</span></span>
+<span id="cb5-373"><a href="#cb5-373" aria-hidden="true" tabindex="-1"></a><span class="vs">.axis .domain {</span></span>
+<span id="cb5-374"><a href="#cb5-374" aria-hidden="true" tabindex="-1"></a><span class="vs">  display: none;</span></span>
+<span id="cb5-375"><a href="#cb5-375" aria-hidden="true" tabindex="-1"></a><span class="vs">} </span></span>
+<span id="cb5-376"><a href="#cb5-376" aria-hidden="true" tabindex="-1"></a><span class="vs">&lt;/style&gt;</span></span>
+<span id="cb5-377"><a href="#cb5-377" aria-hidden="true" tabindex="-1"></a><span class="vs">`</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <div id="ojs-cell-1-1" data-nodetype="expression">
@@ -750,45 +782,51 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
 </div>
 </div>
 </div>
-<div class="sourceCode cell-code hidden" id="cb3" data-startfrom="363" data-source-offset="-271"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 362;"><span id="cb3-363"><a href="#cb3-363" aria-hidden="true" tabindex="-1"></a>d3 <span class="op">=</span> <span class="pp">require</span>(<span class="st">"d3-array@3"</span><span class="op">,</span> <span class="st">"d3-axis@3"</span><span class="op">,</span> <span class="st">"d3-regression@1"</span><span class="op">,</span> <span class="st">"d3-scale@4"</span><span class="op">,</span> <span class="st">"d3-shape@3"</span><span class="op">,</span> <span class="st">"d3-selection@3"</span>)</span>
-<span id="cb3-364"><a href="#cb3-364" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-365"><a href="#cb3-365" aria-hidden="true" tabindex="-1"></a>margin <span class="op">=</span> ({<span class="dt">left</span><span class="op">:</span> <span class="dv">33</span><span class="op">,</span> <span class="dt">right</span><span class="op">:</span> <span class="dv">8</span><span class="op">,</span> <span class="dt">top</span><span class="op">:</span> <span class="dv">13</span><span class="op">,</span> <span class="dt">bottom</span><span class="op">:</span> <span class="dv">24</span>})<span class="op">;</span></span>
-<span id="cb3-366"><a href="#cb3-366" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(width<span class="op">,</span> <span class="dv">500</span>)<span class="op">;</span></span>
-<span id="cb3-367"><a href="#cb3-367" aria-hidden="true" tabindex="-1"></a>innerWidth <span class="op">=</span> base <span class="op">-</span> margin<span class="op">.</span><span class="at">left</span> <span class="op">-</span> margin<span class="op">.</span><span class="at">right</span><span class="op">;</span></span>
-<span id="cb3-368"><a href="#cb3-368" aria-hidden="true" tabindex="-1"></a>innerHeight <span class="op">=</span> base<span class="op">-</span><span class="dv">100</span> <span class="op">-</span> margin<span class="op">.</span><span class="at">top</span> <span class="op">-</span> margin<span class="op">.</span><span class="at">bottom</span><span class="op">;</span></span>
-<span id="cb3-369"><a href="#cb3-369" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-370"><a href="#cb3-370" aria-hidden="true" tabindex="-1"></a>viewof bandwidth <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">range</span>([<span class="op">.</span><span class="bn">01</span><span class="op">,</span> <span class="op">.</span><span class="dv">5</span>]<span class="op">,</span> {</span>
-<span id="cb3-371"><a href="#cb3-371" aria-hidden="true" tabindex="-1"></a>  <span class="dt">label</span><span class="op">:</span> <span class="st">"Bandweite LOESS"</span><span class="op">,</span></span>
-<span id="cb3-372"><a href="#cb3-372" aria-hidden="true" tabindex="-1"></a>  <span class="dt">step</span><span class="op">:</span> <span class="op">.</span><span class="bn">01</span><span class="op">,</span></span>
-<span id="cb3-373"><a href="#cb3-373" aria-hidden="true" tabindex="-1"></a>  <span class="dt">value</span><span class="op">:</span> <span class="op">.</span><span class="dv">25</span></span>
-<span id="cb3-374"><a href="#cb3-374" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
-<span id="cb3-375"><a href="#cb3-375" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-376"><a href="#cb3-376" aria-hidden="true" tabindex="-1"></a>xScaleLoess <span class="op">=</span> d3<span class="op">.</span><span class="fu">scaleLinear</span>()</span>
-<span id="cb3-377"><a href="#cb3-377" aria-hidden="true" tabindex="-1"></a>   <span class="op">.</span><span class="fu">domain</span>([<span class="op">-.</span><span class="dv">55</span><span class="op">,</span> <span class="op">.</span><span class="dv">55</span>])</span>
-<span id="cb3-378"><a href="#cb3-378" aria-hidden="true" tabindex="-1"></a>   <span class="op">.</span><span class="fu">range</span>([<span class="dv">0</span><span class="op">,</span> innerWidth])<span class="op">;</span></span>
-<span id="cb3-379"><a href="#cb3-379" aria-hidden="true" tabindex="-1"></a>   </span>
-<span id="cb3-380"><a href="#cb3-380" aria-hidden="true" tabindex="-1"></a>yScaleLoess <span class="op">=</span> d3<span class="op">.</span><span class="fu">scaleLinear</span>()</span>
-<span id="cb3-381"><a href="#cb3-381" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">domain</span>([<span class="op">.</span><span class="dv">2</span><span class="op">,</span> <span class="op">.</span><span class="dv">8</span>])</span>
-<span id="cb3-382"><a href="#cb3-382" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">range</span>([innerHeight<span class="op">,</span> <span class="dv">0</span>])<span class="op">;</span></span>
-<span id="cb3-383"><a href="#cb3-383" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-384"><a href="#cb3-384" aria-hidden="true" tabindex="-1"></a>lineLoess <span class="op">=</span> d3<span class="op">.</span><span class="fu">line</span>()</span>
-<span id="cb3-385"><a href="#cb3-385" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">x</span>(d <span class="kw">=&gt;</span> <span class="fu">xScaleLoess</span>(d[<span class="dv">0</span>]))</span>
-<span id="cb3-386"><a href="#cb3-386" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">y</span>(d <span class="kw">=&gt;</span> <span class="fu">yScaleLoess</span>(d[<span class="dv">1</span>]))<span class="op">;</span></span>
-<span id="cb3-387"><a href="#cb3-387" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-388"><a href="#cb3-388" aria-hidden="true" tabindex="-1"></a>xAxisLoess <span class="op">=</span> d3<span class="op">.</span><span class="fu">axisBottom</span>(xScaleLoess)</span>
-<span id="cb3-389"><a href="#cb3-389" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">tickSize</span>(innerHeight <span class="op">+</span> <span class="dv">10</span>)</span>
-<span id="cb3-390"><a href="#cb3-390" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">tickValues</span>([<span class="op">-.</span><span class="dv">5</span><span class="op">,</span> <span class="op">-.</span><span class="dv">25</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="op">.</span><span class="dv">25</span><span class="op">,</span> <span class="op">.</span><span class="dv">5</span>])</span>
-<span id="cb3-391"><a href="#cb3-391" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">tickFormat</span>(d <span class="kw">=&gt;</span> d)<span class="op">;</span></span>
-<span id="cb3-392"><a href="#cb3-392" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-393"><a href="#cb3-393" aria-hidden="true" tabindex="-1"></a>yAxisLoess <span class="op">=</span> d3<span class="op">.</span><span class="fu">axisLeft</span>(yScaleLoess)</span>
-<span id="cb3-394"><a href="#cb3-394" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">tickSize</span>(innerWidth <span class="op">+</span> <span class="dv">10</span>)</span>
-<span id="cb3-395"><a href="#cb3-395" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">tickValues</span>([<span class="op">.</span><span class="dv">2</span><span class="op">,</span> <span class="op">.</span><span class="dv">35</span><span class="op">,</span> <span class="op">.</span><span class="dv">5</span><span class="op">,</span> <span class="op">.</span><span class="dv">65</span><span class="op">,</span> <span class="op">.</span><span class="dv">8</span>])</span>
-<span id="cb3-396"><a href="#cb3-396" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">tickFormat</span>(d <span class="kw">=&gt;</span> d)<span class="op">;</span></span>
-<span id="cb3-397"><a href="#cb3-397" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-398"><a href="#cb3-398" aria-hidden="true" tabindex="-1"></a>loessRegression <span class="op">=</span> d3<span class="op">.</span><span class="fu">regressionLoess</span>()</span>
-<span id="cb3-399"><a href="#cb3-399" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">x</span>(d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">StimmenTm1</span>)</span>
-<span id="cb3-400"><a href="#cb3-400" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">y</span>(d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">StimmenT</span>)</span>
-<span id="cb3-401"><a href="#cb3-401" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">bandwidth</span>(bandwidth)<span class="op">;</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code hidden" id="cb6" data-startfrom="379" data-source-offset="-271"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 378;"><span id="cb6-379"><a href="#cb6-379" aria-hidden="true" tabindex="-1"></a>d3 <span class="op">=</span> <span class="pp">require</span>(<span class="st">"d3-array@3"</span><span class="op">,</span> <span class="st">"d3-axis@3"</span><span class="op">,</span> <span class="st">"d3-regression@1"</span><span class="op">,</span> <span class="st">"d3-scale@4"</span><span class="op">,</span> <span class="st">"d3-shape@3"</span><span class="op">,</span> <span class="st">"d3-selection@3"</span>)</span>
+<span id="cb6-380"><a href="#cb6-380" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-381"><a href="#cb6-381" aria-hidden="true" tabindex="-1"></a>margin <span class="op">=</span> ({<span class="dt">left</span><span class="op">:</span> <span class="dv">55</span><span class="op">,</span> <span class="dt">right</span><span class="op">:</span> <span class="dv">8</span><span class="op">,</span> <span class="dt">top</span><span class="op">:</span> <span class="dv">13</span><span class="op">,</span> <span class="dt">bottom</span><span class="op">:</span> <span class="dv">24</span>})<span class="op">;</span></span>
+<span id="cb6-382"><a href="#cb6-382" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(width<span class="op">,</span> <span class="dv">500</span>)<span class="op">;</span></span>
+<span id="cb6-383"><a href="#cb6-383" aria-hidden="true" tabindex="-1"></a>innerWidth <span class="op">=</span> base <span class="op">-</span> margin<span class="op">.</span><span class="at">left</span> <span class="op">-</span> margin<span class="op">.</span><span class="at">right</span><span class="op">;</span></span>
+<span id="cb6-384"><a href="#cb6-384" aria-hidden="true" tabindex="-1"></a>innerHeight <span class="op">=</span> base<span class="op">-</span><span class="dv">100</span> <span class="op">-</span> margin<span class="op">.</span><span class="at">top</span> <span class="op">-</span> margin<span class="op">.</span><span class="at">bottom</span><span class="op">;</span></span>
+<span id="cb6-385"><a href="#cb6-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-386"><a href="#cb6-386" aria-hidden="true" tabindex="-1"></a>viewof bandwidth <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">range</span>([<span class="op">.</span><span class="bn">01</span><span class="op">,</span> <span class="dv">1</span>]<span class="op">,</span> {</span>
+<span id="cb6-387"><a href="#cb6-387" aria-hidden="true" tabindex="-1"></a>  <span class="dt">label</span><span class="op">:</span> <span class="st">"Bandweite LOESS (l)"</span><span class="op">,</span></span>
+<span id="cb6-388"><a href="#cb6-388" aria-hidden="true" tabindex="-1"></a>  <span class="dt">step</span><span class="op">:</span> <span class="op">.</span><span class="bn">01</span><span class="op">,</span></span>
+<span id="cb6-389"><a href="#cb6-389" aria-hidden="true" tabindex="-1"></a>  <span class="dt">value</span><span class="op">:</span> <span class="dv">1</span></span>
+<span id="cb6-390"><a href="#cb6-390" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb6-391"><a href="#cb6-391" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-392"><a href="#cb6-392" aria-hidden="true" tabindex="-1"></a>viewof bw_daten <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">range</span>([<span class="op">.</span><span class="bn">05</span><span class="op">,</span> <span class="op">.</span><span class="dv">5</span>]<span class="op">,</span> {</span>
+<span id="cb6-393"><a href="#cb6-393" aria-hidden="true" tabindex="-1"></a>  <span class="dt">label</span><span class="op">:</span> <span class="st">"Bandweite Daten (h)"</span><span class="op">,</span></span>
+<span id="cb6-394"><a href="#cb6-394" aria-hidden="true" tabindex="-1"></a>  <span class="dt">step</span><span class="op">:</span> <span class="op">.</span><span class="bn">01</span><span class="op">,</span></span>
+<span id="cb6-395"><a href="#cb6-395" aria-hidden="true" tabindex="-1"></a>  <span class="dt">value</span><span class="op">:</span> <span class="op">.</span><span class="dv">28</span></span>
+<span id="cb6-396"><a href="#cb6-396" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb6-397"><a href="#cb6-397" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-398"><a href="#cb6-398" aria-hidden="true" tabindex="-1"></a>xScaleLoess <span class="op">=</span> d3<span class="op">.</span><span class="fu">scaleLinear</span>()</span>
+<span id="cb6-399"><a href="#cb6-399" aria-hidden="true" tabindex="-1"></a>   <span class="op">.</span><span class="fu">domain</span>([<span class="op">-.</span><span class="dv">55</span><span class="op">,</span> <span class="op">.</span><span class="dv">55</span>])</span>
+<span id="cb6-400"><a href="#cb6-400" aria-hidden="true" tabindex="-1"></a>   <span class="op">.</span><span class="fu">range</span>([<span class="dv">0</span><span class="op">,</span> innerWidth])<span class="op">;</span></span>
+<span id="cb6-401"><a href="#cb6-401" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb6-402"><a href="#cb6-402" aria-hidden="true" tabindex="-1"></a>yScaleLoess <span class="op">=</span> d3<span class="op">.</span><span class="fu">scaleLinear</span>()</span>
+<span id="cb6-403"><a href="#cb6-403" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">domain</span>([<span class="op">.</span><span class="dv">2</span><span class="op">,</span> <span class="op">.</span><span class="dv">8</span>])</span>
+<span id="cb6-404"><a href="#cb6-404" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">range</span>([innerHeight<span class="op">,</span> <span class="dv">0</span>])<span class="op">;</span></span>
+<span id="cb6-405"><a href="#cb6-405" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-406"><a href="#cb6-406" aria-hidden="true" tabindex="-1"></a>lineLoess <span class="op">=</span> d3<span class="op">.</span><span class="fu">line</span>()</span>
+<span id="cb6-407"><a href="#cb6-407" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">x</span>(d <span class="kw">=&gt;</span> <span class="fu">xScaleLoess</span>(d[<span class="dv">0</span>]))</span>
+<span id="cb6-408"><a href="#cb6-408" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">y</span>(d <span class="kw">=&gt;</span> <span class="fu">yScaleLoess</span>(d[<span class="dv">1</span>]))<span class="op">;</span></span>
+<span id="cb6-409"><a href="#cb6-409" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-410"><a href="#cb6-410" aria-hidden="true" tabindex="-1"></a>xAxisLoess <span class="op">=</span> d3<span class="op">.</span><span class="fu">axisBottom</span>(xScaleLoess)</span>
+<span id="cb6-411"><a href="#cb6-411" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">tickSize</span>(innerHeight <span class="op">+</span> <span class="dv">10</span>)</span>
+<span id="cb6-412"><a href="#cb6-412" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">tickValues</span>([<span class="op">-.</span><span class="dv">5</span><span class="op">,</span> <span class="op">-.</span><span class="dv">25</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="op">.</span><span class="dv">25</span><span class="op">,</span> <span class="op">.</span><span class="dv">5</span>])</span>
+<span id="cb6-413"><a href="#cb6-413" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">tickFormat</span>(d <span class="kw">=&gt;</span> d)<span class="op">;</span></span>
+<span id="cb6-414"><a href="#cb6-414" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-415"><a href="#cb6-415" aria-hidden="true" tabindex="-1"></a>yAxisLoess <span class="op">=</span> d3<span class="op">.</span><span class="fu">axisLeft</span>(yScaleLoess)</span>
+<span id="cb6-416"><a href="#cb6-416" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">tickSize</span>(innerWidth <span class="op">+</span> <span class="dv">10</span>)</span>
+<span id="cb6-417"><a href="#cb6-417" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">tickValues</span>([<span class="op">.</span><span class="dv">2</span><span class="op">,</span> <span class="op">.</span><span class="dv">35</span><span class="op">,</span> <span class="op">.</span><span class="dv">5</span><span class="op">,</span> <span class="op">.</span><span class="dv">65</span><span class="op">,</span> <span class="op">.</span><span class="dv">8</span>])</span>
+<span id="cb6-418"><a href="#cb6-418" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">tickFormat</span>(d <span class="kw">=&gt;</span> d)<span class="op">;</span></span>
+<span id="cb6-419"><a href="#cb6-419" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-420"><a href="#cb6-420" aria-hidden="true" tabindex="-1"></a>loessRegression <span class="op">=</span> d3<span class="op">.</span><span class="fu">regressionLoess</span>()</span>
+<span id="cb6-421"><a href="#cb6-421" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">x</span>(d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">StimmenTm1</span>)</span>
+<span id="cb6-422"><a href="#cb6-422" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">y</span>(d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">StimmenT</span>)</span>
+<span id="cb6-423"><a href="#cb6-423" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">bandwidth</span>(bandwidth)<span class="op">;</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <div id="ojs-cell-1-2" data-nodetype="declaration">
@@ -873,59 +911,115 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
 </div>
 </div>
 </div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-1-14" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
 </div>
 <div class="cell page-columns page-full">
-<div class="sourceCode cell-code hidden" id="cb4" data-startfrom="406" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 405;"><span id="cb4-406"><a href="#cb4-406" aria-hidden="true" tabindex="-1"></a>{</span>
-<span id="cb4-407"><a href="#cb4-407" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> svg <span class="op">=</span> d3<span class="op">.</span><span class="fu">select</span>(DOM<span class="op">.</span><span class="fu">svg</span>(innerWidth <span class="op">+</span> margin<span class="op">.</span><span class="at">left</span> <span class="op">+</span> margin<span class="op">.</span><span class="at">right</span><span class="op">,</span> innerHeight <span class="op">+</span> margin<span class="op">.</span><span class="at">top</span> <span class="op">+</span> margin<span class="op">.</span><span class="at">bottom</span>))</span>
-<span id="cb4-408"><a href="#cb4-408" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-409"><a href="#cb4-409" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> g <span class="op">=</span> svg<span class="op">.</span><span class="fu">append</span>(<span class="st">"g"</span>)</span>
-<span id="cb4-410"><a href="#cb4-410" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">attr</span>(<span class="st">"transform"</span><span class="op">,</span> <span class="vs">`translate(</span><span class="sc">${</span>margin<span class="op">.</span><span class="at">left</span><span class="sc">}</span><span class="vs">, </span><span class="sc">${</span>margin<span class="op">.</span><span class="at">top</span><span class="sc">}</span><span class="vs">)`</span>)<span class="op">;</span></span>
-<span id="cb4-411"><a href="#cb4-411" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-412"><a href="#cb4-412" aria-hidden="true" tabindex="-1"></a>  g<span class="op">.</span><span class="fu">append</span>(<span class="st">"g"</span>)</span>
-<span id="cb4-413"><a href="#cb4-413" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">attr</span>(<span class="st">"class"</span><span class="op">,</span> <span class="st">"axis"</span>)</span>
-<span id="cb4-414"><a href="#cb4-414" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">call</span>(xAxisLoess)<span class="op">;</span></span>
-<span id="cb4-415"><a href="#cb4-415" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-416"><a href="#cb4-416" aria-hidden="true" tabindex="-1"></a>  g<span class="op">.</span><span class="fu">append</span>(<span class="st">"g"</span>)</span>
-<span id="cb4-417"><a href="#cb4-417" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">attr</span>(<span class="st">"class"</span><span class="op">,</span> <span class="st">"axis"</span>)</span>
-<span id="cb4-418"><a href="#cb4-418" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">attr</span>(<span class="st">"transform"</span><span class="op">,</span> <span class="vs">`translate(</span><span class="sc">${</span>innerWidth<span class="sc">}</span><span class="vs">)`</span>)</span>
-<span id="cb4-419"><a href="#cb4-419" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">call</span>(yAxisLoess)<span class="op">;</span></span>
-<span id="cb4-420"><a href="#cb4-420" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-421"><a href="#cb4-421" aria-hidden="true" tabindex="-1"></a>  g<span class="op">.</span><span class="fu">selectAll</span>(<span class="st">"circle"</span>)</span>
-<span id="cb4-422"><a href="#cb4-422" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">data</span>(<span class="fu">transpose</span>(house_binned))</span>
-<span id="cb4-423"><a href="#cb4-423" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">enter</span>()<span class="op">.</span><span class="fu">append</span>(<span class="st">"circle"</span>)</span>
-<span id="cb4-424"><a href="#cb4-424" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">attr</span>(<span class="st">"r"</span><span class="op">,</span> <span class="dv">2</span>)</span>
-<span id="cb4-425"><a href="#cb4-425" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">attr</span>(<span class="st">"cx"</span><span class="op">,</span> d <span class="kw">=&gt;</span> <span class="fu">xScaleLoess</span>(d<span class="op">.</span><span class="at">StimmenTm1</span>))</span>
-<span id="cb4-426"><a href="#cb4-426" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">attr</span>(<span class="st">"cy"</span><span class="op">,</span> d <span class="kw">=&gt;</span> <span class="fu">yScaleLoess</span>(d<span class="op">.</span><span class="at">StimmenT</span>))<span class="op">;</span></span>
-<span id="cb4-427"><a href="#cb4-427" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-428"><a href="#cb4-428" aria-hidden="true" tabindex="-1"></a>  g<span class="op">.</span><span class="fu">append</span>(<span class="st">"path"</span>)</span>
-<span id="cb4-429"><a href="#cb4-429" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">attr</span>(<span class="st">"class"</span><span class="op">,</span> <span class="st">"regression"</span>)</span>
-<span id="cb4-430"><a href="#cb4-430" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">datum</span>(<span class="fu">loessRegression</span>(</span>
-<span id="cb4-431"><a href="#cb4-431" aria-hidden="true" tabindex="-1"></a>        <span class="fu">transpose</span>(house)</span>
-<span id="cb4-432"><a href="#cb4-432" aria-hidden="true" tabindex="-1"></a>          <span class="op">.</span><span class="fu">filter</span>(<span class="kw">function</span>(d){ <span class="cf">return</span> d<span class="op">.</span><span class="at">StimmenTm1</span> <span class="op">&lt;</span> <span class="dv">0</span> <span class="op">&amp;</span> d<span class="op">.</span><span class="at">StimmenTm1</span> <span class="op">&gt;=</span> <span class="op">-.</span><span class="dv">5</span> })</span>
-<span id="cb4-433"><a href="#cb4-433" aria-hidden="true" tabindex="-1"></a>          )</span>
-<span id="cb4-434"><a href="#cb4-434" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb4-435"><a href="#cb4-435" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">attr</span>(<span class="st">"d"</span><span class="op">,</span> lineLoess)<span class="op">;</span></span>
-<span id="cb4-436"><a href="#cb4-436" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-437"><a href="#cb4-437" aria-hidden="true" tabindex="-1"></a>  g<span class="op">.</span><span class="fu">append</span>(<span class="st">"path"</span>)</span>
-<span id="cb4-438"><a href="#cb4-438" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">attr</span>(<span class="st">"class"</span><span class="op">,</span> <span class="st">"regression"</span>)</span>
-<span id="cb4-439"><a href="#cb4-439" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">datum</span>(<span class="fu">loessRegression</span>(</span>
-<span id="cb4-440"><a href="#cb4-440" aria-hidden="true" tabindex="-1"></a>        <span class="fu">transpose</span>(house)</span>
-<span id="cb4-441"><a href="#cb4-441" aria-hidden="true" tabindex="-1"></a>          <span class="op">.</span><span class="fu">filter</span>(<span class="kw">function</span>(d){ <span class="cf">return</span> d<span class="op">.</span><span class="at">StimmenTm1</span> <span class="op">&gt;=</span> <span class="dv">0</span> <span class="op">&amp;</span> d<span class="op">.</span><span class="at">StimmenTm1</span> <span class="op">&lt;=</span> <span class="op">.</span><span class="dv">5</span> })</span>
-<span id="cb4-442"><a href="#cb4-442" aria-hidden="true" tabindex="-1"></a>          )</span>
-<span id="cb4-443"><a href="#cb4-443" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb4-444"><a href="#cb4-444" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">attr</span>(<span class="st">"d"</span><span class="op">,</span> lineLoess)<span class="op">;</span></span>
-<span id="cb4-445"><a href="#cb4-445" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-446"><a href="#cb4-446" aria-hidden="true" tabindex="-1"></a>  g<span class="op">.</span><span class="fu">append</span>(<span class="st">"line"</span>)</span>
-<span id="cb4-447"><a href="#cb4-447" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">attr</span>(<span class="st">"x1"</span><span class="op">,</span> <span class="fu">xScaleLoess</span>(<span class="dv">0</span>))</span>
-<span id="cb4-448"><a href="#cb4-448" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">attr</span>(<span class="st">"y1"</span><span class="op">,</span> <span class="dv">0</span>)</span>
-<span id="cb4-449"><a href="#cb4-449" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">attr</span>(<span class="st">"x2"</span><span class="op">,</span> <span class="fu">xScaleLoess</span>(<span class="dv">0</span>))</span>
-<span id="cb4-450"><a href="#cb4-450" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">attr</span>(<span class="st">"y2"</span><span class="op">,</span> innerHeight)</span>
-<span id="cb4-451"><a href="#cb4-451" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">style</span>(<span class="st">"stroke"</span><span class="op">,</span> <span class="st">"black"</span>)</span>
-<span id="cb4-452"><a href="#cb4-452" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">style</span>(<span class="st">"stroke-dasharray"</span><span class="op">,</span> <span class="st">"4"</span>)</span>
-<span id="cb4-453"><a href="#cb4-453" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">style</span>(<span class="st">"stroke-width"</span><span class="op">,</span> <span class="st">"1"</span>)<span class="op">;</span></span>
-<span id="cb4-454"><a href="#cb4-454" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-455"><a href="#cb4-455" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> svg<span class="op">.</span><span class="fu">node</span>()<span class="op">;</span></span>
-<span id="cb4-456"><a href="#cb4-456" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code hidden" id="cb7" data-startfrom="428" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 427;"><span id="cb7-428"><a href="#cb7-428" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb7-429"><a href="#cb7-429" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> svg <span class="op">=</span> d3<span class="op">.</span><span class="fu">select</span>(DOM<span class="op">.</span><span class="fu">svg</span>(innerWidth <span class="op">+</span> margin<span class="op">.</span><span class="at">left</span> <span class="op">+</span> margin<span class="op">.</span><span class="at">right</span> <span class="op">+</span> <span class="dv">20</span><span class="op">,</span> innerHeight <span class="op">+</span> margin<span class="op">.</span><span class="at">top</span> <span class="op">+</span> margin<span class="op">.</span><span class="at">bottom</span> <span class="op">+</span> <span class="dv">20</span>))</span>
+<span id="cb7-430"><a href="#cb7-430" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-431"><a href="#cb7-431" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> g <span class="op">=</span> svg<span class="op">.</span><span class="fu">append</span>(<span class="st">"g"</span>)</span>
+<span id="cb7-432"><a href="#cb7-432" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">attr</span>(<span class="st">"transform"</span><span class="op">,</span> <span class="vs">`translate(</span><span class="sc">${</span>margin<span class="op">.</span><span class="at">left</span><span class="sc">}</span><span class="vs">, </span><span class="sc">${</span>margin<span class="op">.</span><span class="at">top</span><span class="sc">}</span><span class="vs">)`</span>)<span class="op">;</span></span>
+<span id="cb7-433"><a href="#cb7-433" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-434"><a href="#cb7-434" aria-hidden="true" tabindex="-1"></a>  g<span class="op">.</span><span class="fu">append</span>(<span class="st">"g"</span>)</span>
+<span id="cb7-435"><a href="#cb7-435" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">attr</span>(<span class="st">"class"</span><span class="op">,</span> <span class="st">"axis"</span>)</span>
+<span id="cb7-436"><a href="#cb7-436" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">call</span>(xAxisLoess)<span class="op">;</span></span>
+<span id="cb7-437"><a href="#cb7-437" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-438"><a href="#cb7-438" aria-hidden="true" tabindex="-1"></a>  g<span class="op">.</span><span class="fu">append</span>(<span class="st">"g"</span>)</span>
+<span id="cb7-439"><a href="#cb7-439" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">attr</span>(<span class="st">"class"</span><span class="op">,</span> <span class="st">"axis"</span>)</span>
+<span id="cb7-440"><a href="#cb7-440" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">attr</span>(<span class="st">"transform"</span><span class="op">,</span> <span class="vs">`translate(</span><span class="sc">${</span>innerWidth<span class="sc">}</span><span class="vs">)`</span>)</span>
+<span id="cb7-441"><a href="#cb7-441" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">call</span>(yAxisLoess)<span class="op">;</span></span>
+<span id="cb7-442"><a href="#cb7-442" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-443"><a href="#cb7-443" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Add X axis label:</span></span>
+<span id="cb7-444"><a href="#cb7-444" aria-hidden="true" tabindex="-1"></a>  g<span class="op">.</span><span class="fu">append</span>(<span class="st">"text"</span>)</span>
+<span id="cb7-445"><a href="#cb7-445" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">attr</span>(<span class="st">"text-anchor"</span><span class="op">,</span> <span class="st">"end"</span>)</span>
+<span id="cb7-446"><a href="#cb7-446" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">attr</span>(<span class="st">"font-size"</span><span class="op">,</span> <span class="dv">13</span>)</span>
+<span id="cb7-447"><a href="#cb7-447" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">attr</span>(<span class="st">"x"</span><span class="op">,</span> innerWidth)</span>
+<span id="cb7-448"><a href="#cb7-448" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">attr</span>(<span class="st">"y"</span><span class="op">,</span> innerHeight <span class="op">+</span> margin<span class="op">.</span><span class="at">top</span> <span class="op">+</span> <span class="dv">25</span>)</span>
+<span id="cb7-449"><a href="#cb7-449" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">text</span>(<span class="st">"Stimmenanteil Demokraten letzte Wahl"</span>)<span class="op">;</span></span>
+<span id="cb7-450"><a href="#cb7-450" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-451"><a href="#cb7-451" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Y axis label:</span></span>
+<span id="cb7-452"><a href="#cb7-452" aria-hidden="true" tabindex="-1"></a>  g<span class="op">.</span><span class="fu">append</span>(<span class="st">"text"</span>)</span>
+<span id="cb7-453"><a href="#cb7-453" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">attr</span>(<span class="st">"text-anchor"</span><span class="op">,</span> <span class="st">"end"</span>)</span>
+<span id="cb7-454"><a href="#cb7-454" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">attr</span>(<span class="st">"transform"</span><span class="op">,</span> <span class="st">"rotate(-90)"</span>)</span>
+<span id="cb7-455"><a href="#cb7-455" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">attr</span>(<span class="st">"font-size"</span><span class="op">,</span> <span class="dv">13</span>)</span>
+<span id="cb7-456"><a href="#cb7-456" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">attr</span>(<span class="st">"y"</span><span class="op">,</span> <span class="op">-</span>margin<span class="op">.</span><span class="at">left</span><span class="op">+</span><span class="dv">10</span>)</span>
+<span id="cb7-457"><a href="#cb7-457" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">attr</span>(<span class="st">"x"</span><span class="op">,</span> <span class="op">-</span>margin<span class="op">.</span><span class="at">top</span><span class="op">+</span><span class="dv">10</span>)</span>
+<span id="cb7-458"><a href="#cb7-458" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">text</span>(<span class="st">"Stimmenanteil Demokraten"</span>)<span class="op">;</span></span>
+<span id="cb7-459"><a href="#cb7-459" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-460"><a href="#cb7-460" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Distance at jump</span></span>
+<span id="cb7-461"><a href="#cb7-461" aria-hidden="true" tabindex="-1"></a>  g<span class="op">.</span><span class="fu">append</span>(<span class="st">"text"</span>)</span>
+<span id="cb7-462"><a href="#cb7-462" aria-hidden="true" tabindex="-1"></a>   <span class="op">.</span><span class="fu">attr</span>(<span class="st">"x"</span><span class="op">,</span> <span class="dv">250</span>) <span class="co">// x-Position des Textelements</span></span>
+<span id="cb7-463"><a href="#cb7-463" aria-hidden="true" tabindex="-1"></a>   <span class="op">.</span><span class="fu">attr</span>(<span class="st">"y"</span><span class="op">,</span> <span class="dv">200</span>) <span class="co">// y-Position des Textelements</span></span>
+<span id="cb7-464"><a href="#cb7-464" aria-hidden="true" tabindex="-1"></a>   <span class="op">.</span><span class="fu">text</span>(<span class="st">""</span>) <span class="co">// Textinhalt</span></span>
+<span id="cb7-465"><a href="#cb7-465" aria-hidden="true" tabindex="-1"></a>   <span class="op">.</span><span class="fu">attr</span>(<span class="st">"font-size"</span><span class="op">,</span> <span class="st">"14px"</span>) <span class="co">// Schriftgröße</span></span>
+<span id="cb7-466"><a href="#cb7-466" aria-hidden="true" tabindex="-1"></a>   <span class="op">.</span><span class="fu">attr</span>(<span class="st">"fill"</span><span class="op">,</span> <span class="st">"black"</span>)<span class="op">;</span> <span class="co">// Textfarbe</span></span>
+<span id="cb7-467"><a href="#cb7-467" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-468"><a href="#cb7-468" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-469"><a href="#cb7-469" aria-hidden="true" tabindex="-1"></a>  g<span class="op">.</span><span class="fu">selectAll</span>(<span class="st">"circle"</span>)</span>
+<span id="cb7-470"><a href="#cb7-470" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">data</span>(<span class="fu">transpose</span>(house_binned))</span>
+<span id="cb7-471"><a href="#cb7-471" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">enter</span>()<span class="op">.</span><span class="fu">append</span>(<span class="st">"circle"</span>)</span>
+<span id="cb7-472"><a href="#cb7-472" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">attr</span>(<span class="st">"r"</span><span class="op">,</span> <span class="dv">2</span>)</span>
+<span id="cb7-473"><a href="#cb7-473" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">attr</span>(<span class="st">"cx"</span><span class="op">,</span> d <span class="kw">=&gt;</span> <span class="fu">xScaleLoess</span>(d<span class="op">.</span><span class="at">StimmenTm1</span>))</span>
+<span id="cb7-474"><a href="#cb7-474" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">attr</span>(<span class="st">"cy"</span><span class="op">,</span> d <span class="kw">=&gt;</span> <span class="fu">yScaleLoess</span>(d<span class="op">.</span><span class="at">StimmenT</span>))<span class="op">;</span></span>
+<span id="cb7-475"><a href="#cb7-475" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-476"><a href="#cb7-476" aria-hidden="true" tabindex="-1"></a>  g<span class="op">.</span><span class="fu">append</span>(<span class="st">"path"</span>)</span>
+<span id="cb7-477"><a href="#cb7-477" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">attr</span>(<span class="st">"class"</span><span class="op">,</span> <span class="st">"regression"</span>)</span>
+<span id="cb7-478"><a href="#cb7-478" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">datum</span>(<span class="fu">loessRegression</span>(</span>
+<span id="cb7-479"><a href="#cb7-479" aria-hidden="true" tabindex="-1"></a>        <span class="fu">transpose</span>(house)</span>
+<span id="cb7-480"><a href="#cb7-480" aria-hidden="true" tabindex="-1"></a>          <span class="op">.</span><span class="fu">filter</span>(<span class="kw">function</span>(d){ <span class="cf">return</span> d<span class="op">.</span><span class="at">StimmenTm1</span> <span class="op">&lt;=</span> <span class="dv">0</span> <span class="op">&amp;</span> d<span class="op">.</span><span class="at">StimmenTm1</span> <span class="op">&gt;=</span> <span class="op">-</span>bw_daten })</span>
+<span id="cb7-481"><a href="#cb7-481" aria-hidden="true" tabindex="-1"></a>          )</span>
+<span id="cb7-482"><a href="#cb7-482" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb7-483"><a href="#cb7-483" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">attr</span>(<span class="st">"d"</span><span class="op">,</span> lineLoess)</span>
+<span id="cb7-484"><a href="#cb7-484" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">style</span>(<span class="st">"stroke"</span><span class="op">,</span> <span class="st">"red"</span>)<span class="op">;</span></span>
+<span id="cb7-485"><a href="#cb7-485" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-486"><a href="#cb7-486" aria-hidden="true" tabindex="-1"></a>  g<span class="op">.</span><span class="fu">append</span>(<span class="st">"path"</span>)</span>
+<span id="cb7-487"><a href="#cb7-487" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">attr</span>(<span class="st">"class"</span><span class="op">,</span> <span class="st">"regression"</span>)</span>
+<span id="cb7-488"><a href="#cb7-488" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">datum</span>(<span class="fu">loessRegression</span>(</span>
+<span id="cb7-489"><a href="#cb7-489" aria-hidden="true" tabindex="-1"></a>        <span class="fu">transpose</span>(house)</span>
+<span id="cb7-490"><a href="#cb7-490" aria-hidden="true" tabindex="-1"></a>          <span class="op">.</span><span class="fu">filter</span>(<span class="kw">function</span>(d){ <span class="cf">return</span> d<span class="op">.</span><span class="at">StimmenTm1</span> <span class="op">&gt;</span> <span class="dv">0</span> <span class="op">&amp;</span> d<span class="op">.</span><span class="at">StimmenTm1</span> <span class="op">&lt;=</span> bw_daten })</span>
+<span id="cb7-491"><a href="#cb7-491" aria-hidden="true" tabindex="-1"></a>          )</span>
+<span id="cb7-492"><a href="#cb7-492" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb7-493"><a href="#cb7-493" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">attr</span>(<span class="st">"d"</span><span class="op">,</span> lineLoess)</span>
+<span id="cb7-494"><a href="#cb7-494" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">style</span>(<span class="st">"stroke"</span><span class="op">,</span> <span class="st">"red"</span>)<span class="op">;</span></span>
+<span id="cb7-495"><a href="#cb7-495" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-496"><a href="#cb7-496" aria-hidden="true" tabindex="-1"></a>  <span class="co">/* dashed line at cutoff */</span></span>
+<span id="cb7-497"><a href="#cb7-497" aria-hidden="true" tabindex="-1"></a>  g<span class="op">.</span><span class="fu">append</span>(<span class="st">"line"</span>)</span>
+<span id="cb7-498"><a href="#cb7-498" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">attr</span>(<span class="st">"x1"</span><span class="op">,</span> <span class="fu">xScaleLoess</span>(<span class="dv">0</span>))</span>
+<span id="cb7-499"><a href="#cb7-499" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">attr</span>(<span class="st">"y1"</span><span class="op">,</span> <span class="dv">0</span>)</span>
+<span id="cb7-500"><a href="#cb7-500" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">attr</span>(<span class="st">"x2"</span><span class="op">,</span> <span class="fu">xScaleLoess</span>(<span class="dv">0</span>))</span>
+<span id="cb7-501"><a href="#cb7-501" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">attr</span>(<span class="st">"y2"</span><span class="op">,</span> innerHeight)</span>
+<span id="cb7-502"><a href="#cb7-502" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">style</span>(<span class="st">"stroke"</span><span class="op">,</span> <span class="st">"black"</span>)</span>
+<span id="cb7-503"><a href="#cb7-503" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">style</span>(<span class="st">"stroke-dasharray"</span><span class="op">,</span> <span class="st">"1"</span>)</span>
+<span id="cb7-504"><a href="#cb7-504" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">style</span>(<span class="st">"stroke-width"</span><span class="op">,</span> <span class="st">"1"</span>)<span class="op">;</span></span>
+<span id="cb7-505"><a href="#cb7-505" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-506"><a href="#cb7-506" aria-hidden="true" tabindex="-1"></a>  <span class="co">/* dashed line data bw upper */</span></span>
+<span id="cb7-507"><a href="#cb7-507" aria-hidden="true" tabindex="-1"></a>  g<span class="op">.</span><span class="fu">append</span>(<span class="st">"line"</span>)</span>
+<span id="cb7-508"><a href="#cb7-508" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">attr</span>(<span class="st">"x1"</span><span class="op">,</span> <span class="fu">xScaleLoess</span>(bw_daten))</span>
+<span id="cb7-509"><a href="#cb7-509" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">attr</span>(<span class="st">"y1"</span><span class="op">,</span> <span class="dv">0</span>)</span>
+<span id="cb7-510"><a href="#cb7-510" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">attr</span>(<span class="st">"x2"</span><span class="op">,</span> <span class="fu">xScaleLoess</span>(bw_daten))</span>
+<span id="cb7-511"><a href="#cb7-511" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">attr</span>(<span class="st">"y2"</span><span class="op">,</span> innerHeight)</span>
+<span id="cb7-512"><a href="#cb7-512" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">style</span>(<span class="st">"stroke"</span><span class="op">,</span> <span class="st">"blue"</span>)</span>
+<span id="cb7-513"><a href="#cb7-513" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">style</span>(<span class="st">"stroke-dasharray"</span><span class="op">,</span> <span class="st">"4"</span>)</span>
+<span id="cb7-514"><a href="#cb7-514" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">style</span>(<span class="st">"stroke-width"</span><span class="op">,</span> <span class="st">"1"</span>)<span class="op">;</span></span>
+<span id="cb7-515"><a href="#cb7-515" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-516"><a href="#cb7-516" aria-hidden="true" tabindex="-1"></a>  <span class="co">/* dashed line data bw lower */</span></span>
+<span id="cb7-517"><a href="#cb7-517" aria-hidden="true" tabindex="-1"></a>  g<span class="op">.</span><span class="fu">append</span>(<span class="st">"line"</span>)</span>
+<span id="cb7-518"><a href="#cb7-518" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">attr</span>(<span class="st">"x1"</span><span class="op">,</span> <span class="fu">xScaleLoess</span>(<span class="op">-</span>bw_daten))</span>
+<span id="cb7-519"><a href="#cb7-519" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">attr</span>(<span class="st">"y1"</span><span class="op">,</span> <span class="dv">0</span>)</span>
+<span id="cb7-520"><a href="#cb7-520" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">attr</span>(<span class="st">"x2"</span><span class="op">,</span> <span class="fu">xScaleLoess</span>(<span class="op">-</span>bw_daten))</span>
+<span id="cb7-521"><a href="#cb7-521" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">attr</span>(<span class="st">"y2"</span><span class="op">,</span> innerHeight)</span>
+<span id="cb7-522"><a href="#cb7-522" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">style</span>(<span class="st">"stroke"</span><span class="op">,</span> <span class="st">"blue"</span>)</span>
+<span id="cb7-523"><a href="#cb7-523" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">style</span>(<span class="st">"stroke-dasharray"</span><span class="op">,</span> <span class="st">"4"</span>)</span>
+<span id="cb7-524"><a href="#cb7-524" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">style</span>(<span class="st">"stroke-width"</span><span class="op">,</span> <span class="st">"1"</span>)<span class="op">;</span></span>
+<span id="cb7-525"><a href="#cb7-525" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-526"><a href="#cb7-526" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> svg<span class="op">.</span><span class="fu">node</span>()<span class="op">;</span></span>
+<span id="cb7-527"><a href="#cb7-527" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div id="fig-ojs-cell-2" class="quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="figure page-columns page-full"><div id="ojs-cell-2" data-nodetype="expression">
 
@@ -934,460 +1028,31 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
 </figure>
 </div>
 </div>
-<div class="cell">
-<button class="btn btn-outline-primary btn-sm btn-webr run" disabled="" type="button" id="webr-run-button-5" style="width:100%; border-radius:15px 15px 0 0;">
-R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
-</button>
-<div id="webr-editor-5">
-
-</div>
-<div id="webr-code-output-5">
-<pre style="visibility: hidden"></pre>
-</div>
-<script type="module">
-  const runButton = document.getElementById("webr-run-button-5");
-  const outputDiv = document.getElementById("webr-code-output-5");
-  const editorDiv = document.getElementById("webr-editor-5");
-
-  const editor = CodeMirror((elt) => {
-    elt.style.border = "2px solid #eee";
-    elt.style.borderRadius = "0 0 15px 15px";
-    elt.style.height = "auto";
-    elt.style.fontSize = "15px";
-    editorDiv.append(elt);
-  },{
-    value: `mlda <- mlda %>%\n  mutate(\n    sameS_fit = predict(drink_mod)\n  )`,
-    lineNumbers: true,
-    mode: "r",
-    theme: "light default",
-    viewportMargin: Infinity,
-  });
-
-  runButton.onclick = async () => {
-    runButton.disabled = true;
-    let canvas = undefined;
-    await globalThis.webR.init();
-    await webR.evalRVoid("canvas(width=504, height=360)");
-    const result = await webRCodeShelter.captureR(editor.getValue(), {
-      withAutoprint: true,
-      captureStreams: true,
-      captureConditions: false,
-      env: webR.objs.emptyEnv,
-    });
-    try {
-      await webR.evalRVoid("dev.off()");
-      const out = result.output.filter(
-        evt => evt.type == "stdout" || evt.type == "stderr"
-      ).map((evt) => evt.data).join("\n");
-
-      const msgs = await webR.flush();
-      msgs.forEach(msg => {
-        if (msg.type === "canvasExec"){
-          if (!canvas) {
-            canvas = document.createElement("canvas");
-            canvas.setAttribute("width", 2 * 504);
-            canvas.setAttribute("height", 2 * 360);
-            canvas.style.width="700px";
-            canvas.style.display="block";
-            canvas.style.margin="auto";
-          }
-          Function(`this.getContext("2d").${msg.data}`).bind(canvas)();
-        }
-      });
-
-      outputDiv.innerHTML = "";
-      const pre = document.createElement("pre");
-      if (/\S/.test(out)) {
-        const code = document.createElement("code");
-        code.innerText = out;
-        pre.appendChild(code);
-      } else {
-        pre.style.visibility = "hidden";
-      }
-      outputDiv.appendChild(pre);
-
-      if (canvas) {
-        const p = document.createElement("p");
-        p.appendChild(canvas);
-        outputDiv.appendChild(p);
-      }
-    } finally {
-      webRCodeShelter.purge();
-      runButton.disabled = false;
-    }
-  }
-
-  await globalThis.webR.init();
-</script>
-</div>
-<div class="cell">
-<button class="btn btn-outline-primary btn-sm btn-webr run" disabled="" type="button" id="webr-run-button-6" style="width:100%; border-radius:15px 15px 0 0;">
-R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
-</button>
-<div id="webr-editor-6">
-
-</div>
-<div id="webr-code-output-6">
-<pre style="visibility: hidden"></pre>
-</div>
-<script type="module">
-  const runButton = document.getElementById("webr-run-button-6");
-  const outputDiv = document.getElementById("webr-code-output-6");
-  const editorDiv = document.getElementById("webr-editor-6");
-
-  const editor = CodeMirror((elt) => {
-    elt.style.border = "2px solid #eee";
-    elt.style.borderRadius = "0 0 15px 15px";
-    elt.style.height = "auto";
-    elt.style.fontSize = "15px";
-    editorDiv.append(elt);
-  },{
-    value: `mlda %>% \n    ggplot(aes(x = agecell, y = all, color = D)) +\n    geom_point() + \n    geom_line(\n        data = mlda %>% filter(D == "Ja"), aes(y = sameS_fit)\n    ) +\n    geom_line(\n        data = mlda %>% filter(D == "Nein"), aes(y = sameS_fit)\n    )`,
-    lineNumbers: true,
-    mode: "r",
-    theme: "light default",
-    viewportMargin: Infinity,
-  });
-
-  runButton.onclick = async () => {
-    runButton.disabled = true;
-    let canvas = undefined;
-    await globalThis.webR.init();
-    await webR.evalRVoid("canvas(width=504, height=360)");
-    const result = await webRCodeShelter.captureR(editor.getValue(), {
-      withAutoprint: true,
-      captureStreams: true,
-      captureConditions: false,
-      env: webR.objs.emptyEnv,
-    });
-    try {
-      await webR.evalRVoid("dev.off()");
-      const out = result.output.filter(
-        evt => evt.type == "stdout" || evt.type == "stderr"
-      ).map((evt) => evt.data).join("\n");
-
-      const msgs = await webR.flush();
-      msgs.forEach(msg => {
-        if (msg.type === "canvasExec"){
-          if (!canvas) {
-            canvas = document.createElement("canvas");
-            canvas.setAttribute("width", 2 * 504);
-            canvas.setAttribute("height", 2 * 360);
-            canvas.style.width="700px";
-            canvas.style.display="block";
-            canvas.style.margin="auto";
-          }
-          Function(`this.getContext("2d").${msg.data}`).bind(canvas)();
-        }
-      });
-
-      outputDiv.innerHTML = "";
-      const pre = document.createElement("pre");
-      if (/\S/.test(out)) {
-        const code = document.createElement("code");
-        code.innerText = out;
-        pre.appendChild(code);
-      } else {
-        pre.style.visibility = "hidden";
-      }
-      outputDiv.appendChild(pre);
-
-      if (canvas) {
-        const p = document.createElement("p");
-        p.appendChild(canvas);
-        outputDiv.appendChild(p);
-      }
-    } finally {
-      webRCodeShelter.purge();
-      runButton.disabled = false;
-    }
-  }
-
-  await globalThis.webR.init();
-</script>
-</div>
-<div class="cell">
-<button class="btn btn-outline-primary btn-sm btn-webr run" disabled="" type="button" id="webr-run-button-7" style="width:100%; border-radius:15px 15px 0 0;">
-R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
-</button>
-<div id="webr-editor-7">
-
-</div>
-<div id="webr-code-output-7">
-<pre style="visibility: hidden"></pre>
-</div>
-<script type="module">
-  const runButton = document.getElementById("webr-run-button-7");
-  const outputDiv = document.getElementById("webr-code-output-7");
-  const editorDiv = document.getElementById("webr-editor-7");
-
-  const editor = CodeMirror((elt) => {
-    elt.style.border = "2px solid #eee";
-    elt.style.borderRadius = "0 0 15px 15px";
-    elt.style.height = "auto";
-    elt.style.fontSize = "15px";
-    editorDiv.append(elt);
-  },{
-    value: `drink_mod_DiffSlope <- lm(\n  formula = all ~ D * I(agecell - 21),\n  data = mlda\n)\n  \nsummary(drink_mod_DiffSlope)`,
-    lineNumbers: true,
-    mode: "r",
-    theme: "light default",
-    viewportMargin: Infinity,
-  });
-
-  runButton.onclick = async () => {
-    runButton.disabled = true;
-    let canvas = undefined;
-    await globalThis.webR.init();
-    await webR.evalRVoid("canvas(width=504, height=360)");
-    const result = await webRCodeShelter.captureR(editor.getValue(), {
-      withAutoprint: true,
-      captureStreams: true,
-      captureConditions: false,
-      env: webR.objs.emptyEnv,
-    });
-    try {
-      await webR.evalRVoid("dev.off()");
-      const out = result.output.filter(
-        evt => evt.type == "stdout" || evt.type == "stderr"
-      ).map((evt) => evt.data).join("\n");
-
-      const msgs = await webR.flush();
-      msgs.forEach(msg => {
-        if (msg.type === "canvasExec"){
-          if (!canvas) {
-            canvas = document.createElement("canvas");
-            canvas.setAttribute("width", 2 * 504);
-            canvas.setAttribute("height", 2 * 360);
-            canvas.style.width="700px";
-            canvas.style.display="block";
-            canvas.style.margin="auto";
-          }
-          Function(`this.getContext("2d").${msg.data}`).bind(canvas)();
-        }
-      });
-
-      outputDiv.innerHTML = "";
-      const pre = document.createElement("pre");
-      if (/\S/.test(out)) {
-        const code = document.createElement("code");
-        code.innerText = out;
-        pre.appendChild(code);
-      } else {
-        pre.style.visibility = "hidden";
-      }
-      outputDiv.appendChild(pre);
-
-      if (canvas) {
-        const p = document.createElement("p");
-        p.appendChild(canvas);
-        outputDiv.appendChild(p);
-      }
-    } finally {
-      webRCodeShelter.purge();
-      runButton.disabled = false;
-    }
-  }
-
-  await globalThis.webR.init();
-</script>
-</div>
-<div class="cell">
-<button class="btn btn-outline-primary btn-sm btn-webr run" disabled="" type="button" id="webr-run-button-8" style="width:100%; border-radius:15px 15px 0 0;">
-R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
-</button>
-<div id="webr-editor-8">
-
-</div>
-<div id="webr-code-output-8">
-<pre style="visibility: hidden"></pre>
-</div>
-<script type="module">
-  const runButton = document.getElementById("webr-run-button-8");
-  const outputDiv = document.getElementById("webr-code-output-8");
-  const editorDiv = document.getElementById("webr-editor-8");
-
-  const editor = CodeMirror((elt) => {
-    elt.style.border = "2px solid #eee";
-    elt.style.borderRadius = "0 0 15px 15px";
-    elt.style.height = "auto";
-    elt.style.fontSize = "15px";
-    editorDiv.append(elt);
-  },{
-    value: `mlda <- mlda %>%\n  mutate(\n    diffS_fit = predict(drink_mod_DiffSlope)\n  )`,
-    lineNumbers: true,
-    mode: "r",
-    theme: "light default",
-    viewportMargin: Infinity,
-  });
-
-  runButton.onclick = async () => {
-    runButton.disabled = true;
-    let canvas = undefined;
-    await globalThis.webR.init();
-    await webR.evalRVoid("canvas(width=504, height=360)");
-    const result = await webRCodeShelter.captureR(editor.getValue(), {
-      withAutoprint: true,
-      captureStreams: true,
-      captureConditions: false,
-      env: webR.objs.emptyEnv,
-    });
-    try {
-      await webR.evalRVoid("dev.off()");
-      const out = result.output.filter(
-        evt => evt.type == "stdout" || evt.type == "stderr"
-      ).map((evt) => evt.data).join("\n");
-
-      const msgs = await webR.flush();
-      msgs.forEach(msg => {
-        if (msg.type === "canvasExec"){
-          if (!canvas) {
-            canvas = document.createElement("canvas");
-            canvas.setAttribute("width", 2 * 504);
-            canvas.setAttribute("height", 2 * 360);
-            canvas.style.width="700px";
-            canvas.style.display="block";
-            canvas.style.margin="auto";
-          }
-          Function(`this.getContext("2d").${msg.data}`).bind(canvas)();
-        }
-      });
-
-      outputDiv.innerHTML = "";
-      const pre = document.createElement("pre");
-      if (/\S/.test(out)) {
-        const code = document.createElement("code");
-        code.innerText = out;
-        pre.appendChild(code);
-      } else {
-        pre.style.visibility = "hidden";
-      }
-      outputDiv.appendChild(pre);
-
-      if (canvas) {
-        const p = document.createElement("p");
-        p.appendChild(canvas);
-        outputDiv.appendChild(p);
-      }
-    } finally {
-      webRCodeShelter.purge();
-      runButton.disabled = false;
-    }
-  }
-
-  await globalThis.webR.init();
-</script>
-</div>
-<div class="cell">
-<button class="btn btn-outline-primary btn-sm btn-webr run" disabled="" type="button" id="webr-run-button-9" style="width:100%; border-radius:15px 15px 0 0;">
-R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
-</button>
-<div id="webr-editor-9">
-
-</div>
-<div id="webr-code-output-9">
-<pre style="visibility: hidden"></pre>
-</div>
-<script type="module">
-  const runButton = document.getElementById("webr-run-button-9");
-  const outputDiv = document.getElementById("webr-code-output-9");
-  const editorDiv = document.getElementById("webr-editor-9");
-
-  const editor = CodeMirror((elt) => {
-    elt.style.border = "2px solid #eee";
-    elt.style.borderRadius = "0 0 15px 15px";
-    elt.style.height = "auto";
-    elt.style.fontSize = "15px";
-    editorDiv.append(elt);
-  },{
-    value: `mlda %>% \n    ggplot(aes(x = agecell, y = all, color = D)) +\n    geom_point() + \n    geom_line(\n        data = mlda %>% filter(D == "Ja"), aes(y = diffS_fit)\n    ) +\n    geom_line(\n        data = mlda %>% filter(D == "Nein"), aes(y = diffS_fit)\n    )`,
-    lineNumbers: true,
-    mode: "r",
-    theme: "light default",
-    viewportMargin: Infinity,
-  });
-
-  runButton.onclick = async () => {
-    runButton.disabled = true;
-    let canvas = undefined;
-    await globalThis.webR.init();
-    await webR.evalRVoid("canvas(width=504, height=360)");
-    const result = await webRCodeShelter.captureR(editor.getValue(), {
-      withAutoprint: true,
-      captureStreams: true,
-      captureConditions: false,
-      env: webR.objs.emptyEnv,
-    });
-    try {
-      await webR.evalRVoid("dev.off()");
-      const out = result.output.filter(
-        evt => evt.type == "stdout" || evt.type == "stderr"
-      ).map((evt) => evt.data).join("\n");
-
-      const msgs = await webR.flush();
-      msgs.forEach(msg => {
-        if (msg.type === "canvasExec"){
-          if (!canvas) {
-            canvas = document.createElement("canvas");
-            canvas.setAttribute("width", 2 * 504);
-            canvas.setAttribute("height", 2 * 360);
-            canvas.style.width="700px";
-            canvas.style.display="block";
-            canvas.style.margin="auto";
-          }
-          Function(`this.getContext("2d").${msg.data}`).bind(canvas)();
-        }
-      });
-
-      outputDiv.innerHTML = "";
-      const pre = document.createElement("pre");
-      if (/\S/.test(out)) {
-        const code = document.createElement("code");
-        code.innerText = out;
-        pre.appendChild(code);
-      } else {
-        pre.style.visibility = "hidden";
-      }
-      outputDiv.appendChild(pre);
-
-      if (canvas) {
-        const p = document.createElement("p");
-        p.appendChild(canvas);
-        outputDiv.appendChild(p);
-      }
-    } finally {
-      webRCodeShelter.purge();
-      runButton.disabled = false;
-    }
-  }
-
-  await globalThis.webR.init();
-</script>
-</div>
-<div class="page-columns page-full"><p>Carpenter und Dobkin <span class="citation" data-cites="CarpenterDobkin2009">(<a href="Literatur.html#ref-CarpenterDobkin2009" role="doc-biblioref">2009</a>)</span> untersuchen den Zusammenhang zwischen Alkoholkonsum und Sterblichkeit mit einem RDD.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> Die Autoren nutzen Variation im gesetzliche Mindestalter für Alkoholkonsum zwischen US-Bundesstaaten: Hierbei ist Alter die Laufvariable und des Mindestalter der Schwellenwert. Personen, die knapp über dem Mindestalter liegen und daher legal Alkohol konsumieren dürfen, weisen ähnliche Merkmale auf wie Personen knapp unter dem Mindestalter, so dass Backdoors vermieden werden.</p><div class="no-row-height column-margin column-container"><li id="fn4"><p><sup>4</sup>&nbsp;Die Studie sowie die Daten sind <a href="https://www.aeaweb.org/articles?id=10.1257/app.1.1.164">hier</a> abrufbar.</p></li></div></div>
-<p>Die Ergebnisse der Studie zeigen, dass der Übergang zum legalen Alkoholkonsum im erlaubten Alter zu einem signifikanten Anstieg der Sterblichkeit führt. Insbesondere stellen die Autoren fest, dass junge Menschen, die legal Alkohol trinken dürfen, ein höheres Risiko haben, an alkoholbedingten Todesfällen zu sterben, im Vergleich zu Personen knapp unter dem Mindestalter.</p>
-</section></section><section id="case-study-protestantische-arbeitsethik" class="level2 page-columns page-full" data-number="2.2"><h2 data-number="2.2" class="anchored" data-anchor-id="case-study-protestantische-arbeitsethik">
-<span class="header-section-number">2.2</span> Case Study: Protestantische Arbeitsethik</h2>
+</section></section><section id="fuzzy-regression-discontinuity-design" class="level2" data-number="2.2"><h2 data-number="2.2" class="anchored" data-anchor-id="fuzzy-regression-discontinuity-design">
+<span class="header-section-number">2.2</span> Fuzzy Regression Discontinuity Design</h2>
+<p>TBD</p>
+</section><section id="case-study-protestantische-arbeitsethik" class="level2 page-columns page-full" data-number="2.3"><h2 data-number="2.3" class="anchored" data-anchor-id="case-study-protestantische-arbeitsethik">
+<span class="header-section-number">2.3</span> Case Study: Protestantische Arbeitsethik</h2>
 <div class="cell">
 
 </div>
-<p>Die Studie <em>Beyond Work Ethic: Religion, Individual, and Political Preferences</em> von Christoph Basten und Frank Betz aus dem Jahr 2013 untersucht den Zusammenhang zwischen Religion, individuellen Merkmalen und politischen Präferenzen. Das Hauptaugenmerk liegt dabei auf der Rolle der Religiosität als Einflussfaktor auf politische Einstellungen.</p>
-<p>Die Autoren argumentieren, dass die Religiosität eines Individuums über den traditionellen Rahmen von Moralvorstellungen und sozialen Normen hinausgeht und auch politische Präferenzen beeinflussen kann. Sie behaupten, dass die Religion eine eigenständige Dimension darstellt, die das politische Verhalten und die Einstellungen einer Person mitgestaltet.</p>
-<p>Um ihre Hypothesen zu testen, nutzen Basten und Betz Daten aus dem World Values Survey, einer internationalen Umfrage, die verschiedene Aspekte von Werten und Einstellungen untersucht. Sie analysieren insbesondere die Zusammenhänge zwischen Religiosität, individuellen Merkmalen wie Geschlecht, Bildung und Einkommen sowie politischen Präferenzen wie links-rechts-Ausrichtung, Einstellungen zur Umverteilung und zur Einwanderung.</p>
+<p>Die Studie <em>Beyond Work Ethic: Religion, Individual, and Political Preferences</em> <span class="citation" data-cites="BastenBetz2013">(<a href="Literatur.html#ref-BastenBetz2013" role="doc-biblioref"><strong>BastenBetz2013?</strong></a>)</span> untersucht den Zusammenhang zwischen Religion, individuellen Merkmalen und politischen Präferenzen. Das Hauptaugenmerk ist die Rolle von Religiosität als Einflussfaktor auf politische Einstellungen. Die Hypothese ist, das Religiosität eines Individuums über den traditionellen Rahmen von Moralvorstellungen und sozialen Normen hinaus auch politische Präferenzen beeinflusst. Diese Theorie wird prominent von Max Weber (1930) vertreten, der argumentiert, dass die protestantische Arbeitsethik einen entscheidenden Einfluss auf die Entwicklung des Kapitalismus hatte. Laut Weber führte der protestantische Glaube an harte Arbeit, ein sparsames Leben und ethisches Verhalten zur einer verbreiteten “Geisteshaltung” , die den wirtschaftlichen Erfolg förderte und den Aufstieg des Kapitalismus begünstigte.</p>
+<p><span class="citation" data-cites="BastenBetz2013">(<a href="Literatur.html#ref-BastenBetz2013" role="doc-biblioref"><strong>BastenBetz2013?</strong></a>)</span> nutzen Daten aus dem World Values Survey,</p>
+<p>Sie analysieren insbesondere die Zusammenhänge zwischen Religiosität, individuellen Merkmalen wie Geschlecht, Bildung und Einkommen sowie politischen Präferenzen wie links-rechts-Ausrichtung, Einstellungen zur Umverteilung und zur Einwanderung.</p>
 <p>Die Ergebnisse der Studie zeigen, dass Religiosität tatsächlich einen signifikanten Einfluss auf politische Präferenzen hat. Insbesondere stellen die Autoren fest, dass religiöse Menschen tendenziell konservativere Einstellungen haben und eher rechten politischen Parteien zuneigen. Dieser Effekt bleibt auch nach Kontrolle anderer Faktoren wie Bildung und Einkommen bestehen.</p>
 <p>Darüber hinaus betonen die Autoren, dass der Zusammenhang zwischen Religion und politischen Präferenzen nicht allein durch moralische Werte erklärt werden kann. Sie argumentieren, dass religiöse Institutionen auch eine soziale und politische Agenda verfolgen, die von den Gläubigen internalisiert wird. Diese Agenda kann beispielsweise Positionen zu Themen wie Abtreibung, gleichgeschlechtlicher Ehe, Einwanderung oder Umweltschutz umfassen.</p>
 <p>Zusammenfassend zeigt das Paper “Beyond Work Ethic: Religion, Individual, and Political Preferences” von Christoph Basten und Frank Betz, dass Religiosität einen Einfluss auf politische Präferenzen hat, der über traditionelle Moralvorstellungen hinausgeht. Es deutet darauf hin, dass religiöse Menschen eher konservative politische Ansichten haben und dass religiöse Institutionen eine Rolle bei der Formulierung dieser Ansichten spielen können.</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://haven.tidyverse.org">haven</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://nickch-k.github.io/vtable/">vtable</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">rdrobust</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">BastenBetz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://haven.tidyverse.org/reference/read_dta.html">read_dta</a></span><span class="op">(</span><span class="st">'BastenBetz.dta'</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">BastenBetz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://haven.tidyverse.org/reference/read_dta.html">read_dta</a></span><span class="op">(</span><span class="st">'BastenBetz.dta'</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Table 1</span></span>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Table 1</span></span>
 <span><span class="va">T1</span> <span class="op">&lt;-</span> <span class="va">BastenBetz</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">borderdis</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">5.0283684</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html">transmute</a></span><span class="op">(</span></span>
@@ -1412,13 +1077,13 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
 <span>    <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">T1_wider</span> <span class="op">&lt;-</span> <span class="va">T1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> </span>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">T1_wider</span> <span class="op">&lt;-</span> <span class="va">T1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> </span>
 <span>    <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html">pivot_wider</a></span><span class="op">(</span></span>
 <span>        names_from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"group"</span>, <span class="st">"statistic"</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell page-columns page-full" data-layout-align="center">
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">T1_wider</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">T1_wider</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">gt</span><span class="op">(</span>rowname_col <span class="op">=</span> <span class="st">"Variable"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu">tab_spanner_delim</span><span class="op">(</span></span>
 <span>    delim <span class="op">=</span> <span class="st">"_"</span>,</span>
@@ -1427,23 +1092,23 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
 <div class="cell-output-display page-columns page-full">
 <div id="tbl-sumstat" class="anchored page-columns page-full">
 
-<div id="hdezodwhuf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;" class="page-columns page-full">
-<style>#hdezodwhuf table {
+<div id="rpapyvyjfl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;" class="page-columns page-full">
+<style>#rpapyvyjfl table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#hdezodwhuf thead, #hdezodwhuf tbody, #hdezodwhuf tfoot, #hdezodwhuf tr, #hdezodwhuf td, #hdezodwhuf th {
+#rpapyvyjfl thead, #rpapyvyjfl tbody, #rpapyvyjfl tfoot, #rpapyvyjfl tr, #rpapyvyjfl td, #rpapyvyjfl th {
   border-style: none;
 }
 
-#hdezodwhuf p {
+#rpapyvyjfl p {
   margin: 0;
   padding: 0;
 }
 
-#hdezodwhuf .gt_table {
+#rpapyvyjfl .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1469,12 +1134,12 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   border-left-color: #D3D3D3;
 }
 
-#hdezodwhuf .gt_caption {
+#rpapyvyjfl .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#hdezodwhuf .gt_title {
+#rpapyvyjfl .gt_title {
   color: #000000;
   font-size: 125%;
   font-weight: initial;
@@ -1486,7 +1151,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   border-bottom-width: 0;
 }
 
-#hdezodwhuf .gt_subtitle {
+#rpapyvyjfl .gt_subtitle {
   color: #000000;
   font-size: 85%;
   font-weight: initial;
@@ -1498,7 +1163,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   border-top-width: 0;
 }
 
-#hdezodwhuf .gt_heading {
+#rpapyvyjfl .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1510,13 +1175,13 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   border-right-color: #D3D3D3;
 }
 
-#hdezodwhuf .gt_bottom_border {
+#rpapyvyjfl .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#hdezodwhuf .gt_col_headings {
+#rpapyvyjfl .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #000000;
@@ -1531,7 +1196,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   border-right-color: #D3D3D3;
 }
 
-#hdezodwhuf .gt_col_heading {
+#rpapyvyjfl .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1551,7 +1216,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   overflow-x: hidden;
 }
 
-#hdezodwhuf .gt_column_spanner_outer {
+#rpapyvyjfl .gt_column_spanner_outer {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1563,15 +1228,15 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   padding-right: 4px;
 }
 
-#hdezodwhuf .gt_column_spanner_outer:first-child {
+#rpapyvyjfl .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#hdezodwhuf .gt_column_spanner_outer:last-child {
+#rpapyvyjfl .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#hdezodwhuf .gt_column_spanner {
+#rpapyvyjfl .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -1583,11 +1248,11 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   width: 100%;
 }
 
-#hdezodwhuf .gt_spanner_row {
+#rpapyvyjfl .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#hdezodwhuf .gt_group_heading {
+#rpapyvyjfl .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1613,7 +1278,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   text-align: left;
 }
 
-#hdezodwhuf .gt_empty_group_heading {
+#rpapyvyjfl .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1628,15 +1293,15 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   vertical-align: middle;
 }
 
-#hdezodwhuf .gt_from_md > :first-child {
+#rpapyvyjfl .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#hdezodwhuf .gt_from_md > :last-child {
+#rpapyvyjfl .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#hdezodwhuf .gt_row {
+#rpapyvyjfl .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1655,7 +1320,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   overflow-x: hidden;
 }
 
-#hdezodwhuf .gt_stub {
+#rpapyvyjfl .gt_stub {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1668,7 +1333,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   padding-right: 5px;
 }
 
-#hdezodwhuf .gt_stub_row_group {
+#rpapyvyjfl .gt_stub_row_group {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1682,15 +1347,15 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   vertical-align: top;
 }
 
-#hdezodwhuf .gt_row_group_first td {
+#rpapyvyjfl .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#hdezodwhuf .gt_row_group_first th {
+#rpapyvyjfl .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#hdezodwhuf .gt_summary_row {
+#rpapyvyjfl .gt_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1700,16 +1365,16 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   padding-right: 5px;
 }
 
-#hdezodwhuf .gt_first_summary_row {
+#rpapyvyjfl .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#hdezodwhuf .gt_first_summary_row.thick {
+#rpapyvyjfl .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#hdezodwhuf .gt_last_summary_row {
+#rpapyvyjfl .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1719,7 +1384,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   border-bottom-color: #D3D3D3;
 }
 
-#hdezodwhuf .gt_grand_summary_row {
+#rpapyvyjfl .gt_grand_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1729,7 +1394,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   padding-right: 5px;
 }
 
-#hdezodwhuf .gt_first_grand_summary_row {
+#rpapyvyjfl .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1739,7 +1404,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   border-top-color: #D3D3D3;
 }
 
-#hdezodwhuf .gt_last_grand_summary_row_top {
+#rpapyvyjfl .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1749,11 +1414,11 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   border-bottom-color: #D3D3D3;
 }
 
-#hdezodwhuf .gt_striped {
+#rpapyvyjfl .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#hdezodwhuf .gt_table_body {
+#rpapyvyjfl .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1762,7 +1427,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   border-bottom-color: #000000;
 }
 
-#hdezodwhuf .gt_footnotes {
+#rpapyvyjfl .gt_footnotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1776,7 +1441,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   border-right-color: #D3D3D3;
 }
 
-#hdezodwhuf .gt_footnote {
+#rpapyvyjfl .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1785,7 +1450,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   padding-right: 5px;
 }
 
-#hdezodwhuf .gt_sourcenotes {
+#rpapyvyjfl .gt_sourcenotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1799,7 +1464,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   border-right-color: #D3D3D3;
 }
 
-#hdezodwhuf .gt_sourcenote {
+#rpapyvyjfl .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1807,63 +1472,63 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
   padding-right: 5px;
 }
 
-#hdezodwhuf .gt_left {
+#rpapyvyjfl .gt_left {
   text-align: left;
 }
 
-#hdezodwhuf .gt_center {
+#rpapyvyjfl .gt_center {
   text-align: center;
 }
 
-#hdezodwhuf .gt_right {
+#rpapyvyjfl .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#hdezodwhuf .gt_font_normal {
+#rpapyvyjfl .gt_font_normal {
   font-weight: normal;
 }
 
-#hdezodwhuf .gt_font_bold {
+#rpapyvyjfl .gt_font_bold {
   font-weight: bold;
 }
 
-#hdezodwhuf .gt_font_italic {
+#rpapyvyjfl .gt_font_italic {
   font-style: italic;
 }
 
-#hdezodwhuf .gt_super {
+#rpapyvyjfl .gt_super {
   font-size: 65%;
 }
 
-#hdezodwhuf .gt_footnote_marks {
+#rpapyvyjfl .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#hdezodwhuf .gt_asterisk {
+#rpapyvyjfl .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#hdezodwhuf .gt_indent_1 {
+#rpapyvyjfl .gt_indent_1 {
   text-indent: 5px;
 }
 
-#hdezodwhuf .gt_indent_2 {
+#rpapyvyjfl .gt_indent_2 {
   text-indent: 10px;
 }
 
-#hdezodwhuf .gt_indent_3 {
+#rpapyvyjfl .gt_indent_3 {
   text-indent: 15px;
 }
 
-#hdezodwhuf .gt_indent_4 {
+#rpapyvyjfl .gt_indent_4 {
   text-indent: 20px;
 }
 
-#hdezodwhuf .gt_indent_5 {
+#rpapyvyjfl .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -1969,7 +1634,7 @@ R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin"></i>
 </div>
 <p>Imbens und Kalyanaraman <span class="citation" data-cites="ImbensKalyanaraman2012">(<a href="Literatur.html#ref-ImbensKalyanaraman2012" role="doc-biblioref">2012</a>)</span> zeigen</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bw_selection</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rdrobust/man/rdbwselect.html">rdbwselect</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bw_selection</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rdrobust/man/rdbwselect.html">rdbwselect</a></span><span class="op">(</span></span>
 <span>  y <span class="op">=</span> <span class="va">BastenBetz</span><span class="op">$</span><span class="va">pfl</span>,</span>
 <span>  x <span class="op">=</span> <span class="va">BastenBetz</span><span class="op">$</span><span class="va">borderdis</span>,</span>
 <span>  fuzzy <span class="op">=</span> <span class="va">BastenBetz</span><span class="op">$</span><span class="va">prot1980s</span>, </span>
@@ -1997,10 +1662,10 @@ Unique Obs.                      97          261
      mserd     5.078      5.078     10.905     10.905
 =======================================================</code></pre>
 </div>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">OB</span> <span class="op">&lt;-</span> <span class="va">bw_selection</span><span class="op">$</span><span class="va">bws</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">OB</span> <span class="op">&lt;-</span> <span class="va">bw_selection</span><span class="op">$</span><span class="va">bws</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Table 2: First stage results </span></span>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Table 2: First stage results </span></span>
 <span><span class="co"># (1) (close to the) Imbens and Kalyanaraman (2012) optimal BW of 5.01 reported in</span></span>
 <span><span class="co"># the paper</span></span>
 <span><span class="va">FS1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span></span>
@@ -2021,30 +1686,30 @@ Unique Obs.                      97          261
 <span>  <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">modelsummary</span><span class="fu">::</span><span class="fu"><a href="https://vincentarelbundock.github.io/modelsummary/reference/modelsummary.html">modelsummary</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">modelsummary</span><span class="fu">::</span><span class="fu"><a href="https://vincentarelbundock.github.io/modelsummary/reference/modelsummary.html">modelsummary</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">FS1</span>, <span class="va">FS2</span>, <span class="va">FS3</span><span class="op">)</span>, </span>
 <span>  vcov <span class="op">=</span> <span class="st">"HC1"</span>, stars <span class="op">=</span> <span class="cn">T</span>, gof_map <span class="op">=</span> <span class="st">"nobs"</span>, output <span class="op">=</span> <span class="st">"gt"</span></span>
 <span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">tabopts</span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
-<div id="bnwxshktym" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#bnwxshktym table {
+<div id="kyddhotlli" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#kyddhotlli table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#bnwxshktym thead, #bnwxshktym tbody, #bnwxshktym tfoot, #bnwxshktym tr, #bnwxshktym td, #bnwxshktym th {
+#kyddhotlli thead, #kyddhotlli tbody, #kyddhotlli tfoot, #kyddhotlli tr, #kyddhotlli td, #kyddhotlli th {
   border-style: none;
 }
 
-#bnwxshktym p {
+#kyddhotlli p {
   margin: 0;
   padding: 0;
 }
 
-#bnwxshktym .gt_table {
+#kyddhotlli .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -2070,12 +1735,12 @@ Unique Obs.                      97          261
   border-left-color: #D3D3D3;
 }
 
-#bnwxshktym .gt_caption {
+#kyddhotlli .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#bnwxshktym .gt_title {
+#kyddhotlli .gt_title {
   color: #000000;
   font-size: 125%;
   font-weight: initial;
@@ -2087,7 +1752,7 @@ Unique Obs.                      97          261
   border-bottom-width: 0;
 }
 
-#bnwxshktym .gt_subtitle {
+#kyddhotlli .gt_subtitle {
   color: #000000;
   font-size: 85%;
   font-weight: initial;
@@ -2099,7 +1764,7 @@ Unique Obs.                      97          261
   border-top-width: 0;
 }
 
-#bnwxshktym .gt_heading {
+#kyddhotlli .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2111,13 +1776,13 @@ Unique Obs.                      97          261
   border-right-color: #D3D3D3;
 }
 
-#bnwxshktym .gt_bottom_border {
+#kyddhotlli .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#bnwxshktym .gt_col_headings {
+#kyddhotlli .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #000000;
@@ -2132,7 +1797,7 @@ Unique Obs.                      97          261
   border-right-color: #D3D3D3;
 }
 
-#bnwxshktym .gt_col_heading {
+#kyddhotlli .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2152,7 +1817,7 @@ Unique Obs.                      97          261
   overflow-x: hidden;
 }
 
-#bnwxshktym .gt_column_spanner_outer {
+#kyddhotlli .gt_column_spanner_outer {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2164,15 +1829,15 @@ Unique Obs.                      97          261
   padding-right: 4px;
 }
 
-#bnwxshktym .gt_column_spanner_outer:first-child {
+#kyddhotlli .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#bnwxshktym .gt_column_spanner_outer:last-child {
+#kyddhotlli .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#bnwxshktym .gt_column_spanner {
+#kyddhotlli .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -2184,11 +1849,11 @@ Unique Obs.                      97          261
   width: 100%;
 }
 
-#bnwxshktym .gt_spanner_row {
+#kyddhotlli .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#bnwxshktym .gt_group_heading {
+#kyddhotlli .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2214,7 +1879,7 @@ Unique Obs.                      97          261
   text-align: left;
 }
 
-#bnwxshktym .gt_empty_group_heading {
+#kyddhotlli .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -2229,15 +1894,15 @@ Unique Obs.                      97          261
   vertical-align: middle;
 }
 
-#bnwxshktym .gt_from_md > :first-child {
+#kyddhotlli .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#bnwxshktym .gt_from_md > :last-child {
+#kyddhotlli .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#bnwxshktym .gt_row {
+#kyddhotlli .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2256,7 +1921,7 @@ Unique Obs.                      97          261
   overflow-x: hidden;
 }
 
-#bnwxshktym .gt_stub {
+#kyddhotlli .gt_stub {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2269,7 +1934,7 @@ Unique Obs.                      97          261
   padding-right: 5px;
 }
 
-#bnwxshktym .gt_stub_row_group {
+#kyddhotlli .gt_stub_row_group {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2283,15 +1948,15 @@ Unique Obs.                      97          261
   vertical-align: top;
 }
 
-#bnwxshktym .gt_row_group_first td {
+#kyddhotlli .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#bnwxshktym .gt_row_group_first th {
+#kyddhotlli .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#bnwxshktym .gt_summary_row {
+#kyddhotlli .gt_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2301,16 +1966,16 @@ Unique Obs.                      97          261
   padding-right: 5px;
 }
 
-#bnwxshktym .gt_first_summary_row {
+#kyddhotlli .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#bnwxshktym .gt_first_summary_row.thick {
+#kyddhotlli .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#bnwxshktym .gt_last_summary_row {
+#kyddhotlli .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2320,7 +1985,7 @@ Unique Obs.                      97          261
   border-bottom-color: #D3D3D3;
 }
 
-#bnwxshktym .gt_grand_summary_row {
+#kyddhotlli .gt_grand_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2330,7 +1995,7 @@ Unique Obs.                      97          261
   padding-right: 5px;
 }
 
-#bnwxshktym .gt_first_grand_summary_row {
+#kyddhotlli .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2340,7 +2005,7 @@ Unique Obs.                      97          261
   border-top-color: #D3D3D3;
 }
 
-#bnwxshktym .gt_last_grand_summary_row_top {
+#kyddhotlli .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2350,11 +2015,11 @@ Unique Obs.                      97          261
   border-bottom-color: #D3D3D3;
 }
 
-#bnwxshktym .gt_striped {
+#kyddhotlli .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#bnwxshktym .gt_table_body {
+#kyddhotlli .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2363,7 +2028,7 @@ Unique Obs.                      97          261
   border-bottom-color: #000000;
 }
 
-#bnwxshktym .gt_footnotes {
+#kyddhotlli .gt_footnotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2377,7 +2042,7 @@ Unique Obs.                      97          261
   border-right-color: #D3D3D3;
 }
 
-#bnwxshktym .gt_footnote {
+#kyddhotlli .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -2386,7 +2051,7 @@ Unique Obs.                      97          261
   padding-right: 5px;
 }
 
-#bnwxshktym .gt_sourcenotes {
+#kyddhotlli .gt_sourcenotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2400,7 +2065,7 @@ Unique Obs.                      97          261
   border-right-color: #D3D3D3;
 }
 
-#bnwxshktym .gt_sourcenote {
+#kyddhotlli .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -2408,63 +2073,63 @@ Unique Obs.                      97          261
   padding-right: 5px;
 }
 
-#bnwxshktym .gt_left {
+#kyddhotlli .gt_left {
   text-align: left;
 }
 
-#bnwxshktym .gt_center {
+#kyddhotlli .gt_center {
   text-align: center;
 }
 
-#bnwxshktym .gt_right {
+#kyddhotlli .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#bnwxshktym .gt_font_normal {
+#kyddhotlli .gt_font_normal {
   font-weight: normal;
 }
 
-#bnwxshktym .gt_font_bold {
+#kyddhotlli .gt_font_bold {
   font-weight: bold;
 }
 
-#bnwxshktym .gt_font_italic {
+#kyddhotlli .gt_font_italic {
   font-style: italic;
 }
 
-#bnwxshktym .gt_super {
+#kyddhotlli .gt_super {
   font-size: 65%;
 }
 
-#bnwxshktym .gt_footnote_marks {
+#kyddhotlli .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#bnwxshktym .gt_asterisk {
+#kyddhotlli .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#bnwxshktym .gt_indent_1 {
+#kyddhotlli .gt_indent_1 {
   text-indent: 5px;
 }
 
-#bnwxshktym .gt_indent_2 {
+#kyddhotlli .gt_indent_2 {
   text-indent: 10px;
 }
 
-#bnwxshktym .gt_indent_3 {
+#kyddhotlli .gt_indent_3 {
   text-indent: 15px;
 }
 
-#bnwxshktym .gt_indent_4 {
+#kyddhotlli .gt_indent_4 {
   text-indent: 20px;
 }
 
-#bnwxshktym .gt_indent_5 {
+#kyddhotlli .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -2539,7 +2204,7 @@ Unique Obs.                      97          261
 </div>
 </div>
 <div>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Figure 3</span></span>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Figure 3</span></span>
 <span><span class="fu">rdrobust</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rdrobust/man/rdplot.html">rdplot</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">BastenBetz</span><span class="op">$</span><span class="va">prot1980s</span>, </span>
 <span>                 x <span class="op">=</span> <span class="va">BastenBetz</span><span class="op">$</span><span class="va">borderdis</span>, </span>
 <span>                 h <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">OB</span>, <span class="va">OB</span><span class="op">)</span>, </span>
@@ -2567,13 +2232,13 @@ Unique Obs.                      97          261
 <div class="quarto-layout-row quarto-layout-valign-top">
 <div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure"><p><img src="RDD_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid figure-img" width="288"></p>
+<figure class="figure"><p><img src="RDD_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="288"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure"><p><img src="RDD_files/figure-html/unnamed-chunk-28-2.png" class="img-fluid figure-img" width="288"></p>
+<figure class="figure"><p><img src="RDD_files/figure-html/unnamed-chunk-24-2.png" class="img-fluid figure-img" width="288"></p>
 </figure>
 </div>
 </div>
@@ -2581,13 +2246,13 @@ Unique Obs.                      97          261
 <div class="quarto-layout-row quarto-layout-valign-top">
 <div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure"><p><img src="RDD_files/figure-html/unnamed-chunk-28-3.png" class="img-fluid figure-img" width="288"></p>
+<figure class="figure"><p><img src="RDD_files/figure-html/unnamed-chunk-24-3.png" class="img-fluid figure-img" width="288"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure"><p><img src="RDD_files/figure-html/unnamed-chunk-28-4.png" class="img-fluid figure-img" width="288"></p>
+<figure class="figure"><p><img src="RDD_files/figure-html/unnamed-chunk-24-4.png" class="img-fluid figure-img" width="288"></p>
 </figure>
 </div>
 </div>
@@ -2597,9 +2262,6 @@ Unique Obs.                      97          261
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
-<div id="ref-CarpenterDobkin2009" class="csl-entry" role="listitem">
-Carpenter, Christopher, und Carlos Dobkin. 2009. <span>„The effect of alcohol consumption on mortality: regression discontinuity evidence from the minimum drinking age“</span>. <em>American Economic Journal: Applied Economics</em> 1 (1): 164–82.
-</div>
 <div id="ref-ImbensLemieux2008" class="csl-entry" role="listitem">
 Imbens, G. W., und Thomas Lemieux. 2008. <span>„Regression discontinuity designs: A guide to practice“</span>. <em>Journal of econometrics</em> 142 (2): 615–35.
 </div>
@@ -2611,7 +2273,7 @@ Lee, David S. 2008. <span>„Randomized experiments from non-random selection in
 </div>
 </div>
 </section></main><!-- /main --><script type="ojs-module-contents">
-{"contents":[{"methodName":"interpret","cellName":"ojs-cell-1","inline":false,"source":"html`\n<style>\ncircle {\n  fill-opacity: .8;\n  stroke: #000;\n  stroke-opacity: 1;\n}\n.regression {\n  fill: none;\n  stroke: #000;\n  stroke-width: 1.5px;\n}\n.axis line {\n  stroke: #ddd;\n}\n.axis .baseline line {\n  stroke: #555;\n}\n.axis .domain {\n  display: none;\n} \n</style>\n`\n\nd3 = require(\"d3-array@3\", \"d3-axis@3\", \"d3-regression@1\", \"d3-scale@4\", \"d3-shape@3\", \"d3-selection@3\")\n\nmargin = ({left: 33, right: 8, top: 13, bottom: 24});\nbase = Math.min(width, 500);\ninnerWidth = base - margin.left - margin.right;\ninnerHeight = base-100 - margin.top - margin.bottom;\n\nviewof bandwidth = Inputs.range([.01, .5], {\n  label: \"Bandweite LOESS\",\n  step: .01,\n  value: .25\n});\n\nxScaleLoess = d3.scaleLinear()\n   .domain([-.55, .55])\n   .range([0, innerWidth]);\n   \nyScaleLoess = d3.scaleLinear()\n  .domain([.2, .8])\n  .range([innerHeight, 0]);\n\nlineLoess = d3.line()\n  .x(d => xScaleLoess(d[0]))\n  .y(d => yScaleLoess(d[1]));\n  \nxAxisLoess = d3.axisBottom(xScaleLoess)\n  .tickSize(innerHeight + 10)\n  .tickValues([-.5, -.25, 0, .25, .5])\n  .tickFormat(d => d);\n\nyAxisLoess = d3.axisLeft(yScaleLoess)\n  .tickSize(innerWidth + 10)\n  .tickValues([.2, .35, .5, .65, .8])\n  .tickFormat(d => d);\n\nloessRegression = d3.regressionLoess()\n  .x(d => d.StimmenTm1)\n  .y(d => d.StimmenT)\n  .bandwidth(bandwidth);\n"},{"methodName":"interpret","cellName":"ojs-cell-2","inline":false,"source":"\n{\n  const svg = d3.select(DOM.svg(innerWidth + margin.left + margin.right, innerHeight + margin.top + margin.bottom))\n  \n  const g = svg.append(\"g\")\n      .attr(\"transform\", `translate(${margin.left}, ${margin.top})`);\n\n  g.append(\"g\")\n      .attr(\"class\", \"axis\")\n      .call(xAxisLoess);\n\n  g.append(\"g\")\n    .attr(\"class\", \"axis\")\n    .attr(\"transform\", `translate(${innerWidth})`)\n    .call(yAxisLoess);\n\n  g.selectAll(\"circle\")\n    .data(transpose(house_binned))\n    .enter().append(\"circle\")\n    .attr(\"r\", 2)\n    .attr(\"cx\", d => xScaleLoess(d.StimmenTm1))\n    .attr(\"cy\", d => yScaleLoess(d.StimmenT));\n\n  g.append(\"path\")\n      .attr(\"class\", \"regression\")\n      .datum(loessRegression(\n        transpose(house)\n          .filter(function(d){ return d.StimmenTm1 < 0 & d.StimmenTm1 >= -.5 })\n          )\n        )\n      .attr(\"d\", lineLoess);\n  \n  g.append(\"path\")\n      .attr(\"class\", \"regression\")\n      .datum(loessRegression(\n        transpose(house)\n          .filter(function(d){ return d.StimmenTm1 >= 0 & d.StimmenTm1 <= .5 })\n          )\n        )\n      .attr(\"d\", lineLoess);\n  \n  g.append(\"line\")\n  .attr(\"x1\", xScaleLoess(0))\n  .attr(\"y1\", 0)\n  .attr(\"x2\", xScaleLoess(0))\n  .attr(\"y2\", innerHeight)\n  .style(\"stroke\", \"black\")\n  .style(\"stroke-dasharray\", \"4\")\n  .style(\"stroke-width\", \"1\");\n\n  return svg.node();\n}\n"},{"methodName":"interpretQuiet","source":"shinyInput('bandwidth')"}]}
+{"contents":[{"methodName":"interpret","cellName":"ojs-cell-1","inline":false,"source":"html`\n<style>\ncircle {\n  fill-opacity: .8;\n  stroke: #000;\n  stroke-opacity: 1;\n}\n.regression {\n  fill: none;\n  stroke: #000;\n  stroke-width: 1.5px;\n}\n.axis line {\n  stroke: #ddd;\n}\n.axis .baseline line {\n  stroke: #555;\n}\n.axis .domain {\n  display: none;\n} \n</style>\n`\n\nd3 = require(\"d3-array@3\", \"d3-axis@3\", \"d3-regression@1\", \"d3-scale@4\", \"d3-shape@3\", \"d3-selection@3\")\n\nmargin = ({left: 55, right: 8, top: 13, bottom: 24});\nbase = Math.min(width, 500);\ninnerWidth = base - margin.left - margin.right;\ninnerHeight = base-100 - margin.top - margin.bottom;\n\nviewof bandwidth = Inputs.range([.01, 1], {\n  label: \"Bandweite LOESS (l)\",\n  step: .01,\n  value: 1\n});\n\nviewof bw_daten = Inputs.range([.05, .5], {\n  label: \"Bandweite Daten (h)\",\n  step: .01,\n  value: .28\n});\n\nxScaleLoess = d3.scaleLinear()\n   .domain([-.55, .55])\n   .range([0, innerWidth]);\n   \nyScaleLoess = d3.scaleLinear()\n  .domain([.2, .8])\n  .range([innerHeight, 0]);\n\nlineLoess = d3.line()\n  .x(d => xScaleLoess(d[0]))\n  .y(d => yScaleLoess(d[1]));\n  \nxAxisLoess = d3.axisBottom(xScaleLoess)\n  .tickSize(innerHeight + 10)\n  .tickValues([-.5, -.25, 0, .25, .5])\n  .tickFormat(d => d);\n\nyAxisLoess = d3.axisLeft(yScaleLoess)\n  .tickSize(innerWidth + 10)\n  .tickValues([.2, .35, .5, .65, .8])\n  .tickFormat(d => d);\n\nloessRegression = d3.regressionLoess()\n  .x(d => d.StimmenTm1)\n  .y(d => d.StimmenT)\n  .bandwidth(bandwidth);\n"},{"methodName":"interpret","cellName":"ojs-cell-2","inline":false,"source":"\n{\n  const svg = d3.select(DOM.svg(innerWidth + margin.left + margin.right + 20, innerHeight + margin.top + margin.bottom + 20))\n  \n  const g = svg.append(\"g\")\n      .attr(\"transform\", `translate(${margin.left}, ${margin.top})`);\n\n  g.append(\"g\")\n      .attr(\"class\", \"axis\")\n      .call(xAxisLoess);\n\n  g.append(\"g\")\n    .attr(\"class\", \"axis\")\n    .attr(\"transform\", `translate(${innerWidth})`)\n    .call(yAxisLoess);\n\n  // Add X axis label:\n  g.append(\"text\")\n    .attr(\"text-anchor\", \"end\")\n    .attr(\"font-size\", 13)\n    .attr(\"x\", innerWidth)\n    .attr(\"y\", innerHeight + margin.top + 25)\n    .text(\"Stimmenanteil Demokraten letzte Wahl\");\n\n  // Y axis label:\n  g.append(\"text\")\n    .attr(\"text-anchor\", \"end\")\n    .attr(\"transform\", \"rotate(-90)\")\n    .attr(\"font-size\", 13)\n    .attr(\"y\", -margin.left+10)\n    .attr(\"x\", -margin.top+10)\n    .text(\"Stimmenanteil Demokraten\");\n\n  // Distance at jump\n  g.append(\"text\")\n   .attr(\"x\", 250) // x-Position des Textelements\n   .attr(\"y\", 200) // y-Position des Textelements\n   .text(\"\") // Textinhalt\n   .attr(\"font-size\", \"14px\") // Schriftgröße\n   .attr(\"fill\", \"black\"); // Textfarbe\n\n\n  g.selectAll(\"circle\")\n    .data(transpose(house_binned))\n    .enter().append(\"circle\")\n    .attr(\"r\", 2)\n    .attr(\"cx\", d => xScaleLoess(d.StimmenTm1))\n    .attr(\"cy\", d => yScaleLoess(d.StimmenT));\n\n  g.append(\"path\")\n      .attr(\"class\", \"regression\")\n      .datum(loessRegression(\n        transpose(house)\n          .filter(function(d){ return d.StimmenTm1 <= 0 & d.StimmenTm1 >= -bw_daten })\n          )\n        )\n      .attr(\"d\", lineLoess)\n      .style(\"stroke\", \"red\");\n\n  g.append(\"path\")\n      .attr(\"class\", \"regression\")\n      .datum(loessRegression(\n        transpose(house)\n          .filter(function(d){ return d.StimmenTm1 > 0 & d.StimmenTm1 <= bw_daten })\n          )\n        )\n      .attr(\"d\", lineLoess)\n      .style(\"stroke\", \"red\");\n  \n  /* dashed line at cutoff */\n  g.append(\"line\")\n  .attr(\"x1\", xScaleLoess(0))\n  .attr(\"y1\", 0)\n  .attr(\"x2\", xScaleLoess(0))\n  .attr(\"y2\", innerHeight)\n  .style(\"stroke\", \"black\")\n  .style(\"stroke-dasharray\", \"1\")\n  .style(\"stroke-width\", \"1\");\n  \n  /* dashed line data bw upper */\n  g.append(\"line\")\n  .attr(\"x1\", xScaleLoess(bw_daten))\n  .attr(\"y1\", 0)\n  .attr(\"x2\", xScaleLoess(bw_daten))\n  .attr(\"y2\", innerHeight)\n  .style(\"stroke\", \"blue\")\n  .style(\"stroke-dasharray\", \"4\")\n  .style(\"stroke-width\", \"1\");\n  \n  /* dashed line data bw lower */\n  g.append(\"line\")\n  .attr(\"x1\", xScaleLoess(-bw_daten))\n  .attr(\"y1\", 0)\n  .attr(\"x2\", xScaleLoess(-bw_daten))\n  .attr(\"y2\", innerHeight)\n  .style(\"stroke\", \"blue\")\n  .style(\"stroke-dasharray\", \"4\")\n  .style(\"stroke-width\", \"1\");\n\n  return svg.node();\n}\n"},{"methodName":"interpretQuiet","source":"shinyInput('bandwidth')"},{"methodName":"interpretQuiet","source":"shinyInput('bw_daten')"}]}
 </script><script type="module">
 if (window.location.protocol === "file:") { alert("The OJS runtime does not work with file:// URLs. Please use a web server to view this document."); }
 window._ojs.paths.runtimeToDoc = "../..";
