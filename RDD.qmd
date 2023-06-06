@@ -158,7 +158,7 @@ knitr::knit_engines$set(webr = function(options) {
 )
 ```
 
-```{r, echo=F}
+```{r, echo=F, message=FALSE}
 library(gt)
 library(tidyverse)
 # Formatierung von gt-Tabellen
