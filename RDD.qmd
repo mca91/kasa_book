@@ -1,5 +1,17 @@
 # Regression Discontiniuty Designs
 
+```{r, echo = F}
+house_binned <-  read.csv("datasets/house_binned.csv")
+house <-  read.csv("datasets/house.csv")
+SRDD <-  read.csv("datasets/SRDD.csv")
+
+ojs_define(
+ house_binned = house_binned,
+ house = house,
+ SRDD = SRDD
+)
+```
+
 ```{CSS, echo = F}
 svg {
   margin-left: auto;
@@ -12,41 +24,26 @@ svg {
 <style>
   .CodeMirror pre {
     background-color: unset !important;
-    font-size: 14px;
+  }
+  .btn-webr {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
   }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/r/r.js"></script>
-
 <script type="module">
-  import { WebR } from "https://webr.r-wasm.org/v0.1.0/webr.mjs";
+  import { WebR } from "https://webr.r-wasm.org/v0.1.1/webr.mjs";
   globalThis.webR = new WebR({
     SW_URL: "/"
   });
   await globalThis.webR.init();
-  
-  let dataset = await new webR.RList(house);
-  let dataset_binned = await new webR.RList(house_binned);
-
-
-  await globalThis.webR.objs.globalEnv.bind('house', dataset);
-  await globalThis.webR.objs.globalEnv.bind('house_binned', dataset_binned);
-
-
-  await globalThis.webR.installPackages(['dplyr', 'tidyr', 'ggplot2']);
-  await globalThis.webR.evalRVoid('library(dplyr); library(tidyr); library(ggplot2); house <- as.data.frame(house) %>% mutate(across(everything(), as.numeric)); house_binned <- as.data.frame(house_binned) %>% mutate(across(everything(), as.numeric))');
-
-  
   globalThis.webRCodeShelter = await new globalThis.webR.Shelter();
   document.querySelectorAll(".btn-webr").forEach((btn) => {
-    btn.innerText = "R-Code ausführen";
+    btn.innerText = "Run code";
     btn.disabled = false;
   });
 </script>
-
-<!-- datasets -->
-<script type="text/javascript" src="/datasets/house.js"></script>
-<script type="text/javascript" src="/datasets/house_binned.js"></script>
 ```
 
 ```{r}
@@ -54,8 +51,8 @@ svg {
 #| echo: false
 webr_counter = 0
 
-cat("importScripts('https://webr.r-wasm.org/v0.1.0/webr-worker.js');", file = "webr-worker.js")
-cat("importScripts('https://webr.r-wasm.org/v0.1.0/webr-serviceworker.js');", file = "webr-serviceworker.js")
+cat("importScripts('https://webr.r-wasm.org/v0.1.1/webr-worker.js');", file = "docs/webr-worker.js")
+cat("importScripts('https://webr.r-wasm.org/v0.1.1/webr-serviceworker.js');", file = "docs/webr-serviceworker.js")
 
 webr_editor = function(code = I(encodeString(code, quote = '`')), width, height) { 
 webr_counter <<- webr_counter + 1
@@ -167,21 +164,23 @@ tabopts <- function(x) {
   tab_options(table_body.hlines.color = "white", 
               column_labels.border.bottom.color = "black", 
              column_labels.border.top.color = "black",
-             table_body.border.bottom.color = "black",
+             table_body.border.bottom.color = "black", 
+             table.border.bottom.color = "black",
              column_labels.font.weight = "bold", 
-             table.font.color = "black", table.font.size = 16)
+             table.font.color = "black", 
+             table.font.size = 16)
 }
 
 house <- read_csv("datasets/house.csv")
 ```
 
-Regression Discontinuity Design (RDD) ist ein Ansatz für die Schätzung von Treatment-Effekten mit Regression, wenn durch einen experimentell oder natürlich gegebenen Umstand die Behandlung an einem Schwellenwert ($C$) einer *Laufvariable* ($X$) sprunghaft beeinflusst wird. Ein RDD-Schätzer brücksichtigt lediglich Beobachtungen mit Ausprägungen von $X$, die knapp ober- oder knapp unterhalb von $C$ liegen. Die zentrale Idee hierbei ist, dass Individuen nahe bei $C$ im Durchschnitt ähnliche Merkmale aufweisen. RDD isoliert Variation auf dem Pfad *Oberhalb C &rarr; Treatment &rarr; Y*. Somit können Backdoor-Pfade über $X$ oder weitere (möglichweise unbeobachtbare) Confounder ($Z$) vermieden werden, siehe @fig-CDRDD.
+Regression Discontinuity Design (RDD) ist ein Ansatz für die Schätzung von Treatment-Effekten mit Regression, wenn durch einen experimentell oder natürlich gegebenen Umstand die Behandlung an einem Schwellenwert ($C$) einer *Laufvariable* ($X$) sprunghaft beeinflusst wird. Ein RDD-Schätzer kann so implementiert werden, dass lediglich Beobachtungen mit Ausprägungen von $X$, die knapp ober- oder knapp unterhalb von $c$ liegen berücksichtigt werden. Die zentrale Idee hierbei ist, dass Individuen nahe bei $c$ im Durchschnitt ähnliche Merkmale aufweisen. Das kausale Diagram in @fig-CDRDD zeigt den Zusammenhang.
 
 ```{dot}
 //| fig-width: 5
 //| fig-height: 3
 //| fig-align: 'center'
-//| fig-cap: "Causal Diagram für RDD"
+//| fig-cap: "Kausales Diagramm für Sharp RDD"
 //| label: "fig-CDRDD" 
 digraph "Causal Diagramm RDD" {
   layout=neato
@@ -191,185 +190,128 @@ digraph "Causal Diagramm RDD" {
   node [shape=none];
   "X" [pos="0,1!"]
   "Y" [pos="4,-1!"]
-  "C" [pos="0,-1!"]
-  "Z" [pos="3,1!"]
-  "Treatment" [pos="2,-1!"]
+  "Oberhalb c" [pos="0,-1!"]
+  "Z" [pos="4,1!"]
+  "Behandlung B" [pos="2,-1!"]
   "X" -> "Y"
   "Z" -> "X"
   "Z" -> "Y"
-  "X" -> "C"
-  "C" -> "Treatment"
-  "Treatment" -> "Y"
+  "X" -> "Oberhalb c"
+  "Oberhalb c" -> "Behandlung B"
+  "Behandlung B" -> "Y"
 }
 ```
 
-Der kausale Effekt wird dabei als durchschnittlicher Effekt der Diskontinuität auf die Outcome-Variable ($Y$) anhand von Beobachtungen *nahe bei $C$* ermittelt. 
+RDD isoliert Variation auf dem Pfad *Oberhalb C &rarr; Behandlung B &rarr; Y*. Somit können Backdoor-Pfade über $X$ oder weitere (möglichweise unbeobachtbare) Confounder ($Z$) vermieden werden, siehe @fig-CDRDD. Der kausale Effekt wird dabei als (lokaler) durchschnittlicher Behandlungseffekt der Diskontinuität auf die Outcome-Variable ($Y$) anhand von Beobachtungen *nahe bei c* ermittelt. 
 
-Hinsichtlich der Beeinflussung der Behandlung unterscheiden wir zwischen *Sharp* und *Fuzzy* Regression Discontinuity Designs (SRDD/FRDD). Bei einem SRDD ist die Zuordnung *deterministisch*, d.h. der Schwellenwert in der Laufvariable ist eine harte Grenze für die Gruppenzugehörigkeit: Die *Wahrscheinlichkeit* der Behandlung springt bei $X=C$ um $p=100\%$.
+Hinsichtlich der Beeinflussung der Behandlung unterscheiden wir zwischen *Sharp* und *Fuzzy* Regression Discontinuity Designs (SRDD/FRDD). Bei einem SRDD ist die Zuweisung der Behandlung *deterministisch*, d.h. der Schwellenwert in der Laufvariable ist eine harte Grenze für die Gruppenzugehörigkeit: Die *Wahrscheinlichkeit* der Behandlung $p$ springt bei $X=c$ von $p=0$ um $\Delta p = 1$ auf $p=1$.
 
-Bei einem FRDD wird angenommen, dass die Zuordnung nicht perfekt durch den Schwellenwert C bestimmt ist: Die *Wahrscheinlichkeit* der Behandlung springt bei $X=C$ um $p<100\%$.^[Im FRDD können also sowohl Treatment- als auch Kontroll-Beobachtungen auf beiden Seiten der Diskontinuität beobachtet werden -- die Trennung der Gruppen ist "unscharf" (engl. *fuzzy*)] Dies tritt auf, wenn das Überschreiten von $C$ nicht die einzige Determinante einer Behandlung ist. Die Wahl zwischen SRDD und FRDD hängt von der Natur der Daten und der Forschungsfrage ab.
+Bei einem FRDD ist die Zuordnung in Behandlungs- und Kontrollgruppe nicht perfekt durch den Schwellenwert $c$ bestimmt: $p$ springt bei $X=c$ um $\Delta p<1$. Im FRDD können grundsätzlich also sowohl behandelte Subjekte als auch Kontroll-Beobachtungen auf beiden Seiten der Diskontinuität vorliegen -- die Trennung der Gruppen ist "unscharf"^[Engl. *fuzzy*.]. Dieser Umstand ist in empirischen Studien gegeben, wenn es neben der Überschreitung von $c$ weitere Determinanten der Behandlung gibt für die wir nicht kontrollieren können. Die Wahl zwischen SRDD und FRDD hängt vom datenerzeugenden Prozess und der Forschungsfrage ab.
 
-Der Geschätzte Treatment-Effekt ist ein s.g. *local average treatment effect* (LATE).
 
 ## Sharp Regression Discontinuity Design
 
-**Modelle und funktionale Form**
+**Modell und funktionale Form**
 
 Die korrekte Spezifikation der funktionalen Form für RDD ist wichtig, um eine unverzerrte Schätzung des Effekts zu vermeiden. Die einfachste Form eines SRDD kann anhand der linearen Regression 
 \begin{align}
-Y_i = \beta_0 + \beta_1 D_i + \beta_2 (X_i - C) + u_i\label{eq-simpleSRDD}
-\end{align} geschätzt werden, wobei $D_i$ Behandlung anzeigt: $D_i$ ist eine Dummy-Variable für das Überschreiten des Schwellenwertes C, d.h.
+Y_i = \beta_0 + \beta_1 B_i + \beta_2 X_i + u_i\label{eq-simpleSRDD}
+\end{align} geschätzt werden, wobei $B_i$ eine Dummy-Variable für das Überschreiten des Schwellenwertes $c$ist, d.h.
 \begin{align*}
-  D_i=\begin{cases}
+  B_i=\begin{cases}
     0 & X_i < C\\
     1 & X_i \geq C.
   \end{cases}
 \end{align*}
-Hierbei ist zu beachten, dass $(X_i - C)$ die um den Schwellenwert zentrierte Laufvariable ist, sodass $\beta_1$ der Effekt der Behandlung bei $(X_i - C)\geq 0$ ist.
+Damit ist $B_i$ eine *deterministische* Funktion der Laufvariable $X_i$ und zeigt die Zugehörigkeit zur Behandlungs- oder Treatmentgruppe an. $\beta_1$ ist der Behandlungseffekt.
 
-Modell \eqref{eq-simpleSRDD} unterstellt, dass $X$ links- und rechtsseitig von $C$ denselben Effekt $\beta_2$ auf $Y$ hat. Eine Alternative ist ein lineares Interaktionsmodell
+Modell \eqref{eq-simpleSRDD} unterstellt, dass $X$ links- und rechtsseitig von $c$denselben Effekt auf $Y$ hat. Diese Annahme ist restriktiv. Eine Alternative ist ein lineares Interaktionsmodell
 \begin{align}
-Y_i = \beta_0 + \beta_1 D_i + \beta_2 (X_i - C) + \beta_3(X_i-C)\times D_i + u_i.\label{eq:linearSRDD}
+Y_i = \beta_0 + \beta_1 B_i + \beta_2 (X_i - C) + \beta_3(X_i-C)\times B_i + u_i.\label{eq:linearSRDD}
 \end{align}
-In Modell \eqref{eq:linearSRDD} erfasst $\beta_3$ den Unterschied des Effekts von $X$ auf $Y$ für Beoabachtungen oberhalb von $C$ gegenüber Beobachtungen unterhalb von $C$, sodass unterschiedliche lineare Effekte von $X$ auf $Y$ link- und rechtsseitig von $C$ modelliert werden können.
+Das Modell \eqref{eq:linearSRDD} kann unterschiedliche lineare Effekte von $X$ auf $Y$ unterhalb ($\beta_2$) und oberhalb ($\beta_2 + \beta_3$) von $c$abgebilden. Beachte, dass $(X_i - C)$ die um den Schwellenwert zentrierte Laufvariable ist, sodass $\beta_1$ wie in \eqref{eq-simpleSRDD} den Unterschied des Effekts von $X$ auf $Y$ für Beoabachtungen am Schwellenwert erfasst. 
 
-**Bandweite**
+Um unterschiedliche nicht-lineare Zusammenhänge von $X$ und $Y$ unterhalb und oberhalb von $c$abzubilden, können (interargierte) Polynom-Terme in $X$ verwendet werden, bspw. eine quadratische Regressionsfunktion
+\begin{align*}
+  Y_i =&\, \beta_0 + \beta_1 B_i + \beta_2 (X_i - C) + \beta_3 (X_i - C)^2\\ 
+       &+\, \beta_4(X_i-C)\times B_i + \beta_5(X_i-C)\times B_i + u_i.\label{eq:quadSRDD}
+\end{align*}
+@GelmanImbens2019 zeigen, dass Polynome höherer Ordnung zu verzerrten Schätzern und hoher Varianz führen können.^[Ursachen sind Überanpassung an die Daten sowie instabiles Verhalten der Schätzung nahe des Schwellenwertes.] Die Authoren empfehlen die Schätzung mit lokaler Regression.
 
-Neben der funktionalen Form muss spezifiziert werden, welche Beobachtungen hinreichend nahe am Schwellenwert C liegen. Hierfür verwenden wir eine sogenannte Bandweite $h$, wobei 
+**Nicht-parametrische Schätzung und Bandweite**
+
+Aktuelle Studien nutzen nicht-parametrische Schätzer, die den Behandlungseffekt als Differenz der geschätzten Regressionsfunktionen am Schwellenwert $c$ berechnen. Um auch nicht-lineare Regressionsfunktionen abzubilden zu können, wird häufig lokale Regression verwendet. Dieses Verfahren liefert eine "lokale" Schätzung der Regressionsfunktionen am Schwellenwert, bei der nur Beobachtungen nahe bei $X = c$ für die Schätzung berücksichtigt werden. Hinreichende Nähe wird durch eine sogenannte Bandweite $h$ festgelegt, wobei 
 \begin{align}
   \lvert(X_i-C)\rvert\leq h \label{eq:bwc}
 \end{align}
-das Kriterium für eine Berücksichtigung von Beobachtung $i$ bei der Schätzung ist. Unter Berücksichtigung einer Bandweite $h$ wird der Regressionsansatz \eqref{eq:linearSRDD} als *local linear regression* mit Uniform-Kernelfunktion bezeichnet.^[*Local regression* ist ein nicht-parametrisches Verfahren. Hierbei kann die Beziehung zwischen Variablen flexibel modelliert werden.] Der Uniform-Kernel ist neben dem Triangular-Kernel eine häufig in der Praxis genutzte lineare Kernelfunktion.^[In der Praxis wird oftmals local linear regression mit linearen Kernelfunktionen zurückgegriffen und die Robustheit der Ergebnisse anhand flexiblerer Spezifikationen geprüft.] Der nachstehende Code plottet die Uniform- (grün) sowie die Triangular-Kernelfunktion (blau) wie in @fig-linearkern dargestellt.
+das Kriterium für eine Berücksichtigung von Beobachtung $i$ bei der Schätzung ist. 
+
+Unter Verwendung einer Bandweite $h$ wird der Regressionsansatz \eqref{eq:linearSRDD} als *lokale lineare Regression* mit Uniform-Kernelfunktion bezeichnet. Der Uniform-Kernel gibt allen Beobachtungen, innerhalb der Bandweite $h$ dasselbe Gewicht. Ist $h$ so groß, dass der gesamte Datensatz in die Schätzung einbezogen wird, entspricht der lokale lineare Regressions-Schätzer mit Uniform-Kernel dem globalen KQ-Schätzer. Neben dem Uniform-Kernel ist der Triangular-Kernel eine in der Praxis häufig genutzte lineare Kernelfunktion. Der nachstehende Code plottet die Uniform- (grün) sowie die Triangular-Kernelfunktion (blau), siehe @fig-linearkern.
 ```{r}
-#| fig-column: margin
-#| fig-cap: "Uniform-Kernel auf [-h, h]"
+#| fig-cap: "Kernelfunktionen auf [-1, 1]"
 #| label: fig-linearkern
-#| fig-width: 3
+#| fig-width: 4
 #| fig-height: 2.5
 #| code-fold: true
 #| message: false
+#| warning: false
 library(ggplot2)
 library(cowplot)
 ggplot() + 
     geom_function(
-      fun = ~ ifelse(abs(.) <= 1, 1, 0), col = "green"
+      fun = ~ ifelse(abs(.) <= 1, 1/2, 0), 
+      col = "green", 
+      n = 1000
       ) + 
     geom_function(
-      fun = ~ ifelse(abs(.) <= 1, 1-abs(.), 0), col = "blue"
+      fun = ~ ifelse(abs(.) <= 1, 1-abs(.), 0), 
+      col = "blue", 
+      n = 100
       ) + 
     scale_x_continuous("x", limits = c(-1.5, 1.5), 
-                       labels = c("-h", 0, "h"), 
                        breaks = c(-1, 0, 1)) +
     scale_y_continuous("K(x)", 
                        breaks = c(0, 1), 
-                       limits = c(0, 1.5)) +
+                       limits = c(0, 1.25)) +
     theme_cowplot()
 ```
-Die Wahl der Bandweite ist eine wichtige Komponente der RDD-Schätzung. Falls der wahre Zusammenhang nicht-linear ist, erlauben kleine Bandweiten eine Schätzung der Regressionsfunktion nahe des Schwellenwertes mit wenig Verzerrung. Allerdings kann diese Schätzung unpräzise sein, wenn nur wenige Beobachtungen \eqref{eq:bwc} erfüllen. In der Praxis wird $h$ daher anhand einer Schätzfunktion [@ImbensKalyanaraman2012] oder anhand von *Cross Validation* [bspw. @ImbensLemieux2008] bestimmt. Die später in diesem Kapitel betrachteten R-Pakete halten diese Methoden bereit.
+In Studien wird oftmals zunächst lokale lineare Regression anhand von \eqref{eq:linearSRDD} mit einer linearen Kernelfunktionen und geringer bandweite $h$ genutzt. Anschließend wird die Robustheit der Ergebnisse anhand flexiblerer Spezifikationen, die eine Nicht-Linearitäten in der Regressionsfunktion besser abbilden können, geprüft.
 
-### Beispiel: Amtsinhaber-Vorteil [@Lee2008]
+Die nachstehende Visualisierung zeigt die Schätzung des kausalen Effektes der Behandlung $B_i$ anhand lokaler linearer Regression mit einem Uniform-Kernel für wiefolgt simulierte Daten:
 
-@Lee2008 untersucht den Einfluss des Amtsinhaber-Vorteils auf die Wahl von Mitgliedern des US-Repräsentantenhauses. Entfällt ein Stimmenanteil von mehr als 50% auf eine Partei, hat diese Partei den Vorsitz des Repräsentantenhauses gewonnen. Durch die Analyse der 6558 Wahlen im Zeitraum 1946-1998 mit RDD kommt die Studie zu dem Ergebnis, dass die amtsinhabende im Durchschnitt einen Vorteil von etwa 8%-10% bei der Wahl hat. Dieses Ergebnis kann als Vorteil kann durch verschiedene Faktoren erklärt werden, bspw. dass die amtierende Partei höhere finanzielle Ressourcen und von einer besseren Organisation als die Opposition profitiert. Anhand der Datensätze `house` und `house_binned` illustrieren wir nachfolgend die Schätzung von SRDD-Modellen für den Wahlerfolg der demokratischen Partei, wenn diese Amtsinhaber ist.
-
-Wir verschaffen uns zunächst einen Überblick über den Datensatz `house`.
-
-```{webr}
-library(dplyr)
-
-glimpse(house)
-glimpse(house_binned)
-```
-
-Der Datensatz `house` enthält Stimmenanteile der Demokraten bei der Wahl zum Zeitpunkt $T$ (`StimmenT`) sowie um den Schwellenwert von 50% zentrierte Stimmenanteile bei der vorherigen Wahl zum Zeitpunkt $T-1$ (`StimmenTm1`). 
-
-`house_binned` ist eine aggregierte Version von `house` mit Mittelwerten von jeweils 50 gleichgroßen Intervallen oberhalb und unterhalb der Schwelle von 0. Dieser Datensatz eignet sich, um einen ersten Eindruck des funktionalen Zusammenhangs auf beiden Seiten zu gewinnen. Wir stellen die klassierten Daten mit `ggplot2` graphisch dar.
-
-```{webr}
-library(ggplot2)
-
-house_binned %>%
-  ggplot(aes(x = StimmenTm1, y = StimmenT)) +
-  geom_point() +
-  geom_vline(xintercept = 0, lty = 2)
-```
-
-Die Grafik zeigt eindeutig einen Sprung an der Stelle $StimmenTm1 = 0$. Weiterhin erkennen wir, dass der Zusammenhang nahe 0 jeweils gut durch eine lineare Funktion approximiert werden kann. Eine Modell-Spezifikation mit gleicher Steigung auf beiden Seiten des Schwellenwertes scheint hingegen ungeeignet. 
-
-Als nächstes fügen wir dem Datensatz eine Dummyvariable `D` hinzu. Diese dient als Indikator für den Wahlgewinn in der letzten Wahl.
-
-```{webr}
-house <- house %>% 
-  mutate(D = StimmenTm1 > 0)
-
-glimpse(house)
-```
-
-Als nächstes schätzen wir das Modell 
-\begin{align}
-  \text{StimmenT}_i = \beta_0 + \beta_1 D_i + \beta_2 (\text{StimmenTm1}_i - 50) + \beta_3(\text{StimmenTm1}_i - 50)\times D_i + u_i
-\end{align}
-bei einer Bandweite von $h = 1$. Aufgrund der Skalierung der Daten bedeutet dies die Verwendung des *gesamten* Datensatzes für die Schätzung.
-
-```{webr}
-house_llr1 <- lm(
-  formula = StimmenT ~ D * StimmenTm1, 
-  data = house
-)
-  
-summary(house_llr1)
-```
-
-Der geschätzte Koeffizient von $D$ (`DTRUE`) beträgt etwa 0.12 und ist hochsignifikant. Übereinstimmend mit der (oben erstellten) Grafik erhalten wir also eine positive Schätzung des Treatment-Effekts. 
-Diese Schätzung könnte jedoch invalide sein: 
-
-- Die (implizite) Wahl von $h=1$ macht die Isolation des relevanten Frontdoor-Paths ($C=0$ &rarr; Treatment &rarr; StimmenT) wenig plausibel.
-
-- Weiterhin könnte die lineare funktionale Form unser Regression für den gesamten Datensatz inadäquat sein: Die lineare Approximation könnte lediglich "lokal" zu 0 gut sein und anderweitig in einer verzerrten Schätzung des Effekts resultieren.
+\begin{align*}
+  Y_i =&\, \beta_1 X_i + \beta_2 B + \beta_3 X_i^2 \times B_i + u_i,\\
+  \\
+  u_i \sim&\, N(0, 0.5), \quad X_i \sim U(0, 10), \quad B = \mathbb{I}(X_i \geq c = 5)\\
+  \beta_1 =&\, .5, \quad \beta_2 = 1.5, \quad \beta_3 = -0.15
+\end{align*}
 
 ```{r}
-round(rdd::IKbandwidth(X = house$StimmenTm1, Y = house$StimmenT), digits = 4)
-```
+set.seed(1234)
+n <- 750
 
-```{webr}
-IK_BW <- 0.2685
+c <- 5
+beta_1 <- .5
+beta_2 <- 1.5
+beta_3 <- -.15
 
-house_poly_IK <- lm(
-  formula = StimmenT ~ D * poly(StimmenTm1, degree = 2, raw = T), 
-  data = house %>% filter()
-)
-  
-summary(house_poly_IK)
-```
+f <- function(X) {
+  beta_1 * (X-c) + beta_2 * B + beta_3 * B * (X-c)^2
+}
 
-Die nachstehende interaktive Abbildung zeigt die klassierten Daten aus @Lee2008 auf dem Intervall $[-0.5,0.5]$ gemeinsam mit einer nicht-parametrischen Schätzung des Zusammenhangs von `StimmenT` und `StimmenTm1` mit LOESS.^[LOESS ist eine nicht-parametrische Regressionsmethode, die lokale Gewichte verwendet, um nicht-lineare Zusammenhänge zwischen Variablen zu modellieren und geglättete Funktionen anzupassen.] Über die Inputs kann eine gemeinsame Bandweite $l\in(0,1]$ für den LOESS-Schätzer auf beiden Seiten des Schwellenwerts 0 und die Bandweite der Daten ($h$) um den Schwellenwert angepasst werden. Beachte: 
+X <- runif(n, 0, 11)
+B <- ifelse(X - c >= 0, 1, 0)
+Y <- f(X) + rnorm(n, sd = .5)
 
-- Der geschätzte Zusammenhang ist etwa linear für die voreingestellten Parameter ($l = 1$, $h = 0.28$). 
-
-- Für kleine $l$ passt sich die Schätzung Besser an die Datenpunkte an. Zu kleine Werte führen jedoch zu *overfitting*. Insbesondere hat die geschätzte Funktion eine zu extreme Steigung nahe des Schwellenwerts &rarr; verzerrte Schätzung des Effekts!
-
-- Kleine Werte $h$ bedeuten eine geringe Datenbasis, sodass LOESS selbst bei großen $l$ zu nicht-linearen Anpassungen der Regressionsfunktion tendiert. Für solche Parameterkombinationen erfolgt die Schätzung des Effekts mit hoher Varianz. 
-
-```{r, echo = F}
-house_binned <-  read.csv("datasets/house_binned.csv")
-house <-  read.csv("datasets/house.csv")
-
-ojs_define(
- house_binned = house_binned,
- house = house
+dat <- data.frame(
+  Y = Y, X = X - c, B = B
 )
 ```
-
-**FRDD mit Nicht-parametrischer Regression**
 
 ```{ojs}
 //| echo: false
 html`
 <style>
-circle {
-  fill-opacity: .8;
-  stroke: #000;
-  stroke-opacity: 1;
-}
 .regression {
   fill: none;
   stroke: #000;
@@ -385,23 +327,415 @@ circle {
   display: none;
 } 
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
 `
-
-d3 = require("d3-array@3", "d3-axis@3", "d3-regression@1", "d3-scale@4", "d3-shape@3", "d3-selection@3")
+d3 = require("d3-array@3", "d3-axis@3", "d3-regression@1", "d3-scale@4", "d3-shape@3", "d3-selection@3", "d3-format")
 
 margin = ({left: 55, right: 8, top: 13, bottom: 24});
 base = Math.min(width, 500);
 innerWidth = base - margin.left - margin.right;
 innerHeight = base-100 - margin.top - margin.bottom;
 
-viewof bandwidth = Inputs.range([.01, 1], {
-  label: "Bandweite LOESS (l)",
-  step: .01,
-  value: 1
+
+viewof bw_daten_LLRU = Inputs.range([.1, 6], {
+  label: "Bandweite (h)",
+  step: .1,
+  value: 1.3
 });
 
-viewof bw_daten = Inputs.range([.05, .5], {
-  label: "Bandweite Daten (h)",
+xScaleLLRU = d3.scaleLinear()
+   .domain([-6, 6])
+   .range([0, innerWidth]);
+   
+yScaleLLRU = d3.scaleLinear()
+  .domain([-4, 6])
+  .range([innerHeight, 0]);
+
+lineLLRU = d3.line()
+  .x(d => xScaleLLRU(d[0]))
+  .y(d => yScaleLLRU(d[1]));
+  
+xAxisLLRU = d3.axisBottom(xScaleLLRU)
+  .tickSize(innerHeight + 10)
+  .tickValues([-6, -4, -2, 0, 2, 4, 6])
+  .tickFormat(d => d);
+
+yAxisLLRU = d3.axisLeft(yScaleLLRU)
+  .tickSize(innerWidth + 10)
+  .tickFormat(d => d);
+
+LLRURegression = d3.regressionLinear()
+  .x(d => d.X)
+  .y(d => d.Y);
+```
+
+```{ojs}
+//| echo: false
+//| label: fig-srddviz
+//| fig-cap: "Nicht-parametrische Regression auf beiden Seiten des Cut-offs"
+
+{
+  const svg = d3.select(DOM.svg(innerWidth + margin.left + margin.right + 20, innerHeight + margin.top + margin.bottom + 20))
+  
+  const g = svg.append("g")
+      .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+  g.append("g")
+      .attr("class", "axis")
+      .call(xAxisLLRU);
+
+  g.append("g")
+    .attr("class", "axis")
+    .attr("transform", `translate(${innerWidth})`)
+    .call(yAxisLLRU);
+
+  // Add X axis label:
+  g.append("text")
+    .attr("text-anchor", "end")
+    .attr("font-size", 13)
+    .attr("x", innerWidth)
+    .attr("y", innerHeight + margin.top + 25)
+    .text("X - c");
+
+  // Y axis label:
+  g.append("text")
+    .attr("text-anchor", "end")
+    .attr("transform", "rotate(-90)")
+    .attr("font-size", 13)
+    .attr("y", -margin.left+10)
+    .attr("x", -margin.top+10)
+    .text("Y");
+
+  g.selectAll("circle")
+    .data(transpose(SRDD))
+    .enter().append("circle")
+    .attr("r", 2)
+    .attr("cx", d => xScaleLLRU(d.X))
+    .attr("cy", d => yScaleLLRU(d.Y));
+
+g.selectAll("circle")
+ .filter( function(d){ return Math.abs(d.X) <= bw_daten_LLRU } )
+ .attr("fill", "orange")
+ .attr("stroke", "none");
+ 
+  <!-- trf -->
+var  line = d3.line()
+           .x(function(d) { return xScaleLLRU(d.X); }) 
+           .y(function(d) { return yScaleLLRU(d.Y_true); }) 
+           .curve(d3.curveLinear); 
+
+  g.append("path")
+    .datum(transpose(SRDD))
+    .attr("d", line)
+    .attr("fill", "none")
+    .attr("stroke", "red")
+    .attr("stroke-width", 2);
+
+
+function b(d) { return LLRURegression(
+        transpose(SRDD).filter(function(d){ return d.X <= 0 & d.X >= -bw_daten_LLRU })
+    ); }
+
+function a(d) { return LLRURegression(
+      transpose(SRDD).filter(function(d){ return d.X > 0 & d.X <= bw_daten_LLRU })
+    ); }
+
+  g.append("path")
+      .attr("class", "regression")
+      .datum(b)
+      .attr("d", lineLLRU)
+      .attr("stroke-width", 2)
+      .style("stroke", "#39FF14");
+
+  g.append("path")
+      .attr("class", "regression")
+      .datum(a)
+      .attr("d", lineLLRU)
+      .attr("stroke-width", 2)
+      .style("stroke", "#39FF14");
+  
+  g.append("line")
+  .attr("x1", xScaleLLRU(0))
+  .attr("y1", yScaleLLRU((b().slice(-1))[0][1]))
+  .attr("x2", xScaleLLRU(0))
+  .attr("y2", yScaleLLRU((a().slice(0))[0][1]))
+  .attr("stroke", "#39FF14")
+  .attr("stroke-width", 2);
+  
+   g.append("text")
+    .attr("x", d => xScaleLLRU(-2.75))
+    .attr("y", d => yScaleLLRU(4.5))
+    .attr("dy", ".35em")
+    .attr("fill", "#39FF14")
+    .text(
+    d3.format(",.2f")( (a().slice(0))[0][1] - (b().slice(-1))[0][1] ) 
+    );
+  
+  /* dashed line data bw upper */
+  g.append("line")
+  .attr("x1", xScaleLLRU(bw_daten_LLRU))
+  .attr("y1", 0)
+  .attr("x2", xScaleLLRU(bw_daten_LLRU))
+  .attr("y2", innerHeight)
+  .style("stroke", "blue")
+  .style("stroke-dasharray", "4")
+  .style("stroke-width", "1");
+  
+  /* dashed line data bw lower */
+  g.append("line")
+  .attr("x1", xScaleLLRU(-bw_daten_LLRU))
+  .attr("y1", 0)
+  .attr("x2", xScaleLLRU(-bw_daten_LLRU))
+  .attr("y2", innerHeight)
+  .style("stroke", "blue")
+  .style("stroke-dasharray", "4")
+  .style("stroke-width", "1");
+
+  return svg.node();
+}
+```
+
+Der interssierende Effekt am Schwellenwert $c=5$ beträgt $\beta_2 = 1.5$. Beachte, dass aufgrund des Terms $\beta_3 X_i^2 \times B_i$ ein quadratischer Zusammenhang von $Y$ und $X$ oberhalb von $X_i = c$ vorliegt. @fig-srddviz Es können folgende Eigenschaften der Schätzung in Abhängigkeit von der Bandweite $h$ beobachtet werden:
+
+- Für die voreingestellte Bandweite $h = 1.3$ liefert die lokale lineare Regression eine gute Approximation des Regressionszusammenhangs auf beiden Seiten des Schwellenwertes und die Schätzung des Behandlungseffekts liegt nahe beim wahren Wert $\beta_2 = 1.5$.
+
+- Für kleinere Bandweiten verringern sich Datenbasis der Schätzung. Die Varianz der Schätzung nimmt zu und die Approximation der Regressionsfunktion verschlechtert sich. Wir erhalten eine mit $h\to0$ zunehmend verzerrte Schätzung des Behandlungseffekts.
+
+- Größere Bandweiten $h$ erhöhen die Datenbasis der Schätzung, führen aber zu einer Annäherung der lokalen Schätzung an die globale KQ-Schätzung. Linksseitig des Schwellenwertes erzielen wir damit eine Schätzung mit hoher Güte. Rechsseitig von $X_i = c$ verschlechtert sich die lokale Anpassung am Schwellenwert deutlich, weil die lineare Schätzung den tatsächlichen nicht-linearen Zusammenhang nicht adäquait abbildet. Die Schätzung des Behandlungseffekts ist deutlich verzerrt.
+
+Die Wahl der Bandweite ist also eine wichtige Komponenten der RDD-Schätzung: Kleine Bandweiten erlauben eine Schätzung der Regressionsfunktion nahe des Schwellenwertes mit wenig Verzerrung. Allerdings kann diese Schätzung unpräzise sein, wenn nur wenige Beobachtungen \eqref{eq:bwc} erfüllen. In der Praxis wird $h$ daher mit einem analytischen Schätzer [vgl. @ImbensKalyanaraman2012] oder anhand von *Cross Validation* [bspw. @ImbensLemieux2008] bestimmt. Die später in diesem Kapitel betrachteten R-Pakete halten diese Methoden bereit.
+
+## Manipulation am Schwellenwert
+
+Eine wichtige Annahmen für die Gültigkeit der RDD-Schätzung ist, dass keine Manipulation der Gruppenzugehörigkeit am Schwellenwert vorliegt. Wenn für Subjekte nahe des Schwellenwertes $c$ -- d.h. in Abhängigkeit der Laufvariable $X$ -- sich systematisch in den Confoundern $Z$ unterscheiden, können wir den Backdoor-Pfad *Oberhalb C &rarr; Behandlung B &rarr; Y* nicht isolieren. Wir erhalten wir eine verzerrte Schätzung des Behandlungseffekts.
+
+Bspw. kann in empirischen Studien mit Individuen Selbstselektion auftreten: Menschen mit $X<c$ aber nahe $c$ (Kontrollgruppe) könnten aufgrund unbeobachtbarer Eigenschaften $Z$ die Ausprägung ihrer Laufvariable zu $X>c$ (Behandlungsgruppe) manipulieren. Wenn $Z$ die Outcome-Variable beeinflusst, bleibt der Backdoor-Pfad *Oberhalb C &rarr; Behandlung B &rarr; Y* dann bestehen.  
+
+Manipulation resultiert in Häufung von Beobachtungen am Schwellenwert. Dei Verteilung der Laufvariable kann auf diese Diese Unregelmäßigkeit hin untersucht werden. @McCrary2008 schlägt hierfür einen Verfahren vor, das auf die Kontinuität der Dichtefunktion von $X$ am Schwellenwert testet.
+
+Der Test von @McCrary2008 ist in `rdd::DCdensity()` implementiert. wir Zeigen die Anwendung anhand der weiter oben simulierten Daten. Beachte, dass $X_i\sim U(0, 10)$, d.h. die Laufvariable ist bei $X_i = c$ kontinuierlich verteilt: die Nullhypothese trifft für die simulierten Daten zu.
+
+```{r}
+# McCrary-Test durchführen
+p_mccrary <- rdd::DCdensity(
+  runvar = X, 
+  cutpoint = c, 
+  plot = F
+)
+
+# p-Wert
+p_mccrary
+```
+
+Der p-Wert `r round(p_mccrary, 2)` ist größer als jedes übliche Signifikanzniveau und ist damit starke Evidenz für die Nullhypothese (keine Diskontinuität) und damit gegen Manipulation am Schwellenwert.
+
+@CJM2020 (CMJ) schlagen eine Weiterentwicklung des McCrary-Tests vor, die höhere statistische Power gegenüber Diskontinuitäten hat. Der CJM-Test ist im Paket `rddensity` implementiert.
+
+```{r}
+library(rddensity)
+# CJm Schätzer berechnen
+CJM <- rddensity(X, c = 5)
+```
+
+Mit der Funktion `rdplotdensity()` erzeugen wir @fig-cjmtsim.
+
+```{r}
+#| fig-cap: "CJM-Test -- geschätzte Dichtefunktionen der Laufvariable"
+#| label: fig-cjmtsim
+# plot erstellen
+plot <- rdplotdensity(
+  CJM, 
+  X = X, 
+  type = "both" # Punkte- und Linienplots
+)
+```
+Die Abbildung zeigt die geschätzten Dichtefunktionen. Erwartungsgemäß finden wir eine große Überlappung der zugehörigen Konfidenzbänder (schattierte Flächen) am Schwellenwert $c=5$.
+
+Mit `summary()` erhalten wir eine detalierte Zusammenfassung des Tests. 
+
+```{r}
+summary(CJM)
+```
+
+Gemäß des p-Werts (` P > |T|`) von 0.7385 spricht der CJM-Test noch deutlicher gegen eine Diskontinuität als der McCrary-Test.
+
+### Beispiel: Amtsinhaber-Vorteil [@Lee2008]
+
+@Lee2008 untersucht den Einfluss des Amtsinhaber-Vorteils auf die Wahl von Mitgliedern des US-Repräsentantenhauses. In den meisten Wahlkreisen entfallen große Anteile der Stimmen (wenn nicht sogar ausschließlich) auf demokratische und repuplikanische Kanditat\*innen, sodass sich die Studie auf diese Parteien beschränkt. Entfällt die Mehrheit der Stimmen auf eine\*n Kandiat\*in, gewinnt diese\*r den Sitz für den Wahlkreis. Durch die Analyse der 6558 Wahlen im Zeitraum 1946-1998 mit einem SRDD kommt die Studie zu dem Ergebnis, dass Amtsinhabende im Durchschnitt einen Vorteil von etwa 8%-10% bei der Wahl haben. Dieses Ergebnis kann verschiedene Ursachen haben, bspw. dass die amtierende Partei höhere finanzielle Ressourcen besitzt und von einer besseren Organisation als die Opposition profitiert.
+
+Anhand der Datensätze `house` und `house_binned` illustrieren wir nachfolgend die Schätzung von SRDD-Modellen für den Wahlerfolg der demokratischen Partei, wenn diese Amtsinhaber ist. Wir lesen zunächst die Datensätze `house` und `house_binned` ein und verschaffen uns einen Überblick.
+
+```{r}
+library(tidyverse)
+library(modelsummary)
+
+house <- read_csv("datasets/house.csv")
+house_binned <- read_csv("datasets/house_binned.csv")
+
+glimpse(house)
+glimpse(house_binned)
+```
+
+Der Datensatz `house` enthält Stimmenanteile demokratischer Kandidat\*innen bei der Wahl zum Zeitpunkt $T$ ($StimmenT$) sowie die Differenz zwischen demokratischen und republikanischen Stimmenanteile bei der vorherigen Wahl, d.h. zum Zeitpunkt $T-1$ ($StimmenTm1$). Der Schwellenwert für einen Wahlgewinn liegt bei Stimmengleichheit, d.h. $StimmenTm1 = 0$.
+
+`house_binned` ist eine aggregierte Version von `house` mit Mittelwerten von jeweils 50 gleichgroßen Intervallen oberhalb und unterhalb der Schwelle von 0. Dieser Datensatz eignet sich, um einen ersten Eindruck des funktionalen Zusammenhangs auf beiden Seiten zu gewinnen. Wir stellen diese klassierten Daten mit `ggplot2` graphisch dar.
+
+```{r}
+#| fig-cap: Klassierte Daten aus Lee (2008)
+#| label: fig-LeeDataClass
+house_binned %>%
+  ggplot(aes(x = StimmenTm1, y = StimmenT)) +
+  geom_point() +
+  geom_vline(xintercept = 0, lty = 2)
+```
+
+Die Grafik zeigt eindeutig einen Sprung von $StimmenT$ bei $StimmenTm1 = 0$. Weiterhin erkennen wir, dass der Zusammenhang nahe 0 vermutlich jeweils gut durch eine lineare Funktion approximiert werden kann. Eine Modell-Spezifikation mit gleicher Steigung auf beiden Seiten des Schwellenwertes könnte hingegen weniger gut geeignet sein. Wir vergleichen diese Spezifikationen nachfolgend. 
+
+Zunächst fügen wir dem Datensatz eine Dummyvariable `B` hinzu. Diese dient als Indikator für den Wahlgewinn in der letzten Wahl und zeigt Amtsinhaberschaft ("Behandlung") an.
+
+```{r}
+house <- house %>% 
+  mutate(B = StimmenTm1 > 0)
+
+glimpse(house)
+```
+
+Wir überprüfen die Laufvariable auf Manipulation am Schwellenwert $c=0$.
+
+```{r}
+# CJM-Test
+CJM_Lee <- rddensity(X = house$StimmenTm1)
+summary(CJM_Lee)
+```
+
+```{r}
+#| fig-cap: "CJM-Test -- geschätzte Dichtefunktionen der Laufvariable"
+#| label: fig-cjm-lee
+
+# CJM-Plot
+plot <- rdplotdensity(
+  CJM_Lee,
+  X = house$StimmenTm1, 
+  type = "both", 
+)
+```
+@fig-cjm-lee und der p-Wert von $0.15$ liefern Evidenz gegen Manipulation am Schwellenwert. 
+
+Um den Behandlungseffekt im SRDD zu ermitteln, schätzen wir das Interaktionsmodell 
+\begin{align*}
+  \text{StimmenT}_i =&\, \beta_0 + \beta_1 B_i + \beta_2 (\text{StimmenTm1}_i - 50)\\ 
+  +&\, \beta_3(\text{StimmenTm1}_i - 50)\times B_i + u_i
+\end{align*}
+zunächst bei einer Bandweite von $h = 0.5$. Aufgrund der Skalierung der Daten bedeutet dies die Verwendung des *gesamten* Datensatzes für die Schätzung.
+
+```{r}
+house_llr1 <- lm(
+  formula = StimmenT ~ B * StimmenTm1, 
+  data = house
+)
+  
+modelsummary(house_llr1, 
+             vcov = "HC1", 
+             stars = T, 
+             gof_map = "nobs", 
+             output = "gt") %>% 
+  tabopts
+```
+
+Der geschätzte Koeffizient von $B$ (`BTRUE`) beträgt etwa 0.12 und ist hochsignifikant. Übereinstimmend mit Abbildung @fig-LeeDataClass erhalten wir also eine positive Schätzung des Treatment-Effekts. Die Interpretation ist, dass die amtierende Demokraten bei der Wahl von einem Amtsinhabervorteil profitieren, der sich als Stimmenbonus von geschätzten 12\% niederschlägt. Diese Schätzung könnte jedoch verzerrt sein: 
+
+- Die (implizite) Wahl von $h=0.5$ in unserer Schätzung macht die Isolation des relevanten Frontdoor-Paths ($c=0$ &rarr; Treatment &rarr; StimmenT) wenig plausibel. $h$ sollte mit einer datengetriebenen Methode gewählt werden.
+
+- Weiterhin könnte die lineare funktionale Form der Regression inadäquat sein: Die lineare Approximation nahe beim Schwellenwert 0 könnte nicht hinreichend gut sein und in einer verzerrten Schätzung des Effekts resultieren. Zur Überprüfung der Robustheit der Ergebnisse sollte mit Schätzungen nicht-linearer Spezifikationen verglichen werden.
+
+Um diesen Gefahren für die Validität der Studie zu begegnen, schätzen wir nun weitere Spezifikationen. Im Folgenden verwenden wir eine Bandweitenschätzung gemäß @ImbensKalyanaraman2012.
+
+```{r}
+# Bandweite mit Schätzer von IK (2012) berechnen
+(
+IK_BW <- 
+  rdd::IKbandwidth(
+    X = house$StimmenTm1, 
+    Y = house$StimmenT
+  )
+)
+```
+
+Wir schätzen zunächst erneut das lineare Interaktionsmodell, diesmal jedoch mit Bandweite `IK_BW`.
+
+```{r}
+# Lineares Interaktionsmodelle mit IK-Bandweite
+house_llin_IK <- lm(
+  formula = StimmenT ~ B * StimmenTm1, 
+  data = house %>% 
+    filter(abs(StimmenTm1) <= IK_BW)
+)
+```
+
+Für den Vergleich mit einer nicht-linearen Spezifikation schätzen wir auch ein quadratisches Interaktionsmodel.
+
+```{r}
+# Quadratisches Interaktionsmodell mit IK-Bandweite
+house_poly_IK <- update(
+  house_llin_IK,
+  formula = StimmenT ~ B * poly(StimmenTm1, degree = 2, raw = T)
+)
+```
+
+Für eine Gegenüberstellung der Modelle verwenden wir `modelsummary::modelsummary()`.
+
+```{r}
+#| tbl-cap: Vergleich von SRDD-Interaktionsmodellen für Lee (2008)
+#| label: tbl-intmodsLee
+# Tabellarischer Modellvergleich
+modelsummary(
+  list(
+    "Linear int." = house_llin_IK, 
+    "Quadratisch int." = house_poly_IK
+  ),  
+  vcov = "HC1", 
+  stars = T,
+  gof_map = "nobs", 
+  output = "gt") %>% 
+    tabopts
+```
+
+Die Spalte (1) in @tbl-intmodsLee zeigt die lokale Schätzung mit einem linearen Interaktionsmodell. Wir erhalten damit einen Behandlungseffekt von etwa 8.5\%. Der Schätzwert fällt also etwas geringer aus, als für die globale KQ-Schätzung des linearen Interaktionsmodells. Für das Modell (2) mit quadratischer Spezifikation liegt der Schätzwert in der gleichen Größenordnung, fällt jedoch mit 6.8\% etwas geringer aus. Beide Schätzungen des Effekts sind signifikant von 0 verschieden. Weiterhin fällt auf, dass in beiden Modellen keine Evidenz verschiedene Spezifikationen der Regressionsfunktionen auf beiden Seiten des Schwellenwerts vorliegen: sämtliche Koeffizientenschätzwerte der Interaktionsterme haben hohe Standardfehler und sind nicht signifikant. Im quadratischen Modell hat auch der Term $StimmenTm1^2$ keinen signifikanten Effekt. Diese Ergebnisse deuten darauf hin, dass eine lineare Spezifikation ausreichend ist.
+
+**SRDD-Schätzung mit LOESS**
+
+Wir illustrieren nachfolgend die Schätzung des Behandlungseffekts mit einer flexiblen und in der Praxis häufig verwendeten Methode für lokale Regression. Die interaktive Grafik zeigt die klassierten Daten aus @Lee2008 auf dem Intervall $[-0.5,0.5]$ gemeinsam mit einer nicht-parametrischen Schätzung des Zusammenhangs von `StimmenT` und `StimmenTm1` mittels LOESS.^[[LOESS](https://en.wikipedia.org/wiki/Local_regression) ist eine Variante von lokaler Polynom-Regression.] Diese Implementierung von lokaler Regression nutzt einen [tricube kernel](https://en.wikipedia.org/wiki/Kernel_(statistics)). Über den Input kann eine Bandweite $l\in(0,1]$ für den LOESS-Schätzer auf beiden Seiten des Schwellenwerts 0 gewählt werden. Die Bandweite ist hier der *Anteil der Beobachtungen an der gesamten Anzahl an Beobachtungen*, die in die Schätzung einbezogen werden sollen. Für die Schätzung am Schwellenwert berücksichtigte Daten werden orange kenntlich gemacht. Die rote linie zeigt die geschätzte Regressionsfunktion über gleichmäßig verteilte Werte von `StimmenTm1` auf $[-0.5,0.5]$. Die Grafik verdeutlicht, das die LOESS-Methode flexibel genug ist, lineare und nicht-lineare Zusammenhänge abbilden zu können. Wie zuvor ist eine adäquate Wahl der Bandweite wichtig: 
+
+- Der mit LOESS geschätzte Zusammenhang auf beiden Seiten des Schwellenwerts ist etwa linear für den voreingestellten Parameter ($l = 0.28$).
+
+- Für größere Werte von $l$ nähert sich die Schätzung weiter einem linearen Verlauf an. Die Schätzung des Effekts bleibt vergleichbar mit den Ergebnissen des linearen Interaktionsmodell (s. oben).
+
+- Für kleinere $l$ erhalten wir eine stärkere Anpassung der Schätzung an die Daten. Zu kleine Werte führen zu einer Überanpassung (*overfitting*). Insbesondere tendiert die geschätzte Funktion zu extremer Steigung nahe des Schwellenwerts &rarr; stark verzerrte Schätzung des Effekts!
+
+
+```{ojs}
+//| echo: false
+html`
+<style>
+.regression {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+.axis line {
+  stroke: #ddd;
+}
+.axis .baseline line {
+  stroke: #555;
+}
+.axis .domain {
+  display: none;
+} 
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+`
+viewof bandwidth = Inputs.range([.01, 1], {
+  label: "Bandweite LOESS (l)",
   step: .01,
   value: .28
 });
@@ -459,7 +793,7 @@ loessRegression = d3.regressionLoess()
     .attr("font-size", 13)
     .attr("x", innerWidth)
     .attr("y", innerHeight + margin.top + 25)
-    .text("Stimmenanteil Demokraten letzte Wahl");
+    .text("Differenz Stimmenanteil Demokraten letzte Wahl zur 50%-Schwelle");
 
   // Y axis label:
   g.append("text")
@@ -470,15 +804,6 @@ loessRegression = d3.regressionLoess()
     .attr("x", -margin.top+10)
     .text("Stimmenanteil Demokraten");
 
-  // Distance at jump
-  g.append("text")
-   .attr("x", 250) // x-Position des Textelements
-   .attr("y", 200) // y-Position des Textelements
-   .text("") // Textinhalt
-   .attr("font-size", "14px") // Schriftgröße
-   .attr("fill", "black"); // Textfarbe
-
-
   g.selectAll("circle")
     .data(transpose(house_binned))
     .enter().append("circle")
@@ -486,25 +811,45 @@ loessRegression = d3.regressionLoess()
     .attr("cx", d => xScaleLoess(d.StimmenTm1))
     .attr("cy", d => yScaleLoess(d.StimmenT));
 
+  g.selectAll("circle")
+   .filter( function(d){ return Math.abs(d.StimmenTm1) <= bandwidth/2 } )
+   .attr("fill", "orange")
+   .attr("stroke", "none");
+
+function b(d) { return loessRegression(
+        transpose(house).filter(function(d){ return d.StimmenTm1 <= 0 & d.StimmenTm1 >= -.5 })
+    ); }
+
+function a(d) { return loessRegression(
+      transpose(house).filter(function(d){ return d.StimmenTm1 > 0 & d.StimmenTm1 <= .5  })
+    ); }
+
   g.append("path")
       .attr("class", "regression")
-      .datum(loessRegression(
-        transpose(house)
-          .filter(function(d){ return d.StimmenTm1 <= 0 & d.StimmenTm1 >= -bw_daten })
-          )
-        )
+      .datum(b)
       .attr("d", lineLoess)
       .style("stroke", "red");
 
   g.append("path")
       .attr("class", "regression")
-      .datum(loessRegression(
-        transpose(house)
-          .filter(function(d){ return d.StimmenTm1 > 0 & d.StimmenTm1 <= bw_daten })
-          )
-        )
+      .datum(a)
       .attr("d", lineLoess)
       .style("stroke", "red");
+  
+  g.append("text")
+    .attr("x", d => xScaleLoess(-.24))
+    .attr("y", d => yScaleLoess(.55))
+    .attr("dy", ".35em")
+    .attr("fill", "#39FF14")
+    .text(d3.format(",.2f")((a().slice(0))[0][1] - (b().slice(-1))[0][1]));
+  
+  g.append("line")
+  .attr("x1", xScaleLoess(0))
+  .attr("y1", yScaleLoess((b().slice(-1))[0][1]))
+  .attr("x2", xScaleLoess(0))
+  .attr("y2", yScaleLoess((a().slice(0))[0][1]))
+  .attr("stroke", "#39FF14")
+  .attr("stroke-width", 2);
   
   /* dashed line at cutoff */
   g.append("line")
@@ -518,9 +863,9 @@ loessRegression = d3.regressionLoess()
   
   /* dashed line data bw upper */
   g.append("line")
-  .attr("x1", xScaleLoess(bw_daten))
+  .attr("x1", xScaleLoess(bandwidth/2))
   .attr("y1", 0)
-  .attr("x2", xScaleLoess(bw_daten))
+  .attr("x2", xScaleLoess(bandwidth/2))
   .attr("y2", innerHeight)
   .style("stroke", "blue")
   .style("stroke-dasharray", "4")
@@ -528,9 +873,9 @@ loessRegression = d3.regressionLoess()
   
   /* dashed line data bw lower */
   g.append("line")
-  .attr("x1", xScaleLoess(-bw_daten))
+  .attr("x1", xScaleLoess(-bandwidth/2))
   .attr("y1", 0)
-  .attr("x2", xScaleLoess(-bw_daten))
+  .attr("x2", xScaleLoess(-bandwidth/2))
   .attr("y2", innerHeight)
   .style("stroke", "blue")
   .style("stroke-dasharray", "4")
@@ -542,7 +887,115 @@ loessRegression = d3.regressionLoess()
 
 ## Fuzzy Regression Discontinuity Design
 
-TBD
+```{dot}
+//| fig-width: 5
+//| fig-height: 3
+//| fig-align: 'center'
+//| fig-cap: "Kausales Diagram für FRDD"
+//| label: "fig-CDFRDD" 
+digraph "oberhalb causal Diagramm RDD" {
+  layout=neato
+  fontname="Helvetica,Arial,sans-serif"
+  node [fontname="Helvetica,Arial,sans-serif"]
+  edge [fontname="Helvetica,Arial,sans-serif"]
+  node [shape=none];
+  "X" [pos="0,1!"]
+  "Y" [pos="4,-1!"]
+  "oberhalb c" [pos="0,-1!"]
+  "Z" [pos="4,1!"]
+  "Behandlung" [pos="2,-1!"]
+  "Z" -> "Behandlung"
+  "X" -> "Y"
+  "X" -> "Behandlung"
+  "Z" -> "X"
+  "Z" -> "Y"
+  "X" -> "oberhalb c"
+  "oberhalb c" -> "Behandlung"
+  "Behandlung" -> "Y"
+}
+```
+
+Ein FRDD liegt vor, wenn die Laufvariable $X$ (und möglicherweise weitere Variablen $Z$) die Zuweisung der Behandlung $B$ beeinflusst. Im Vergleich zum SRDD ist die Behandlung dann *nicht* ausschließlich durch Überschreiten des Schwellenwerts $X = c$ bestimmt. Abbildung @fig-CDFRDD zeig den Zusammenhang. Es genügt weiterhin, für $X$ (und ggf. $Z$) zu kontrollieren, um den Pfad *oberhalb $C$ &rarr; Behandlung $B$ &rarr; $Y$* zu isolieren. Der so für *Behandlung $B$* ermittelte Effekt auf $Y$ entspricht jedoch *nicht* dem "vollständigen" Behandlungseffekt, da bei $c$ die Zuweisung der Behandlung nicht von 0 auf 100% springt. Die Schätzung des FRDD berücksichtigt dies und skaliert den Effekt entsprechend.
+
+Wir betrachten zunächst den Zusammenhang
+\begin{align}
+  Y_i = \beta_0 + \beta_1 B_i + \beta_2 (X_i - c) + u_i.\label{eq-simpleFRDD}
+\end{align}
+In einem FRDD springt die Behandlungswahrscheinlichkeit am Schwellenwert $c$ um $\Delta p<1$. Wir können $B_i$ also nicht als deterministische Funktion von $X$ definieren, die Zuweisung zu Behandlungs- bzw. Kontrollgruppe am Schwellenwert $c$ anzeigt (wie im SRDD). Stattdessen betrachten wir
+\begin{align}
+  P(B_i=1\vert X_i) = 
+  \begin{cases}
+    g_{X_i<c}(X_i), & X_i < c \\ 
+    g_{X_i\geq c}(X_i) & X_i \geq c
+  \end{cases}\,. \label{eq-BFRDD}
+\end{align}
+Die Funktionen $g_{X_i<c}$ und $g_{X_i\geq c}$ können verschieden sein, jedoch muss $$g_{X_i<c}(X_i = c) \neq g_{X_i\geq c}(X_i = c)$$ gelten. Die Behandlungsvariable $B_i$ ist also eine (binäre) Zufallsvariable, deren bedingte Wahrscheinlichkeitsfunktion $P(B_i=1\vert X_i)$ am Schwellenwert $c$ eine Diskontinuität aufweist. @fig-FRDDprobD zeigt ein Beispiel für eine nicht-lineare Wahrscheinlichkeitsfunktion mit Diskontinuität bei $X_i = c$.
+
+```{r}
+#| fig-cap: "Bedingte Behandlungswahrscheinlichkeiten im FRDD"
+#| label: fig-FRDDprobD
+#| fig-width: 3
+#| fig-height: 2.5
+#| code-fold: true
+#| message: false
+library(ggplot2)
+library(cowplot)
+ggplot() + 
+  geom_function(
+    fun = ~ ifelse(
+      . < 0, 
+      -.1 * .^2 + .25, 
+      -.1 * (.-1.5)^2 + 1
+    ), 
+    n = 1000
+  ) + 
+    geom_function(
+    fun = ~ ifelse(
+      . < 0, 
+     .35, 
+     .65
+    ),
+    n = 1000, lty = 2, col = "red"
+  ) + 
+  scale_x_continuous("Laufvariable X", limits = c(-1.5, 1.5),
+                     labels = NULL,
+                     breaks = NULL) +
+  scale_y_continuous("P(D=1|X)", 
+                     breaks = c(0, 1), 
+                     limits = c(0, 1)) +
+  theme_cowplot()
+```
+
+Definition \eqref{eq-BFRDD} bedeutet, dass eine KQ-Schätzung von $\beta_1$ anhand \eqref{eq-simpleFRDD} eine *verzerrte* Schätzung des Behandlungseffekts ist: Der in $\widehat{\beta}_1$ erfasste Effekt auf $Y$ ist auf einen Sprung der Behandlungswahrscheinlichkeit bei $X_i = c$ um *weniger* als 100\% zurückzuführen. Der Behandlungseffekt wird *unterschätzt*. Daher muss $\widehat{\beta}_1$ skaliert werden, sodass die Schätzung als Effekt einer Änderung der Behandlungswahrscheinlichkei um 100\% interpretiert werden kann -- der zu erwartende Effekt, wenn ausschließlich Subjekte mit $X_i\geq c$ behandelt würden. Diese skalierte Schätzung erhalten wir mit IV-Regression (vgl. Kapitel XYZ). Hierfür nutzen wir für $B_i$ die Instrumentvariable 
+\begin{align*}
+  D_i = \begin{cases}
+    0, & X_i < c \\ 
+    1, & X_i \geq c.
+  \end{cases} \label{eq-instFRDD}
+\end{align*}
+Angenommen $g_{X_i\geq c}(X_i) = \alpha_0$ und $g_{X_i<c}(X_i) = \alpha_0 + \alpha_1$ mit $\alpha_0 + \alpha_1 < 1$ (vgl. rote Funktion in @fig-CDFRDD). Der FRDD-Schätzer des Behandlungseffekts ist dann $\widehat{\gamma}_\textup{FRDD}$ im 2SLS-Verfahren mit den Regressionen
+\begin{align}
+  \begin{split}
+  (\mathrm{I})\qquad B_i =&\, \alpha_0 + \alpha_1 D_i + \alpha_2 (X_i - c) + e_i,\\
+  (\mathrm{II})\qquad Y_i =&\, \gamma_0 + \gamma_1 \widehat{B}_i + \gamma_2 (X_i - c) + \epsilon_i,
+  \end{split}\label{eq:FRDD_simpleIV}
+\end{align}
+wobei $\widehat{B}_i$ die angepassten Werte aus Stufe $(\mathrm I)$ und $e_i$ sowie $\epsilon_i$ Fehlterterme sind.
+
+Analog zum SRDD müssen in Anwendungen geeignete Spezifikationen für die Regressionsfunktionen \eqref{eq-simpleFRDD} und \eqref{eq-BFRDD} gewählt und der 2SLS-Schätzer \eqref{eq:FRDD_simpleIV} entsprechend angepasst werden. Ein einfaches Interaktionsmodell wäre
+\begin{align}
+  \begin{split}
+  (\mathrm{I})\qquad B_i =&\, \alpha_0 + \alpha_1 D_i + \alpha_2 (X_i - c)\\ 
+  +&\, \alpha_3 (X_i - c) \times D_i + e_i,\\
+  \\
+  (\mathrm{II})\qquad Y_i =&\, \gamma_0 + \gamma_1 \widehat{B}_i\\
+  +&\, \gamma_2 (X_i - c) + \gamma_3 (X_i-c)\times\widehat{B}_i, \epsilon_i
+  \end{split}\label{eq:FRDD_lintIV}
+\end{align}
+d.h. wir instrumentieren $B_i$ mit $D_i$ und dem Interaktionsterm $(X_i-c)\times D_i$.
+
+Wie im SRDD werden die IV-Ansätze für das FRDD \eqref{eq:FRDD_simpleIV} und \eqred{eq:FRDD_lintIV} in empirischen Studien unter Berücksichtigung einer Bandweite (i.d.R. dieselbe Bandweite für beide Stufen) angewendet.
+
 
 ## Case Study: Protestantische Arbeitsethik
 
@@ -550,17 +1003,23 @@ TBD
 knitr::opts_chunk$set(fig.align = 'center', warning = F, message = F)
 ```
 
-Die Studie *Beyond Work Ethic: Religion, Individual, and Political Preferences* [@BastenBetz2013] untersucht den Zusammenhang zwischen Religion, individuellen Merkmalen und politischen Präferenzen. Das Hauptaugenmerk ist die Rolle von Religiosität als Einflussfaktor auf politische Einstellungen. Die Hypothese ist, das Religiosität eines Individuums über den traditionellen Rahmen von Moralvorstellungen und sozialen Normen hinaus auch politische Präferenzen beeinflusst. Diese Theorie wird prominent von Max Weber (1930) vertreten, der argumentiert, dass die protestantische Arbeitsethik einen entscheidenden Einfluss auf die Entwicklung des Kapitalismus hatte. Laut Weber führte der protestantische Glaube an harte Arbeit, ein sparsames Leben und ethisches Verhalten zur einer verbreiteten "Geisteshaltung" , die den wirtschaftlichen Erfolg förderte und den Aufstieg des Kapitalismus begünstigte.
+Die Studie *Beyond Work Ethic: Religion, Individual, and Political Preferences* [@BastenBetz2013] untersucht den Zusammenhang zwischen Religion, individuellen Merkmalen und politischen Präferenzen. Das Hauptaugenmerk ist die Rolle von Religiosität als Einflussfaktor auf politische Einstellungen. Die Hypothese ist, das Religiosität eines Individuums über den traditionellen Rahmen von Moralvorstellungen und sozialen Normen hinaus auch politische Präferenzen beeinflusst. Diese Theorie wurde zu Beginn des 20. Jahrhunderts entwickelt und prominent von Max Weber [vgl. @Weber2004] vertreten. Weber argumentiert, dass die protestantische Arbeitsethik einen entscheidenden Einfluss auf die Entwicklung des Kapitalismus hatte. Laut Weber führte der protestantische Glaube an harte Arbeit, ein sparsames Leben und ethisches Verhalten zur einer verbreiteten "Geisteshaltung", die den wirtschaftlichen Erfolg förderte und den Aufstieg des Kapitalismus begünstigte.
 
-@BastenBetz2013 nutzen Daten aus dem World Values Survey,
+@BastenBetz2013 nutzen Wahlergebnisse sowie geo- und soziodemographische Datensätze für schweizer Gemeinden, um den Zusammenhang zwischen Religiosität und politischen Präferenzen wie links-rechts-Ausrichtung, Einstellungen zur Umverteilung und Einwanderung zu untersuchen. Hierfür verwenden die Autoren ein FRDD, dass auf einer historisch bedingte Diskontinuität der geographischen Verteilung von evanglischer bzw. katholischer Religionszugehörigkeit zwischen den Kantonen Freiburg (überwiegend dunkelrote Region, frz. *Fribourg*) und Waadt (kleinere hellrote Region, frz. *Vaud*) basiert, vgl. @fig-vaudfb.
 
-Sie analysieren insbesondere die Zusammenhänge zwischen Religiosität, individuellen Merkmalen wie Geschlecht, Bildung und Einkommen sowie politischen Präferenzen wie links-rechts-Ausrichtung, Einstellungen zur Umverteilung und zur Einwanderung.
+```{r}
+#| echo: false
+#| fig-cap: "Historische Verteilung von Religionszugehörigkeit in Schweizer Gemeinden. Quelle: Basten und Betz (2013)."
+#| cap-location: margin
+#| label: fig-vaudfb
+knitr::include_graphics(path = "img/WaadtFribourg.png")
+```
 
-Die Ergebnisse der Studie zeigen, dass Religiosität tatsächlich einen signifikanten Einfluss auf politische Präferenzen hat. Insbesondere stellen die Autoren fest, dass religiöse Menschen tendenziell konservativere Einstellungen haben und eher rechten politischen Parteien zuneigen. Dieser Effekt bleibt auch nach Kontrolle anderer Faktoren wie Bildung und Einkommen bestehen.
+Die Ergebnisse der Studie zeigen einen signifikanten Einfluss von Protestantismus auf politische Präferenzen, die über traditionelle Moralvorstellungen hinausgehen: Die Autoren finden Hinweise, dass Einwohner evangelisch geprägter Gemeinden eher konservative soziale und politische Ansichten vertreten. Eine mögliche Erklärung für diesen Effekt ist, dass religiöse Institutionen auch eine soziale und politische Agenda verfolgen, die von den Gläubigen internalisiert wird.
 
-Darüber hinaus betonen die Autoren, dass der Zusammenhang zwischen Religion und politischen Präferenzen nicht allein durch moralische Werte erklärt werden kann. Sie argumentieren, dass religiöse Institutionen auch eine soziale und politische Agenda verfolgen, die von den Gläubigen internalisiert wird. Diese Agenda kann beispielsweise Positionen zu Themen wie Abtreibung, gleichgeschlechtlicher Ehe, Einwanderung oder Umweltschutz umfassen.
+### Aufbereitung der Daten
 
-Zusammenfassend zeigt das Paper "Beyond Work Ethic: Religion, Individual, and Political Preferences" von Christoph Basten und Frank Betz, dass Religiosität einen Einfluss auf politische Präferenzen hat, der über traditionelle Moralvorstellungen hinausgeht. Es deutet darauf hin, dass religiöse Menschen eher konservative politische Ansichten haben und dass religiöse Institutionen eine Rolle bei der Formulierung dieser Ansichten spielen können.
+In diesem Kapitel zeigen wir, wie die Kernergebnisse der Studie mit R reproduziert werden können. Hierfür werden folgende Pakete benötigt.
 
 ```{r, eval=TRUE}
 library(tidyverse)
@@ -569,48 +1028,100 @@ library(vtable)
 library(rdrobust)
 ```
 
+Das Papier sowie der Datensatz `BastenBetz.dta` sind auf der [Übersichtsseite der AEA](https://www.aeaweb.org/articles?id=10.1257/pol.5.3.67) verfügbar und liegt im STATA-Format `.dta` vor.^[Siehe alternativ das [working paper](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2133848), falls kein Abbonement für AEA-Journals vorliegt.]
 
 ```{r}
+# Datensatz einlesen
 BastenBetz <- read_dta('BastenBetz.dta')
 ```
 
+Der Datensatz `BastenBetz` enthält Beobachtungen zu 509 schweizer Gemeinden. Eine Vielzahl an Variablen ist lediglich für Robustheits-Checks relevant. Für die Reproduktion der Kernergebnisse erstellen wir zunächst einen reduzierten Datensatz und transformieren einige Variablen. 
 
 ```{r}
-# Table 1
+# Reduzierten Datensatz erstellen
+BastenBetz <- BastenBetz %>%
+  transmute(
+    gini = Ecoplan_gini,
+    prot = prot1980s,
+    bord = borderdis, 
+    vaud,
+    pfl, 
+    pfr, 
+    pfi
+  )
+```
+
+Die Definitionen der Variablen sind in @tbl-BastenBetzRed gegeben. Die Präferenzen `pfl`, `pfr` und `pfi` basieren auf Wahlergebnissen auf Gemeindeebene zu Volksentscheiden.
+
+| Variable    | Definition                                                |
+|-------------|-----------------------------------------------------------|
+| `prot`      | Anteil Prothestanten im Jahr 1980 (%)                     |
+| `gini`      | Gini-Koeffizient                                          |
+| `bord`      | Laufdistanz zur Kantonsgrenze (Km)                     |
+| `vaud`      | Dummyvariable: Gemeine im Kanton Waadt                    |
+| `pfl`       | Präferenz für Freizeit (%)                                |
+| `pfr`       | Präferenz für Umverteilung (%)                            |
+| `pfi`       | Präferenz für wirtschaftliche Intervention des Staats (%) |
+    
+: `BastenBetz` -- Variablen und Definitionen {#tbl-BastenBetzRed}
+
+Für die Berechnung der optimalen Bandweite des FRDD verwenden wir einen MSE-optimalen Schätzer, der in der Funktion `rdrobust::rdbwselect()` implementiert ist.^[@BastenBetz2013 setzen BW = 5.01, den Durchschnitt von IK-Schätzungen über Modelle sämtlicher betrachteter Outcome-Variablen. Diese Bandweite liegt nahe des Ergebnisses von `rdbwselect`. Wir verwenden nachfolgend die Schätzung `OB`.]
+
+```{r}
+# Bandweite schätzen (Bsp. für Freizeitpräferenz)
+bw_selection <- rdbwselect(
+  y = BastenBetz$pfl,
+  x = BastenBetz$bord,
+  fuzzy = BastenBetz$prot, 
+  bwselect = "mserd", 
+  kernel = "uniform"
+) 
+
+# summary(bw_selection)
+
+# Bandweite auslesen und zuweisen
+(OB <- bw_selection$bws[1])
+```
+
+### Deskriptive Statistiken
+
+Zur Reproduktion von Tabelle 1 aus @BastenBetz2013 erzeugen wir eine nach Kantonen gruppierte Zusammenfassung der Daten und berechnen deskriptive Statistiken. Wie im Paper berücksichtigen wir hierbei nur Gemeinden innerhalb der geschätzten optimalen Bandweite `OB`.
+
+```{r}
+# Datensatz für Reproduktion von Table 1 formatieren
 T1 <- BastenBetz %>%
-    filter(abs(borderdis) < 5.0283684) %>%
-    transmute(
-        group = ifelse(vaud == 1, "T", "C"),
-        prot1980s = prot1980s * 100,
-        reineink = reineink_pc_mean * 1000,
-        noreligion1980s,
-        altitude, 
-        pfl, 
-        pfr, 
-        pfi,
-        gini = Ecoplan_gini
+    filter(abs(bord) < OB) %>%
+    mutate(
+        vaud = ifelse(vaud == 1, "Waadt", "Freiburg"),
+        prot = prot * 100
     ) %>%
-    group_by(group) %>%
+    group_by(vaud) %>%
     summarise(
       across(everything(), list(Mean = mean, SD = sd, N = length))
       ) %>%
     pivot_longer(
-      -group, 
+      -vaud,
       names_to = c("variable", "statistic"), 
       names_sep = "_"
     )
 ```
 
+Für die tabellarische Darstellung transformieren wir in ein weites Format, sodass die Tabelle die deskriptive Statistiken spaltenweise für die Kantone zeigt.
+
 ```{r}
+# weites Format
 T1_wider <- T1 %>% 
     pivot_wider(
-        names_from = c("group", "statistic")
+        names_from = c("vaud", "statistic")
     )
 ```
 
+Die Tabelle erzeugen wir mit `gt::gt()`.
+
 ```{r}
 #| label: tbl-sumstat
-#| tbl-cap: "Datensatz `BastenBetz` -- Zusammenfassende Statistiken"
+#| tbl-cap: "Datensatz `BastenBetz` -- tusammenfassende Statistiken"
+# Tabelle mit gt() erzeugen
 T1_wider %>%
   gt(rowname_col = "Variable") %>% 
   tab_spanner_delim(
@@ -619,85 +1130,249 @@ T1_wider %>%
  tabopts
 ```
 
-Imbens und Kalyanaraman [-@ImbensKalyanaraman2012] zeigen
+Die Statistiken in @tbl-sumstat scheinen konsistent mit der (historischen) Verteilung der Religionszugehörigkeit und politischen Einstellung gemäß der Hypothese: Im überwiegend katholischen Freiburg finden wir eine größere Einkommensungleichkeit und höhere aus Wahlergebnissen abgeleitete Präferenzen für Freizeit, Umverteilung sowie staatliche Interventionen.
+
+### Modellspezifikation und First-Stage-Ergebnisse
+
+Die Kantone Waadt und Freiburg haben bis heute mehrheitlich protestantische bzw. katholische Gemeinden. Die Verteilung von Protestantismus ist also, u.a. aufgrund von Bevölkerungsbewegungen, nicht mehr deterministisch. An der Kantonsgrenze besteht jedoch eine deutliche Diskontinuität im Anteil protestantischer Einwohner, die auf die historische Verteilung der Religionszugehörigkeit zurückzuführen ist. Damit kann ein  FRDD implementiert werden, bei dem die Distanz zur Grenze (`bord`) die zentrierte Laufvariable ist und die Zugehörigkeit zum Kanton Waadt (`vaud`) ein Instrument für die Behandlungsvariable (`prot`) ist. 
+
+Wir nutzen die Funktion `rdrobust::rdplot` um diesen Zusammenhang für verschiedene Bandweiten anhand des linearen Interaktionsmodells
+\begin{align}
+  \begin{split}
+  prot_i =&\, \alpha_0 + \alpha_1 vaud_i + \alpha_2 bord_i \\
+  +&\, \alpha_3 bord_i \times vaud_i + u_i
+  \end{split}\label{eq:BBFSR}
+\end{align}
+grafisch darzustellen. Dies ist die First-Stage-Regression für die 2SLS-Schätzung der Behandlungseffekte.
 
 ```{r}
-bw_selection <- rdbwselect(
-  y = BastenBetz$pfl,
-  x = BastenBetz$borderdis,
-  fuzzy = BastenBetz$prot1980s, 
-  bwselect = "mserd", 
-  kernel = "uniform") 
+#| echo: true
+#| fig-keep: none
 
-summary(bw_selection)
+# Reproduktion von Abbildung 3 in Basten und Betz (2013)
 
-OB <- bw_selection$bws[1]
+plots_BB <- list(
+  # gesch. optimale Bandweite
+  p_OB = rdplot(y = BastenBetz$prot, 
+                x = BastenBetz$bord, 
+                h = c(OB, OB), 
+                x.label = "Distanz zur Grenze (bord)",
+                y.label = "Anteil Protestanten (prot)", 
+                title = "Gesch. Bandweite",
+                p = 1, 
+                nbins = c(6, 14), 
+                masspoints = "off"),
+  
+  # Bandweite 10
+  p_BW10 = rdplot(y = BastenBetz$prot, 
+                  x = BastenBetz$bord, 
+                  h = c(10, 10), 
+                  x.label = "Distanz zur Grenze (bord)",
+                  y.label = "Anteil Protestanten  (prot)", 
+                  title = "Bandweite = 10",
+                  p = 1, 
+                  nbins = c(6, 14),
+                  masspoints = "off"),
+  
+  # Bandweite 20
+  p_BW20 = rdplot(y = BastenBetz$prot, 
+                  x = BastenBetz$bord, 
+                  h = c(20, 20), 
+                  x.label = "Distanz zur Grenze (bord)",
+                  y.label = "Anteil Protestanten  (prot)", 
+                  title = "Bandweite = 20",
+                  p = 1, 
+                  nbins = c(6, 14),
+                  masspoints = "off"),
+  
+  # Gesamter Datensatz
+  p_G = rdplot(y = BastenBetz$prot, 
+               x = BastenBetz$bord,
+               x.label = "Distanz zur Grenze (bord)",
+               y.label = "Anteil Protestanten", 
+               title = "Ges. Datensatz",
+               p = 1, 
+               nbins = c(6, 14),
+               masspoints = "off")
+)
 ```
 
+Wir sammeln die Ergebnisse in einem Plot-Gitter mit `cowplot::plot_grid()`.
+
 ```{r}
-# Table 2: First stage results 
-# (1) (close to the) Imbens and Kalyanaraman (2012) optimal BW of 5.01 reported in
-# the paper
+#| label: fig-BastenBetzFS
+#| fig-cap: First-Stage-Regressionen
+#| fig-cap-location: margin
+# Reproduktion von Abbildung 3 in Basten und Betz (2013)
+plot_grid(
+  plotlist = map(plots_BB, ~ .$rdplot), ncol = 2
+)
+```
+
+Die Grafiken in @fig-BastenBetzFS zeigen deutliche Hinweise auf die Diskontinuität in `prot` nahe der Kantonsgrenze. Die Größe des geschätzten Sprungs scheint nur wenig sensitiv gegenüber der gewählten Bandweite zu sein. Die Signifikanz des Effekts können wir anhand der jeweiligen KQ-Regressionen beurteilen.^[Wir nutzen `update()` um die Regression mit weniger Code für verschiedene Bandweiten zu schätzen.] 
+
+```{r}
+# Reproduktion der First-Stage-Regressionen
+# s. Tabelle 2 in Basten und Betz (2013)
+
+# (1) BW = OB
 FS1 <- lm(
-  formula = prot1980s ~ vaud + borderdis + vaud * borderdis, 
-  data = BastenBetz %>% filter(abs(borderdis) < OB)
-  )
+  formula = prot ~ vaud + bord + vaud * bord, 
+  data = BastenBetz %>% filter(abs(bord) <= OB)
+)
 
-# (2) Constant BW: 10
-FS2 <- lm(
-  formula = prot1980s ~ vaud + borderdis + vaud * borderdis, 
-  data = BastenBetz %>% filter(abs(borderdis) < 10)
-  )
+# (2) BW = 10
+FS2 <- update(
+  FS1,
+  data = BastenBetz %>% filter(abs(bord) <= 10)
+)
 
-# (3)  Constant BW: 20
-FS3 <- lm(
-  formula = prot1980s ~ vaud + borderdis + vaud * borderdis, 
-  data = BastenBetz %>% filter(abs(borderdis) < 20)
-  )
+# (3) BW = 20
+FS3 <- update(
+  FS1,
+  data = BastenBetz %>% filter(abs(bord) <= 20)
+)
+
+# (4) Ges. Datensatz
+FS4 <- update(
+  FS1,
+  data = BastenBetz
+)
 ```
 
-
 ```{r}
+#| tbl-cap: "First-Stage Regressionen"
+#| label: tbl-BastenBetzFS
+#| cap-location: margin
+
+# Tabellarische Darstellung
 modelsummary::modelsummary(
-  list(FS1, FS2, FS3), 
-  vcov = "HC1", stars = T, gof_map = "nobs", output = "gt"
+  list("BW = OB"= FS1, 
+       "BW = 10" = FS2, 
+       "BW=20" = FS3, 
+       "Ges. Datensatz" = FS4), 
+  vcov = "HC1", 
+  stars = T, 
+  gof_map = "nobs", 
+  output = "gt"
 ) %>%
   tabopts()
 ```
 
+Für die geschätze Bandweite schätzen wir einen hochsignifikanten Sprung in `prot` von etwa 67\% an der Kantonsgrenze. Auch für größere Bandweiten von 10km und 20km sowie für den gesamten Datensatz finden wir vergleichbare signifikante Effekte, was eine bei zunehmender Distanz zur Grenze persistente Diskrepanz der Religionszugehörigkeit bestätigt. 
+
+### Second-Stage-Ergebnisse
+
+Wir schätzen nun den LATE von Protestantismus für die Outcome-Variablen `gini`, `pfl`, `pfi` und `pfr`, vgl. @tbl-BastenBetzRed. Die Spezifikation für die Second-Stage-Regression der FRDD-Schätzung ist
+\begin{align}
+  \begin{split}
+    Y_i = \gamma_0 + \gamma_1 \widehat{prot}_i +  \gamma_2 bord_i + \gamma_3 bord_i  \times vaud_i + e_i
+  \end{split},
+\end{align}
+wobei $\widehat{prot}_i$ angepasste Werte aus der KQ-Schätzung von \eqref{eq:BBFSR} mit Bandweite `OB` sind. Dazu erzeugen wir zunächst eine angepasste Version des Objekts `BastenBetz`, welche nur Gemeinden innerhalb der Bandweite enthält.
 
 ```{r}
-#| layout-ncol: 2
-#| fig-width: 3
-#| fig-height: 3
-# Figure 3
-rdrobust::rdplot(y = BastenBetz$prot1980s, 
-                 x = BastenBetz$borderdis, 
-                 h = c(OB, OB), 
-                 p = 1, 
-                 nbins = c(6, 14), 
-                 masspoints = "off")
-
-rdrobust::rdplot(y = BastenBetz$prot1980s, 
-                 x = BastenBetz$borderdis, 
-                 h = c(10, 10), 
-                 p = 1, 
-                 nbins = c(6, 14),
-                  masspoints = "off")
-
-rdrobust::rdplot(y = BastenBetz$prot1980s, 
-                 x = BastenBetz$borderdis, 
-                 h = c(20, 20), 
-                 p = 1, 
-                 nbins = c(6, 14),
-                  masspoints = "off")
-
-rdrobust::rdplot(y = BastenBetz$prot1980s, 
-                 x = BastenBetz$borderdis, 
-                 p = 1, 
-                 nbins = c(6, 14),
-                 masspoints = "off")
+BastenBetz_OB <- BastenBetz %>% 
+  filter(
+    abs(bord) <= OB
+  )
 ```
 
+Zur Illustration schätzen wir nun die Second-Stage-Regression für $Y = pfl$. 
 
+```{r}
+BastenBetz_OB %>% 
+  mutate(prot_fitted = fitted(FS1)) %>%
+  
+lm(pfl ~ prot_fitted + bord + vaud:bord, data = .) %>% 
+  summary()
+```
+
+Der Koeffizient `prot_fitted` ist der gesuchte Behandlungseffekt. Beachte, dass die von `summary()` berechneten Standardfehler ungültig sind, weil diese die zusätzliche Unsicherheit durch die Berechnung von $\widehat{prot}$ über die First-Stage-Regression nicht berücksichtigen. Nachfolgend nutzen wir `AER::ivreg()`, um komfortabel gültige (heteroskedastie-robuste) Inferenz betreiben zu können.^[Die Autoren geben an, robuste SEs zu nutzen. Das scheint nicht der Fall zu sein, denn `vcov = "HC0"` liefert die Ergebinsse im Paper. Die von Stata berechneten HC1-SEs weichen ab. Dies ändert allerdings nichts
+an der Signifikanz der Koeffizienten. Wir nutzen `vcov = "HC1"`.]
+
+```{r}
+# Schätzung mit 2SlS
+# s. Tabelle 4 in Basten und Betz (2013)
+#
+# Wir instrumentieren Treatment (`prot1980s`) mit dem Schwellenindikator (`vaud`)
+# ivreg: exogene Variablen instrumentieren sich selbst, daher
+# ' | vaud * borderdis '
+library(AER)
+# (1) Präferenz für Freizeit
+SS_pfl <- ivreg(
+  formula = pfl ~ prot + bord:vaud + bord | vaud * bord,
+  data = BastenBetz_OB
+)
+
+# (2) Präferenz für Umverteilung
+SS_pfr <- update(
+  SS_pfl,
+  formula = pfr ~ prot + bord:vaud + bord | vaud * bord,
+)
+
+# (3) Präferenz für Intervention
+SS_pfi <- update(
+  SS_pfl,
+  formula = pfi ~ prot + bord:vaud + bord | vaud * bord,
+)
+
+# (4) Einkommensungleichheit
+SS_gini <- update(
+  SS_pfl,
+  formula = pfi ~ prot + bord:vaud + bord | vaud * bord,
+)
+```
+
+```{r}
+#| tbl-cap: "Ergebnisse der Second-Stage-Regressionen"
+#| label: tbl-BastenBetzSS
+#| cap-location: margin
+
+# Tabellarische Darstellung
+modelsummary::modelsummary(
+  list("(1) Freizeit"= SS_pfl, 
+       "(2) Umverteilung" = SS_pfr, 
+       "(3) Intervention" = SS_pfi, 
+       "(4) Ungleichheit" = SS_gini), 
+  vcov = "HC1", 
+  stars = T, 
+  gof_map = "nobs", 
+  output = "gt"
+) %>%
+  tabopts()
+```
+
+Die Koeffizienten von `prot` in @tbl-BastenBetzSS sind die mit 2SLS ermittelten erwarteten Behandlungseffekte einer 100%-Reformation (d.h. von 100% katholisch zu 100% protestantisch) für eine durchschnittliche Gemeine nahe der Kantonsgrnze. Es handelt sich jeweils um einen lokalen durchschnittlichen Behandlungseffekt (LATE). Gem. der Definition der abhängigen Variablen, interpretieren wir die Koeffizienten von `prot` in de Regressionen (1), (2) und (3) als erwartete Prozentänderung durch Reformation. Der Koeffizient in Regression (4) gibt die erwartete Änderung des Gini-Index an. Sämtliche geschätzte Effekte sind signifikant und haben ein mit der Hypothese der Autoren konsistentes negatives Vorzeichen. 
+
+Die Ergebnisse sind Evidenz, dass Protestantismus zu verringerter Präferenz für Freizeit, Umverteilung sowie wirtschaftspolitische Intervention seitens des Staats führt. Auch die ökonomische Ungleichheit ist signifikant geringer, als in einer durchschnittlichen vollständig katholischen Gemeinde.
+
+### Addendum: FRDD-Schätzung mit `rdrobust()`
+
+Die Funktion `rdrobust::rdrobust()` erlaubt die Schätzung von SRDD und FRDD mit einer Vielzahl von Optionen, s. `?rdrobust`. Dies erleichtert die Schätzung mehrerer Modellspezifikationenen und Bandweiten. Mit dem nachstehenden Befehl schätzen wir den LATE von Reformation auf die Präferenz für Umverteilung anhand lokaler quadratischer Regression. Der Output gibt einen Überblick der Bandweitenschätzung sowie der 2 Stufen des 2SLS-Schätzers, inkl. robuster Inferenzstatistiken.
+
+```{r}
+pfr_rdr <- rdrobust(
+  y = BastenBetz$pfr,
+  x = BastenBetz$bord,
+  fuzzy = BastenBetz$prot, 
+  p = 2,
+  kernel = "uniform",
+  vce = "HC1"
+) 
+
+pfr_rdr %>% 
+  summary()
+```
+Auch für die quadratische Spezifikation erhalten wir mit -5.047 ein vergleichbares signifikantes Ergebnis für den LATE von Protestantismus auf Umverteilung, vgl. Spalte (2) in @tbl-BastenBetzSS.
+
+Mit der Option `bwselect = "msetwo"` kann die Bandweite jeweils für die lokale Regression links- und rechtssetig des Schwellenwerts geschätzt werden.
+
+```{r}
+pfr_rdr %>% 
+  update(bwselect = "msetwo") %>%
+  summary()
+```
+
+Trotz Diskrepanz der geschätzten Bandweiten erhalten wir eine größere aber vergleichbare Schätzung für einen negativen Effekt.
 

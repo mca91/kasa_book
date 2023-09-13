@@ -125,7 +125,5 @@ Lade Pakete, etwas Geduld bitte...  <i class="fas fa-cog fa-spin"></i>
 </script>
 ```
 
-#### `r ttcode("R")` Basics {-}
-
 #### Pinguine und Pipes
 
