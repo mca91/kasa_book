@@ -1,22 +1,26 @@
 lang: "de"
 
+engine: knitr
+
+webr: 
+  show-startup-message: false 
+
 project:
   type: book
   output-dir: "docs"
 
 book:
-  title: "Kausalanalyse und Machine Learning in R"
+  title: "Kausalanalyse und Machinelles Lernen mit R"
   subtitle: "Ein Leitfaden für reproduzierbare Forschung"
   reader-mode: true
   author: "Martin C. Arnold, Christoph Hanck"
-  date: "November 2022"
+  date: "November 2023"
   chapters:
     - index.qmd
     - R_Einfuehrung.qmd
+    - Matching.qmd
     - RDD.qmd
-    - summary.qmd
-    - webrworking.qmd
-    - webrworking_2.qmd
+    - RegReg.qmd
     - Literatur.qmd
   repo-branch: main
   repo-actions: [edit, issue]
@@ -37,15 +41,55 @@ format:
     cap-location: margin
     code-link: true
     toc: true
-    toc-location: right
+    toc-location: left
     toc-title: "<a href='/index.html'>Übersicht</a>"
     reference-location: margin
     include-in-header:
       file: 'mathjax.html'
     code-tools: true
+
   pdf:
-    documentclass: scrreprt
+    pdf-engine: pdflatex
+    papersize: a4
+    linestretch: 1.2
+    fig-pos: t
 
-
+    geometry:
+      - inner=3cm
+      - outer=5cm
+      - top=3cm
+      - bottom=4cm
+      - headsep=22pt
+      - headheight=11pt
+      - footskip=33pt
+      - ignorehead
+      - ignorefoot
+      - heightrounded
+      
+    keep-tex: true
+    
+    include-in-header:
+       text: |
+         \usepackage{lscape}
+         \newcommand{\blandscape}{\begin{landscape}}
+         \newcommand{\elandscape}{\end{landscape}}
+         \usepackage{float}
+         \floatplacement{table}{t}
+         \usepackage{amsmath, amssymb, amsthm, amstext}
+         \usepackage{mlmodern}
+         \usepackage[T1]{fontenc}
+         \usepackage{fvextra}
+         \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+    include-before-body:
+        text: |
+          \RecustomVerbatimEnvironment{verbatim}{Verbatim}{
+          showspaces = false,
+          showtabs = false,
+          breaksymbolleft={},
+          breaklines
+          }
+          
 editor: visual
 
+filters: 
+  - webr

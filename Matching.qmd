@@ -1,0 +1,20 @@
+---
+webr: 
+  show-startup-message: true
+  packages: ['tidyverse', 'MatchIt']
+---
+
+# Matching
+
+## Darkmode
+
+```{webr-r}
+library(tidyverse)
+# darkmode einlesen
+darkmode <- read_csv("datasets/darkmode.csv")
+glimpse(darkmode)
+
+# Alle Variablen zu typ 'numeric' formatieren
+darkmode <- darkmode %>% 
+  mutate_all(.funs = as.numeric)
+```

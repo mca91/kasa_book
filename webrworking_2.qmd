@@ -2,13 +2,12 @@
 
 ## Background
 
-The purpose of this document is to explore how WebR can be embedded in a 
-Quarto Document for the purposes of teaching _R_. 
+The purpose of this document is to explore how WebR can be embedded in a Quarto Document for the purposes of teaching *R*.
 
-- WebR Website: <https://docs.r-wasm.org/webr/latest/>
-- WebR GitHub: <https://github.com/r-wasm/webr/>
+-   WebR Website: <https://docs.r-wasm.org/webr/latest/>
+-   WebR GitHub: <https://github.com/r-wasm/webr/>
 
-## Setup 
+## Setup
 
 See the <https://github.com/coatless-r-n-d/webR-quarto-demos> for source.
 
@@ -38,7 +37,6 @@ See the <https://github.com/coatless-r-n-d/webR-quarto-demos> for source.
   });
 </script>
 ```
-
 ```{r}
 #| results: asis
 #| echo: false
@@ -154,8 +152,7 @@ Next, let's look at a few features of the language
 
 ### Linear Regression
 
-We'll first start with the WebR team's demo example or the statistician way of
-saying, "Hello world!"... Aka linear regression:
+We'll first start with the WebR team's demo example or the statistician way of saying, "Hello world!"... Aka linear regression:
 
 ```{webr}
 fit = lm(mpg ~ am, data=mtcars)
@@ -164,8 +161,7 @@ summary(fit)
 
 ### Retrieving prior objects
 
-Each WebR cell appears to be connected to each other. Thus, we can access the
-`fit` outcome:
+Each WebR cell appears to be connected to each other. Thus, we can access the `fit` outcome:
 
 ```{webr}
 coef(fit)
@@ -175,11 +171,11 @@ coef(fit)
 anova(fit)
 ```
 
-### Mixing active and non-active _R_ code
+### Mixing active and non-active *R* code
 
-For _if-else_ statements, we have:
+For *if-else* statements, we have:
 
-```r
+``` r
 if (...) {
   # Statements for TRUE
 } else {
@@ -187,11 +183,11 @@ if (...) {
 }
 ```
 
-- `...` denotes a condition (either `TRUE` or `FALSE`)
-- If `TRUE`, then run the statements inside `{}`
-- Else, `FALSE`, carry on with your day. 
+-   `...` denotes a condition (either `TRUE` or `FALSE`)
+-   If `TRUE`, then run the statements inside `{}`
+-   Else, `FALSE`, carry on with your day.
 
-How could we modify `temperature` to have the `if` statement print `"Hot!"`? 
+How could we modify `temperature` to have the `if` statement print `"Hot!"`?
 
 ```{webr}
 # Let's classify 
@@ -204,17 +200,15 @@ if (temperature > 76) {
 }
 ```
 
-
 ### Summarize Data
 
-Glancing at data frames yields: 
+Glancing at data frames yields:
 
 ```{webr}
 summary(mtcars)
 ```
 
 ### Errors and Warnings
-
 
 ```{webr}
 stop("What happens if an error is present?")
@@ -224,16 +218,15 @@ stop("What happens if an error is present?")
 warning("You shouldn't be here...")
 ```
 
-
 ### Base graphics
 
-Graphing with base R 
+Graphing with base R
 
 ```{webr}
 plot(pressure)
 ```
 
-More advanced base R graphing... 
+More advanced base R graphing...
 
 ```{webr}
 x1 = seq(0, 1, length = 20)
@@ -252,8 +245,7 @@ box(col = "grey")
 
 ### ggplot2 Graphics
 
-Next, we look at using `ggplot2` graphics. By default, the `ggplot2` package
-is not available as it is _dependency_ heavy. 
+Next, we look at using `ggplot2` graphics. By default, the `ggplot2` package is not available as it is *dependency* heavy.
 
 ```{=html}
 <details>
@@ -290,7 +282,6 @@ Downloading webR package: withr
 Downloading webR package: ggplot2
 </details>
 ```
-
 ```{webr}
 # Install non-base R packages
 webr::install("ggplot2")
@@ -299,6 +290,3 @@ library("ggplot2")
 p = ggplot(mpg, aes(class, hwy))
 p + geom_boxplot()
 ```
-
-
-

@@ -1,0 +1,18 @@
+
+# Einleitung {.unnumbered}
+
+In den letzten Jahren hat sich die datengetriebene Forschung in vielen Fachgebieten, insbesondere in der Ökonometrie und den empirischen Wirtschaftswissenschaften, grundlegend verändert. Haupttreiber dieses Wandels ist die zunehmende Verfügbarkeit von *big data* -- hochdimensionale Datenmengen die regelmäßig in Unternehmen und öffentlichen Institutionen anfallen und die Entwicklung sowie den Einsatz neuer statistischer Verfahren im Gebiet *machine learning* prominent gemacht haben. Mit diesen Verfahren können große Datenmengen schnell und effizient verarbeitet und analysiert werden, was ihre zunehmende Relevanz für die evidenzbasierte Entscheidungsfindung in Politik und Wirtschaft begründet.
+
+Ein weiterer Treiber der empirischen wirtschaftswissenschaftlichen Forschung ist die^[Bekannst als *the credibility revolution in empirical economics*  [@AngristPischke2010].] 
+
++ Data Science / Varian zitieren: der hat recht behalten
+
++ Reproducibility 
+
++ Programmierung / Relevanz von Coding 
+
++ kanonischer Unterrichtskatalog in Ökonometrie aufbrechen
+
++ Alles zusammenlegen als ein wichtiger Block für Wirtschaftswissenschaftler und solche die es werden wollen. Und es wird noch wichtiger werden.
+
+[@AngristPischke2010]
