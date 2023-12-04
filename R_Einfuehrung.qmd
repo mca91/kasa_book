@@ -1,129 +1,612 @@
+---
+webr: 
+  show-startup-message: true
+  packages: ['tidyverse', 'palmerpenguins']
+---
+
 # Statistische Programmierung mit R
 
 ```{r}
 #| results: "asis"
 #| echo: false
 source("setup.R")
+library(tidyverse)
+library(kableExtra)
+library(modelsummary)
+library(gt)
 ```
 
-Dieses Kapitel ist *nicht* als umfassende Einführung in R gedacht, sondern behandelt Kernkonzepte und soll der Selbsteinschätzung dienen. Wenngleich die Inhalte deutlich über ein Hallo-Welt-Beispiel^[https://de.wikipedia.org/wiki/Hallo-Welt-Programm] hinausgehen, betrachten wir hier **absolutes Basiswissen**. Dieses ist Vorraussetzung für das Verständnis fortgeschrittener Konzepte in späteren Kapitel. Falls Sie bereits über solide Grundkenntnisse im Umgang mit R verfügen, können Sie problemlos zu Kapitel XYZ springen. Sollten Sie nicht oder nur teilweise mit den hier gezeigten Befehlen vertraut sein, empfiehlt sich eine Erarbeitung bzw. Wiederholung der Grundlagen. Nachstehede Ressourcen finden wir hilfreich:
+Dieses Kapitel ist *nicht* als umfassende Einführung in R gedacht, sondern behandelt Kernfunktionen aus der Paketsammlung `tidyverse`. Wenngleich die Inhalte deutlich über ein Hallo-Welt-Beispiel^[https://de.wikipedia.org/wiki/Hallo-Welt-Programm] hinausgehen, betrachten wir hier grundlegene Funktionen für Datenmanipulation und Visualisierung. Diese sind Vorraussetzung für das Verständnis fortgeschrittener Code-Bausteine in späteren Kapiteln. Falls Sie bereits über Grundkenntnisse im Umgang mit `tidyverse` verfügen, können Sie dieses Kapitel überspringen. Sollten Sie nicht oder nur teilweise mit den hier gezeigten Befehlen vertraut sein oder keinerlei Erfahrung mit R haben, empfiehlt sich vorab eine Erarbeitung bzw. Wiederholung der Inhalte. Nachstehede Ressourcen finden wir hilfreich:
 
-- Feedbackgestütze interaktive Übungsaufgaben bei DataCamp, bspw. [Einführung in R](https://campus.datacamp.com/courses/einfuhrung-in-r/)^[Ein Teil des hier angebotenen Katalogs (exlusive *Einführung in R*) ist kostenpflichtig.]
+- Feedbackgestütze interaktive Übungsaufgaben bei DataCamp^[Ein Teil des hier angebotenen Katalogs (exlusive *Einführung in R*) ist kostenpflichtig.], bspw. 
 
-- Open-source-Literatur wie der Umfangreiche Leitfaden von [Ellis und Mayer (2023)](https://methodenlehre.github.io/einfuehrung-in-R/).
+    - [Einführung in R](https://campus.datacamp.com/courses/einfuhrung-in-r/)
+    - [Introduction to Data Visualization with ggplot2](https://www.datacamp.com/courses/introduction-to-data-visualization-with-ggplot2)
+    - [Data Manipulation with dplyr](https://www.datacamp.com/courses/data-manipulation-with-dplyr)
 
-```{=html}
-<button class="btn btn-outline-primary btn-sm run" disabled type="button" id="runButton" style="width:auto; border-radius:15px 15px 0 0;">
-R lädt, etwas Geduld bitte...
-</button>
-<div id="editor" style="margin-bottom:15px"></div>
-<pre><code id="out" style="font-size:16px"></code></pre>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/eclipse.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/r/r.js"></script>
-
-<script type="module">
-
-  const editor = CodeMirror((elt) => {
-    elt.style.border = '2px solid #eee';
-    elt.style.borderRadius = "0 0 15px 15px";
-    elt.style.height = 'auto';
-    elt.style.fontSize = '16px';
-    document.getElementById('editor').append(elt);
-  },{
-    value: 'fit <- lm(mpg ~ am, data=mtcars)\nsummary(123)',
-    lineNumbers: true,
-    matchBrackets: true,
-    mode: 'r',
-    theme: 'eclipse',
-    viewportMargin: Infinity,
-  });
+- Open-source-Literatur wie 
   
-  import { WebR } from 'https://webr.r-wasm.org/v0.1.0/webr.mjs';
-  const webR = new WebR();
-  await webR.init();
-  const shelter = await new webR.Shelter();
-  async function runR() {
-    let code = editor.getValue();
-    const result = await shelter.captureR(code, {
-      withAutoprint: true,
-      captureStreams: true,
-      captureConditions: false
-    });
-    try {
-      const out = result.output.filter(
-        evt => evt.type == 'stdout' || evt.type == 'stderr'
-      ).map((evt) => evt.data);
-      document.getElementById('out').innerText = out.join('\n');
-    } finally {
-      shelter.purge();
-    }
-  }
-  
-  document.getElementById('runButton').onclick = runR;
-  document.getElementById('runButton').innerText = 'R-Code ausführen';
-  document.getElementById('runButton').disabled = false;
+    - der umfangreiche Leitfaden von [Ellis und Mayer (2023)](https://methodenlehre.github.io/einfuehrung-in-R/)
+    - [R for Data Science](https://r4ds.hadley.nz/)
+    - [Hands-On Programming with R](https://rstudio-education.github.io/hopr/)
+
+
+Wir laden zunächst die Paketsammlung `tidyverse`. Für die Reproduktion mit dem [R GUI](https://www.r-project.org/) oder mit [RStudio](https://posit.co/download/rstudio-desktop/) muss das Paket vorab mit `install.packages()` installiert werden. In den interaktiven R-Konsolen in diesem Kapitel (und im Rest des Buchs) sind die benötigten R-Pakete bereits installiert *und* geladen, sofern nicht anders beschrieben. 
+
+```{r}
+# Paket tidyverse installieren
+# install.packages("tidyverse")
+
+# Paket 'tidyverse' laden
+library(tidyverse)
+```
+
+Für das Verständnis von Code-Chunks ist es hilfreich, Zwischenergebnisse explizit zu evaluieren und in der Konsole auszugeben. Hierfür umschließen wir häufig Code-Zeilen mit runden Klammern. Der nächste Chunk illustriert dies für die Variable `x`.
+
+```{webr-r}
+# Variable definieren...
+x <- pi
+# ... und evaluieren
+x
+
+# Äquivalent:
+(
+  x <- pi
+)
+```
+
+## Lange, weite und "tidy" Datenformate
+
+Wir betrachten den in @tbl-Klausurergebnisse dargestellten Datensatz *Klausurergebnisse*.
+
+```{r, echo=F, eval = T}
+#| tbl-cap: "Datensatz *Klausurergebnisse*"
+#| label: tbl-Klausurergebnisse
+klausurergebnisse <- tribble(
+  ~Name,    ~Mikro, ~Makro, ~Mathe,
+  "Tim",        NA,    1.3,    3.0,
+  "Lena",      1.0,    3.0,     NA,
+  "Ricarda",   2.0,    1.7,    1.3,
+  "Simon",     2.3,    3.3,     NA
+)
+gt(klausurergebnisse) %>% 
+  tabopts()
+```
+
+Der Datensatz ist noch nicht in der R-Arbeitsumgebung verfügbar. Mit der Funktion `tribble()` können wir @tbl-Klausurergebnisse händisch als R-Objekt der Klasse `tibble` definieren
+
+```{webr-r}
+# 'klasurergebnisse' als tibble definieren
+(
+  klausurergebnisse <- tribble(
+    ~Name,    ~Mikro, ~Makro, ~Mathe,
+    "Tim",        NA,    1.3,    3.0,
+    "Lena",      1.0,    3.0,     NA,
+    "Ricarda",   2.0,    1.7,    1.3,
+    "Simon",     2.3,    3.3,     NA
+  )
+)
+```
+
+`klausurergebnisse` enhält die Klausurnoten der vier Studierenden (Boebachtungen) spaltenweise *pro Modul*, d.h. die Spaltennamen `Mikro`, `Makro` und `Mathe` sind Ausprägungen der Variable *Modul*. Der Datensatz liegt also *nicht* im s.g. *Tidy-Format* vor.
+
+::: {.callout-tip}
+## Tidy-Format
+Tidy-Format: Jede Spalte ist ***eine*** Variable, jede Reihe ist ***eine*** Beobachtung und jede Zelle enthält einen ***einen*** Wert. Datensätze im Tidy-Format sind häufig lang: Die Zeilendimension ist größer als die Spaltendimension.
+:::
+
+Das Tidy-Format ist hilfreich für statistische Analysen mit `tidyverse`-Funktionen wie bspw. `ggplot()`. Wir nutzen die Funktion `tidyr::pivot_longer()`, um `klausurergebnisse` ein (langes) Tidy-Format zu transformieren.
+
+```{webr-r}
+# 'klausurergebnisse' in Tidy-Format überführen
+(
+  long <- pivot_longer(
+    data = klausurergebnisse, 
+    cols = Mikro:Mathe, 
+    names_to = "Modul", 
+    values_to = "Note"
+  )
+)
+```
+
+Beachte, dass die Spalte `Name` die Zugehörigkeit der Ausprägungen (`Note`) jeder Variable (`Modul`) zu einer Beobachtung identifiziert. Mit dieser Information können wir den langen Datensatz wieder in das ursprüngliche (weite) Format zurückführen. Wir nutzen hierzu `tidyr::pivot_wider()`.  
+
+```{webr-r}
+# langes Format in das Ausgangsformat transformieren
+(
+  wide <- pivot_wider(
+    data = long,
+    id_cols = "Name",
+    names_from = "Modul", 
+    values_from = "Note"
+  )
+)
+```
+
+Wenn die Zuweisung von Zwischenergebnissen in Variablen nicht benötigt wird, kann eine Verkettung von Funktionsaufrufen die Verständlichkeit des Codes verbessern. Hierzu wird der [Pipe-Operator](https://magrittr.tidyverse.org/reference/pipe.html) `%>%` genutzt. Wir wiederholen die Transformationen mit den `tidyr::pivot_*`-Funktion bei Verwendung von `%>%`.
+
+```{webr-r}
+# langes Format mit %>%
+(
+  long <- klausurergebnisse %>% 
+    pivot_longer(
+      cols = Mikro:Mathe, 
+      names_to = "Modul", 
+      values_to = "Note"
+    )
+)
+
+# weites Format mit %>%
+(
+  wide <- long %>% 
+    pivot_wider(
+      id_cols = "Name",
+      names_from = "Modul", 
+      values_from = "Note"
+    )
+)
+```
+
+Ein Beispiel für den Nachteil des weiten Formats im Umgang mit `tidyverse`-Paketen ist die Funktion `tidyr::drop_na()`. Diese entfernt sämtliche *Zeilen* eines Datensatzes, die `NA`-Einträge (d.h. fehlende Werte) aufweisen. Beachte, dass diese Operation im ursprünglichen weiten Format zum Entfernen ganzer Beobachtungen aus `wide` führt.
+
+```{webr-r}
+# NA-Einträge aus dem "weiten" Format entfernen
+wide %>% 
+  drop_na()
+```
+
+Im Tidy-Format `long` hingegen bleiben die übrigen Informationen betroffener Beobachtungen erhalten.
+
+```{webr-r}
+# NA-Einträge aus dem "langen" Format entfernen
+long %>% 
+  drop_na()
+```
+
+## Pinguine und Pipes
+
+In diesem Abschnitt zeigen wir die Verwendung häufig verwendeter `dplyr`-Funktionen (s.g. *Verben*) für die Transformation von Datensätzen: `mutate()`, `select()`, `filter()`,` summarise()` und `arrange()`.
+
+Für die Illustration verwenden wir den Datensatz `penguins` aus dem R-Paket `palmerpenguins`. Dieser Datensatz wurde im Zeitraum 2007 bis 2009 von Dr. Kristen Gorman im Rahmen des *Palmer Station Long Term Ecological Research Program* zusammengetragen und enthält Größenmessungen für drei Pinguinarten, die auf den Inseln des [Palmer-Archipels](https://en.wikipedia.org/wiki/Palmer_Archipelago) in der Antarktis beobachtet wurden.
+
+```{r}
+# Paket 'palmerpenguins' installieren
+# install.packages("palmerpenguins")
+
+# Paket 'palmerpenguins' laden
+library(palmerpenguins)
+```
+
+Mit `data()` wird der Datensatz in der Arbeitsumgebung verfügbar gemacht. Wir nutzen `glimpse()`, um einen Überblick zu erhalten.
+
+```{webr-r}
+# Datensatz in der Arbeitsumgebung verfügbar machen
+data(penguins)
+
+# Übersicht anzeigen lassen
+glimpse(penguins)
+```
+
+### `dplyr::mutate()`
+
+Mit `mutate()` können bestehende Variablen überschrieben oder neue Variablen als Funktion bestehender Variablen definiert werden. `mutate()` operiert in der Spaltendimension des Datensatz. 
+
+Wir definieren eine neue Variable `body_mass_kg` als Transformation `body_mass_g/1000`.
+
+```{webr-r}
+# Neue Variable mit Gewicht in Kg definieren
+penguins %>% 
+  mutate(
+    body_mass_kg = body_mass_g/1000
+  ) %>%
+  glimpse()
+```
+
+Mit `across()` kann die dieselbe Operation auf mehrere Variablen angewendet werden. 
+
+Im nachstehenden Beispiel ändern wir den typ (`type`) der Variablen `species`, `island`, `sex` und `year` zu `character`. 
+
+```{webr-r}
+# species, island, sex und year in Typ 'character' umwandeln
+penguins %>% 
+  mutate(
+    across(
+      c(species, island, sex, year), 
+      .fns = as.character
+    )
+  ) %>%
+  glimpse()
+```
+
+`transmute()` ist eine Variante von `mutate()`, die lediglich die transformierten Variablen beibehält.
+
+```{webr-r}
+# Nur transformierte Variablen behalten
+penguins %>% 
+  transmute(
+    body_mass_kg = body_mass_g/1000
+  )
+```
+
+### `dplyr::select()`
+
+Mit `select()` werden Variablen aus dem Datensatz ausgewählt. Dies geschieht entweder über den Variablennamen...
+
+```{webr-r}
+# 'species' auswählen
+penguins %>% 
+  select(species)
+```
+
+... oder über eine Indexmenge.^[Hilfreich: `dplyr::pull()` selektiert eine Variable und wandelt diese in einen Vektor um.]
+
+```{webr-r}
+# Teilmenge von Variablen per Index auswählen
+penguins %>% 
+  select(
+    c(1, 2, 3)
+  )
+```
+
+Variablen können anhand eines Muster im Namen selektiert werden. Die Selektion von `ends_with("mm")` bezieht nur Variablen mit Endung `mm` im Namen ein:
+
+```{webr-r}
+# Nur in mm gemessene Variablen auslesen
+penguins %>% 
+  select(
+    ends_with("mm")
+  )
+```
+
+Mit `where()` können wir Variablen aufgrund bestimmter Eigenschaften ihrer Ausprägungen selektieren. 
+
+```{webr-r}
+# Nur numerische Variablen auswählen
+penguins %>% 
+  select(
+    where(is.numeric)
+  )
+```
+
+### `dplyr::filter()`
+
+Das Verb `filter()` filtert den Datensatz in der Zeilendimension. So können Beobachtungen ausgewält werden, deren Merkmalsausprägungen bestimmte Kriterien erfüllen. Hierzu muss `filter()` ein logischer (`logical`) Ausdruck übergeben werden. Häufig erfolgt dies über Vergleichsoperatoren.
+
+```{webr-r}
+# Nur Pinguine mit bill_length_mm >= 39
+penguins %>% 
+  filter(
+    bill_length_mm >= 39
+  )
+```
+
+```{webr-r}
+# Nur Pinguine mit bill_length_mm <= 40
+penguins %>% 
+  filter(
+    bill_length_mm <= 40
+  )
+```
+
+Oft ist es praktisch, mehrere Kriterien zu kombinieren.
+
+```{webr-r}
+# Kombinierter Filter -- Variante 1
+penguins %>% 
+  filter(
+    bill_length_mm >= 39 & bill_length_mm <= 40
+  )
+```
+
+Analog: komma-getrennte Kriterien werden intern über den Und-Operator (`&`) verknüpft.
+
+```{webr-r}
+# Kombinierter Filter -- Variante 2
+penguins %>% 
+  filter(
+    bill_length_mm >= 39, 
+    bill_length_mm <= 40
+  )
+```
+
+Ähnlich wie bei `select()` verwenden wir häufig nützliche Funktionen, welche die Interpretation des Codes erleichtern. `dplyr::between()` erlaubt filtern innerhalb eines Intervals.
+
+```{webr-r}
+# Filtern mit Hilfsfunktion
+penguins %>% 
+  filter(
+    between(
+      bill_length_mm, left = 39, right = 40
+    )
+  )
+```
+
+Mit diesen Verben sind wir bereits in der Lage, den Datensatz gemäß folgender Vorschrift zu bereinigen: 
+
+  1. Entfernen der Maßeinheiten aus den Variablennamen
+  2. Entfernen von Pinguinen mit fehlenden Werten (`NA`)
+  3. Entfernen von Pinguinen mit einem Gewicht *oberhalb* des 95\%-Stichprobenquantils
+
+```{webr-r}
+# Schritt 1
+(
+  penguins_cleaned <- penguins %>% 
+    rename(
+      bill_length = bill_length_mm,
+      bill_depth  = bill_depth_mm,
+      flipper_length = flipper_length_mm,
+      body_mass = body_mass_g
+    )
+)
+```
     
-</script>
+```{webr-r}
+# Schritt 2
+(
+  penguins_cleaned <- penguins_cleaned %>%
+    drop_na()
+)
+```
+    
+```{webr-r}
+# Schritt 3
+penguins_cleaned %>% 
+  filter(
+    body_mass < quantile(body_mass, probs = .95)
+  ) %>%
+  glimpse()
 ```
 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-<i class="fa-brands fa-github"></i>
+Durch die Verkettung mit `%>%` können wir sämtliche Schritte für die Bereinigung ohne das Abspeichern von Zwischenergebnissen durchführen.
 
-```{=html}
-<button class="btn btn-outline-primary btn-sm run" id="runButton2" disabled type="button" style="width:auto; border-radius:15px 15px 0 0;">
-Lade Pakete, etwas Geduld bitte...  <i class="fas fa-cog fa-spin"></i>
-</button>
-<div id="editortwo" style="margin-bottom:15px"></div>
-<pre><code id="out2" style="font-size:16px"></code></pre>
+```{webr-r}
+# Verketter Funktionsaufruf für Datensatzbereinigung
+penguins_cleaned <- penguins %>% 
+  rename(
+    bill_length = bill_length_mm,
+    bill_depth  = bill_depth_mm,
+    flipper_length = flipper_length_mm,
+    body_mass = body_mass_g
+  ) %>% 
+  drop_na() %>% 
+  filter(
+    body_mass < quantile(body_mass, .95)
+  )
 
-<script type="module">
-
-  const editortwo = CodeMirror((elt) => {
-    elt.style.border = '2px solid #eee';
-    elt.style.borderRadius = "0 0 15px 15px";
-    elt.style.height = 'auto';
-    elt.style.fontSize = '16px';
-    document.getElementById('editortwo').append(elt);
-  },{
-    value: 'library(ggplot2)\nhead(diamonds)',
-    lineNumbers: true,
-    matchBrackets: true,
-    mode: 'r',
-    theme: 'eclipse',
-    viewportMargin: Infinity,
-  });
-  
-  import { WebR } from 'https://webr.r-wasm.org/v0.1.0/webr.mjs';
-  const webR = new WebR();
-  await webR.init();
-  await webR.installPackages(['dplyr', 'ggplot2']);
-  const shelter = await new webR.Shelter();
-  async function runR() {
-    let code = editortwo.getValue();
-    const result = await shelter.captureR(code, {
-      withAutoprint: true,
-      captureStreams: true,
-      captureConditions: false
-    });
-    try {
-      const out = result.output.filter(
-        evt => evt.type == 'stdout' || evt.type == 'stderr'
-      ).map((evt) => evt.data);
-      document.getElementById('out2').innerText = out.join('\n');
-    } finally {
-      shelter.purge();
-    }
-  }
-  
-   document.getElementById('runButton2').onclick = runR;
-  document.getElementById('runButton2').innerText = 'R-Code ausführen';
-  document.getElementById('runButton2').disabled = false;
-  
-</script>
+penguins_cleaned %>% 
+  glimpse()
 ```
 
-#### Pinguine und Pipes
+### `dplyr::summarise()`
+
+Das Verb `summarise()` fasst Variablen über Beobachtungen hinweg zusammen. Der nachstehende Code-Chunk erzeugt eine Tabelle mit Stichprobenmittelwert und -standardabweichung von `flipper_length_mm`.^[`dplyr::summarise()` darf nicht mit `base::summary()` verwechselt werden!] Um zu vermeiden, dass die Auswertung aufgrund fehlender Werte (`NA`) in `flipper_length_mm` scheitert, lassen wir `NA`s mit `na.rm = TRUE` bei der Berechnung unberücksichtigt (wir verwenden weiterhin den unbereinigten Datensatz `penguins`).
+
+```{webr-r}
+# statistische Zusammenfassung mit 'summarise()'
+penguins %>% 
+  select(flipper_length_mm) %>% 
+  summarise(
+    mean = mean(flipper_length_mm, na.rm = TRUE), 
+    sd = sd(flipper_length_mm, na.rm = TRUE)
+  )
+```
+
+Varianten von `summarise()` können über mehrere Variablen angewendet werden. Wir verwenden `across()` und `where()`, um lediglich numerische Variablen mit den in der liste definierten Funktionen zusammenzufassen. Beachte, dass `\(x) mean(x)` eine anonyme Funktion definiert.
+
+```{webr-r}
+penguins %>% 
+  summarise(
+    across(
+      where(is.numeric), 
+      .fns = list(
+        mean = \(x) mean(x, na.rm = TRUE), 
+        sd = \(x) sd(x, na.rm = TRUE)
+      )
+    )
+  ) %>%
+  glimpse()
+```
+
+
+### `dplyr::arrange()`
+
+Mit `arrange()` können Datensätze in Abhängigkeit der beobachteten Ausprägungen von Variablen sortiert werden.
+
+```{webr-r}
+# Datensatz aufsteigend nach 'body_mass_g' sortieren
+penguins %>% 
+  arrange(body_mass_g)
+```
+
+Die Funktion `dplyr::desc()` kehrt die Reihenfolge zu einer absteigenden Sortierung um.
+
+```{webr-r}
+# Absteigende Sortierung nach 'body_mass_g'
+penguins %>% 
+  arrange(
+    desc(body_mass_g)
+  )
+```
+
+Komplexe Sortier-Muster werden durch Übergabe von Variablennamen in der gewünschten Reihenfolge erreicht.
+
+```{webr-r}
+# Erst Sortierung nach 'sex', dann gruppenweise absteigend 
+# nach 'body_mass_g' sortieren
+penguins %>% 
+  arrange(
+    sex, desc(body_mass_g)
+  )
+```
+
+
+### Operationen mit gruppierten Datensätzen
+
+Für manche Transformationen ist eine Gruppierung der Daten hilfreich. Wir illustrieren nachfolgend die unterschiedlichen Verhaltensweisen ausgewählter Verben durch Vergleiche von gruppierten und nicht-gruppierten Anwendungen.
+  
+```{webr-r}
+# Datensatz gruppieren
+penguins_grouped <- penguins %>% 
+  group_by(species)
+
+# Datensatz hat nun die Eigenschaft 'Groups'
+glimpse(penguins_grouped)
+```
+
+`species` hat drei Ausprägungen. Entsprechend ist `penguins_grouped` nun in drei Gruppen eingeteilt.
+
+Bei gruppierten Datensätzen fasst `summarise()` die Variablen pro Guppe zusammen.
+
+```{webr-r}
+# summarise -- ungruppiert:
+penguins %>%
+  summarise(
+    across(
+      where(is.numeric), \(x) mean(x, na.rm = T)
+      )
+    )
+```
+
+```{webr-r}
+# summarise -- gruppiert:    
+penguins_grouped %>%
+  summarise(
+    across(
+      where(is.numeric), 
+      ~ mean(., na.rm = T)
+    )
+  )
+```
+
+
+`mutate()` definiert bzw. transformiert für jede Gruppe separat. Im dies zu veranschaulichen, ziehen wir eine Zufallsstichprobe von 10 Pinguinen aus der Datensatz.
+
+```{webr-r}
+# Zufallsstichprobe generieren
+set.seed(123)
+(
+  penguins_sample <- penguins %>%
+    slice_sample(n = 10)  
+)
+```
+
+```{webr-r}
+# mutate() -- ungruppiert:
+penguins_sample %>%
+  transmute(
+    mean = mean(bill_length_mm)
+  )
+```
+
+Für den ungruppierten Datensatz berechnet `mutate()` das Stichprobenmittel von `bill_length_mm` über *alle* zehn Datenpunkte und weißt diesen Wert jeweils in der Variable `mean` zu.
+
+```{webr-r}
+# mutate() -- gruppiert
+penguins_sample %>%
+  group_by(species) %>%
+  transmute(
+    mean = mean(bill_length_mm)
+  )
+```
+
+Bei gruppierten Daten berechnet `mutate()` das Stichprobenmittel *pro Gruppe* und weist die Mittelwerte entsprechend zu.
+
+## Eine explorative Analyse mit `ggplot2`
+
+Der bereinigte Datensatz `penguins_cleaned` eignet sich gut für eine graphische Auswertung mit dem R-Paket `ggplot2`, welches Bestandteil des `tidyverse` ist. Nachfolgend untersuchen wir Zusammenhänge zwischen den Körpermaßen der Pinguine.
+
+Wir erstellen zunächst einen einfachen Punkteplot des Gewichts (`body_mass`) und der Schnabeltiefe (`bill_depth`).
+
+```{webr-r}
+# Punkteplot: body_mass vs. bill_depth
+penguins_cleaned %>%
+  ggplot(
+    mapping = aes(
+      x = body_mass, 
+      y = bill_depth
+    )
+  ) +
+  geom_point()
+```
+
+Die Grafik zeigt einen positiven Zusammenhang zwischen dem Gewicht und der Schnabeltiefe. Als nächstes passen wir den Code so an, dass die Datenpunkte entsprechend der Art (`species`) eingefärbt sind.
+
+```{webr-r}
+# Punkteplot: Farbliche Darstellung verschiedener Arten
+penguins_cleaned %>%
+  ggplot(
+    mapping = aes(
+      x = body_mass, 
+      y = bill_depth, 
+      color = species
+    )
+  ) +
+  geom_point()
+```
+
+Offenbar gibt es deutliche Unterschiede in der (gemeinsamen) Verteilung von Gewicht und Schnabeltiefe zwischen den verschiedenen Arten.
+
+Um den Zusammenhang zwischen Gewicht und Schnabeltiefe zu untersuchen, schätzen wir lineare Regressionen $$body\_mass = \beta_0 + \beta_1 bill\_depth + u$$ separat für jede der drei Pinguinarten mit der KQ-Methode. Anschließend zeichnen wir die geschätzten Regressionsgeraden ein.
+
+```{webr-r}
+# Lineare Regression per Art
+penguins_cleaned %>%
+  ggplot(
+    aes(
+      x = body_mass, 
+      y = bill_depth, 
+      color = species
+    )
+  ) +
+  geom_point() +
+  geom_smooth(method = "lm", se = F)
+```
+
+Die Schätzungen bekräftigen die Vermutung, dass der lineare Zusammenhang zwischen Gewicht und Schnabeltiefe sich nicht zwischen den verschiedenen Pinguinarten unterscheidet: Pinguine der Art *Gentoo* sind im Mittel schwerer als Pinguine der übrigen Arten, haben jedoch eine geringere Schnabeltiefe. 
+
+Der nachfolgende Code fügt der Grafik eine Regressionsline *über alle* Arten hinzu. Wir setzen hierbei das Argment `inherit_aes = FALSE` und legen damit fest, dass die Regression für `body_mass` und `bill_depth` ohne Differenzierung per `species` durchgeführt wird.
+
+```{webr-r}
+# Zusatz: Globale Regression
+penguins_cleaned %>%
+  ggplot(
+    mapping = aes(
+      x = body_mass, 
+      y = bill_depth, 
+      color = species
+    )
+  ) +
+  geom_point() +
+  geom_smooth(method = "lm", se = F) +
+  # Regression für alle Datenpunkte
+  geom_smooth(
+    mapping = aes(
+      x = body_mass, 
+      y = bill_depth
+    ),
+    method = "lm", 
+    se = F, 
+    inherit.aes = F
+  )
+```
+
+Offenbar ist die vorherige Analyse per Spezies sinnvoller: Die Regression über alle Arten suggeriert einen negativen Zusammenhang zwischen Gewicht und Schnabeltiefe.
+
+*Facetting* mit `facet_wrap()` erlaubt eine Untersuchung des Zusammenhangs je Insel (`island`), auf der die Messung erfolgt ist.
+
+```{webr-r}
+# Facettierung des per In
+penguins_cleaned %>%
+  ggplot(
+    mapping = aes(
+      x = body_mass, 
+      y = bill_depth, 
+      color = species)
+  ) +
+  geom_point() +
+  geom_smooth(method = "lm", se = F) +
+  facet_wrap(~ island)
+```
+
+Wir sehen, dass es hinsichtlich des Zusammenhangs von Gewicht und Schnabeltiefe keine wesentlichen Diskrepanzen zwischen den drei Inseln gibt. Darüber hinaus lässt sich anhand der Facetten leicht erkennen, wie die drei Arten über die Inseln verteilt sind.
 
