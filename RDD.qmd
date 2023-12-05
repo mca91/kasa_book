@@ -19,33 +19,6 @@ svg {
 }
 ```
 
-```{=html}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
-<style>
-  .CodeMirror pre {
-    background-color: unset !important;
-  }
-  .btn-webr {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/r/r.js"></script>
-<script type="module">
-  import { WebR } from "https://webr.r-wasm.org/v0.1.1/webr.mjs";
-  globalThis.webR = new WebR({
-    SW_URL: "/"
-  });
-  await globalThis.webR.init();
-  globalThis.webRCodeShelter = await new globalThis.webR.Shelter();
-  document.querySelectorAll(".btn-webr").forEach((btn) => {
-    btn.innerText = "Run code";
-    btn.disabled = false;
-  });
-</script>
-```
-
 ```{r}
 #| results: asis
 #| echo: false
@@ -174,7 +147,7 @@ tabopts <- function(x) {
 house <- read_csv("datasets/house.csv")
 ```
 
-Regression Discontinuity Design (RDD) ist ein Ansatz für die Schätzung von Treatment-Effekten mit Regression, wenn durch einen experimentell oder natürlich gegebenen Umstand die Behandlung an einem Schwellenwert ($C$) einer *Laufvariable* ($X$) sprunghaft beeinflusst wird. Ein RDD-Schätzer kann so implementiert werden, dass lediglich Beobachtungen mit Ausprägungen von $X$, die knapp ober- oder knapp unterhalb von $c$ liegen berücksichtigt werden. Die zentrale Idee hierbei ist, dass Individuen nahe bei $c$ im Durchschnitt ähnliche Merkmale aufweisen. Das kausale Diagram in @fig-CDRDD zeigt den Zusammenhang.
+Regression Discontinuity Design (RDD) ist ein Ansatz für die Schätzung von Behandlungs-Effekten mit Regression, wenn durch einen experimentell oder natürlich gegebenen Umstand die Behandlung an einem Schwellenwert ($c$) einer *Laufvariable* ($X$) sprunghaft beeinflusst wird. Ein RDD-Schätzer wird so implementiert, dass lediglich Beobachtungen mit Ausprägungen von $X$, die knapp ober- oder knapp unterhalb von $c$ liegen, berücksichtigt werden. Die zentrale Idee hierbei ist, dass Individuen nahe bei $c$ im Durchschnitt ähnliche Merkmale aufweisen. Beobachtungen nahe $c$ sind dann insbesondere hinsichtlich potentieller Backdoor-Variablen vergleichbar, sodass deren problematische Pfade geschlossen sind. Das kausale Diagram in @fig-CDRDD zeigt den grundsätzlichen Zusammenhang.
 
 ```{dot}
 //| fig-width: 5
@@ -206,47 +179,47 @@ RDD isoliert Variation auf dem Pfad *Oberhalb C &rarr; Behandlung B &rarr; Y*. S
 
 Hinsichtlich der Beeinflussung der Behandlung unterscheiden wir zwischen *Sharp* und *Fuzzy* Regression Discontinuity Designs (SRDD/FRDD). Bei einem SRDD ist die Zuweisung der Behandlung *deterministisch*, d.h. der Schwellenwert in der Laufvariable ist eine harte Grenze für die Gruppenzugehörigkeit: Die *Wahrscheinlichkeit* der Behandlung $p$ springt bei $X=c$ von $p=0$ um $\Delta p = 1$ auf $p=1$.
 
-Bei einem FRDD ist die Zuordnung in Behandlungs- und Kontrollgruppe nicht perfekt durch den Schwellenwert $c$ bestimmt: $p$ springt bei $X=c$ um $\Delta p<1$. Im FRDD können grundsätzlich also sowohl behandelte Subjekte als auch Kontroll-Beobachtungen auf beiden Seiten der Diskontinuität vorliegen -- die Trennung der Gruppen ist "unscharf"^[Engl. *fuzzy*.]. Dieser Umstand ist in empirischen Studien gegeben, wenn es neben der Überschreitung von $c$ weitere Determinanten der Behandlung gibt für die wir nicht kontrollieren können. Die Wahl zwischen SRDD und FRDD hängt vom datenerzeugenden Prozess und der Forschungsfrage ab.
+Bei einem FRDD ist die Zuordnung in Behandlungs- und Kontrollgruppe nicht perfekt durch den Schwellenwert $c$ bestimmt: Die Behandlungswahrscheinlichkeit $p$ springt bei $X=c$ um $\Delta p<1$. Im FRDD können grundsätzlich also sowohl behandelte Subjekte als auch Kontroll-Beobachtungen auf beiden Seiten der Diskontinuität vorliegen -- die Trennung der Gruppen ist "unscharf"^[Engl. *fuzzy*.]. Dieser Umstand ist oft in empirischen Studien mit nicht-experimentellen Daten gegeben, wenn es neben der Überschreitung von $c$ weitere Determinanten der Behandlung gibt (für die wir nicht kontrollieren können). Die Wahl zwischen SRDD und FRDD hängt grundsätzlich vom datenerzeugenden Prozess und der Forschungsfrage ab.
 
 
 ## Sharp Regression Discontinuity Design
 
 **Modell und funktionale Form**
 
-Die korrekte Spezifikation der funktionalen Form für RDD ist wichtig, um eine unverzerrte Schätzung des Effekts zu vermeiden. Die einfachste Form eines SRDD kann anhand der linearen Regression 
+Die korrekte Spezifikation der funktionalen Form für ein RDD ist wichtig, um eine verzerrte Schätzung des Effekts zu vermeiden. Die einfachste Form eines SRDD kann anhand der linearen Regression 
 \begin{align}
 Y_i = \beta_0 + \beta_1 B_i + \beta_2 X_i + u_i\label{eq-simpleSRDD}
-\end{align} geschätzt werden, wobei $B_i$ eine Dummy-Variable für das Überschreiten des Schwellenwertes $c$ist, d.h.
+\end{align} geschätzt werden, wobei $B_i$ eine Dummy-Variable für das Überschreiten des Schwellenwertes $c$ ist, d.h.
 \begin{align*}
   B_i=\begin{cases}
-    0 & X_i < C\\
-    1 & X_i \geq C.
+    0 & X_i < c\\
+    1 & X_i \geq c.
   \end{cases}
 \end{align*}
-Damit ist $B_i$ eine *deterministische* Funktion der Laufvariable $X_i$ und zeigt die Zugehörigkeit zur Behandlungs- oder Treatmentgruppe an. $\beta_1$ ist der Behandlungseffekt.
+Damit ist $B_i$ eine *deterministische* Funktion der Laufvariable $X_i$ und zeigt die Zugehörigkeit zur Behandlungs- oder Treatmentgruppe an. Der Koeffizient $\beta_1$ misst den Behandlungseffekt.
 
-Modell \eqref{eq-simpleSRDD} unterstellt, dass $X$ links- und rechtsseitig von $c$denselben Effekt auf $Y$ hat. Diese Annahme ist restriktiv. Eine Alternative ist ein lineares Interaktionsmodell
+Das Modell \eqref{eq-simpleSRDD} unterstellt, dass $X$ links- und rechtsseitig von $c$ denselben Effekt auf $Y$ hat. Diese Annahme ist restriktiv. Eine Alternative ist ein lineares Interaktionsmodell
 \begin{align}
-Y_i = \beta_0 + \beta_1 B_i + \beta_2 (X_i - C) + \beta_3(X_i-C)\times B_i + u_i.\label{eq:linearSRDD}
+Y_i = \beta_0 + \beta_1 B_i + \beta_2 (X_i - c) + \beta_3(X_i - c)\times B_i + u_i.\label{eq:linearSRDD}
 \end{align}
-Das Modell \eqref{eq:linearSRDD} kann unterschiedliche lineare Effekte von $X$ auf $Y$ unterhalb ($\beta_2$) und oberhalb ($\beta_2 + \beta_3$) von $c$abgebilden. Beachte, dass $(X_i - C)$ die um den Schwellenwert zentrierte Laufvariable ist, sodass $\beta_1$ wie in \eqref{eq-simpleSRDD} den Unterschied des Effekts von $X$ auf $Y$ für Beoabachtungen am Schwellenwert erfasst. 
+Das Modell \eqref{eq:linearSRDD} kann unterschiedliche lineare Effekte von $X$ auf $Y$ unterhalb ($\beta_2$) und oberhalb ($\beta_2 + \beta_3$) von $c$ abbilden. Beachte, dass $(X_i - c)$ die um den Schwellenwert zentrierte Laufvariable ist, sodass $\beta_1$ wie in \eqref{eq-simpleSRDD} den Unterschied des Effekts von $X$ auf $Y$ für Beoabachtungen am Schwellenwert erfasst. 
 
-Um unterschiedliche nicht-lineare Zusammenhänge von $X$ und $Y$ unterhalb und oberhalb von $c$abzubilden, können (interargierte) Polynom-Terme in $X$ verwendet werden, bspw. eine quadratische Regressionsfunktion
+Um unterschiedliche nicht-lineare Zusammenhänge von $X$ und $Y$ unterhalb und oberhalb von $c$ abzubilden, können (interargierte) Polynom-Terme in $X$ verwendet werden. Häufig wird eine quadratische Regressionsfunktion genutzt,
 \begin{align}
-  Y_i =&\, \beta_0 + \beta_1 B_i + \beta_2 (X_i - C) + \beta_3 (X_i - C)^2\\ 
-       &+\, \beta_4(X_i-C)\times B_i + \beta_5(X_i-C)\times B_i + u_i.\label{eq:quadSRDD}
+  Y_i =&\, \beta_0 + \beta_1 B_i + \beta_2 (X_i - c) + \beta_3 (X_i - c)^2\\ 
+       &+\, \beta_4(X_i - c)\times B_i + \beta_5(X_i - c)\times B_i + u_i.\label{eq:quadSRDD}
 \end{align}
-@GelmanImbens2019 zeigen, dass Polynome höherer Ordnung zu verzerrten Schätzern und hoher Varianz führen können.^[Ursachen sind Überanpassung an die Daten sowie instabiles Verhalten der Schätzung nahe des Schwellenwertes.] Die Authoren empfehlen die Schätzung mit lokaler Regression.
+@GelmanImbens2019 zeigen, dass Polynome höherer Ordnung zu verzerrten Schätzern und hoher Varianz führen können.^[Ursachen sind Überanpassung an die Daten sowie instabiles Verhalten der Schätzung nahe des Schwellenwertes.] Die Authoren empfehlen stattdessen die Schätzung mit lokaler Regression.
 
 **Nicht-parametrische Schätzung und Bandweite**
 
-Aktuelle Studien nutzen nicht-parametrische Schätzer, die den Behandlungseffekt als Differenz der geschätzten Regressionsfunktionen am Schwellenwert $c$ berechnen. Um auch nicht-lineare Regressionsfunktionen abzubilden zu können, wird häufig lokale Regression verwendet. Dieses Verfahren liefert eine "lokale" Schätzung der Regressionsfunktionen am Schwellenwert, bei der nur Beobachtungen nahe bei $X = c$ für die Schätzung berücksichtigt werden. Hinreichende Nähe wird durch eine sogenannte Bandweite $h$ festgelegt, wobei 
+Aktuelle Studien nutzen nicht-parametrische Schätzer, die den Behandlungseffekt als Differenz der geschätzten Regressionsfunktionen am Schwellenwert $c$ berechnen. Um auch nicht-lineare Regressionsfunktionen abzubilden zu können, wird häufig lokale Regression verwendet. Dieses Verfahren liefert eine "lokale" Schätzung der Regressionsfunktionen am Schwellenwert, bei der nur Beobachtungen nahe $X = c$ für die Schätzung berücksichtigt werden. Hinreichende Nähe wird hierbei durch eine sogenannte Bandweite $h$ festgelegt, wobei 
 \begin{align}
-  \lvert(X_i-C)\rvert\leq h \label{eq:bwc}
+  \lvert(X_i-c)\rvert\leq h \label{eq:bwc}
 \end{align}
 das Kriterium für eine Berücksichtigung von Beobachtung $i$ bei der Schätzung ist. 
 
-Unter Verwendung einer Bandweite $h$ wird der Regressionsansatz \eqref{eq:linearSRDD} als *lokale lineare Regression* mit Uniform-Kernelfunktion bezeichnet. Der Uniform-Kernel gibt allen Beobachtungen, innerhalb der Bandweite $h$ dasselbe Gewicht. Ist $h$ so groß, dass der gesamte Datensatz in die Schätzung einbezogen wird, entspricht der lokale lineare Regressions-Schätzer mit Uniform-Kernel dem globalen KQ-Schätzer. Neben dem Uniform-Kernel ist der Triangular-Kernel eine in der Praxis häufig genutzte lineare Kernelfunktion. Der nachstehende Code plottet die Uniform- (grün) sowie die Triangular-Kernelfunktion (blau), siehe @fig-linearkern.
+Unter Verwendung einer Bandweite $h$ wird der Regressionsansatz \eqref{eq:linearSRDD} als *lokale lineare Regression* mit Uniform-Kernelfunktion bezeichnet. Der Uniform-Kernel gibt allen Beobachtungen, innerhalb der Bandweite $h$ dasselbe Gewicht. Ist $h$ so groß, dass der gesamte Datensatz in die Schätzung einbezogen wird, entspricht der lokale lineare Regressions-Schätzer mit Uniform-Kernel dem (globalen) KQ-Schätzer in einem linearen Interaktionsmodell anhand aller Beobachtungen. Neben dem Uniform-Kernel ist der Triangular-Kernel eine in der Praxis häufig genutzte lineare Kernelfunktion. Der nachstehende Code plottet die Uniform- (grün) sowie die Triangular-Kernelfunktion (blau), siehe @fig-linearkern.
 ```{r}
 #| fig-cap: "Kernelfunktionen auf [-1, 1]"
 #| label: fig-linearkern
@@ -258,6 +231,7 @@ Unter Verwendung einer Bandweite $h$ wird der Regressionsansatz \eqref{eq:linear
 library(ggplot2)
 library(cowplot)
 
+# Kernelfunktionen zeichnen
 ggplot() + 
     geom_function(
       fun = ~ ifelse(
@@ -290,7 +264,7 @@ ggplot() +
     theme_cowplot()
 ```
 
-In Studien wird oftmals zunächst lokale lineare Regression anhand von \eqref{eq:linearSRDD} mit einer linearen Kernelfunktionen und geringer bandweite $h$ genutzt. Anschließend wird die Robustheit der Ergebnisse anhand flexiblerer Spezifikationen, die eine Nicht-Linearitäten in der Regressionsfunktion besser abbilden können, geprüft.
+In empirischen Studien wird als Basis-Spezifikation oft eine lokale lineare Regression anhand von \eqref{eq:linearSRDD} mit einer linearen Kernelfunktionen und geringer bandweite $h$ genutzt. Anschließend wird die Robustheit der Ergebnisse anhand flexiblerer Spezifikationen, die Nicht-Linearitäten in der Regressionsfunktion besser abbilden können, geprüft.
 
 Die nachstehende Visualisierung zeigt die Schätzung des kausalen Effektes der Behandlung $B_i$ anhand lokaler linearer Regression mit einem Uniform-Kernel für wiefolgt simulierte Daten:
 \begin{align*}
@@ -304,9 +278,10 @@ Diese Vorschrift ist schnell mit R umgesetzt:
 
 ```{r}
 set.seed(1234)
-n <- 750 # Anz.Beobachtungen
+# Anz.Beobachtungen
+n <- 750
 
-# Parameter
+# Parameter definieren
 c <- 5
 beta_1 <- .5
 beta_2 <- 1.5
@@ -314,7 +289,7 @@ beta_3 <- -.15
 
 # Regressionsfunktion definieren
 f <- function(X) {
-  beta_1 * (X-c) + beta_2 * B + beta_3 * B * (X-c)^2
+  beta_1 * (X - c) + beta_2 * B + beta_3 * B * (X - c)^2
 }
 
 # Daten erzeugen
@@ -532,21 +507,21 @@ Der interssierende Effekt am Schwellenwert $c=5$ beträgt $\beta_2 = 1.5$. Beach
 
 - Für die voreingestellte Bandweite $h = 1.3$ liefert die lokale lineare Regression eine gute Approximation des Regressionszusammenhangs auf beiden Seiten des Schwellenwertes und die Schätzung des Behandlungseffekts liegt nahe beim wahren Wert $\beta_2 = 1.5$.
 
-- Für kleinere Bandweiten verringern sich Datenbasis der Schätzung. Die Varianz der Schätzung nimmt zu und die Approximation der Regressionsfunktion verschlechtert sich. Wir erhalten eine mit $h\to0$ zunehmend verzerrte Schätzung des Behandlungseffekts.
+- Für kleinere Bandweiten verringert sich die Datenbasis der Schätzung. Die Varianz der Schätzung nimmt zu und die Approximation der Regressionsfunktion verschlechtert sich. Wir beobachten eine mit $h\to0$ zunehmende Verzerrung bei der Schätzung des Behandlungseffekts.
 
-- Größere Bandweiten $h$ erhöhen die Datenbasis der Schätzung, führen aber zu einer Annäherung der lokalen Schätzung an die globale KQ-Schätzung. Linksseitig des Schwellenwertes erzielen wir damit eine Schätzung mit hoher Güte. Rechsseitig von $X_i = c$ verschlechtert sich die lokale Anpassung am Schwellenwert deutlich, weil die lineare Schätzung den tatsächlichen nicht-linearen Zusammenhang nicht adäquat abbilden kann. Die Schätzung des Behandlungseffekts ist hier deutlich verzerrt.
+- Größere Bandweiten $h$ erhöhen die Datenbasis der Schätzung, führen aber zu einer Annäherung der lokalen Schätzung an die globale KQ-Schätzung. Linksseitig des Schwellenwertes erzielen wir damit eine Schätzung mit hoher Güte. Rechsseitig von $X_i = c$ verschlechtert sich die lokale Anpassung am Schwellenwert deutlich, weil die lineare Schätzung den tatsächlichen (nicht-linearen) Zusammenhang nicht adäquat abbilden kann. Die Schätzung des Behandlungseffekts ist hier deutlich verzerrt.
 
 Die Wahl der Bandweite ist also eine wichtige Komponenten der RDD-Schätzung: Kleine Bandweiten erlauben eine Schätzung der Regressionsfunktion nahe des Schwellenwertes mit wenig Verzerrung. Allerdings kann diese Schätzung unpräzise sein, wenn nur wenige Beobachtungen \eqref{eq:bwc} erfüllen. In der Praxis wird $h$ daher mit einem analytischen Schätzer [vgl. @ImbensKalyanaraman2012] oder anhand von *Cross Validation* [bspw. @ImbensLemieux2008] bestimmt. Die später in diesem Kapitel betrachteten R-Pakete halten diese Methoden bereit.
 
 ## Manipulation am Schwellenwert
 
-Eine wichtige Annahmen für die Gültigkeit der RDD-Schätzung ist, dass keine Manipulation der Gruppenzugehörigkeit am Schwellenwert vorliegt. Wenn für Subjekte nahe des Schwellenwertes $c$ -- d.h. in Abhängigkeit der Laufvariable $X$ -- sich systematisch in den Confoundern $Z$ unterscheiden, können wir den Backdoor-Pfad *Oberhalb C &rarr; Behandlung B &rarr; Y* nicht isolieren. Wir erhalten wir eine verzerrte Schätzung des Behandlungseffekts.
+Eine wichtige Annahmen für die Gültigkeit einer RDD-Schätzung ist, dass keine Manipulation der Gruppenzugehörigkeit am Schwellenwert vorliegt. Wenn sich Subjekte nahe des Schwellenwertes $c$ --- d.h. in Abhängigkeit der Laufvariable $X$ --- systematisch in den Confoundern $Z$ unterscheiden, können wir den Backdoor-Pfad *Oberhalb C &rarr; Behandlung B &rarr; Y* nicht isolieren. Wir erhalten dann eine verzerrte Schätzung des Behandlungseffekts.
 
-Bspw. kann in empirischen Studien mit Individuen Selbstselektion auftreten: Menschen mit $X<c$ aber nahe $c$ (Kontrollgruppe) könnten aufgrund unbeobachtbarer Eigenschaften $Z$ die Ausprägung ihrer Laufvariable zu $X>c$ (Behandlungsgruppe) manipulieren. Wenn $Z$ die Outcome-Variable beeinflusst, bleibt der Backdoor-Pfad *Oberhalb C &rarr; Behandlung B &rarr; Y* dann bestehen.  
+In empirischen Studien mit Individuen kann Selbstselektion auftreten: Menschen mit $X<c$ aber nahe $c$ (hier Kontrollgruppe) könnten aufgrund unbeobachtbarer Eigenschaften $Z$ die Ausprägung ihrer Laufvariable zu $X>c$ (hier Behandlungsgruppe) manipulieren. Wenn $Z$ die Outcome-Variable beeinflusst, bleibt der Backdoor-Pfad *Oberhalb C &rarr; Behandlung B &rarr; Y* so bestehen.  
 
-Manipulation resultiert in Häufung von Beobachtungen am Schwellenwert. Dei Verteilung der Laufvariable kann auf diese Diese Unregelmäßigkeit hin untersucht werden. @McCrary2008 schlägt hierfür einen Verfahren vor, das auf die Kontinuität der Dichtefunktion von $X$ am Schwellenwert testet.
+Manipulation resultiert in Häufung von Beobachtungen am Schwellenwert. Dei Verteilung der Laufvariable kann auf diese Unregelmäßigkeit hin untersucht werden. @McCrary2008 schlägt hierfür einen Verfahren vor, das die Kontinuität der Dichtefunktion von $X$ am Schwellenwert testet.
 
-Der Test von @McCrary2008 ist in `rdd::DCdensity()` implementiert. wir Zeigen die Anwendung anhand der weiter oben simulierten Daten. Beachte, dass $X_i\sim U(0, 10)$, d.h. die Laufvariable ist bei $X_i = c$ kontinuierlich verteilt: die Nullhypothese trifft für die simulierten Daten zu.
+Der Test von @McCrary2008 ist in `rdd::DCdensity()` implementiert. Wir zeigen die Anwendung des Tests anhand der oben simulierten Daten. Beachte, dass $X_i\sim U(0, 10)$, d.h. die Laufvariable ist bei $X_i = c$ kontinuierlich verteilt. Die Nullhypothese (keine Manipulation) gilt für die simulierten Daten
 
 ```{r}
 # McCrary-Test durchführen
@@ -560,9 +535,9 @@ p_mccrary <- rdd::DCdensity(
 p_mccrary
 ```
 
-Der p-Wert `r round(p_mccrary, 2)` ist größer als jedes übliche Signifikanzniveau und ist damit starke Evidenz für die Nullhypothese (keine Diskontinuität) und damit gegen Manipulation am Schwellenwert.
+Der p-Wert `r round(p_mccrary, 2)` ist größer als jedes übliche Signifikanzniveau. Damit liegt starke Evidenz für die Nullhypothese (keine Diskontinuität) und gegen Manipulation am Schwellenwert vor.
 
-@CJM2020 (CMJ) schlagen eine Weiterentwicklung des McCrary-Tests vor, die höhere statistische Macht gegenüber Diskontinuitäten hat. Der CJM-Test ist im Paket `rddensity` implementiert.
+@CJM2020 (CMJ) schlagen eine Weiterentwicklung des McCrary-Tests vor, die höhere statistische Macht gegenüber Diskontinuitäten hat am Schwellenwert hat. Der CJM-Test ist im Paket `rddensity` implementiert.
 
 ```{r}
 library(rddensity)
@@ -571,34 +546,35 @@ library(rddensity)
 CJM <- rddensity(X, c = 5)
 ```
 
-Mit der Funktion `rdplotdensity()` erzeugen wir @fig-cjmtsim.
+Mit der Funktion `rddensity::rdplotdensity()` erzeugen wir @fig-cjmtsim.
 
 ```{r}
-#| fig-cap: "CJM-Test -- geschätzte Dichtefunktionen der Laufvariable"
+#| fig-cap: "CJM-Test -- geschätzte Dichtefunktionen der Laufvariable auf beiden Seiten des Schwellenwerts c = 5"
 #| label: fig-cjmtsim
 # Plot für Dichtefunktion erstellen
 plot <- rdplotdensity(
   rdd = CJM, 
   X = X, 
-  type = "both" # für Punkte- und Linienplots
+  # für Punkte- und Linienplots:
+  type = "both" 
 )
 ```
-Die Abbildung zeigt die geschätzten Dichtefunktionen. Erwartungsgemäß finden wir eine große Überlappung der zugehörigen Konfidenzbänder (schattierte Flächen) am Schwellenwert $c=5$.
+@fig-cjmtsim zeigt die geschätzten Dichtefunktionen. Erwartungsgemäß finden wir eine große Überlappung der zugehörigen Konfidenzbänder (schattierte Flächen) am Schwellenwert $c=5$.
 
-Mit `summary()` erhalten wir eine detalierte Zusammenfassung des Tests. 
+Mit `summary()` erhalten wir eine detaillierte Zusammenfassung des Tests. 
 
 ```{r}
 # Statistische Zusammenfassung des CJM-Tests
 summary(CJM)
 ```
 
-Gemäß des p-Werts (`P > |T|`) von 0.7385 spricht der CJM-Test noch deutlicher gegen eine Diskontinuität als der McCrary-Test.
+Gemäß des p-Werts (`P > |T|`) von 0.74 spricht der CJM-Test noch deutlicher gegen eine Diskontinuität als der McCrary-Test.
 
 ### Case Study: Amtsinhaber-Vorteil [@Lee2008]
 
-@Lee2008 untersucht den Einfluss des Amtsinhaber-Vorteils auf die Wahl von Mitgliedern des US-Repräsentantenhauses. In den meisten Wahlkreisen entfallen große Anteile der Stimmen (wenn nicht sogar ausschließlich) auf demokratische und republikanische Kanditat\*innen, sodass sich die Studie auf diese Parteien beschränkt. Entfällt die Mehrheit der Stimmen auf eine\*n Kandiat\*in, gewinnt diese\*r den Sitz für den Wahlkreis. Durch die Analyse der 6558 Wahlen im Zeitraum 1946-1998 mit einem SRDD kommt die Studie zu dem Ergebnis, dass Amtsinhabende im Durchschnitt einen Vorteil von etwa 8%-10% bei der Wahl haben. Dieses Ergebnis kann verschiedene Ursachen haben, bspw. dass die amtierende Partei höhere finanzielle Ressourcen besitzt und von einer besseren Organisation als die Opposition profitiert.
+@Lee2008 untersucht den Einfluss des Amtsinhaber-Vorteils auf die Wahl von Mitgliedern des US-Repräsentantenhaus. In den meisten Wahlkreisen entfallen große Anteile der Stimmen (oder gar ausschließlich) auf demokratische und republikanische Kanditat\*innen, sodass sich die Studie auf diese Parteien beschränkt. Entfällt die Mehrheit der Stimmen auf eine\*n Kandiat\*in, gewinnt diese\*r den Sitz für den Wahlkreis. Durch die Analyse der 6558 Wahlen im Zeitraum 1946-1998 mit einem SRDD kommt die Studie zu dem Ergebnis, dass Amtsinhabende im Durchschnitt einen Vorteil von etwa 8% bis 10% bei der Wahl haben. Dieses Ergebnis kann verschiedene Ursachen haben, bspw. dass die amtierende Partei höhere finanzielle Ressourcen besitzt und von einer besseren Organisation und durch Instrumenalisierung staatlicher Strukturen für die eigenen Zwecke profitiert.
 
-Anhand der Datensätze `house` und `house_binned` illustrieren wir nachfolgend die Schätzung von SRDD-Modellen für den Wahlerfolg der demokratischen Partei, wenn diese Amtsinhaber ist. Wir lesen zunächst die Datensätze `house` und `house_binned` ein und verschaffen uns einen Überblick.
+Anhand der Datensätze `house` und `house_binned` illustrieren wir nachfolgend die Schätzung von SRDD-Modellen für den Wahlerfolg der demokratischen Partei, wenn diese Amtsinhaber ist. Wir lesen hierfür zunächst die Datensätze `house` und `house_binned` ein und verschaffen uns einen Überblick.
 
 ```{r}
 library(tidyverse)
