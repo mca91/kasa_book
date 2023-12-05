@@ -1,20 +1,530 @@
 ---
 webr: 
   show-startup-message: true
-  packages: ['tidyverse', 'MatchIt']
+  packages: [
+            'boot', 
+            'cobalt', 
+            'marginaleffects', 
+            'MatchIt', 
+            'sandwich',
+            'tidyverse'
+            ]
 ---
 
 # Matching
 
-## Darkmode
+```{webr-r}
+#| context: setup
+# create dataset directory
+dir.create("datasets")
+# Download the dataset
+download.file(
+    "https://raw.githubusercontent.com/mca91/kasa_data/main/darkmode.csv",
+    'datasets/darkmode.csv'
+)
+```
+
+## Einfluss von Darkmode auf Blog-Lesezeit
+
+```{dot}
+//| fig-width: 4
+//| fig-height: 3
+//| fig-align: 'center'
+//| fig-cap: "Geschlecht ist Backdoor-Pfad"
+//| label: "fig-CDdarkmode" 
+digraph {
+  layout=neato
+  fontname="Helvetica,Arial,sans-serif"
+  node [fontname="Helvetica,Arial,sans-serif"]
+  edge [fontname="Helvetica,Arial,sans-serif"]
+  node [shape=none];
+  "read_time" [pos="4,1!", fontname="Helvetica,Arial,mono"]
+  "dark_mode" [pos="0,1!"]
+  "male" [pos="2,-1!"]
+  "dark_mode" -> "read_time"
+  "male" -> "dark_mode"
+  "male" -> "read_time"
+}
+```
+
+Wir lesen zunächst den Datensatz *darkmode.csv* ein und verschaffen uns einen Überblick über die verfügbaren Variablen. 
 
 ```{webr-r}
 library(tidyverse)
-# darkmode einlesen
-darkmode <- read_csv("datasets/darkmode.csv")
-glimpse(darkmode)
 
-# Alle Variablen zu typ 'numeric' formatieren
+# Datensatz 'darkmode' einlesen
+darkmode <- read_csv(
+  file = "datasets/darkmode.csv", 
+  show_col_types = F
+)
+
+# Überblick verschaffen
+glimpse(darkmode)
+```
+
+`dark_mode` hat den Typ `logical`. Mit `dplyr::mutate_all()` können wir komfortabel alle Spalten in den Typ `numeric` transformieren.
+
+```{webr-r}
+# Alle Variablen zu typ 'numeric' formatieren...
 darkmode <- darkmode %>% 
   mutate_all(.funs = as.numeric)
+
+# ... und überprüfen
+glimpse(darkmode)
 ```
+
+```{dot}
+//| fig-width: 4
+//| fig-height: 3
+//| fig-align: 'center'
+//| fig-cap: "Möglicher DGP als Kausales Diagramm"
+//| label: "fig-CDdarkmode2" 
+digraph {
+  layout=neato
+  fontname="Helvetica,Arial,sans-serif"
+  node [fontname="Helvetica,Arial,sans-serif"]
+  edge [fontname="Helvetica,Arial,sans-serif"]
+  node [shape=none];
+  "age" [pos="0,2!"]
+  "read_time" [pos="4,1!", fontname="Helvetica,Arial,mono"]
+  "dark_mode" [pos="0,1!"]
+  "hours" [pos="4,2!"]
+  "male" [pos="2,-1!"]
+  "age" -> "dark_mode"
+  "dark_mode" -> "read_time"
+  "hours" -> "read_time"
+  "male" -> "dark_mode"
+  "male" -> "read_time"
+}
+```
+
+```{webr-r}
+# Logit-Modell mit 'glm()' schätzen
+(
+  darkmode_ps_logit <- glm(
+    formula = dark_mode ~ age + male + hours,
+    data = darkmode,
+    family = binomial
+  )
+)
+```
+
+```{webr-r}
+# Datensatz um propensity scores erweitern
+(
+  darkmode_probabilities <- 
+    darkmode %>%
+    mutate(
+      propensity = fitted(darkmode_ps_logit)
+    )
+)
+```
+
+Inverse probability weights (IPWs) anhand der PS können schnell anhand der Vorschrift $$\texttt{ipw} = \texttt{dark\_mode} / \texttt{propensity} + (1 - \texttt{dark\_mode}) / (1 - \texttt{propensity}), \quad \texttt{dark\_mode} \in\{0,1\}$$
+berechnet werden.
+
+```{webr-r}
+# Datensatz um IPWs erweitern
+darkmode_ipw <- darkmode_probabilities %>%
+  mutate(
+    ipw = dark_mode / propensity + (1 - dark_mode) / (1 - propensity)
+  )
+
+darkmode_ipw %>% 
+  select(ipw)
+```
+
+Verteilung der Propensity Scores nach Behandlungs-Indikator:
+
+```{webr-r}
+# Dichteschätzung der PS nach Treatment-Indikator
+darkmode_ipw %>%
+ggplot(
+  mapping = aes(
+    x = propensity, 
+    fill = factor(dark_mode))
+  ) + 
+  lims(x = c(0, 1)) +
+  geom_density(alpha = .5, )
+```
+
+Beobachtungen aus der Kontroll-Gruppe entfernen, die außerhalb des Supports der Treatment-Gruppe liegen.
+
+```{webr-r}
+# Propensity scores auslesen
+darkmode_ipws <- darkmode_ipw %>% 
+  filter(dark_mode == 1) %>% 
+  pull(propensity)
+
+# Support sicherstellen 
+# (entfernt 13 Beobachtungen aus der Kontrollgruppe)
+darkmode_ipw <- darkmode_ipw %>% 
+  filter(
+    between(
+      propensity,
+      darkmode_ipws %>% 
+        min(),
+      darkmode_ipws %>% 
+        max()
+    )
+  )
+```
+
+Die Abdeckung können wir erneut mit einer Grafik geschätzter Dichtefunktionen vergleichen.
+
+```{webr-r}
+# Dichteschätzung der PS per Treatment-Indikator nach Anpassung
+darkmode_ipw %>%
+  ggplot(
+    mapping = aes(
+      x = propensity, 
+      fill = factor(dark_mode)
+    )
+  ) + 
+  lims(x = c(0, 1)) +
+  geom_density(alpha = .5)
+```
+
+Wir finden etwas weniger Wahrscheinlichkeits-Masse nahe 0 für die Kontroll-Gruppe nach filtern von (Kontroll-)Beobachtungen mit PS in der Spannweite der PS in der Behandlungs-Gruppe. Als nächstes schätzen wir den ATE mit linearer Regression.
+
+```{webr-r}
+# Mit IPWs gewichteter KQ-Schaetzer berechnet einen ATE
+model_ipw <- lm(
+  formula = read_time ~ dark_mode, 
+  data = darkmode_ipw,
+  weights = ipw
+)
+
+summary(model_ipw)
+```
+
+Unsere Schätzung des ATE ist der geschätzte Koeffizient von `dark_mode`. Die ausgegebenen Standardfehler und Inferenzstatistiken sind *ungültig* aufgrund der Gewichtung mit IPWs, inversen *geschätzten*  Wahrscheinlichkeiten für eine Behandlung. Der Grund hierfür ist, dass die Standardformel in `summary()`  die zusätzliche Unsicherheit durch die IPW-Schätzung nicht berücksichtigt!
+
+Die Vergleichbarkeit der Nutzer in Kontroll- und Behandlungsgruppe-Gruppe für die Variablen `age`, `hours` und `male` können wir graphisch und anhand einer *balance table* vergleichen.
+
+```{webr-r}
+# Dichteschätzungen
+darkmode %>% 
+  group_by(dark_mode) %>%
+  select(age, hours) %>%
+  mutate_all(scale) %>% # Standardisierung mit 'scale()'
+  pivot_longer(cols = c(-dark_mode)) %>% # langes Format
+  
+  ggplot(aes(x = value, fill = as.factor(dark_mode))) +
+  geom_density( alpha = .5) + 
+  facet_wrap(~ name, scales = "free", nrow = 3) # Facetting nach 'name'
+
+# Relative Hfkt. für 'male' als barplot
+darkmode %>% 
+  group_by(dark_mode) %>%
+  mutate(
+    male = as.factor(male), 
+    dark_mode = as.factor(dark_mode)
+  ) %>%
+  
+  ggplot(aes(x = dark_mode, fill = male)) +
+  geom_bar(position = "fill") +
+  ylab("Anteil")
+
+# Balance table mit 'cobalt::bal.tab()'
+bal.tab(
+  x = darkmode %>% 
+    select(age, hours, male), 
+  treat = darkmode$dark_mode, 
+  disp = "m", # zeige zusätzlich Mittelwerte für C und T
+)
+```
+
+Wir zeigen als nächstes, wie `MatchIt::matchit()` für Nearest-neighbor-Matching anhand der Regressoren `age`, `hours`, und `male` in unterschiedlichen Varianten durchgeführt werden kann. 
+
+`MatchIt::matchit()` führt standardmäßig 1:1-Matching (ohne Zurücklegen) von Beobachtungen der Treatment-Gruppe mit Beobachtungen der Kontrollgruppe druch. Das Objekt wird für eine Schätzung des ATT mit einer geeigneten Funktionen vorbereitet, s. `?matchit`, und hier insb. die Argumente `replace = F`, `ratio = 1` und `estimand = "ATT"` für Details. 
+
+Mit `cobalt::balt.tab()` erhalten wir eine *balance table* für den gematchten Datensatz.
+
+**Exaktes Matching**
+    
+```{webr-r}
+res <- matchit(
+  formula = dark_mode ~ age + male + hours, 
+  data = darkmode, 
+  method = "exact"
+)
+bal.tab(res)
+```
+
+**Eins-zu-Eins-Matching: Mahalanobis-Distanz**
+    
+```{webr-r}
+res <- matchit(
+  formula = dark_mode ~ age + male + hours, 
+  data = darkmode, 
+  distance = "mahalanobis", 
+  method = "nearest"
+)
+bal.tab(res)
+```
+
+**Eins-zu-Eins-Matching: Mahalanobis-Distanz mit Caliper 0.25 für propensity scores basierend auf logistischer Regression**
+
+```{webr-r}
+res <- matchit(
+  formula = dark_mode ~ age + male + hours, 
+  data = darkmode, 
+  distance = "glm", 
+  caliper = .25,
+  mahvars = ~ age + male + hours
+)
+# (Nur K-Beobachtungen mit PS bei Caliper .25 kommen für MHD-Matching in betracht.)
+bal.tab(res)
+```
+
+**4. Eins-zu-Eins-Matching: Propensity scores basierend auf logistischer Regression mit Caliper 0.25**
+        
+```{webr-r}
+res <- matchit(
+  formula = dark_mode ~ age + male + hours, 
+  data = darkmode, 
+  method = "nearest", 
+  distance = "glm", 
+  caliper = .25
+)
+bal.tab(res)
+```
+    
+Die Vergleichbarkeit der Nutzer in Kontroll- und Treatment-Gruppe hinsichtlich der Variablen `age`, `hours` und `male` können wir graphisch und anhand einer *balance table* vergleichen. Wir berechnen die balance table mit `cobalt::bal.tab()` für den anhand von Variante 4 gematchten Datensatz.
+
+```{webr-r}
+bal.tab(res, un = T, disp = "m")
+
+# Der gematchte Datensatz enthält Gewichte für die jeweilige 
+# Subklasse zu denen die Beobachtungen gehören.
+#
+# Hier 1:1 matching _ohne_ Zurücklegen, d.h. sämtliche
+# Gewichte sind 1 und wird müssten diese nicht für nachfolgende 
+# Aufrufe von avg comparisons berücksichtigen.
+darkmode_matched <- match.data(res)
+
+darkmode_matched %>%
+  group_by(dark_mode) %>%
+  select(age, hours) %>%
+  mutate_all(scale) %>%
+  pivot_longer(cols = c(-dark_mode)) %>%
+  
+  ggplot(aes(x = value, fill = as.factor(dark_mode))) +
+  geom_density( alpha = .5) + 
+  facet_wrap(~ name, scales = "free", nrow = 3)
+
+darkmode_matched %>% 
+  group_by(dark_mode) %>%
+  mutate(
+    male = as.factor(male), 
+    dark_mode = as.factor(dark_mode)
+  ) %>%
+  
+  ggplot(aes(x = dark_mode, fill = male)) +
+  geom_bar(position = "fill") +
+  ylab("Anteil")
+```
+
+Wir beobachten eine bessere Balance bei `age` und `hours`. Am wichtigsten: `gender` (`male`) ist nahezu ausgeglichen für Kontroll- und Treatment-Gruppe!
+
+Wir schätzen nun den ATT von `dark_mode` auf `read_time` mit linearer Regression für den gematchten Datensatz aus sowie für den ursprünglichen Datensatz und berechnen jeweils ein robustes 95%-Konfidenzintervall für den ATT.
+
+```{webr-r}
+# ATT mit linearem Modell für ungematchten Datensatz schätzen
+ATT_mod_org <- lm(
+  formula = read_time ~ age + male + hours + dark_mode,
+  data = darkmode
+)
+summary(ATT_mod_org)
+
+# ATT mit linearem Modell für gematchten Datensatz schätzen
+ATT_mod <- lm(
+  formula = read_time ~ age + male + hours + dark_mode,
+  data = darkmode_matched, 
+  weights = weights 
+)
+# (weights = 1 für alle Beobachtungen weil wg. 1:1-Matching
+# nur 2er-Paare von Beobachtungen. Hier also vernachlässigbar.
+# Andere Gewichtung bei k:1-Matching!)
+summary(ATT_mod)
+```
+
+**Achtung**: Für Matching-Verfahren (`ATT_mod`) sind die von `summary()` berechneten Standardfehler (und damit KI, t-Statistiken und p-Werte) für den ATT *grundsätzlich ungültig* Wir haben 3 Quellen von Schätzunsicherheit, die bei der Berechnung von Standardfehlern berücksichtigt werden müssen: Die Schätzung der PS, der Matching-Prozess und die "übliche" Stichproben-Variabilität. Wir nutzen daher nachfolgende Funktionen gem. Empfehlungen aus der aktuellen Forschung für Standardfehlerberechnung. S. auch Aufgabe 5 (a).
+
+```{webr-r}
+library(marginaleffects)
+
+# Inferenz Multiple Regression bei ungematchten Beobachtungen
+# identisch zu 'coeftest(ATT_mod_org, vcovHC, type = "HC3")'
+avg_comparisons(
+  model = ATT_mod_org,
+  variables = "dark_mode",
+  vcov = "HC3", # Heteroskedastie-robuster SE
+  newdata = subset(darkmode, dark_mode == 1) # Identifiziert Kontrollgruppe
+) 
+
+# Inferenz Multiple Regression bei _gematchten_ Beobachtungen
+avg_comparisons(
+  model = ATT_mod,
+  variables = "dark_mode",
+  vcov = ~subclass, # cluster robust SE > als oben => mehr Unsicherheit
+  newdata = subset(darkmode_matched, dark_mode == 1),
+  wts = "weights"  # = 1
+)
+# ( Weights = 1 wg. 1:1-Matching.
+# Anzahl subclasses = Anzahl gematchter treatment/control units )
+```
+
+
+
+## Inferenz für ATT/ATE: Propensity-Score-Matching mit Bootstrap
+
+Bei Matching mit Zurücklegen besteht zusätzliche Unsicherheit durch Zurücklegen, d.h. Beobachtungen aus der Kontroll-Gruppe können mehrfach als Match für Beobachtungen aus der Treatment-Gruppe genutzt werden. Mit `summary()` berechnete Standardfehler berücksichtigen dies nicht!
+
+Ein Bootstrap-Verfahren generiert mit Resampling (wiederholtes Ziehen mit Zurücklegen) aus dem Original-Datensatz (viele) künstliche Datensätze, für die der Schätzer (d.h. das gesamte Verfahren inkl. Matching!) jeweils berechnet wird. Die Verteilung der so gewonnenen Bootstrap-Schätzwerte approximiert die wahre, unbekannte Stichprobenverteilung des Schätzers des Behandlungseffekts. Mit dieser simulierten Verteilung können wir Inferenz betreiben: Wir können einen Bootstrap-Punktschätzer des Behandlungseffekts (Stichprobenmittel der Bootstrap-Schätzungen) sowie Standardfehler (Standardabweichung der der Bootstrap-Schätzungen) und p-Werte berechnen.
+
+Wir Implementieren nun einen Bootstrap-Schätzer des ATT als `R`-Funktion `boot_fun()`.
+
+```{webr-r}
+boot_fun <- function(data, i) {
+  
+  boot_data <- data[i, ]
+  
+  # 1:1 PS Matching _mit_ Zurücklegen
+  match_res <- matchit(dark_mode ~ age + hours + male,
+                       data = boot_data,
+                       caliper = .25,
+                       replace = TRUE) # Zurücklegen
+  
+  # Gematchten Datensatz zuweisen
+  darkmode_matched <- match.data(match_res, data = boot_data)
+  
+  # Outcome-Modell schätzen
+  ATT_mod <- lm(
+    formula = read_time ~ age + male + hours + dark_mode,
+    data = darkmode_matched, 
+    weights = weights # hier teilweise > 1 wg. Matching mit Zurücklegen!
+  )
+  
+  #  ATT-Schätzer auslesen
+  return(
+    ATT_mod$coefficients["dark_mode"]  
+  )
+}
+```
+
+
+Abadie & Imbens (2008) zeigen analytisch, dass ein Standard-Bootstrap bei Matching grundsätzlich ungültig ist: Die unbekannte Varianz der Stichprobenverteilung des Matching-Schätzers (und damit der Standardfehler des Schätzers) kann durch den Bootstrap nicht repliziert werden. Problematisch hierbei sind grundsätzlich zu liberale (d.h. zu große) mit dem Bootstrap berechnete Standardfehler. Es gibt jedoch Simulationsnachweise die zeigen, dass Bootstrap-Standardfehler bei Matching mit Zurücklegen konservativ sind (Bodory et al., 2020), also tendentiell zu kleine Standardfehler produzieren und damit das gewünschte nominale Signifikanzniveau eines Bootstrap-Hypothesentests nicht überschritten wird.
+
+Wir berechnen nun eine Bootstrap-Schätzung des ATT von `dark_mode` auf `readingtime` sowie den zugehörigen Standardfehler und ein 95%-KI mit der zuvor definierten Funktion `boot_fun`.
+
+```{webr-r}
+library("boot")
+set.seed(4321)
+boot_out <- boot(darkmode, boot_fun, R = 999)
+
+boot_out
+```
+
+```{webr-r}
+# Bootstrap-Schätzer für den Treatment-Effekt
+mean(boot_out$t) 
+# = mean(t0) + bias = mean(Bootstrap_samples)
+# vgl. 't0 = boot_fun(darkmode, i = 1:1e3)'
+
+# Bootstrap-Standardfehler
+sd(boot_out$t)
+
+# 95% Bootstrap-KI für den Treatment-Effekt
+boot.ci(boot_out, type = "perc")
+```
+
+
+## Doubly-Robust-Schätzer für ATT/ATE
+
+Implementieren und berechnen Sie einen Doubly-Robust-Schätzer des ATT (vgl. Wooldridge, 2010) für den kausalen Effekt in Aufgabe 5. Vergleichen Sie mit den Ergebnissen der Aufgaben 1 (d), 4 (f) und 5 (d).
+
+```{webr-r}
+# IPW estimation with regression adjustment
+ipwra <- function(br, index = 1:nrow(br)) {
+    # slice bootstrapped observations
+    br <- br %>% slice(index)
+    
+    # estimate and predict propensity score
+    m <- glm(formula = dark_mode ~ age + hours + male,
+             data = br, 
+             family = binomial(link = 'logit'))
+    
+    br <- br %>%
+        mutate(ps = predict(m, type = 'response'))
+    
+    # trim control observations outside of treated PS range
+    minps <- br %>%
+        filter(dark_mode == 1) %>%
+        pull(ps) %>%
+        min(na.rm = TRUE)
+    
+    maxps <- br %>%
+        filter(dark_mode == 1) %>%
+        pull(ps) %>%
+        max(na.rm = TRUE)
+    
+    # do the trimming
+    br <- br %>%
+        filter(ps >= minps & ps <= maxps)
+    
+    # compute IPWs
+    br <- br %>%
+      mutate(
+        ipw = case_when(
+          dark_mode == 1 ~ 1 / ps,
+          dark_mode == 0 ~ 1 / (1 - ps))
+      )
+    
+    # Simple _ATT_ estimate:
+    # w_means <- br %>%
+    #     group_by(dark_mode) %>%
+    #     summarize(m = weighted.mean(read_time, w = ipw)) %>% 
+    #     arrange(dark_mode)
+    # 
+    # # simple diff-in-means _ATT_ estimate
+    #  return(w_means$m[2] - w_means$m[1]) 
+    
+    # Do regression adjustment for _ATE_ estimate
+    # TE prediction for whole sample based on TG model
+    mtreat <- br %>%
+      filter(dark_mode == 1) %>%
+      lm(read_time ~ 1 + age + hours + male, data = ., weights = .$ipw) %>%
+      predict(newdata = br) %>%
+      mean()
+    
+    # TE prediction for whole sample based on CG model
+    mcont <- br %>%
+      filter(dark_mode == 0) %>%
+      lm(read_time ~ 1 + age + hours + male, data = ., weights = .$ipw) %>%
+      predict(newdata = br) %>%
+      mean()
+
+    return(mtreat - mcont) # Regression adjusted _ATE_ estimate
+}
+```
+
+```{webr-r}
+b <- boot(data = darkmode, ipwra, R = 999)
+# Bootstrap estimate and standard error
+mean(b$t)
+sd(b$t)
+```
+
+\vfill
+# Literatur
+
+Abadie, Alberto, and Guido W. Imbens. (2008). *On the Failure of the Bootstrap for Matching Estimators.*Econometrica 76 (**6**): 1537–57.
+
+Bodory, H., Camponovo, L., Huber, M., & Lechner, M. (2020). *The Finite Sample Performance of Inference Methods for Propensity Score Matching and Weighting Estimators*. Journal of Business & Economic Statistics, 38(**1**), 183–200.
+
+Wooldridge, J. M. (2010). *Econometric analysis of cross section and panel data*. MIT press.
+
+
+

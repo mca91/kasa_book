@@ -4,14 +4,14 @@
 .qwebr-editor {
   border-radius: 15px 15px 0 0;
   border-color: gray;
+  border-bottom-width: 0;
 }
 
 .qwebr-button-run,
-.qwebr-button-run:hover,
 .qwebr-button-run:disabled {
     position: relative;
     z-index: 1;
-    border: 2px solid darkgreen !important;
+    border: 2px solid darkgreen;
     color: white;
     background-color: darkgreen;
     border-radius: 0 0 15px 15px;
@@ -21,6 +21,19 @@
     box-shadow: 0px 5px 15px 5px rgba(0, 0, 0, 0.3); 
 }
 
+.qwebr-button-run:hover {
+  position: relative;
+  z-index: 1;
+  border: 2px solid darkgreen;
+  color: darkgreen;
+  background-color: white;
+  border-radius: 0 0 15px 15px;
+  width: 100%;
+  height: 30px;
+  -webkit-box-shadow: 0px 5px 15px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 5px 15px 5px rgba(0, 0, 0, 0.3); 
+}
+
 </style>
 
 
@@ -28,7 +41,8 @@
   <div id="qwebr-console-area-{{WEBRCOUNTER}}" class="qwebr-console-area">
     <div id="qwebr-editor-{{WEBRCOUNTER}}" class="qwebr-editor"></div>
     <button class="btn btn-default qwebr-button-run" disabled type="button" id="qwebr-button-run-{{WEBRCOUNTER}}">
-      R lädt. Etwas Geduld bitte…<i class="fas fa-cog fa-spin" alt="Ein sich drehendes Zahnrad."></i>.
+      <i class="fas fa-cog fa-spin" alt="Ein sich drehendes Zahnrad."></i>
+      R lädt. Etwas Geduld bitte….
     </button>
     <div id="qwebr-output-code-area-{{WEBRCOUNTER}}" class="qwebr-output-code-area" aria-live="assertive">
       <pre style="visibility: hidden"></pre>
@@ -51,7 +65,7 @@
       value: `{{WEBRCODE}}`,
       language: 'r',
       theme: 'vs-light',
-      automaticLayout: true,           // TODO: Could be problematic for slide decks
+      automaticLayout: true,           
       scrollBeyondLastLine: false,
       minimap: {
         enabled: false
@@ -161,7 +175,7 @@
     });
 
     // Emphasize the active code cell
-    runButton.innerHTML = '<span>R-Code ausführen</span>';
+    runButton.innerHTML = '<span>R-Code ausführen.</span>';
 
     // Create a canvas variable for graphics
     let canvas = undefined;
@@ -243,7 +257,7 @@
             canvas = document.createElement("canvas");
             canvas.setAttribute("width", 2 * {{WIDTH}});
             canvas.setAttribute("height", 2 * {{HEIGHT}});
-            canvas.style.width = "700px";
+            canvas.style.width = "600px";
             canvas.style.display = "block";
             canvas.style.margin = "auto";
           }
@@ -303,7 +317,7 @@
     });
 
     // Revert to the initial code cell state
-    runButton.innerHTML = '<span>R-Code ausführen</span>';
+    runButton.innerHTML = '<span>R-Code ausführen.</span><i class="fa fa-sign-in"></i>';
   }
 
   // Add a click event listener to the run button

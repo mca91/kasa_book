@@ -6,7 +6,7 @@
   }
 
   .qwebr-icon-status-spinner {
-    color: #7894c4;
+    color: darkgreen;
   }
 
   .qwebr-icon-run-code {
@@ -59,8 +59,12 @@
     border-color: #e1e5e9;
   }
 
-  .qwebr-button-run:disabled,.qwebr-button-run.disabled,fieldset:disabled .qwebr-button-run {
+  .qwebr-button-run:disabled,
+  .qwebr-button-run.disabled,
+  fieldset:disabled 
+  .qwebr-button-run {
     pointer-events: none;
+    cursor: not-allowed;
     opacity: .5
   }
   
@@ -161,7 +165,7 @@
     const secondInnerDiv = document.createElement("div");
     secondInnerDiv.setAttribute("id", "qwebr-status-message-title");
     secondInnerDiv.classList.add("quarto-title-meta-heading");
-    secondInnerDiv.innerText = "WebR Status";
+    secondInnerDiv.innerText = "WebR-Status";
 
     // Create another inner div for contents
     const secondInnerDivContents = document.createElement("div");
@@ -170,7 +174,7 @@
 
     // Describe the WebR state
     var startupMessageWebR = document.createElement("p");
-    startupMessageWebR.innerText = "🟡 Loading...";
+    startupMessageWebR.innerText = "Starte..."
     startupMessageWebR.setAttribute("id", "qwebr-status-message-text");
     // Add `aria-live` to auto-announce the startup status to screen readers
     startupMessageWebR.setAttribute("aria-live", "assertive");
@@ -240,7 +244,7 @@
   // Function to update the status message
   function qwebrUpdateStatusHeader(message) {
     startupMessageWebR.innerHTML = `
-      <i class="fa-solid fa-spinner fa-spin qwebr-icon-status-spinner"></i>
+      <i class="fas fa-cog fa-spin qwebr-icon-status-spinner"></i>
       <span>${message}</span>`;
   }
 
@@ -257,15 +261,15 @@
   // Generic function to process R packages
   async function qwebrProcessRPackagesWithStatus(packages, processType, displayStatusMessageUpdate = true) {
     // Switch between contexts
-    const messagePrefix = processType === 'install' ? 'Installing' : 'Loading';
+    const messagePrefix = processType === 'install' ? 'Installiere' : 'Lade';
 
     // Modify button state
-    qwebrSetInteractiveButtonState(`🟡 ${messagePrefix} package ...`, false);
+    qwebrSetInteractiveButtonState(`<i class="fas fa-cog fa-spin qwebr-icon-status-spinner"></i> ${messagePrefix} Pakete ...`, false);
 
     // Iterate over packages
     for (let i = 0; i < packages.length; i++) {
       const activePackage = packages[i];
-      const formattedMessage = `${messagePrefix} package ${i + 1} out of ${packages.length}: ${activePackage}`;
+      const formattedMessage = `${messagePrefix} Paket ${i + 1} von ${packages.length}: <code style="background-color:white; color:darkgreen;">${activePackage}</code>`;
       
       // Display the update
       if (displayStatusMessageUpdate) {
@@ -306,11 +310,11 @@
 
   // Release document status as ready
   if (showStartupMessage) {
-    startupMessageWebR.innerText = "🟢 Ready!"
+    startupMessageWebR.innerText = "✅ Bereit!"
   }
   
   qwebrSetInteractiveButtonState(
-    `<span>R-Code ausführen</span>`, 
+    `<span>R-Code ausführen <i class="fa fa-sign-in"></i></span>`, 
     true
   );
 
