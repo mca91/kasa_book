@@ -20,8 +20,17 @@ dir.create("datasets")
 # Download the dataset
 download.file(
     "https://raw.githubusercontent.com/mca91/kasa_data/main/darkmode.csv",
-    'datasets/darkmode.csv', mode = "w"
+    'datasets/darkmode.csv',
 )
+
+# make darkmode available using read.csv for now
+# beacause there's some issue with readr::read_csv
+# I can't fix right now
+darkmode <- read.csv(
+    file = "datasets/darkmode.csv", 
+    colClasses = c("numeric", "logical", "numeric", "numeric", "numeric") 
+) %>%
+    as_tibble()
 ```
 
 ## Einfluss von Darkmode auf Blog-Lesezeit
@@ -47,19 +56,22 @@ digraph {
 }
 ```
 
-Wir lesen zunächst den Datensatz *darkmode.csv* ein und verschaffen uns einen Überblick über die verfügbaren Variablen. 
+Wir lesen zunächst den Datensatz *darkmode.csv* mit `readr::read_csv()` ein und verschaffen uns einen Überblick über die verfügbaren Variablen. 
 
-```{webr-r}
+```{r, eval=FALSE}
+# `tidyverse` laden
 library(tidyverse)
 
 # Datensatz 'darkmode' einlesen
-darkmode <- read_csv(
-  file = "datasets/darkmode.csv", 
-  show_col_types = F
+darkmode <- read.csv(
+  file = "datasets/darkmode.csv"
 )
+```
 
+```{webr-r}
 # Überblick verschaffen
 glimpse(darkmode)
+
 ```
 
 `dark_mode` hat den Typ `logical`. Mit `dplyr::mutate_all()` können wir komfortabel alle Spalten in den Typ `numeric` transformieren.
