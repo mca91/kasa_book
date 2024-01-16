@@ -20,7 +20,7 @@ dir.create("datasets")
 # Download the dataset
 download.file(
     "https://raw.githubusercontent.com/mca91/kasa_data/main/darkmode.csv",
-    'datasets/darkmode.csv'
+    'datasets/darkmode.csv', mode = "w"
 )
 ```
 
