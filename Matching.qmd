@@ -11,10 +11,28 @@ webr:
             ]
 ---
 
+```{r, echo=F, message=FALSE}
+library(gt)
+library(tidyverse)
+# Formatierung von gt-Tabellen
+tabopts <- function(x) {
+    fmt_number(x, decimals = 3, drop_trailing_zeros = T) %>%
+  tab_options(table_body.hlines.color = "white", 
+              column_labels.border.bottom.color = "black", 
+             column_labels.border.top.color = "black",
+             table_body.border.bottom.color = "black", 
+             table.border.bottom.color = "black",
+             column_labels.font.weight = "bold", 
+             table.font.color = "black", 
+             table.font.size = 16)
+}
+```
+
 # Matching
 
 ```{webr-r}
 #| context: setup
+
 # create dataset directory
 dir.create("datasets")
 # Download the dataset
@@ -22,24 +40,66 @@ download.file(
     "https://raw.githubusercontent.com/mca91/kasa_data/main/darkmode.csv",
     'datasets/darkmode.csv',
 )
+```
 
+```{webr-r}
+#| context: output
+#| 
 # make darkmode available using read.csv for now
-# beacause there's some issue with readr::read_csv
+# because there's some issue with readr::read_csv
 # I can't fix right now
 darkmode <- read.csv(
     file = "datasets/darkmode.csv", 
     colClasses = c("numeric", "logical", "numeric", "numeric", "numeric") 
-) %>%
-    as_tibble()
+)
+
+options(pillar.bold = TRUE, pillar.subtle = FALSE)
 ```
 
 ## Einfluss von Darkmode auf Blog-Lesezeit
+
+Wir illustrieren eine Auswahl an Methoden für die Schätzung eines Behandlungseffekts mit Matching anhand einer folgender (fiktiver) Fallstudie. 
+
+Der Lehrstuhl für Ökonometrie an der Universität Duisburg-Essen verwaltet die Website betreibt einen Ökonometrie-Blog und interessiert sich für den kausalen Effekt der Einführung eines [darkmode](https://en.wikipedia.org/wiki/Wikipedia:Dark_mode) auf die Verweildauer der User auf der Webseite. Die Webseite ist zwar nicht-kommerziell, hat sich allerdings insb. für die Aquise internationaler Studierender für den Studiengang MSc. Econometrics als wichtiges Marketing-Instrument erwiesen. Ein anprechendes Design des Blogs wird daher als hoch-relevant erachtet. 
+
+Idealerweise sollte der Effekt des Design-Relaunches auf die Nutzungsintensität in einem kontrollierten randomisierten Experiment untersucht werden. Hierbei würden wir Nutzern zufällig das neue oder das alte Design zuweisen und den Effekt als Differnz des durchschnittlichen Verweildauer für die Gruppen bestimmen. Eine solche Studie ist jedoch aus technischen und finanziellen Gründen nicht realisierbar, sodass die Auswirkungen des darkmode mit vorliegenden nicht-experimenellen Nutzungsstatistiken für die Webseite geschätzt werden sollen. 
+
+Die Nutzungsstatistiken sind im Datensatz [*darkmode.csv*](https://raw.githubusercontent.com/mca91/kasa_data/main/darkmode.csv) enthalten und sollen der Analyse des Effekts des darkmode (`dark_mode`) auf die Verweildauer der Leser auf der Webseite (`read_time`) dienen.
+
+@tbl-darkmode zeigt die Definitionen der Variablen in *darkmode.csv*.
+
+```{r, echo = F}
+#| tbl-cap: "Variablen im Datensatz *darkmode*"
+#| label: tbl-darkmode
+tibble(
+  Variable = c(
+    "read_time", 
+    "dark_mode", 
+    "male", 
+    "age", 
+    "hours"
+    ),
+  Beschreibung = c(
+    "Lesezeit (Minuten/Woche)",
+    "Indikator: Beobachtung nach Einführung darkmode",
+    "Indikator: Individuum männlich",
+    "Alter (in Jahren)",
+    "Bisherige Verweildauer auf der Seite"
+  )
+) %>%
+  gt() %>%
+  tabopts
+```
+
+Da die User sich beim Aufrufen der Seite aktiv für oder gegen den das neue Design entscheiden müssen (und somit selektieren, ob Sie in der Behandlungs- oder Kontrollgruppe landen), liegt wahrscheinlich *Confounding* vor: Unsere Hypothese ist, dass männliche User eine durchschnittlich längere Lesezeit aufweisen als nicht-männliche Leser und mit größerer Wahrscheinlichkeit auf das neue Design wechseln. Weiterhin scheint plausibel, dass das Alter der Nutzer sowohl die Akzeptanz des Design-Updates als auch die Lesezeit beeinflusst. Die bisherige Verweildauer ist ebenfalls eine plausible Determinante der Lesezeit.
+
+Der angenommene DGP ist in Abbildung @fig-CDdarkmode dargestellt, wobei Backdoor-Pfade mit roten Pfeilen gekennzeichnet sind.
 
 ```{dot}
 //| fig-width: 4
 //| fig-height: 3
 //| fig-align: 'center'
-//| fig-cap: "Geschlecht ist Backdoor-Pfad"
+//| fig-cap: "Vermuteter DGP im Website-Design-Bespiel"
 //| label: "fig-CDdarkmode" 
 digraph {
   layout=neato
@@ -47,31 +107,38 @@ digraph {
   node [fontname="Helvetica,Arial,sans-serif"]
   edge [fontname="Helvetica,Arial,sans-serif"]
   node [shape=none];
-  "read_time" [pos="4,1!", fontname="Helvetica,Arial,mono"]
-  "dark_mode" [pos="0,1!"]
+  "read_time" [pos="4,0.5!"]
+  "dark_mode" [pos="0,0.5!"]
   "male" [pos="2,-1!"]
+  "age" [pos="2,2!"]
+  "hours" [pos="4,2!"]
+  "hours" -> "read_time"
+  "age" -> "dark_mode" [color="red"]
+  "age" -> "read_time" [color="red"]
   "dark_mode" -> "read_time"
-  "male" -> "dark_mode"
-  "male" -> "read_time"
+  "male" -> "dark_mode" [color="red"]
+  "male" -> "read_time" [color="red"]
 }
 ```
 
-Wir lesen zunächst den Datensatz *darkmode.csv* mit `readr::read_csv()` ein und verschaffen uns einen Überblick über die verfügbaren Variablen. 
+Für die Analyse lesen wir zunächst den Datensatz *darkmode.csv* mit `readr::read_csv()` ein und verschaffen uns einen Überblick über die verfügbaren Variablen. 
 
 ```{r, eval=FALSE}
-# `tidyverse` laden
+# Paket `tidyverse` laden
 library(tidyverse)
 
 # Datensatz 'darkmode' einlesen
-darkmode <- read.csv(
+darkmode <- read_csv(
   file = "datasets/darkmode.csv"
 )
 ```
 
 ```{webr-r}
+# darkmode zu tibble umwandeln
+darkmode <- as_tibble(darkmode)
+
 # Überblick verschaffen
 glimpse(darkmode)
-
 ```
 
 `dark_mode` hat den Typ `logical`. Mit `dplyr::mutate_all()` können wir komfortabel alle Spalten in den Typ `numeric` transformieren.
@@ -85,30 +152,14 @@ darkmode <- darkmode %>%
 glimpse(darkmode)
 ```
 
-```{dot}
-//| fig-width: 4
-//| fig-height: 3
-//| fig-align: 'center'
-//| fig-cap: "Möglicher DGP als Kausales Diagramm"
-//| label: "fig-CDdarkmode2" 
-digraph {
-  layout=neato
-  fontname="Helvetica,Arial,sans-serif"
-  node [fontname="Helvetica,Arial,sans-serif"]
-  edge [fontname="Helvetica,Arial,sans-serif"]
-  node [shape=none];
-  "age" [pos="0,2!"]
-  "read_time" [pos="4,1!", fontname="Helvetica,Arial,mono"]
-  "dark_mode" [pos="0,1!"]
-  "hours" [pos="4,2!"]
-  "male" [pos="2,-1!"]
-  "age" -> "dark_mode"
-  "dark_mode" -> "read_time"
-  "hours" -> "read_time"
-  "male" -> "dark_mode"
-  "male" -> "read_time"
-}
+```{webr-r}
+lm(
+  formula = read_time ~ dark_mode + age + male + hours,
+  data = darkmode
+) %>%
+  summary()
 ```
+
 
 ```{webr-r}
 # Logit-Modell mit 'glm()' schätzen
