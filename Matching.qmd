@@ -152,12 +152,16 @@ darkmode <- darkmode %>%
 glimpse(darkmode)
 ```
 
+```{web-r}
+
+```
+
 ```{webr-r}
 lm(
-  formula = read_time ~ dark_mode + age + male + hours,
-  data = darkmode
-) %>%
-  summary()
+   formula = read_time ~ dark_mode + age + male + hours,
+   data = darkmode
+ ) %>%
+   summary()
 ```
 
 
