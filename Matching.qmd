@@ -7,9 +7,11 @@ webr:
             'marginaleffects', 
             'MatchIt', 
             'sandwich',
-            'tidyverse'
+            'ggplot2'
             ]
 ---
+
+# Matching
 
 ```{r, echo=F, message=FALSE}
 library(gt)
@@ -28,23 +30,22 @@ tabopts <- function(x) {
 }
 ```
 
-# Matching
-
 ```{webr-r}
 #| context: setup
+webr::install("dplyr")
 
 # create dataset directory
 dir.create("datasets")
 # Download the dataset
 download.file(
-    "https://raw.githubusercontent.com/mca91/kasa_data/main/darkmode.csv",
+    "https://raw.githubusercontent.com/mca91/kausal_data/main/darkmode.csv",
     'datasets/darkmode.csv',
 )
 ```
 
 ```{webr-r}
-#| context: output
-#| 
+#| context: setup
+library(dplyr)
 # make darkmode available using read.csv for now
 # because there's some issue with readr::read_csv
 # I can't fix right now
@@ -56,11 +57,15 @@ darkmode <- read.csv(
 options(pillar.bold = TRUE, pillar.subtle = FALSE)
 ```
 
-## Einfluss von Darkmode auf Blog-Lesezeit
+In randomisierten kontrollierten Studien stellt eine randomisierte Behandlung sicher, dass die Individuen beider Gruppen im Mittel vergleichbar sind, dass heißt es gibt keine systematischen Unterschiede der Studiensubjekte hinsichtlich der Verteilung von Charakteristika zwischen den Gruppen. Dann ist es plausibel eine beobachtete mittlere Differenz in der Outcome-Variable alleine auf die Behandlung zurückzuführen.
 
-Wir illustrieren eine Auswahl an Methoden für die Schätzung eines Behandlungseffekts mit Matching anhand einer folgender (fiktiver) Fallstudie. 
+In der Praxis, insbesondere in ökonomischen Studien, sind randomisierte kontrollierte Studien aus ethischen und/oder finanziellen Gründen nicht durchführbar. Stattdessen werden nicht-experimentelle Daten genutzt, die jedoch nur sehr selten eine Vergleichbarkeit von Behandlungs- und Kontrollgruppe gewährleisten.
 
-Der Lehrstuhl für Ökonometrie an der Universität Duisburg-Essen verwaltet die Website betreibt einen Ökonometrie-Blog und interessiert sich für den kausalen Effekt der Einführung eines [darkmode](https://en.wikipedia.org/wiki/Wikipedia:Dark_mode) auf die Verweildauer der User auf der Webseite. Die Webseite ist zwar nicht-kommerziell, hat sich allerdings insb. für die Aquise internationaler Studierender für den Studiengang MSc. Econometrics als wichtiges Marketing-Instrument erwiesen. Ein anprechendes Design des Blogs wird daher als hoch-relevant erachtet. 
+In diesem Kapitel betrachten wir Methoden, die in solchen Forschungsdesigns -- bei hinreichenden Informationen über die Studiensubjekte -- eine Schätzung kausaler Effekte ermöglichen, indem eine Vergleichbarkeit von Behandlungs- und Kontrollgruppe hergestellt wird. Dies kann über eine gezielte Gewichtung von Beobachtungen anhand invididueller Merkmale erfolgen. Eine etablierte Methode ist die Schätzung des kausalen Effekts nach Selektion von vergleichbaren Teilmengen von Subjekten beider Gruppen aus der ursprünglichen Stichprobe, sogenanntes *Matching*.
+
+## Gewichtete Mittelwerte und Matching
+
+Der Lehrstuhl für Ökonometrie an der Universität Duisburg-Essen verwaltet betreibt einen Ökonometrie-Blog und interessiert sich für den kausalen Effekt der Einführung eines [darkmode](https://en.wikipedia.org/wiki/Wikipedia:Dark_mode) auf die Verweildauer der User auf der Webseite. Die Webseite ist zwar nicht-kommerziell, hat sich allerdings insb. für die Aquise internationaler Studierender für den Studiengang MSc. Econometrics als wichtiges Marketing-Instrument erwiesen. Ein anprechendes Design wird daher als hoch-relevant erachtet. 
 
 Idealerweise sollte der Effekt des Design-Relaunches auf die Nutzungsintensität in einem kontrollierten randomisierten Experiment untersucht werden. Hierbei würden wir Nutzern zufällig das neue oder das alte Design zuweisen und den Effekt als Differnz des durchschnittlichen Verweildauer für die Gruppen bestimmen. Eine solche Studie ist jedoch aus technischen und finanziellen Gründen nicht realisierbar, sodass die Auswirkungen des darkmode mit vorliegenden nicht-experimenellen Nutzungsstatistiken für die Webseite geschätzt werden sollen. 
 
@@ -91,7 +96,164 @@ tibble(
   tabopts
 ```
 
-Da die User sich beim Aufrufen der Seite aktiv für oder gegen den das neue Design entscheiden müssen (und somit selektieren, ob Sie in der Behandlungs- oder Kontrollgruppe landen), liegt wahrscheinlich *Confounding* vor: Unsere Hypothese ist, dass männliche User eine durchschnittlich längere Lesezeit aufweisen als nicht-männliche Leser und mit größerer Wahrscheinlichkeit auf das neue Design wechseln. Weiterhin scheint plausibel, dass das Alter der Nutzer sowohl die Akzeptanz des Design-Updates als auch die Lesezeit beeinflusst. Die bisherige Verweildauer ist ebenfalls eine plausible Determinante der Lesezeit.
+Für die Analyse lesen wir zunächst den Datensatz *darkmode.csv* mit `readr::read_csv()` ein und verschaffen uns einen Überblick über die verfügbaren Variablen. 
+
+```{r, message=FALSE}
+# Paket `tidyverse` laden
+library(tidyverse)
+
+# Datensatz 'darkmode' einlesen
+darkmode <- read_csv(
+  file = "datasets/darkmode.csv"
+)
+```
+
+`dark_mode` hat den Typ `logical`. Mit `dplyr::mutate_all()` können wir komfortabel alle Spalten in den Typ `numeric` transformieren.
+
+```{r}
+# Alle Variablen zu typ 'numeric' formatieren...
+darkmode <- darkmode %>% 
+  mutate_all(.funs = as.numeric)
+
+# ... und überprüfen
+glimpse(darkmode)
+```
+
+Eine naive Schätzung des durchschnittlichen Behandlungseffekts (ATE) $\widehat{\tau}^{\text{naiv}}$ erhalten wir als Mittelwertdifferenz von `read_time` für die Behandlungsgruppe (`dark_mode == 1`) und die Kontrollgruppe (`dark_mode == 0`)
+\begin{align}
+  \widehat{\tau}^{\text{naiv}} = \overline{\text{read\_time}}_{\text{Behandlung}} - \overline{\text{read\_time}}_{\text{Kontrolle}}.\label{eq:naivATEdarkmode}
+\end{align}
+
+Diese Berechnung ist schnell mit R durchgeführt.
+
+```{r}
+# Naiver Schätzer für ATE: 
+# Differenz der Gruppen-Durchschnitte
+
+# Outcome in Behandlungsgruppe
+read_time_mTG <- darkmode %>% 
+  filter(dark_mode == 1) %>% 
+  pull("read_time")
+
+# Outcome in Kontrollgruppe
+read_time_mKG <- darkmode %>% 
+  filter(dark_mode == 0) %>% 
+  pull("read_time")
+
+# Mittelwert-Differenz
+mean(read_time_mTG) - mean(read_time_mKG)
+```
+
+Die Schätzung ergibt einen negativen Behandlungseffekt, mit der Interpreation, dass das neue Design zu einer Reduktion der Lesezeit um etwa 0.44 Minuten pro Woche führt. Dieses Ergebnis ist allerdings zweifelhaft, weil eine Isolierung des Behandlungseffekts aufgrund von Backdoor-Pfaden im DGP vermutlich nicht gewähleistet ist. Ein Indikator hierfür sind systematische Unterschiede hinsichtlich von (möglicherweise unbeobachtbaren) Charakteristika von Kontrollgruppe und Behandlungsgruppe.
+
+Da die User sich beim Aufrufen der Seite aktiv für oder gegen den das neue Design entscheiden müssen (und somit selektieren, ob Sie in der Behandlungs- oder Kontrollgruppe landen), liegt wahrscheinlich *Confounding* vor: Unsere Hypothese ist zunächst, dass männliche User eine durchschnittlich längere Lesezeit aufweisen *und* mit größerer Wahrscheinlichkeit auf das neue Design wechseln als nicht-männliche Leser. Dann ist `male` eine Backdoor-Variable. Diese Situation ist unter der Annahme, dass nur diese Faktoren den DGP bestimmen, in @fig-maleCDdarkmode dargestellt.
+
+```{dot}
+//| fig-width: 4
+//| fig-height: 3
+//| fig-align: 'center'
+//| fig-cap: "Backdoor durch 'male' im Website-Design-Bespiel"
+//| label: "fig-maleCDdarkmode" 
+digraph {
+  layout=neato
+  fontname="Helvetica,Arial,sans-serif"
+  node [fontname="Helvetica,Arial,sans-serif"]
+  edge [fontname="Helvetica,Arial,sans-serif"]
+  node [shape=none];
+  "read_time" [pos="4,0.5!"]
+  "dark_mode" [pos="0,0.5!"]
+  "male" [pos="2,-1!"]
+  "dark_mode" -> "read_time" [color="green"]
+  "male" -> "dark_mode" [color="red"]
+  "male" -> "read_time" [color="red"]
+}
+```
+
+Der DGP in @fig-maleCDdarkmode führt zu einer verzerrten Schätzung des kausalen Effekts von `dark_mode` auf `read_time` mit \eqref{eq:naivATEdarkmode}, wenn das Verhältnis von männlichen und nicht-männlichen Usern in Bahandlungs- und Kontrollgruppe sich systematisch unterscheided. Wir überprüfen dies mit R.
+
+```{r}
+# Anteile männlicher und nicht-männlicher User
+(
+  anteile <- darkmode %>% 
+  group_by(dark_mode) %>% 
+  summarise(
+    gesamt = n(),
+    ant_m = mean(male),
+    ant_nm = 1 - ant_m,
+    anz_m = sum(male),
+    anz_nm = gesamt - anz_m
+    )
+)
+```
+
+Die Zusammenfassung `anteile_m` zeigt, dass der Anteil männlicher User in der Behandlungsgruppe deutlich höher ist als in der Kontrollgruppe.
+
+Ein Schätzer basierend auf einem Matching eliminiert die Variation von `male` zwischen den Gruppen. Eine Möglichkeit hierfür ist die Gewichtung der Beobachtungen in der Kontrollgruppe entsprechend der Anteile von Mönnern und Nicht-Männern in der Behandlungsgruppe, sodass die Vergleichbarkeit hinsichtlich des Geschlechts gewährleistet ist. Hierzu berechnen wir zunächst die Gewichte als
+\begin{align}
+  w_i = 
+  \begin{cases}
+    \text{ant\_m}_B/\text{anz\_m}_{K}, & \text{falls } \text{male}_i = 1\\
+        \text{ant\_nm}_B/\text{anz\_nm}_{K}, & \text{sonst.}\\
+  \end{cases}
+\end{align}
+Anhand der Formel
+\begin{align}
+  \overline{X}_w = \frac{\sum_i w_i \cdot X_i}{\sum_i w_i}
+\end{align}
+berechnen wir die gewichteten Mittelwerte für `male` und `read_time` in der Kontrollgruppe.
+
+```{r}
+# Anteile und Anzahlen auslesen
+anz_m_K <- anteile %>% 
+  filter(dark_mode == 0) %>% pull(anz_m)
+anz_nm_K <- anteile %>% 
+  filter(dark_mode == 0) %>% pull(anz_nm)
+ant_m_B <- anteile %>% 
+  filter(dark_mode == 1) %>% pull(ant_m)
+ant_nm_B <- anteile %>% 
+  filter(dark_mode == 1) %>% pull(ant_nm)
+```
+
+```{r}
+# Gewichtete Mittelwerte für Kontrollgruppe
+(
+gew_K <- darkmode %>% 
+  filter(dark_mode == 0) %>% 
+  select(read_time, male) %>%
+  mutate(w = ifelse(
+    male == 1, 
+    ant_m_B/anz_m_K, 
+    ant_nm_B/anz_nm_K)
+    ) %>%
+  summarise(
+    male_k = sum(male * w) / sum(w),
+    mean_read_time_wK = sum(read_time * w) / sum(w)
+  )
+)
+```
+
+Ein Vergleich des gewichteten Mittelwertes von `male` in der Kontrollgruppe mit dem Mittelwert in der Behandlungsgruppe (`male_k`) zeigt, dass die Gewichte die Variation in `male` zwischen beiden Gruppen eliminieren. Mit `wmean_read_time_K` haben wir einen entsprechend gewichteten Mittelwert der Verweildauer für die Kontrollgruppe berechnet. Wir schätzen den Behandlungseffekt nun als
+\begin{align}
+  \widehat{\tau}^{\text{w}} = \overline{\text{read\_time}}_{B} - \overline{\text{read\_time}}_{w,K}.
+\end{align}
+
+```{r}
+mean(read_time_mTG)  - gew_K$mean_read_time_wK
+```
+
+
+
+### *Balance*: Vergleichbarkeit von Behandlungs- und Kontrollgruppe
+
+
+
+
+
+
+
+
+
+Weiterhin scheint plausibel, dass das Alter der Nutzer sowohl die Akzeptanz des Design-Updates als auch die Lesezeit beeinflusst. Die bisherige Verweildauer ist ebenfalls eine plausible Determinante der Lesezeit.
 
 Der angenommene DGP ist in Abbildung @fig-CDdarkmode dargestellt, wobei Backdoor-Pfade mit roten Pfeilen gekennzeichnet sind.
 
@@ -115,46 +277,89 @@ digraph {
   "hours" -> "read_time"
   "age" -> "dark_mode" [color="red"]
   "age" -> "read_time" [color="red"]
-  "dark_mode" -> "read_time"
+  "dark_mode" -> "read_time" [color="green"]
   "male" -> "dark_mode" [color="red"]
   "male" -> "read_time" [color="red"]
 }
 ```
 
-Für die Analyse lesen wir zunächst den Datensatz *darkmode.csv* mit `readr::read_csv()` ein und verschaffen uns einen Überblick über die verfügbaren Variablen. 
+Zur Beurteilung der Vergleichbarkeit von Kontrollgruppe und Behandlungsgruppe empfiehlt sich eine Gegenüberstellung der empirischen Verteilungen der Kovariablen beider Gruppen. Wir visualisieren die empirischen Verteilungen zunächst mit `ggplot2`. Hierzu transformieren wir `male` und `dark_mode` in den Typ `factor` und standardisieren `age` und `hours` mit `scale()`.
 
-```{r, eval=FALSE}
-# Paket `tidyverse` laden
-library(tidyverse)
+```{webr-r}
+# Datensatz für graphische Darstellung formatieren
+darkmode_p <- darkmode %>% 
+  # Standardisierung mit 'scale()'
+  mutate(
+    male = as.factor(male), 
+    dark_mode = as.factor(dark_mode),
+    age = scale(age), 
+    hours = scale(hours)
+  )
 
-# Datensatz 'darkmode' einlesen
-darkmode <- read_csv(
-  file = "datasets/darkmode.csv"
+head(darkmode_p)
+```
+
+Für `age` und `hours` eignen sich die geschätzten Dichtefunktionen für einen Vergleich der Verteilungen in Behandlungs- und Kontrollgruppe.
+
+```{webr-r}
+# Vergleich mit Dichteschätzungen
+darkmode_p %>%
+  select(dark_mode, hours, age) %>%
+  # in langes Format überführen
+  pivot_longer(cols = c(-dark_mode)) %>%
+  
+  ggplot(
+    aes(x = value, fill = dark_mode)
+    ) +
+  geom_density(alpha = .5) + 
+  facet_wrap(
+    facets = ~ name, 
+    scales = "free", 
+    nrow = 2
+    )
+```
+
+Für `male` vergleichen wir die relativen Häufigkeiten mit Balkendiagrammen.
+
+```{webr-r}
+# Relative Hfkt. für 'male' als barplot
+darkmode_p %>%
+  ggplot(
+    aes(x = dark_mode, fill = male)
+    ) +
+  geom_bar(position = "fill") +
+  ylab("Anteil")
+```
+
+Die graphische Analyse zeigt deutliche Unterschiede in den Verteilungen von `age` und `male` zwischen Kontroll- und Behandlungsgruppe. Für einen Beurteilung mit deskriptiven Statistiken wird häufig eine sogenannte *Balance Table* herangezogen. Wir berechnen diese für `age`, `hours` und `male` mit `cobalt::bal.tab()`
+
+```{webr-r}
+library(cobalt)
+
+# Balance table mit 'cobalt::bal.tab()'
+bal.tab(
+  x = darkmode %>% 
+    select(age, hours, male), 
+  treat = darkmode$dark_mode, 
+   # berechne SMD für KG und TG:
+  disp = "m", 
+  s.d.denom = "pooled"
 )
 ```
 
-```{webr-r}
-# darkmode zu tibble umwandeln
-darkmode <- as_tibble(darkmode)
+Die Einträge `M.0.Un` und `M.1.Un` zeigen die jeweiligen Stichprobenmittelwerte der Variablen für Kontroll- und Behandlungsgruppe. `Diff.U` gibt eine standardisierte Mittelwertdifferenz $SMD$ an, wobei
+\begin{align*}
+  SMD_j := \left(\overline{X}_{j,B} - \overline{X}_{j,K}\right) \bigg/ \sqrt{\frac{1}{2}\left(\widehat{\text{Var}}(X_{j,B}) + \widehat{\text{Var}}(X_{j,K})\right)},
+\end{align*}
+mit Stichprobenmitteln $\overline{X}_{j,B}$ und $\overline{X}_{j,K}$ und Stichprobenvarianzen $\widehat{\text{Var}}(X_{j,B})$ und $\widehat{\text{Var}}(X_{j,K})$ für eine kontinuierliche Kovariable $j$.^[Siehe @Austin2011 für einen Überblick zu Balance-Statistiken.] Obwohl es keinen einheitlichen Schwellenwert für die standardisierte Differenz gibt, der ein erhebliches Ungleichgewicht anzeigt, gilt für kontinuierliche Variablen eine standardisierte (absolute) Differenz von weniger als $0.1$ als Hinweis auf einen vernachlässigbaren Unterschied zwischen den Gruppen.
 
-# Überblick verschaffen
-glimpse(darkmode)
-```
+Die Balance Table weist also auf einen vernachlässigbaren Unterschied für `hours` und bestätigt die aus den Grafiken abgeleiteten Hinweise auf relevante Differenzen für `age` und `male`. 
 
-`dark_mode` hat den Typ `logical`. Mit `dplyr::mutate_all()` können wir komfortabel alle Spalten in den Typ `numeric` transformieren.
+###
 
-```{webr-r}
-# Alle Variablen zu typ 'numeric' formatieren...
-darkmode <- darkmode %>% 
-  mutate_all(.funs = as.numeric)
+### Inverse Probability Weighting
 
-# ... und überprüfen
-glimpse(darkmode)
-```
-
-```{web-r}
-
-```
+### Propensity score
 
 ```{webr-r}
 lm(

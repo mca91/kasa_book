@@ -4,6 +4,7 @@ engine: knitr
 
 webr: 
   show-startup-message: false 
+  packages: ['dplyr']
 
 project:
   type: book
