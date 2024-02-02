@@ -33,6 +33,7 @@ tabopts <- function(x) {
 ```{webr-r}
 #| context: setup
 webr::install("dplyr")
+webr::install("tidyr")
 
 # create dataset directory
 dir.create("datasets")
@@ -61,13 +62,29 @@ In randomisierten kontrollierten Studien stellt eine randomisierte Behandlung si
 
 In der Praxis, insbesondere in ökonomischen Studien, sind randomisierte kontrollierte Studien aus ethischen und/oder finanziellen Gründen nicht durchführbar. Stattdessen werden nicht-experimentelle Daten genutzt, die jedoch nur sehr selten eine Vergleichbarkeit von Behandlungs- und Kontrollgruppe gewährleisten.
 
-In diesem Kapitel betrachten wir Methoden, die in solchen Forschungsdesigns -- bei hinreichenden Informationen über die Studiensubjekte -- eine Schätzung kausaler Effekte ermöglichen, indem eine Vergleichbarkeit von Behandlungs- und Kontrollgruppe hergestellt wird. Dies kann über eine gezielte Gewichtung von Beobachtungen anhand invididueller Merkmale erfolgen. Eine etablierte Methode ist die Schätzung des kausalen Effekts nach Selektion von vergleichbaren Teilmengen von Subjekten beider Gruppen aus der ursprünglichen Stichprobe, sogenanntes *Matching*.
+In diesem Kapitel betrachten wir Methoden, die in solchen Forschungsdesigns -- bei hinreichenden Informationen über die Studiensubjekte -- eine Schätzung kausaler Effekte ermöglichen, indem eine Vergleichbarkeit von Behandlungs- und Kontrollgruppe hergestellt wird. Dies kann durch eine gezielte Gewichtung von Beobachtungen anhand invididueller Merkmale bei der Schätzung des Behandlungseffekts erfolgen. Andere etablierte Methoden schätzen den kausalen Effekt nach Selektion von vergleichbaren Teilmengen von Subjekten beider Gruppen aus der ursprünglichen Stichprobe, sogenanntes *Matching*.
 
-## Gewichtete Mittelwerte und Matching
+Da *Matching* ähnliche Beobachtungen basierend auf beobachtbaren Merkmalen vergleicht, kann die Wahrscheinlichkeit einer verzerrten Schätzung des kausalen Effekt durch falsche Modellspezifikationen geringer sein als für eine Schätzung des Effekts anhand multipler Regression. Weiterhin basieren Matching-Methoden nicht auf der Annahme eines linearen Zusammenhangs zwischen Kovariablen und der erklärenden Variable und können für die Schätzung unterschiedlicher Spezifikationen von Behandlungseffekten herangezogen werden.
 
-Der Lehrstuhl für Ökonometrie an der Universität Duisburg-Essen verwaltet betreibt einen Ökonometrie-Blog und interessiert sich für den kausalen Effekt der Einführung eines [darkmode](https://en.wikipedia.org/wiki/Wikipedia:Dark_mode) auf die Verweildauer der User auf der Webseite. Die Webseite ist zwar nicht-kommerziell, hat sich allerdings insb. für die Aquise internationaler Studierender für den Studiengang MSc. Econometrics als wichtiges Marketing-Instrument erwiesen. Ein anprechendes Design wird daher als hoch-relevant erachtet. 
+Für die Gültigkeit eines Schätzers basierend auf *Matching* sind zwei Annahmen erforderlich.
 
-Idealerweise sollte der Effekt des Design-Relaunches auf die Nutzungsintensität in einem kontrollierten randomisierten Experiment untersucht werden. Hierbei würden wir Nutzern zufällig das neue oder das alte Design zuweisen und den Effekt als Differnz des durchschnittlichen Verweildauer für die Gruppen bestimmen. Eine solche Studie ist jedoch aus technischen und finanziellen Gründen nicht realisierbar, sodass die Auswirkungen des darkmode mit vorliegenden nicht-experimenellen Nutzungsstatistiken für die Webseite geschätzt werden sollen. 
+1.  ***Bedingte Unabhängigkeit.*** Seien $Y^{(0)}_i$ und $Y^{(1)}_i$ potentielle Ergebnisse der Outcome-Variable $Y$ für ein Subjekt $i$ mit $B_i=0$ (keine Zuweisung zur Behandlung) beziehungsweise $B_i=1$ (Behandlung) und $X_i$ die beobachteten Kovariablen. Wir nehmen an, dass \begin{align}
+      \left\{Y^{(0)}_i, Y^{(1)}_i\right\} \perp B_i\vert X_i, \label{eq:cia}
+    \end{align} d.h. die Behandlungszuweisung/-selektion ist unanabhängig von den potentielle Ergebnissen $Y^{(0)}_i$ und $Y^{(1)}_i$, wenn wir für die Kovariablen $X$ kontrollieren.
+
+2.  ***Überlappung.*** Für jede mögliche Kombination von Kovariablen $X_i$ gibt es eine positive Wahrscheinlichkeit $<1$, sowohl zur Behandlungsgruppe ($B_i = 1$) als auch zur Kontrollgruppe ($B_i = 0$) zugewiesen zu werden, \begin{align}
+      0 < \text{P}(B_i=1\lvert X_i) < 1, \label{eq:overlap}
+    \end{align} d.h. keine Beobachtung hat eine Behandlungswahrscheinlichkeit von exakt $0$ oder $1$.
+
+Annahme 1 stellt sicher, dass die Zuweisung zur Behandlungsgruppe nach Kontrolle für die Kovariablen $X$ als zufällig betracht werden kann. Somit ist es möglich den kausalen Effekt der Behandlung zu identifizieren, indem wir hinsichtlich der Kovariablen $X$ ähnliche Subjekte (vgl. Annahme 2) aus Kontroll- und Behandlungsgruppe vergleichen.
+
+Annahme 2 setzt vorraus, dass es eine ausreichende Überlappung in den Verteilungen der Kovariablen zwischen Behandlungs- und Kontrollgruppe gibt. Dann ist sichergestellt, dass für jedes Subjekt in einer Gruppe ein hinsichtlich seiner Charakteristika vergleichbares Subjekt in der anderen Gruppe geben kann, sodass ein Vergleich möglich ist.
+
+## *Balance*: Vergleichbarkeit von Behandlungs- und Kontrollgruppe {#sec-balance}
+
+Der Lehrstuhl für Ökonometrie an der Universität Duisburg-Essen betreibt einen Ökonometrie-Blog und interessiert sich für den kausalen Effekt der Einführung eines [darkmode](https://en.wikipedia.org/wiki/Wikipedia:Dark_mode) auf die Verweildauer der User auf der Webseite. Die Webseite ist zwar nicht-kommerziell, hat sich allerdings insb. für die Aquise internationaler Studierender für den Studiengang MSc. Econometrics als wichtiges Marketing-Instrument erwiesen. Ein anprechendes Design wird daher als hoch-relevant erachtet.
+
+Idealerweise sollte der Effekt des Design-Relaunches auf die Nutzungsintensität in einem kontrollierten randomisierten Experiment untersucht werden. Hierbei würden wir Nutzern zufällig das neue oder das alte Design zuweisen und den Effekt als Differnz des durchschnittlichen Verweildauer für die Gruppen bestimmen. Eine solche Studie ist jedoch aus technischen und finanziellen Gründen nicht realisierbar, sodass die Auswirkungen des darkmode mit vorliegenden nicht-experimenellen Nutzungsstatistiken für die Webseite geschätzt werden sollen.
 
 Die Nutzungsstatistiken sind im Datensatz [*darkmode.csv*](https://raw.githubusercontent.com/mca91/kasa_data/main/darkmode.csv) enthalten und sollen der Analyse des Effekts des darkmode (`dark_mode`) auf die Verweildauer der Leser auf der Webseite (`read_time`) dienen.
 
@@ -96,7 +113,7 @@ tibble(
   tabopts
 ```
 
-Für die Analyse lesen wir zunächst den Datensatz *darkmode.csv* mit `readr::read_csv()` ein und verschaffen uns einen Überblick über die verfügbaren Variablen. 
+Für die Analyse lesen wir zunächst den Datensatz *darkmode.csv* mit `readr::read_csv()` ein und verschaffen uns einen Überblick über die verfügbaren Variablen.
 
 ```{r, message=FALSE}
 # Paket `tidyverse` laden
@@ -119,8 +136,7 @@ darkmode <- darkmode %>%
 glimpse(darkmode)
 ```
 
-Eine naive Schätzung des durchschnittlichen Behandlungseffekts (ATE) $\widehat{\tau}^{\text{naiv}}$ erhalten wir als Mittelwertdifferenz von `read_time` für die Behandlungsgruppe (`dark_mode == 1`) und die Kontrollgruppe (`dark_mode == 0`)
-\begin{align}
+Eine naive Schätzung des durchschnittlichen Behandlungseffekts (ATE) $\widehat{\tau}^{\text{naiv}}$ erhalten wir als Mittelwertdifferenz von `read_time` für die Behandlungsgruppe (`dark_mode == 1`) und die Kontrollgruppe (`dark_mode == 0`) \begin{align}
   \widehat{\tau}^{\text{naiv}} = \overline{\text{read\_time}}_{\text{Behandlung}} - \overline{\text{read\_time}}_{\text{Kontrolle}}.\label{eq:naivATEdarkmode}
 \end{align}
 
@@ -169,7 +185,7 @@ digraph {
 }
 ```
 
-Der DGP in @fig-maleCDdarkmode führt zu einer verzerrten Schätzung des kausalen Effekts von `dark_mode` auf `read_time` mit \eqref{eq:naivATEdarkmode}, wenn das Verhältnis von männlichen und nicht-männlichen Usern in Bahandlungs- und Kontrollgruppe sich systematisch unterscheided. Wir überprüfen dies mit R.
+Der DGP in @fig-maleCDdarkmode führt zu einer verzerrten Schätzung des kausalen Effekts von `dark_mode` auf `read_time` mit \eqref{eq:naivATEdarkmode}, wenn das Verhältnis von männlichen und nicht-männlichen Usern in Bahandlungs- und Kontrollgruppe nicht ausgeglichen ist. Wir überprüfen dies mit R.
 
 ```{r}
 # Anteile männlicher und nicht-männlicher User
@@ -188,34 +204,35 @@ Der DGP in @fig-maleCDdarkmode führt zu einer verzerrten Schätzung des kausale
 
 Die Zusammenfassung `anteile_m` zeigt, dass der Anteil männlicher User in der Behandlungsgruppe deutlich höher ist als in der Kontrollgruppe.
 
-Ein Schätzer basierend auf einem Matching eliminiert die Variation von `male` zwischen den Gruppen. Eine Möglichkeit hierfür ist die Gewichtung der Beobachtungen in der Kontrollgruppe entsprechend der Anteile von Mönnern und Nicht-Männern in der Behandlungsgruppe, sodass die Vergleichbarkeit hinsichtlich des Geschlechts gewährleistet ist. Hierzu berechnen wir zunächst die Gewichte als
-\begin{align}
+Matching eliminiert die Variation von `male` zwischen den Gruppen. Eine Möglichkeit hierfür ist die Gewichtung der Beobachtungen in der Kontrollgruppe entsprechend der Anteile von Männern und Nicht-Männern in der Behandlungsgruppe, sodass die Vergleichbarkeit mit der Behandlungsgruppe hinsichtlich des Geschlechts gewährleistet ist. Dies wird in der Literatur als *Balance* bezeichnet. Der Behandlungseffekt wird dann analog zu \eqref{eq:naivATEdarkmode} geschätzt.
+
+Die Gewichte für Beobachtungen in der Kontrollgruppe $w_i$ werden berechnet als \begin{align}
   w_i = 
   \begin{cases}
     \text{ant\_m}_B/\text{anz\_m}_{K}, & \text{falls } \text{male}_i = 1\\
         \text{ant\_nm}_B/\text{anz\_nm}_{K}, & \text{sonst.}\\
-  \end{cases}
-\end{align}
-Anhand der Formel
-\begin{align}
-  \overline{X}_w = \frac{\sum_i w_i \cdot X_i}{\sum_i w_i}
-\end{align}
-berechnen wir die gewichteten Mittelwerte für `male` und `read_time` in der Kontrollgruppe.
+  \end{cases}\label{eq:darkmodeweights}
+\end{align} Anhand der Formel für einen gewichteten Durchschnitt, \begin{align}
+  \overline{X}_w = \frac{\sum_i w_i \cdot X_i}{\sum_i w_i},
+\end{align} berechnen wir die gewichteten Mittelwerte für `male` und `read_time` in der Kontrollgruppe.
 
 ```{r}
-# Anteile und Anzahlen auslesen
+# Anteile und Anzahlen aus `anteile` auslesen
 anz_m_K <- anteile %>% 
   filter(dark_mode == 0) %>% pull(anz_m)
+
 anz_nm_K <- anteile %>% 
   filter(dark_mode == 0) %>% pull(anz_nm)
+
 ant_m_B <- anteile %>% 
   filter(dark_mode == 1) %>% pull(ant_m)
+
 ant_nm_B <- anteile %>% 
   filter(dark_mode == 1) %>% pull(ant_nm)
 ```
 
 ```{r}
-# Gewichtete Mittelwerte für Kontrollgruppe
+# Gewichtete Mittel für Kontrollgruppe berechnen
 (
 gew_K <- darkmode %>% 
   filter(dark_mode == 0) %>% 
@@ -232,36 +249,46 @@ gew_K <- darkmode %>%
 )
 ```
 
-Ein Vergleich des gewichteten Mittelwertes von `male` in der Kontrollgruppe mit dem Mittelwert in der Behandlungsgruppe (`male_k`) zeigt, dass die Gewichte die Variation in `male` zwischen beiden Gruppen eliminieren. Mit `wmean_read_time_K` haben wir einen entsprechend gewichteten Mittelwert der Verweildauer für die Kontrollgruppe berechnet. Wir schätzen den Behandlungseffekt nun als
-\begin{align}
-  \widehat{\tau}^{\text{w}} = \overline{\text{read\_time}}_{B} - \overline{\text{read\_time}}_{w,K}.
+Ein Vergleich des gewichteten Mittelwertes von `male` in der Kontrollgruppe mit dem Mittelwert in der Behandlungsgruppe (`male_k`) zeigt, dass die Gewichte die Variation in `male` zwischen beiden Gruppen eliminieren, sodass die Backdoor durch `male` geschlossen ist. Mit `wmean_read_time_K` haben wir einen entsprechend gewichteten Mittelwert der Verweildauer für die Kontrollgruppe berechnet. Wir schätzen den Behandlungseffekt nun als \begin{align}
+  \widehat{\tau}^{\text{w}} = \overline{\text{read\_time}}_{B} - \overline{\text{read\_time}}_{w,K}.\label{eq:weightedATEdarkmode}
 \end{align}
 
 ```{r}
 mean(read_time_mTG)  - gew_K$mean_read_time_wK
 ```
 
+Entgegen der naiven Schätzung andhand von \eqref{eq:naivATEdarkmode} erhalten wir nach Matching für `male` eine positive Schätzung des Behandlungseffekts von etwa $`r round(mean(read_time_mTG) - gew_K$mean_read_time_wK, 2)`$.
 
+Die Schätzung des Behandlungseffekts anhand von \eqref{eq:weightedATEdarkmode} entspricht dem geschätzten Koeffizienten $\widehat{\beta}_1$ aus einer gewichteten KQ-Regression im Modell \begin{align*}
+  \text{read\_time} = \beta_0 + \beta_1 \text{dark\_mode} + u,
+\end{align*} 
+wobei die Beobachtungen der Kontrollgruppe wie in \eqref{eq:darkmodeweights} gewichtet werden und $w_i=1$ für Beobachtungen der Behandlungsgruppe ist. Wir überprüfen dies mit R.
 
-### *Balance*: Vergleichbarkeit von Behandlungs- und Kontrollgruppe
+```{r}
+darkmode_w <- darkmode %>% 
+  mutate(
+    w = case_when(
+      male == 1 & dark_mode == 0 ~ ant_m_B/anz_m_K,
+      male == 0 & dark_mode == 0 ~ ant_nm_B/anz_nm_K,
+      T ~ 1
+    )
+  ) 
 
+lm(read_time ~ dark_mode, weights = w, data = darkmode_w) %>%
+  summary()
+```
 
+Der geschätzte Koeffizient von `dark_mode` entspricht $\widehat{\tau}^w$.
 
+Da `male` eine binäre Variable ist, reduziert sich eine Beurteilung der Vergleichbarkeit der Verteilungen von `male` in Behandlungs- und Kontrollgruppe auf einen simplen Vergleich des Männeranteils beider Gruppen. In der Praxis gibt es meist eine Vielzahl potentieller Backdoor-Variablen, die zudem kontinuierlich verteilt sind. Es scheint plausibel, dass das Alter der Nutzer sowohl die Akzeptanz des Design-Updates als auch die Lesezeit beeinflusst. Die bisherige Verweildauer ist mindestens eine plausible Determinante der Lesezeit.
 
-
-
-
-
-
-Weiterhin scheint plausibel, dass das Alter der Nutzer sowohl die Akzeptanz des Design-Updates als auch die Lesezeit beeinflusst. Die bisherige Verweildauer ist ebenfalls eine plausible Determinante der Lesezeit.
-
-Der angenommene DGP ist in Abbildung @fig-CDdarkmode dargestellt, wobei Backdoor-Pfade mit roten Pfeilen gekennzeichnet sind.
+Der erweiterte DGP ist in Abbildung @fig-CDdarkmode dargestellt, wobei der zusätzliche Backdoor-Pfad durch `age` ebenfalls mit roten Pfeilen gekennzeichnet sind.
 
 ```{dot}
 //| fig-width: 4
 //| fig-height: 3
 //| fig-align: 'center'
-//| fig-cap: "Vermuteter DGP im Website-Design-Bespiel"
+//| fig-cap: "Erweiterter DGP im Website-Design-Beispiel"
 //| label: "fig-CDdarkmode" 
 digraph {
   layout=neato
@@ -283,15 +310,14 @@ digraph {
 }
 ```
 
-Zur Beurteilung der Vergleichbarkeit von Kontrollgruppe und Behandlungsgruppe empfiehlt sich eine Gegenüberstellung der empirischen Verteilungen der Kovariablen beider Gruppen. Wir visualisieren die empirischen Verteilungen zunächst mit `ggplot2`. Hierzu transformieren wir `male` und `dark_mode` in den Typ `factor` und standardisieren `age` und `hours` mit `scale()`.
+Die Beurteilung der *Balance* von Kontrollgruppe und Behandlungsgruppe kann durch eine grafische Gegenüberstellung der empirischen Verteilungen der Kovariablen beider Gruppen erfolgen. Wir visualisieren die empirischen Verteilungen mit `ggplot2`. Hierzu standardisieren wir `age` und `hours` zunächst mit `scale()`.
 
-```{webr-r}
+```{r}
 # Datensatz für graphische Darstellung formatieren
 darkmode_p <- darkmode %>% 
   # Standardisierung mit 'scale()'
   mutate(
-    male = as.factor(male), 
-    dark_mode = as.factor(dark_mode),
+    dark_mode = as_factor(dark_mode),
     age = scale(age), 
     hours = scale(hours)
   )
@@ -301,7 +327,7 @@ head(darkmode_p)
 
 Für `age` und `hours` eignen sich die geschätzten Dichtefunktionen für einen Vergleich der Verteilungen in Behandlungs- und Kontrollgruppe.
 
-```{webr-r}
+```{r}
 # Vergleich mit Dichteschätzungen
 darkmode_p %>%
   select(dark_mode, hours, age) %>%
@@ -319,21 +345,9 @@ darkmode_p %>%
     )
 ```
 
-Für `male` vergleichen wir die relativen Häufigkeiten mit Balkendiagrammen.
+Die graphische Analyse zeigt deutliche Unterschiede in den Verteilungen von `age` zwischen Kontroll- und Behandlungsgruppe. Für einen Beurteilung mit deskriptiven Statistiken wird häufig eine sogenannte *Balance Table* herangezogen. Wir berechnen diese für `age`, `hours` und `male` mit `cobalt::bal.tab()`
 
-```{webr-r}
-# Relative Hfkt. für 'male' als barplot
-darkmode_p %>%
-  ggplot(
-    aes(x = dark_mode, fill = male)
-    ) +
-  geom_bar(position = "fill") +
-  ylab("Anteil")
-```
-
-Die graphische Analyse zeigt deutliche Unterschiede in den Verteilungen von `age` und `male` zwischen Kontroll- und Behandlungsgruppe. Für einen Beurteilung mit deskriptiven Statistiken wird häufig eine sogenannte *Balance Table* herangezogen. Wir berechnen diese für `age`, `hours` und `male` mit `cobalt::bal.tab()`
-
-```{webr-r}
+```{r}
 library(cobalt)
 
 # Balance table mit 'cobalt::bal.tab()'
@@ -347,30 +361,71 @@ bal.tab(
 )
 ```
 
-Die Einträge `M.0.Un` und `M.1.Un` zeigen die jeweiligen Stichprobenmittelwerte der Variablen für Kontroll- und Behandlungsgruppe. `Diff.U` gibt eine standardisierte Mittelwertdifferenz $SMD$ an, wobei
-\begin{align*}
+Die Einträge `M.0.Un` und `M.1.Un` zeigen die jeweiligen Stichprobenmittelwerte der Variablen für Kontroll- und Behandlungsgruppe. `Diff.Un` gibt eine standardisierte Mittelwertdifferenz $SMD$ an, wobei \begin{align*}
   SMD_j := \left(\overline{X}_{j,B} - \overline{X}_{j,K}\right) \bigg/ \sqrt{\frac{1}{2}\left(\widehat{\text{Var}}(X_{j,B}) + \widehat{\text{Var}}(X_{j,K})\right)},
-\end{align*}
-mit Stichprobenmitteln $\overline{X}_{j,B}$ und $\overline{X}_{j,K}$ und Stichprobenvarianzen $\widehat{\text{Var}}(X_{j,B})$ und $\widehat{\text{Var}}(X_{j,K})$ für eine kontinuierliche Kovariable $j$.^[Siehe @Austin2011 für einen Überblick zu Balance-Statistiken.] Obwohl es keinen einheitlichen Schwellenwert für die standardisierte Differenz gibt, der ein erhebliches Ungleichgewicht anzeigt, gilt für kontinuierliche Variablen eine standardisierte (absolute) Differenz von weniger als $0.1$ als Hinweis auf einen vernachlässigbaren Unterschied zwischen den Gruppen.
+\end{align*} mit Stichprobenmitteln $\overline{X}_{j,B}$ und $\overline{X}_{j,K}$ und Stichprobenvarianzen $\widehat{\text{Var}}(X_{j,B})$ und $\widehat{\text{Var}}(X_{j,K})$ für eine kontinuierliche Kovariable $j$.[^matching-1] Obwohl es keinen einheitlichen Schwellenwert für die standardisierte Differenz gibt, der ein erhebliches Ungleichgewicht anzeigt, gilt für kontinuierliche Variablen eine standardisierte (absolute) Differenz von weniger als $0.1$ als Hinweis auf einen vernachlässigbaren Unterschied zwischen den Gruppen.
 
-Die Balance Table weist also auf einen vernachlässigbaren Unterschied für `hours` und bestätigt die aus den Grafiken abgeleiteten Hinweise auf relevante Differenzen für `age` und `male`. 
+[^matching-1]: Siehe @Austin2011 für einen Überblick zu Balance-Statistiken.
 
-###
+Die Balance Table weist also auf einen vernachlässigbaren Unterschied für `hours` hin und bestätigt den aus den Grafiken abgeleiteten Eindruck einer relevanten Differenzen für `age`.
 
-### Inverse Probability Weighting
+### Mehrere Matching-Variablen und der Propensity Score
 
-### Propensity score
+Bei mehreren Backdoor-Variablen kann eine Gewichtung anhand der Behandlungswahrscheinlichkeit (*Treatment Propensity*) erfolgen. Die Idee hierbei ist, dass der DGP wie in @fig-propCDdarkmode dargestellt werden kann.
 
-```{webr-r}
-lm(
-   formula = read_time ~ dark_mode + age + male + hours,
-   data = darkmode
- ) %>%
-   summary()
+```{dot}
+//| fig-width: 4
+//| fig-height: 3
+//| fig-align: 'center'
+//| fig-cap: "Propensity im Website-Design-Beispiel"
+//| label: "fig-propCDdarkmode" 
+digraph {
+  layout=neato
+  fontname="Helvetica,Arial,sans-serif"
+  node [fontname="Helvetica,Arial,sans-serif"]
+  edge [fontname="Helvetica,Arial,sans-serif"]
+  node [shape=none];
+  "read_time" [pos="4,0.5!"]
+  "dark_mode" [pos="0,0.5!"]
+  "TreatmentPropensity" [pos="0,2!"]
+  "male" [pos="2,-1!"]
+  "age" [pos="2,2!"]
+  "hours" [pos="4,2!"]
+  "hours" -> "read_time"
+  "age" -> "TreatmentPropensity" [color="red"]
+  "age" -> "read_time" [color="red"]
+  "dark_mode" -> "read_time" [color="green"]
+  "male" -> "TreatmentPropensity" [color="red"]
+  "male" -> "read_time" [color="red"]
+  "TreatmentPropensity" -> "dark_mode" [color="red"]
+}
 ```
 
+Hierbei beeinflussen die Backdoor-Variablen *age* und *male* die Behandlungsvariable *dark_mode* lediglich durch die Behandlungswahrscheinlichkeit *Treatment Propensity*. Diese Darstellung zeigt, das die mehrdimensionale Information bzgl. der Ähnlichkeit von Subjekten hinsichtlich der beobachteten Kovariablen in einer einzigen Variable zusammengefasst werden kann. Die Backdoor-Pfade können daher geschlossen werden, indem wir Subjekte anhand von *Treatment Propensity* derart gewichten, dass beide Gruppen hinsichtlich der Verteilung der Behandlungswahrscheinlichkeit vergleichbar sind. Betrachte erneut \eqref{eq:cia} und beachte, dass \begin{align}
+  Y_i = Y_i^{(1)} D_i + Y_i^{(0)} (1-D_i).
+\end{align} @RosenbaumRubin1983 zeigen, dass es hinsichtlich \eqref{eq:cia} äquivalent ist für die *Treatment Propensity* $P_i(X_i):=P(B_i=1\vert X_i = x)$ zu kontrollieren, d.h. \begin{align}
+  \left\{Y_i^{(1)},Y_i^{(0)}\right\} \perp B_i\vert X_i \quad\Leftrightarrow\quad \left\{Y_i^{(1)},Y_i^{(0)}\right\} \perp B_i\vert P_i(X_i).
+\end{align}
 
-```{webr-r}
+Der Behandlungseffekt kann so als Differenz von gewichteten Gruppenmittelwerten berechnet werden, mit inversem Wahrscheinlichkeitsgewicht (IPW) $w_{i,B} = 1/P_i(X_i)$ für Beobachtungen in der Behandlungsgruppe und $w_{i,K} = 1/(1-P_i(X_i))$ für Beobachtungen in der Kontrollgruppe, \begin{align}
+  \tau^{\text{IPW}} = \frac{1}{n}\sum_{i=1}^n \left[\frac{B_i Y_i}{P_i(X_i)} - \frac{(1-B_i)Y_i}{1-P_i(X_i)} \right].\label{eq:tauipw}
+\end{align}
+
+Grundsätzlich ist *TreatmentPropensity* eine nicht beobachtbare Variable und muss daher aus den Daten geschätzt werden. Eine geschätzte Behandlungswahrscheinlichkeiten $\widehat{P}_i(X_i)$ wird als *Propensity Score* bezeichnet. In der Praxis erfolgt die Schätzung von *Propensity Scores* meist mit logistischer Regression. Ein erwartungstreuer Schätzer des ATE ist \begin{align}
+  \widehat{\tau}^{\text{IPW}} = \frac{1}{n}\sum_{i=1}^n \left[\frac{B_i Y_i}{\widehat{P}_i(X_i)} - \frac{(1-B_i)Y_i}{1-\widehat{P}_i(X_i)} \right].\label{eq:hattauipw}
+\end{align} @Hiranoetal2003 diskutieren Alternativen zu \eqref{eq:hattauipw} für die Schätzung anderer Typen von Behandlungseffekten.
+
+Wir schätzen nachfolgend die *Propensity Scores* für unser Anwendungsbeispiel, erläutern die Berechnung der Gewichte sowie die Schätzung von Behandlungseffekten mit gewichteter Regression. Hierbei betrachten wir eine Variante von \eqref{eq:hattauipw} mit normalisierten Gewichten $\tilde{w}_{i,B} = w_{i,B}/\sum_i w_{i,B}$ und $\tilde{w}_{i,K} = w_{i,K}/\sum_i w_{i,K}$ die sich jeweils zu 1 summieren.[^matching-2] Dies ergibt den Hájek-Schätzer[^matching-3] \begin{align}
+    \widehat{\tau}_N^{\text{IPW}} = \frac{\sum_i\tilde{w}_{i,B}Y_i}{\sum_i\tilde{w}_{i,B}} -  \frac{\sum_i\tilde{w}_{i,K}Y_i}{\sum_i\tilde{w}_{i,K}}.\label{eq:hattauhajek}
+\end{align}
+
+[^matching-2]: Eine Normalisierung der Gewichte reduziert die Varianz des Schätzers, vgl. @Hiranoetal2003
+
+[^matching-3]: Siehe @Hajek1971.
+
+Zunächst Schätzen wir ein logistisches Regressionsmodell mit `age`, `male` und `hours` als erklärende Variablen für `dark_mode`.
+
+```{r}
 # Logit-Modell mit 'glm()' schätzen
 (
   darkmode_ps_logit <- glm(
@@ -381,273 +436,425 @@ lm(
 )
 ```
 
-```{webr-r}
-# Datensatz um propensity scores erweitern
+Die *Propensity Scores* erhalten wir als angepasste Werte aus der Regression `darkmode_ps_logit` mit `fitted()`. Wir erweitern den Datensatz mit den Ergebnissen.
+
+```{r}
+# Datensatz um Propensity Scores erweitern
 (
-  darkmode_probabilities <- 
+  darkmode_probs <- 
     darkmode %>%
     mutate(
-      propensity = fitted(darkmode_ps_logit)
+      PS = fitted(darkmode_ps_logit)
     )
 )
 ```
 
-Inverse probability weights (IPWs) anhand der PS können schnell anhand der Vorschrift $$\texttt{ipw} = \texttt{dark\_mode} / \texttt{propensity} + (1 - \texttt{dark\_mode}) / (1 - \texttt{propensity}), \quad \texttt{dark\_mode} \in\{0,1\}$$
-berechnet werden.
+Zur Beurteilung der Überlappung (vgl. Annahme \eqref{eq:overlap} können wir die Verteilung der *Propensity Scores* nach Behandlungs-Indikator mit Histogrammen visualisieren.
 
-```{webr-r}
-# Datensatz um IPWs erweitern
-darkmode_ipw <- darkmode_probabilities %>%
-  mutate(
-    ipw = dark_mode / propensity + (1 - dark_mode) / (1 - propensity)
-  )
-
-darkmode_ipw %>% 
-  select(ipw)
-```
-
-Verteilung der Propensity Scores nach Behandlungs-Indikator:
-
-```{webr-r}
-# Dichteschätzung der PS nach Treatment-Indikator
-darkmode_ipw %>%
-ggplot(
-  mapping = aes(
-    x = propensity, 
-    fill = factor(dark_mode))
-  ) + 
-  lims(x = c(0, 1)) +
-  geom_density(alpha = .5, )
-```
-
-Beobachtungen aus der Kontroll-Gruppe entfernen, die außerhalb des Supports der Treatment-Gruppe liegen.
-
-```{webr-r}
-# Propensity scores auslesen
-darkmode_ipws <- darkmode_ipw %>% 
-  filter(dark_mode == 1) %>% 
-  pull(propensity)
-
-# Support sicherstellen 
-# (entfernt 13 Beobachtungen aus der Kontrollgruppe)
-darkmode_ipw <- darkmode_ipw %>% 
-  filter(
-    between(
-      propensity,
-      darkmode_ipws %>% 
-        min(),
-      darkmode_ipws %>% 
-        max()
-    )
-  )
-```
-
-Die Abdeckung können wir erneut mit einer Grafik geschätzter Dichtefunktionen vergleichen.
-
-```{webr-r}
-# Dichteschätzung der PS per Treatment-Indikator nach Anpassung
-darkmode_ipw %>%
+```{r}
+# Überlappung prüfen:
+# Histogramme der PS nach Treatment-Indikator
+darkmode_probs %>%
   ggplot(
     mapping = aes(
-      x = propensity, 
+      x = PS, 
       fill = factor(dark_mode)
     )
   ) + 
-  lims(x = c(0, 1)) +
-  geom_density(alpha = .5)
+  geom_histogram(
+    alpha = .5, 
+    bins = 25, 
+    position = "identity"
+  )
 ```
 
-Wir finden etwas weniger Wahrscheinlichkeits-Masse nahe 0 für die Kontroll-Gruppe nach filtern von (Kontroll-)Beobachtungen mit PS in der Spannweite der PS in der Behandlungs-Gruppe. Als nächstes schätzen wir den ATE mit linearer Regression.
+Ein Vergleich der Histogramme zeigt, dass die Überlappung der *Propensity Scores* in der linken Flanken der Verteilungen der Kontrollgruppe und in der rechten Flanke der Behandlungsgruppe schlechter wird. Wir entfernen zunächst Beobachtungen aus der Stichprobe deren *Propensity Scores* wenig bzw. keine Überlappung aufweisen.
 
-```{webr-r}
-# Mit IPWs gewichteter KQ-Schaetzer berechnet einen ATE
+```{r}
+# Datensatz nach PS trimmen
+darkmode_probs <- darkmode_probs %>% 
+  filter(
+    between(
+      x = PS,
+      left = .25,
+      right = .75
+    )
+  )
+```
+
+```{r}
+# Überlappung nach trimming prüfen:
+# Dichteschätzung der PS nach Treatment-Indikator
+darkmode_probs %>%
+ggplot(
+  mapping = aes(
+    x = PS, 
+    fill = factor(dark_mode))
+  ) + 
+  geom_histogram(
+    alpha = .5, 
+    bins = 25, 
+    position = "identity"
+  )
+```
+
+IPWs anhand der *Propensity Scores* können schnell mit der Vorschrift \begin{align}
+  \text{IPW} = \frac{\text{dark\_mode}}{\text{PS}} + \frac{1 - \text{dark\_mode}}{1 - \text{PS}},
+\end{align} berechnet werden.
+
+```{r}
+# Datensatz um IPWs erweitern
+darkmode_IPW <- darkmode_probs %>%
+  mutate(
+    IPW = dark_mode / PS + (1 - dark_mode) / (1 - PS)
+  )
+
+darkmode_IPW %>% 
+  select(IPW)
+```
+
+Eine Schätzung des durchschnittlichen Behandlungseffekts gemäß \eqref{eq:hattauhajek} implementieren wir mit `dplyr`.
+
+```{r}
+darkmode_IPW %>%
+  group_by(dark_mode) %>%
+  mutate(w = IPW / sum(IPW)) %>%
+  summarise(weighted_mean = sum(read_time * w)) %>%
+  summarise(diff = diff(weighted_mean))
+```
+
+Diese Schätzung des Behandlungseffekts ist äquivalent zur gewichteten KQ-Schätzung anhand eines einfachen linearen Regressionsmodells.
+
+```{r}
+# Mit IPWs gewichteter KQ-Schaetzer berechnet den ATE
 model_ipw <- lm(
   formula = read_time ~ dark_mode, 
-  data = darkmode_ipw,
-  weights = ipw
+  data = darkmode_IPW,
+  weights = IPW
 )
 
 summary(model_ipw)
 ```
 
-Unsere Schätzung des ATE ist der geschätzte Koeffizient von `dark_mode`. Die ausgegebenen Standardfehler und Inferenzstatistiken sind *ungültig* aufgrund der Gewichtung mit IPWs, inversen *geschätzten*  Wahrscheinlichkeiten für eine Behandlung. Der Grund hierfür ist, dass die Standardformel in `summary()`  die zusätzliche Unsicherheit durch die IPW-Schätzung nicht berücksichtigt!
+Unsere Schätzung des ATE ist der geschätzte Koeffizient von `dark_mode`. Die ausgegebenen Standardfehler und Inferenzstatistiken sind jedoch *ungültig* aufgrund der Gewichtung mit IPWs, den inversen *geschätzten* Wahrscheinlichkeiten für eine Behandlung. Der Grund hierfür ist, dass die Berechnung der Standardfehler in `summary()` die zusätzliche Unsicherheit durch die geschätzen *Propensity Scores* nicht berücksichtigt! Später im Kapitel erläutern wir die Berechnung gültiger Standardfehler für IPW-Schätzer basierend auf *Propensity Scores* mit dem Bootstrap.
 
-Die Vergleichbarkeit der Nutzer in Kontroll- und Behandlungsgruppe-Gruppe für die Variablen `age`, `hours` und `male` können wir graphisch und anhand einer *balance table* vergleichen.
+## Matching-Verfahren
 
-```{webr-r}
-# Dichteschätzungen
-darkmode %>% 
-  group_by(dark_mode) %>%
-  select(age, hours) %>%
-  mutate_all(scale) %>% # Standardisierung mit 'scale()'
-  pivot_longer(cols = c(-dark_mode)) %>% # langes Format
-  
-  ggplot(aes(x = value, fill = as.factor(dark_mode))) +
-  geom_density( alpha = .5) + 
-  facet_wrap(~ name, scales = "free", nrow = 3) # Facetting nach 'name'
+Das grundsätzliche Konzept von Matching wird in der nachstehenden interaktiven Grafik veranschaulicht. Hier betrachten wir beobachtete Ausprägungen von zwei (unabhängig und identisch verteilten) Matching-Variablen für Subjekte in der Behandlungsgruppe (blau) sowie Kontrollgruppe (rot). Per Klick auf eine Beobachtung werden Matches aus der anderen Gruppe in grün kenntlich gemacht. Als Matches zählen sämtliche Beobachtungen der anderen Gruppe, deren [Euklidische Distanz](https://de.wikipedia.org/wiki/Euklidischer_Abstand) zu dem ausgewählten Punkt das über den Slider eingestellte Maximum *Caliper* nicht überschreitet.^[Es handelt sich hierbei um einen Spezialfall von Matching anhand der Mahalanobis-Distanz.] Diese Region wird durch den gestrichelten Kreis gekennzeichnet. Die Grafik illustriert inbesondere, dass Beobachtungen mehrfach (s.g. Matching mit zurücklegen) oder gar nicht gematcht werden können.
 
-# Relative Hfkt. für 'male' als barplot
-darkmode %>% 
-  group_by(dark_mode) %>%
-  mutate(
-    male = as.factor(male), 
-    dark_mode = as.factor(dark_mode)
-  ) %>%
-  
-  ggplot(aes(x = dark_mode, fill = male)) +
-  geom_bar(position = "fill") +
-  ylab("Anteil")
+<iframe width="100%" height="629" frameborder="0" src="https://observablehq.com/embed/62067a02a72c9f90?cells=theplot%2Cviewof+caliper%2Cstyles">
+</iframe>
 
-# Balance table mit 'cobalt::bal.tab()'
-bal.tab(
-  x = darkmode %>% 
-    select(age, hours, male), 
-  treat = darkmode$dark_mode, 
-  disp = "m", # zeige zusätzlich Mittelwerte für C und T
-)
-```
+`MatchIt::matchit()` nutzt standardmäßig Eins-zu-Eins-Matching (ohne Zurücklegen) von Beobachtungen der Treatment-Gruppe mit Beobachtungen der Kontrollgruppe. Die für das Matching zu verwendenden Variablen werden über das Argument `formula` als Funktion des Behandlungsindikators definiert. `matchit()` bereitet das Objekt für eine Schätzung des ATT mit einer geeigneten Funktionen, s. `?matchit` und hier insb. die Erläuterungen der Argumente `replace = F`, `ratio = 1` und `estimand = "ATT"` für Details. Mit `cobalt::balt.tab()` erhalten wir eine *balance table* für den gematchten Datensatz.
 
-Wir zeigen als nächstes, wie `MatchIt::matchit()` für Nearest-neighbor-Matching anhand der Regressoren `age`, `hours`, und `male` in unterschiedlichen Varianten durchgeführt werden kann. 
-
-`MatchIt::matchit()` führt standardmäßig 1:1-Matching (ohne Zurücklegen) von Beobachtungen der Treatment-Gruppe mit Beobachtungen der Kontrollgruppe druch. Das Objekt wird für eine Schätzung des ATT mit einer geeigneten Funktionen vorbereitet, s. `?matchit`, und hier insb. die Argumente `replace = F`, `ratio = 1` und `estimand = "ATT"` für Details. 
-
-Mit `cobalt::balt.tab()` erhalten wir eine *balance table* für den gematchten Datensatz.
+Wir zeigen als nächstes, wie `MatchIt::matchit()` für Matching anhand der Regressoren `age`, `hours`, und `male` in unserem Website-Beispiel für unterschiedliche Varianten durchgeführt werden kann.
 
 **Exaktes Matching**
-    
-```{webr-r}
-res <- matchit(
+
+Exaktes Matching ordnet einem Subjekt aus der Behandlungsgruppe ein oder mehrere Subjekte aus der Kontrollgruppe zu, wenn die boebachteten Ausprägung der Matching-Variablen *exakt* übereinstimmen. Hierbei muss die 'Distanz' zwischen den Ausprägung der Matching-Variablen folglich $0$ sein. Dieses Verfahren findet meist bei ausschließlich diskret verteilten Merkmalen Anwendung. Bei kontinuierlich verteilten Merkmalen (vgl. die obige interaktive Grafik) sind exakte Matches zwar theoretisch unmöglich, ergeben sich jedoch in der Praxis aus der Datenerfassung, bspw. durch Rundungsfehler. In `matchit()` erhalten wir exaktes Ein-zu-eins-Matching mit `method = "exact"`.
+
+```{r, error=TRUE}
+library(MatchIt)
+
+# Exaktes Eins-zu-Eins-Matching durchführen
+res_em <- matchit(
   formula = dark_mode ~ age + male + hours, 
-  data = darkmode, 
+  data = darkmode,
+  estimand = "ATT",
   method = "exact"
 )
-bal.tab(res)
+res_em
 ```
 
-**Eins-zu-Eins-Matching: Mahalanobis-Distanz**
-    
-```{webr-r}
-res <- matchit(
+Aufgrund der kontinulierliche Verteilten Variable `hours` gibt es in unserem Website-Beispiel keine exakten Matches. Dieses Verfahren ist hier folglich ungeeignet.
+
+**Coarsened Exact Matching**
+
+Bei dieser Methode werden kontinuierliche Matching-Variablen grob (Engl. *coarse*) klassiert, ähnlich wie bei einem Histogram. Diese Diskretisierung ermöglicht es exakte Übereinstimmungen zwischen Behandlungs- und Kontrollgruppenbeobachtungen hinsichtlich ihrer klassierten Ausprägungen zu finden. Sowohl Behandlungs- als auch Kontrollbeobachtungen die mindestents einen exakten Match haben, werden Teil des gematchten Datensatzes. In `matchit()` wird Coarsened Exact Matching mit `method = "cem"` durchgeführt. Über das Argument `cutpoints` geben wir an, dass `hours` in 6 Klassen und `age` in 4 Klassen eingeteilt werden soll.^[Diese Werte wurden ad-hoc gewählt da sie zu einem guten Ergebnis führen.] Mit `k1k = TRUE` erfolgt Eins-zu-eins-Matching: Bei mehreren exakten Matches wird die Beobachtung mit der geringsten Mahalanobis-Distanz (für die unklassierten Matching-Variablen) gewählt.
+
+```{r}
+# Coarsened Exact Matching
+res_CEM <- matchit(
   formula = dark_mode ~ age + male + hours, 
   data = darkmode, 
+  estimand = "ATT",
+  method = "cem", 
+  k2k = TRUE,
+  cutpoints = list(
+    "hours" = 6, 
+    "age" = 4
+  ) 
+)
+res_CEM
+```
+
+```{r}
+# Balance-Table Coarsened Exact Matching
+bal.tab(res_CEM)
+```
+
+Mit Coarsened Exact Matching erhalten wir einen Datensatz mit 82 Beobachtungen und guter Balance.
+
+**Matching anhand der Mahalanobis-Distanz**
+
+Die Euklidische Distanz misst den direkten Abstand zwischen zwei Punkten und ist nicht invariant gegenüber Transformationen, insbesondere bei unterschiedlichen Skalierungen und bei Korrelation der Matching-Variablen. Die Mahalanobis-Distanz hingegen ist ein standardisiertes Distanzmaß, das unter Berücksichtigung der Varianz-Kovarianz-Struktur der Daten angibt, wie viele Standardabweichungen zwei Datenpunkte voneinander entfernt sind. Die Mahalanobis-Distanz ist invariant gegenüber linearen Transformationen (Skalierung, Translation und Rotation) der Daten und bietet ein genaueres Maß für die Unähnlichkeit zweier Beobachtungen hinsichtlich ihrer Ausprägungen der Matching-Variablen. 
+
+Betrachte die Datenpunkte $P_1=(X_1,Y_1)'$ und $P_2=(X_2,Y_2)'$ für die Matching-Variablen $X$ und $Y$. Die Mahalanobis-Distanz zwischen $P_1$ und $P_2$ ist definiert als
+\begin{align*}
+  d_M(P_1,\,P_2) = \sqrt{(P_1 - P_2)'\boldsymbol{S}^{-1} (P_1 - P_2)},
+\end{align*}
+wobei $\boldsymbol{S}$ die Varianz-Kovarianz-Matrix von $X$ und $Y$ ist. Die Mahalanobis-Distanz $d_M(\cdot,\cdot)$ ist also die Euklidische Distanz zwischen den standardisierten Datenpunkten.
+
+Für beobachtete Daten ersetzen wir die Komponenten der Varianz-Kovarianz-Matrix durch  Stichprobenmaße. Dies ergibt die Formel
+
+\begin{align*}
+  \widehat{d}_M(P_1,\,P_2) = \sqrt{
+  \begin{pmatrix}
+    X_1 - X_2\\
+    \tilde  Y_1 - \tilde Y_2
+  \end{pmatrix}'
+  \begin{pmatrix}
+    \widehat{\text{Var}}(X^2) & \widehat{\text{Cov}}(X, Y) \\
+     \widehat{\text{Cov}}(X, Y) & \widehat{\text{Var}}(X^2) 
+  \end{pmatrix}^{-1}
+    \begin{pmatrix}
+    X_1 - X_2\\
+    \tilde Y_1 - \tilde Y_2
+  \end{pmatrix}
+}.
+\end{align*}
+
+Die nachstehende interaktive Grafik zeigt Beobachtungen zweier Matching-Variablen, die aus einer bivariaten Normalverteilung mit positiver Korrelation generiert wurden. Diese bivariate Verteilung ist identisch für Beobachtungen aus der Kontrollgruppe (rot) und Beobachtungen aus der Behandlungsgruppe (blau). Für die ausgewählte Beobachtung aus der Behandlungsgruppe (schwarzer Rand) werden potentielle Matches in der Kontrollgruppe innerhalb der vorgegebenen Mahalanobis-Distanz in Cyan kenntlich gemacht. Beachte, dass die Mahalanobis-Distanz Varianzen und Kovarianzen der Daten berücksichtigt, sodass die gematchten Beobachtungen in einem elliptischen Bereich um die betrachtete behandelte Beobachtung liegen. Eine Euklidische Distanz hingegen (gestrichelte Linie) ignoriert die Skalierung der Daten.
+
+<iframe width="100%" height="648" frameborder="0"
+  src="https://observablehq.com/embed/1338355035acc056@687?cells=theplot%2Cviewof+caliper%2Cstyles"></iframe>
+
+Für Eins-zu-Eins-Matching im Website-Beispiel anhand der Mahalanobis-Distanz mit `matchit()` setzen wir `distance = "mahalanobis"` und wählen `method = "nearest"`. Mit diesen Parametern wird jeder Behandlung aus der Behandlungsgruppe die gemäß $d_M$ am ehesten vergleichbarste Beobachtung aus der Kontrollgruppe zugewiesen, wobei keine mehrfachen Matches zulässig sind. 
+
+```{r}
+# 1:1 Mahalanobis-Distanz-Matching
+res_maha <- matchit(
+  formula = dark_mode ~ age + male + hours, 
+  data = darkmode, 
+  estimand = "ATT",
   distance = "mahalanobis", 
   method = "nearest"
 )
-bal.tab(res)
+res_maha
 ```
 
-**Eins-zu-Eins-Matching: Mahalanobis-Distanz mit Caliper 0.25 für propensity scores basierend auf logistischer Regression**
-
-```{webr-r}
-res <- matchit(
-  formula = dark_mode ~ age + male + hours, 
-  data = darkmode, 
-  distance = "glm", 
-  caliper = .25,
-  mahvars = ~ age + male + hours
-)
-# (Nur K-Beobachtungen mit PS bei Caliper .25 kommen für MHD-Matching in betracht.)
-bal.tab(res)
+```{r}
+# Balance-Table für 1:1 Mahalanobis-Matching
+bal.tab(res_maha)
 ```
 
-**4. Eins-zu-Eins-Matching: Propensity scores basierend auf logistischer Regression mit Caliper 0.25**
-        
-```{webr-r}
-res <- matchit(
+Die Ergebnisse zeigen, dass für sämtliche $149$ Beobachtungen aus der Behandlungsgruppe ein individueller Match in der Kontrollgruppe gefunden werden konnte. Es werden lediglich $2$ Beobachtungen der $151$ Beobachtungen in der Kontrollgruppe nicht gematcht.
+
+Entsprechend zeigt die Balance-Table eine ähnliche Diskrepanz beider Gruppen hinsichtlich der Matching-Variablen an.
+
+**Mahalanobis-Distanz mit Caliper .25 für Propensity Scores basierend auf logistischer Regression**
+
+Für eine strengeres Matching-Kriterium kann ein *Caliper*, d.h. eine maximal zulässige Distanz, herangezogen werden. Die Mahalanobis-Distanz hat jedoch keine einheitliche Skala: Ob eine Distanz als groß oder klein betrachten werden kann, hängt von der Anzahl der Matching-Variablen und dem Überlappungsgrad zwischen den Gruppen ab. Daher wird die Beschränkung durch einen Caliper nicht auf $\widehat{d}_M$ sondern auf Propensity Scores angewendet.
+
+Im nächsten Code-Beispiel spezifizieren wir mit `distance = "glm"`, dass Propensity Scores gemäß der Vorschrift in `formula` geschätzt werden. Mit `mahvars = ~ age + male + hours` legen wir die Matching-Variablen für die Berechnung von $\widehat{d}_M$ fest. `caliper = .25` legt fest, dass lediglich Beobachtungen der Kontrollgruppe bei einer absoluten Differenz der Propensity Scores von höchstens $0.25$ Standardabweichungen als Match für eine Beobachtung in der Behandlungsgruppe qualifiziert sind.
+
+```{r}
+# Mahalanobis-Matchig mit PS-Caliper
+res_mahaC <- matchit(
   formula = dark_mode ~ age + male + hours, 
   data = darkmode, 
-  method = "nearest", 
-  distance = "glm", 
+  distance = "glm",
+  estimand = "ATT",
+  method = "nearest",
+  mahvars = ~ age + male + hours,
   caliper = .25
 )
-bal.tab(res)
+res_mahaC
 ```
-    
-Die Vergleichbarkeit der Nutzer in Kontroll- und Treatment-Gruppe hinsichtlich der Variablen `age`, `hours` und `male` können wir graphisch und anhand einer *balance table* vergleichen. Wir berechnen die balance table mit `cobalt::bal.tab()` für den anhand von Variante 4 gematchten Datensatz.
 
-```{webr-r}
-bal.tab(res, un = T, disp = "m")
+```{r}
+# Balance Table
+bal.tab(res_mahaC)
+```
 
-# Der gematchte Datensatz enthält Gewichte für die jeweilige 
-# Subklasse zu denen die Beobachtungen gehören.
-#
-# Hier 1:1 matching _ohne_ Zurücklegen, d.h. sämtliche
-# Gewichte sind 1 und wird müssten diese nicht für nachfolgende 
-# Aufrufe von avg comparisons berücksichtigen.
-darkmode_matched <- match.data(res)
+Die Balance-Table zeigt einen deutlichen Effekt der Beschränkung qualifizierter Beobachtungen durch `caliper = .25`: Aufgrund der oberen Grenze für die Propensity-Score-Differenz von $`r round(.25 * sd(fitted(darkmode_ps_logit)), 3)`$ wird für lediglich $104$ Beobachtungen aus der Behandlungsgruppe ein individueller Match in der Kontrollgruppe gefunden.^[Die durch `caliper` implizierte Obergrenze ergibt sich als `.25 * sd(fitted(darkmode_ps_logit)))`.] Weiterhin finden wir eine verbesserte Balance für den gematchten Datensatz.
 
-darkmode_matched %>%
+**Matching mit Propensity Scores und Caliper**
+
+Eine gängige Variante ist Matching ausschließlich anhand von Propensity Scores innerhalb eines Calipers. 
+
+```{r}
+# 1:1 Matching mit PS und Caliper
+res_PSC <- matchit(
+  formula = dark_mode ~ age + male + hours, 
+  data = darkmode, 
+  estimand = "ATT",
+  distance = "glm", 
+  method = "nearest", 
+  caliper = .25
+)
+res_PSC
+```
+
+```{r}
+# Balance Table
+bal.tab(res_PSC)
+```
+
+Laut Balance-Table führt Eins-zu-Eins-Matching basierend auf Propensity Scores zu einem Datensatz mit $104$ gematchten Beobachtungen in der Behandlungsgruppe. Hinsichtlich der standardisierten Mittelwertdifferenz (`Diff.Adj`) erzielt diese Methode die beste Balance unter den betrachteten Ansätzen.
+
+**Vergleich der Balance verschiedener Verfahren mit Love-Plot**
+
+Standardisierte Mittelwertdifferenzen für verschiedene Matching-Verfahren können grafisch mit einem Love-Plot [@Love2004] veranschaulicht werden. Hierzu nutzen wir `cobalt::love.plot()` und übergeben die mit `matchit()` generierten Objekte im Argument `weights`.
+
+```{r}
+# Love-Plot für
+love.plot(
+  x = dark_mode ~ age + male + hours, 
+  weights = list(
+    CEM = res_CEM,
+    Mahalanobis = res_maha,
+    Mahalanobis_Cal = res_mahaC,
+    PSC = res_PSC
+  ),
+  data = darkmode, 
+  line = T,
+  # absolute Mittelwertdifferenz plotten
+  abs = T
+)
+```
+
+Die Grafik zeigt, dass Coarsened Exact Matching (CEM) unter allen betrachteten Verfahren die Stichprobe mit der besten Balance ergibt. Diesen gematchten Datensatz erhalten wir mit `MatchIt::match.data()`.
+
+```{r}
+# gematchten Datensatz zuweisen
+darkmode_matched_CEM <- match.data(res_CEM)
+head(darkmode_matched_CEM)
+```
+
+`darkmode_matched` enthält Gewichte (`weights`) für die jeweilige Gruppe zu denen gemachte Beobachtungen gehören (`subclass`). Dies ist relevant, falls Beobachtungen mehrfach gematcht werden. Wegen Eins-zu-eins-Matching _ohne_ Zurücklegen gibt es in unserem Beispiel `r length(unique(darkmode_matched_CEM$subclass))` Beobachtungspaare und sämtliche Gewichte sind 1. Die Berücksichtigung der Gewicht in den nachfolgenden Aufrufen von Schätzfunktionen (bspw.`lm()`) ist daher nicht nötig und erfolgt lediglich zur Illustration der grundsätzlichen Vorgehensweise.
+
+Eine Wiederholung der grafischen Analyse in @sec-balance zeigt eine deutlich verbesserte Vergleichbarkeit hinsichtlich der Verteilung der Matching-Variablen in `darkmode_matched`.
+
+```{r, warning=FALSE, message = F}
+darkmode_matched_CEM %>%
   group_by(dark_mode) %>%
   select(age, hours) %>%
   mutate_all(scale) %>%
   pivot_longer(cols = c(-dark_mode)) %>%
   
-  ggplot(aes(x = value, fill = as.factor(dark_mode))) +
+  ggplot(
+    aes(x = value, fill = as.factor(dark_mode))
+  ) +
   geom_density( alpha = .5) + 
-  facet_wrap(~ name, scales = "free", nrow = 3)
+  facet_wrap(
+    facets = ~ name, 
+    scales = "free", 
+    nrow = 3
+  )
 
-darkmode_matched %>% 
+darkmode_matched_CEM %>% 
   group_by(dark_mode) %>%
   mutate(
     male = as.factor(male), 
     dark_mode = as.factor(dark_mode)
   ) %>%
   
-  ggplot(aes(x = dark_mode, fill = male)) +
+  ggplot(
+    aes(x = dark_mode, fill = male)
+  ) +
   geom_bar(position = "fill") +
   ylab("Anteil")
 ```
 
-Wir beobachten eine bessere Balance bei `age` und `hours`. Am wichtigsten: `gender` (`male`) ist nahezu ausgeglichen für Kontroll- und Treatment-Gruppe!
+Wir beobachten eine bessere Balance bei `age` und `hours`. Inbesondere ist `male` für Kontroll- und Behandlungsgruppe ausgeglichen!
 
-Wir schätzen nun den ATT von `dark_mode` auf `read_time` mit linearer Regression für den gematchten Datensatz aus sowie für den ursprünglichen Datensatz und berechnen jeweils ein robustes 95%-Konfidenzintervall für den ATT.
+## Schätzung und Inferenz für den Behandlungseffekts nach Matching
 
-```{webr-r}
-# ATT mit linearem Modell für ungematchten Datensatz schätzen
+Wir schätzen nun den Behandlungseffekt von `dark_mode` auf `read_time` für die mit CEM und Propensity Score Matching ermittelten Datensätze mittels linearer Regression und vergleichen mit einer Regression anhand des ursprünglichen Datensatzes. 
+
+
+```{r}
+# ATT mit linearem Modell schätzen: CEM Datensatz
+ATT_mod_CEM <- lm(
+  formula = read_time ~ age + male + hours + dark_mode,
+  data = darkmode_matched_CEM, 
+  weights = weights 
+)
+summary(ATT_mod_CEM)
+```
+
+```{r}
+# Datensatz für Propensity Score Matching zuweisen
+darkmode_matched_PSC <- match.data(res_PSC)
+
+# ATT mit linearem Modell schätzen: PSM Datensatz
+ATT_mod_PSC <- lm(
+  formula = read_time ~ age + male + hours + dark_mode,
+  data = darkmode_matched_PSC, 
+  weights = weights 
+)
+summary(ATT_mod_PSC)
+```
+
+```{r}
+# ATT mit linearem Modell für vollständigen Datensatz schätzen
 ATT_mod_org <- lm(
   formula = read_time ~ age + male + hours + dark_mode,
   data = darkmode
 )
 summary(ATT_mod_org)
-
-# ATT mit linearem Modell für gematchten Datensatz schätzen
-ATT_mod <- lm(
-  formula = read_time ~ age + male + hours + dark_mode,
-  data = darkmode_matched, 
-  weights = weights 
-)
-# (weights = 1 für alle Beobachtungen weil wg. 1:1-Matching
-# nur 2er-Paare von Beobachtungen. Hier also vernachlässigbar.
-# Andere Gewichtung bei k:1-Matching!)
-summary(ATT_mod)
 ```
 
-**Achtung**: Für Matching-Verfahren (`ATT_mod`) sind die von `summary()` berechneten Standardfehler (und damit KI, t-Statistiken und p-Werte) für den ATT *grundsätzlich ungültig* Wir haben 3 Quellen von Schätzunsicherheit, die bei der Berechnung von Standardfehlern berücksichtigt werden müssen: Die Schätzung der PS, der Matching-Prozess und die "übliche" Stichproben-Variabilität. Wir nutzen daher nachfolgende Funktionen gem. Empfehlungen aus der aktuellen Forschung für Standardfehlerberechnung. S. auch Aufgabe 5 (a).
+Beachte, dass für die gematchten Datensätze jeweils ein durchschnittlicher Behandlungseffekt für die Beobachtungen _mit_ erfolgter Behandlung ermittelt wird: In sämtlichen oben gezeigten Verfahren werden mit `estimand = "ATT"` vergleichbarere Kontrollbeobachtungen für die behandelten Beobachtungen ermittelt. Wir schätzen den Effekt der Behandlung, indem wir die Ergebnisse von behandelten Personen mit denen von  gematchten (d.h.ähnlichen) Personen vergleichen, die keine Behandlung erhalten haben. Diese Vergleichsgruppe dient als Ersatz für den hypothetischen Zustand der Behandlungsgruppe, wenn keine Behandlung erfolgt wäre. Dies ist die Definition eines ATT --- ein average treatment effect *on the treated*.
 
-```{webr-r}
+Für Matching-Verfahren (`ATT_mod`) sind die von `summary()` berechneten Standardfehler (und damit Konfidenzintervalle, t-Statistiken und p-Werte) für den Behandlungseffekt *grundsätzlich ungültig*. Je nach Matching-Verfahren liegen unterschiedliche Quellen von Schätzunsicherheit vor, die bei der Berechnung von Standardfehlern zusätzlich zu der "üblichen" Stichproben-Variabilität berücksichtig werden müssen, bspw. aufgrund der Schätzung von Propensity Scores und der Matching-Prozess ansich. Wir nutzen daher nachfolgende Funktionen gem. Empfehlungen aus der aktuellen Forschung für Standardfehlerberechnung.
+
+```{r}
 library(marginaleffects)
 
-# Inferenz Multiple Regression bei ungematchten Beobachtungen
-# identisch zu 'coeftest(ATT_mod_org, vcovHC, type = "HC3")'
-avg_comparisons(
-  model = ATT_mod_org,
-  variables = "dark_mode",
-  vcov = "HC3", # Heteroskedastie-robuster SE
-  newdata = subset(darkmode, dark_mode == 1) # Identifiziert Kontrollgruppe
+# Inferenz: Multiple Regression bei ungematchten Beobachtungen
+(
+  sum_orig <- avg_comparisons(
+    model = ATT_mod_org,
+    variables = "dark_mode",
+    # Heteroskedastie-robuste SE:
+    vcov = "HC3", 
+    # Identifizierung der Kontrollgruppe:
+    newdata = subset(darkmode, dark_mode == 1) 
+  )
 ) 
 
-# Inferenz Multiple Regression bei _gematchten_ Beobachtungen
-avg_comparisons(
-  model = ATT_mod,
+# Inferenz: Multiple Regression bei CEM
+(
+  sum_CEM <- avg_comparisons(
+  model = ATT_mod_CEM ,
   variables = "dark_mode",
-  vcov = ~subclass, # cluster robust SE > als oben => mehr Unsicherheit
-  newdata = subset(darkmode_matched, dark_mode == 1),
+  # Cluster-robuster SE
+  vcov = ~ subclass, 
+  newdata = subset(darkmode_matched_CEM, dark_mode == 1),
   wts = "weights"  # = 1
+  )
 )
-# ( Weights = 1 wg. 1:1-Matching.
-# Anzahl subclasses = Anzahl gematchter treatment/control units )
+
+# Inferenz: Multiple Regression bei PSM
+(
+  sum_PSC <- avg_comparisons(
+    model = ATT_mod_PSC ,
+    variables = "dark_mode",
+    vcov = ~ subclass, 
+    newdata = subset(darkmode_matched_PSC, dark_mode == 1),
+    wts = "weights"  # = 1
+  )
+)
 ```
 
+```{r}
+library(modelsummary)
+modelsummary(
+  models = list(sum_orig, sum_CEM, sum_PSC)
+)
+```
 
 
 ## Inferenz für ATT/ATE: Propensity-Score-Matching mit Bootstrap
@@ -658,16 +865,22 @@ Ein Bootstrap-Verfahren generiert mit Resampling (wiederholtes Ziehen mit Zurüc
 
 Wir Implementieren nun einen Bootstrap-Schätzer des ATT als `R`-Funktion `boot_fun()`.
 
-```{webr-r}
+```{r}
 boot_fun <- function(data, i) {
   
   boot_data <- data[i, ]
   
   # 1:1 PS Matching _mit_ Zurücklegen
-  match_res <- matchit(dark_mode ~ age + hours + male,
-                       data = boot_data,
-                       caliper = .25,
-                       replace = TRUE) # Zurücklegen
+  match_res <- matchit(
+    dark_mode ~ age + hours + male,
+    estimand = "ATT",
+    distance = "glm", 
+    method = "nearest", 
+    caliper = .3,
+    data = boot_data,
+    # mit Zurücklegen:
+    replace = TRUE
+  ) 
   
   # Gematchten Datensatz zuweisen
   darkmode_matched <- match.data(match_res, data = boot_data)
@@ -686,12 +899,11 @@ boot_fun <- function(data, i) {
 }
 ```
 
-
 Abadie & Imbens (2008) zeigen analytisch, dass ein Standard-Bootstrap bei Matching grundsätzlich ungültig ist: Die unbekannte Varianz der Stichprobenverteilung des Matching-Schätzers (und damit der Standardfehler des Schätzers) kann durch den Bootstrap nicht repliziert werden. Problematisch hierbei sind grundsätzlich zu liberale (d.h. zu große) mit dem Bootstrap berechnete Standardfehler. Es gibt jedoch Simulationsnachweise die zeigen, dass Bootstrap-Standardfehler bei Matching mit Zurücklegen konservativ sind (Bodory et al., 2020), also tendentiell zu kleine Standardfehler produzieren und damit das gewünschte nominale Signifikanzniveau eines Bootstrap-Hypothesentests nicht überschritten wird.
 
 Wir berechnen nun eine Bootstrap-Schätzung des ATT von `dark_mode` auf `readingtime` sowie den zugehörigen Standardfehler und ein 95%-KI mit der zuvor definierten Funktion `boot_fun`.
 
-```{webr-r}
+```{r}
 library("boot")
 set.seed(4321)
 boot_out <- boot(darkmode, boot_fun, R = 999)
@@ -699,7 +911,7 @@ boot_out <- boot(darkmode, boot_fun, R = 999)
 boot_out
 ```
 
-```{webr-r}
+```{r}
 # Bootstrap-Schätzer für den Treatment-Effekt
 mean(boot_out$t) 
 # = mean(t0) + bias = mean(Bootstrap_samples)
@@ -712,12 +924,11 @@ sd(boot_out$t)
 boot.ci(boot_out, type = "perc")
 ```
 
-
 ## Doubly-Robust-Schätzer für ATT/ATE
 
 Implementieren und berechnen Sie einen Doubly-Robust-Schätzer des ATT (vgl. Wooldridge, 2010) für den kausalen Effekt in Aufgabe 5. Vergleichen Sie mit den Ergebnissen der Aufgaben 1 (d), 4 (f) und 5 (d).
 
-```{webr-r}
+```{r}
 # IPW estimation with regression adjustment
 ipwra <- function(br, index = 1:nrow(br)) {
     # slice bootstrapped observations
@@ -732,19 +943,28 @@ ipwra <- function(br, index = 1:nrow(br)) {
         mutate(ps = predict(m, type = 'response'))
     
     # trim control observations outside of treated PS range
-    minps <- br %>%
-        filter(dark_mode == 1) %>%
-        pull(ps) %>%
-        min(na.rm = TRUE)
-    
-    maxps <- br %>%
-        filter(dark_mode == 1) %>%
-        pull(ps) %>%
-        max(na.rm = TRUE)
-    
-    # do the trimming
+    # minps <- br %>%
+    #     filter(dark_mode == 1) %>%
+    #     pull(ps) %>%
+    #     min(na.rm = TRUE)
+    # 
+    # maxps <- br %>%
+    #     filter(dark_mode == 1) %>%
+    #     pull(ps) %>%
+    #     max(na.rm = TRUE)
+    # 
+    # # do the trimming
+    # br <- br %>%
+    #     filter(ps >= minps & ps <= maxps)
+   
     br <- br %>%
-        filter(ps >= minps & ps <= maxps)
+      filter(
+        between(
+          x = ps,
+          left = .2,
+          right = .7
+          )
+    )
     
     # compute IPWs
     br <- br %>%
@@ -782,14 +1002,19 @@ ipwra <- function(br, index = 1:nrow(br)) {
 }
 ```
 
-```{webr-r}
+```{r}
 b <- boot(data = darkmode, ipwra, R = 999)
 # Bootstrap estimate and standard error
 mean(b$t)
 sd(b$t)
+# 95% Bootstrap-KI für den Treatment-Effekt
+boot.ci(b, type = "perc")
 ```
 
+
+
 \vfill
+
 # Literatur
 
 Abadie, Alberto, and Guido W. Imbens. (2008). *On the Failure of the Bootstrap for Matching Estimators.*Econometrica 76 (**6**): 1537–57.
@@ -797,6 +1022,3 @@ Abadie, Alberto, and Guido W. Imbens. (2008). *On the Failure of the Bootstrap f
 Bodory, H., Camponovo, L., Huber, M., & Lechner, M. (2020). *The Finite Sample Performance of Inference Methods for Propensity Score Matching and Weighting Estimators*. Journal of Business & Economic Statistics, 38(**1**), 183–200.
 
 Wooldridge, J. M. (2010). *Econometric analysis of cross section and panel data*. MIT press.
-
-
-

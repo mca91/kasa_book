@@ -158,6 +158,16 @@
 \usepackage{makecell}
 \usepackage{xcolor}
 \usepackage{caption}
+\usepackage{siunitx}
+
+  \newcolumntype{d}{S[
+    input-open-uncertainty=,
+    input-close-uncertainty=,
+    parse-numbers = false,
+    table-align-text-pre=false,
+    table-align-text-post=false
+  ]}
+  
 \usepackage{lscape}
 \newcommand{\blandscape}{\begin{landscape}}
 \newcommand{\elandscape}{\end{landscape}}
@@ -289,7 +299,7 @@ breaksymbolleft={},
 breaklines
 }
 
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, boxrule=0pt, interior hidden, frame hidden, breakable, enhanced, borderline west={3pt}{0pt}{shadecolor}]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, frame hidden, interior hidden, borderline west={3pt}{0pt}{shadecolor}, breakable, boxrule=0pt, enhanced]}{\end{tcolorbox}}\fi
 
 \renewcommand*\contentsname{Inhaltsverzeichnis}
 {
@@ -442,7 +452,7 @@ Tabelle~\ref{tbl-Klausurergebnisse} händisch als R-Objekt der Klasse
 Variable \emph{Modul}. Der Datensatz liegt also \emph{nicht} im s.g.
 \emph{Tidy-Format} vor.
 
-\begin{tcolorbox}[enhanced jigsaw, colbacktitle=quarto-callout-tip-color!10!white, bottomtitle=1mm, breakable, leftrule=.75mm, opacityback=0, title=\textcolor{quarto-callout-tip-color}{\faLightbulb}\hspace{0.5em}{Tidy-Format}, left=2mm, arc=.35mm, titlerule=0mm, bottomrule=.15mm, opacitybacktitle=0.6, coltitle=black, toptitle=1mm, colback=white, colframe=quarto-callout-tip-color-frame, toprule=.15mm, rightrule=.15mm]
+\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, left=2mm, coltitle=black, leftrule=.75mm, toprule=.15mm, titlerule=0mm, bottomrule=.15mm, colframe=quarto-callout-tip-color-frame, breakable, opacitybacktitle=0.6, bottomtitle=1mm, arc=.35mm, colback=white, colbacktitle=quarto-callout-tip-color!10!white, toptitle=1mm, opacityback=0, title=\textcolor{quarto-callout-tip-color}{\faLightbulb}\hspace{0.5em}{Tidy-Format}]
 
 Tidy-Format: Jede Spalte ist \textbf{\emph{eine}} Variable, jede Reihe
 ist \textbf{\emph{eine}} Beobachtung und jede Zelle enthält einen
@@ -1171,19 +1181,247 @@ die drei Arten über die Inseln verteilt sind.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{\#| context: setup}
+\NormalTok{webr::install("dplyr")}
+\NormalTok{webr::install("tidyr")}
+
 \NormalTok{\# create dataset directory}
 \NormalTok{dir.create("datasets")}
 \NormalTok{\# Download the dataset}
 \NormalTok{download.file(}
-\NormalTok{    "https://raw.githubusercontent.com/mca91/kasa\_data/main/darkmode.csv",}
-\NormalTok{    \textquotesingle{}datasets/darkmode.csv\textquotesingle{}}
+\NormalTok{    "https://raw.githubusercontent.com/mca91/kausal\_data/main/darkmode.csv",}
+\NormalTok{    \textquotesingle{}datasets/darkmode.csv\textquotesingle{},}
 \NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{einfluss-von-darkmode-auf-blog-lesezeit}{%
-\section{Einfluss von Darkmode auf
-Blog-Lesezeit}\label{einfluss-von-darkmode-auf-blog-lesezeit}}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\#| context: setup}
+\NormalTok{library(dplyr)}
+\NormalTok{\# make darkmode available using read.csv for now}
+\NormalTok{\# because there\textquotesingle{}s some issue with readr::read\_csv}
+\NormalTok{\# I can\textquotesingle{}t fix right now}
+\NormalTok{darkmode \textless{}{-} read.csv(}
+\NormalTok{    file = "datasets/darkmode.csv", }
+\NormalTok{    colClasses = c("numeric", "logical", "numeric", "numeric", "numeric") }
+\NormalTok{)}
+
+\NormalTok{options(pillar.bold = TRUE, pillar.subtle = FALSE)}
+\end{Highlighting}
+\end{Shaded}
+
+In randomisierten kontrollierten Studien stellt eine randomisierte
+Behandlung sicher, dass die Individuen beider Gruppen im Mittel
+vergleichbar sind, dass heißt es gibt keine systematischen Unterschiede
+der Studiensubjekte hinsichtlich der Verteilung von Charakteristika
+zwischen den Gruppen. Dann ist es plausibel eine beobachtete mittlere
+Differenz in der Outcome-Variable alleine auf die Behandlung
+zurückzuführen.
+
+In der Praxis, insbesondere in ökonomischen Studien, sind randomisierte
+kontrollierte Studien aus ethischen und/oder finanziellen Gründen nicht
+durchführbar. Stattdessen werden nicht-experimentelle Daten genutzt, die
+jedoch nur sehr selten eine Vergleichbarkeit von Behandlungs- und
+Kontrollgruppe gewährleisten.
+
+In diesem Kapitel betrachten wir Methoden, die in solchen
+Forschungsdesigns -- bei hinreichenden Informationen über die
+Studiensubjekte -- eine Schätzung kausaler Effekte ermöglichen, indem
+eine Vergleichbarkeit von Behandlungs- und Kontrollgruppe hergestellt
+wird. Dies kann durch eine gezielte Gewichtung von Beobachtungen anhand
+invididueller Merkmale bei der Schätzung des Behandlungseffekts
+erfolgen. Andere etablierte Methoden schätzen den kausalen Effekt nach
+Selektion von vergleichbaren Teilmengen von Subjekten beider Gruppen aus
+der ursprünglichen Stichprobe, sogenanntes \emph{Matching}.
+
+Da \emph{Matching} ähnliche Beobachtungen basierend auf beobachtbaren
+Merkmalen vergleicht, kann die Wahrscheinlichkeit einer verzerrten
+Schätzung des kausalen Effekt durch falsche Modellspezifikationen
+geringer sein als für eine Schätzung des Effekts anhand multipler
+Regression. Weiterhin basieren Matching-Methoden nicht auf der Annahme
+eines linearen Zusammenhangs zwischen Kovariablen und der erklärenden
+Variable und können für die Schätzung unterschiedlicher Spezifikationen
+von Behandlungseffekten herangezogen werden.
+
+Für die Gültigkeit eines Schätzers basierend auf \emph{Matching} sind
+zwei Annahmen erforderlich.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{\emph{Bedingte Unabhängigkeit.}} Seien \(Y^{(0)}_i\) und
+  \(Y^{(1)}_i\) potentielle Ergebnisse der Outcome-Variable \(Y\) für
+  ein Subjekt \(i\) mit \(B_i=0\) (keine Zuweisung zur Behandlung)
+  beziehungsweise \(B_i=1\) (Behandlung) und \(X_i\) die beobachteten
+  Kovariablen. Wir nehmen an, dass \begin{align}
+    \left\{Y^{(0)}_i, Y^{(1)}_i\right\} \perp B_i\vert X_i, \label{eq:cia}
+  \end{align} d.h. die Behandlungszuweisung/-selektion ist unanabhängig
+  von den potentielle Ergebnissen \(Y^{(0)}_i\) und \(Y^{(1)}_i\), wenn
+  wir für die Kovariablen \(X\) kontrollieren.
+\item
+  \textbf{\emph{Überlappung.}} Für jede mögliche Kombination von
+  Kovariablen \(X_i\) gibt es eine positive Wahrscheinlichkeit \(<1\),
+  sowohl zur Behandlungsgruppe (\(B_i = 1\)) als auch zur Kontrollgruppe
+  (\(B_i = 0\)) zugewiesen zu werden, \begin{align}
+    0 < \text{P}(B_i=1\lvert X_i) < 1, \label{eq:overlap}
+  \end{align} d.h. keine Beobachtung hat eine
+  Behandlungswahrscheinlichkeit von exakt \(0\) oder \(1\).
+\end{enumerate}
+
+Annahme 1 stellt sicher, dass die Zuweisung zur Behandlungsgruppe nach
+Kontrolle für die Kovariablen \(X\) als zufällig betracht werden kann.
+Somit ist es möglich den kausalen Effekt der Behandlung zu
+identifizieren, indem wir hinsichtlich der Kovariablen \(X\) ähnliche
+Subjekte (vgl. Annahme 2) aus Kontroll- und Behandlungsgruppe
+vergleichen.
+
+Annahme 2 setzt vorraus, dass es eine ausreichende Überlappung in den
+Verteilungen der Kovariablen zwischen Behandlungs- und Kontrollgruppe
+gibt. Dann ist sichergestellt, dass für jedes Subjekt in einer Gruppe
+ein hinsichtlich seiner Charakteristika vergleichbares Subjekt in der
+anderen Gruppe geben kann, sodass ein Vergleich möglich ist.
+
+\hypertarget{sec-balance}{%
+\section{\texorpdfstring{\emph{Balance}: Vergleichbarkeit von
+Behandlungs- und
+Kontrollgruppe}{Balance: Vergleichbarkeit von Behandlungs- und Kontrollgruppe}}\label{sec-balance}}
+
+Der Lehrstuhl für Ökonometrie an der Universität Duisburg-Essen betreibt
+einen Ökonometrie-Blog und interessiert sich für den kausalen Effekt der
+Einführung eines
+\href{https://en.wikipedia.org/wiki/Wikipedia:Dark_mode}{darkmode} auf
+die Verweildauer der User auf der Webseite. Die Webseite ist zwar
+nicht-kommerziell, hat sich allerdings insb. für die Aquise
+internationaler Studierender für den Studiengang MSc. Econometrics als
+wichtiges Marketing-Instrument erwiesen. Ein anprechendes Design wird
+daher als hoch-relevant erachtet.
+
+Idealerweise sollte der Effekt des Design-Relaunches auf die
+Nutzungsintensität in einem kontrollierten randomisierten Experiment
+untersucht werden. Hierbei würden wir Nutzern zufällig das neue oder das
+alte Design zuweisen und den Effekt als Differnz des durchschnittlichen
+Verweildauer für die Gruppen bestimmen. Eine solche Studie ist jedoch
+aus technischen und finanziellen Gründen nicht realisierbar, sodass die
+Auswirkungen des darkmode mit vorliegenden nicht-experimenellen
+Nutzungsstatistiken für die Webseite geschätzt werden sollen.
+
+Die Nutzungsstatistiken sind im Datensatz
+\href{https://raw.githubusercontent.com/mca91/kasa_data/main/darkmode.csv}{\emph{darkmode.csv}}
+enthalten und sollen der Analyse des Effekts des darkmode
+(\texttt{dark\_mode}) auf die Verweildauer der Leser auf der Webseite
+(\texttt{read\_time}) dienen.
+
+Tabelle~\ref{tbl-darkmode} zeigt die Definitionen der Variablen in
+\emph{darkmode.csv}.
+
+\hypertarget{tbl-darkmode}{}
+\begin{longtable}{ll}
+\caption{\label{tbl-darkmode}Variablen im Datensatz \emph{darkmode} }\tabularnewline
+
+\toprule
+Variable & Beschreibung \\ 
+\midrule\addlinespace[2.5pt]
+read\_time & Lesezeit (Minuten/Woche) \\ 
+dark\_mode & Indikator: Beobachtung nach Einführung darkmode \\ 
+male & Indikator: Individuum männlich \\ 
+age & Alter (in Jahren) \\ 
+hours & Bisherige Verweildauer auf der Seite \\ 
+\bottomrule
+\end{longtable}
+
+Für die Analyse lesen wir zunächst den Datensatz \emph{darkmode.csv} mit
+\texttt{readr::read\_csv()} ein und verschaffen uns einen Überblick über
+die verfügbaren Variablen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Paket \textasciigrave{}tidyverse\textasciigrave{} laden}
+\FunctionTok{library}\NormalTok{(tidyverse)}
+
+\CommentTok{\# Datensatz \textquotesingle{}darkmode\textquotesingle{} einlesen}
+\NormalTok{darkmode }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}
+  \AttributeTok{file =} \StringTok{"datasets/darkmode.csv"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{dark\_mode} hat den Typ \texttt{logical}. Mit
+\texttt{dplyr::mutate\_all()} können wir komfortabel alle Spalten in den
+Typ \texttt{numeric} transformieren.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Alle Variablen zu typ \textquotesingle{}numeric\textquotesingle{} formatieren...}
+\NormalTok{darkmode }\OtherTok{\textless{}{-}}\NormalTok{ darkmode }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{mutate\_all}\NormalTok{(}\AttributeTok{.funs =}\NormalTok{ as.numeric)}
+
+\CommentTok{\# ... und überprüfen}
+\FunctionTok{glimpse}\NormalTok{(darkmode)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Rows: 300
+Columns: 5
+$ read_time <dbl> 14.4, 15.4, 20.9, 20.0, 21.5, 19.5, 22.0, 17.4, 23.6, 15.7, ~
+$ dark_mode <dbl> 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, ~
+$ male      <dbl> 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, ~
+$ age       <dbl> 43, 55, 23, 41, 29, 64, 18, 53, 59, 53, 43, 38, 42, 23, 39, ~
+$ hours     <dbl> 65.6, 125.4, 642.6, 129.1, 190.2, 185.3, 333.5, 279.3, 1302.~
+\end{verbatim}
+
+Eine naive Schätzung des durchschnittlichen Behandlungseffekts (ATE)
+\(\widehat{\tau}^{\text{naiv}}\) erhalten wir als Mittelwertdifferenz
+von \texttt{read\_time} für die Behandlungsgruppe
+(\texttt{dark\_mode\ ==\ 1}) und die Kontrollgruppe
+(\texttt{dark\_mode\ ==\ 0}) \begin{align}
+  \widehat{\tau}^{\text{naiv}} = \overline{\text{read\_time}}_{\text{Behandlung}} - \overline{\text{read\_time}}_{\text{Kontrolle}}.\label{eq:naivATEdarkmode}
+\end{align}
+
+Diese Berechnung ist schnell mit R durchgeführt.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Naiver Schätzer für ATE: }
+\CommentTok{\# Differenz der Gruppen{-}Durchschnitte}
+
+\CommentTok{\# Outcome in Behandlungsgruppe}
+\NormalTok{read\_time\_mTG }\OtherTok{\textless{}{-}}\NormalTok{ darkmode }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(dark\_mode }\SpecialCharTok{==} \DecValTok{1}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{pull}\NormalTok{(}\StringTok{"read\_time"}\NormalTok{)}
+
+\CommentTok{\# Outcome in Kontrollgruppe}
+\NormalTok{read\_time\_mKG }\OtherTok{\textless{}{-}}\NormalTok{ darkmode }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(dark\_mode }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{pull}\NormalTok{(}\StringTok{"read\_time"}\NormalTok{)}
+
+\CommentTok{\# Mittelwert{-}Differenz}
+\FunctionTok{mean}\NormalTok{(read\_time\_mTG) }\SpecialCharTok{{-}} \FunctionTok{mean}\NormalTok{(read\_time\_mKG)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] -0.4446331
+\end{verbatim}
+
+Die Schätzung ergibt einen negativen Behandlungseffekt, mit der
+Interpreation, dass das neue Design zu einer Reduktion der Lesezeit um
+etwa 0.44 Minuten pro Woche führt. Dieses Ergebnis ist allerdings
+zweifelhaft, weil eine Isolierung des Behandlungseffekts aufgrund von
+Backdoor-Pfaden im DGP vermutlich nicht gewähleistet ist. Ein Indikator
+hierfür sind systematische Unterschiede hinsichtlich von (möglicherweise
+unbeobachtbaren) Charakteristika von Kontrollgruppe und
+Behandlungsgruppe.
+
+Da die User sich beim Aufrufen der Seite aktiv für oder gegen den das
+neue Design entscheiden müssen (und somit selektieren, ob Sie in der
+Behandlungs- oder Kontrollgruppe landen), liegt wahrscheinlich
+\emph{Confounding} vor: Unsere Hypothese ist zunächst, dass männliche
+User eine durchschnittlich längere Lesezeit aufweisen \emph{und} mit
+größerer Wahrscheinlichkeit auf das neue Design wechseln als
+nicht-männliche Leser. Dann ist \texttt{male} eine Backdoor-Variable.
+Diese Situation ist unter der Annahme, dass nur diese Faktoren den DGP
+bestimmen, in Abbildung~\ref{fig-maleCDdarkmode} dargestellt.
 
 \begin{figure}
 
@@ -1199,42 +1437,346 @@ Blog-Lesezeit}\label{einfluss-von-darkmode-auf-blog-lesezeit}}
 
 }
 
-\caption{\label{fig-CDdarkmode}Geschlecht ist Backdoor-Pfad}
+\caption{\label{fig-maleCDdarkmode}Backdoor durch `male' im
+Website-Design-Bespiel}
 
 \end{figure}
 
-Wir lesen zunächst den Datensatz \emph{darkmode.csv} ein und verschaffen
-uns einen Überblick über die verfügbaren Variablen.
+Der DGP in Abbildung~\ref{fig-maleCDdarkmode} führt zu einer verzerrten
+Schätzung des kausalen Effekts von \texttt{dark\_mode} auf
+\texttt{read\_time} mit \eqref{eq:naivATEdarkmode}, wenn das Verhältnis
+von männlichen und nicht-männlichen Usern in Bahandlungs- und
+Kontrollgruppe nicht ausgeglichen ist. Wir überprüfen dies mit R.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{library(tidyverse)}
-
-\NormalTok{\# Datensatz \textquotesingle{}darkmode\textquotesingle{} einlesen}
-\NormalTok{darkmode \textless{}{-} read\_csv(}
-\NormalTok{  file = "datasets/darkmode.csv", }
-\NormalTok{  show\_col\_types = F}
+\CommentTok{\# Anteile männlicher und nicht{-}männlicher User}
+\NormalTok{(}
+\NormalTok{  anteile }\OtherTok{\textless{}{-}}\NormalTok{ darkmode }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{group\_by}\NormalTok{(dark\_mode) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{gesamt =} \FunctionTok{n}\NormalTok{(),}
+    \AttributeTok{ant\_m =} \FunctionTok{mean}\NormalTok{(male),}
+    \AttributeTok{ant\_nm =} \DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ ant\_m,}
+    \AttributeTok{anz\_m =} \FunctionTok{sum}\NormalTok{(male),}
+    \AttributeTok{anz\_nm =}\NormalTok{ gesamt }\SpecialCharTok{{-}}\NormalTok{ anz\_m}
+\NormalTok{    )}
 \NormalTok{)}
-
-\NormalTok{\# Überblick verschaffen}
-\NormalTok{glimpse(darkmode)}
 \end{Highlighting}
 \end{Shaded}
 
-\texttt{dark\_mode} hat den Typ \texttt{logical}. Mit
-\texttt{dplyr::mutate\_all()} können wir komfortabel alle Spalten in den
-Typ \texttt{numeric} transformieren.
+\begin{verbatim}
+# A tibble: 2 x 6
+  dark_mode gesamt ant_m ant_nm anz_m anz_nm
+      <dbl>  <int> <dbl>  <dbl> <dbl>  <dbl>
+1         0    151 0.338  0.662    51    100
+2         1    149 0.658  0.342    98     51
+\end{verbatim}
+
+Die Zusammenfassung \texttt{anteile\_m} zeigt, dass der Anteil
+männlicher User in der Behandlungsgruppe deutlich höher ist als in der
+Kontrollgruppe.
+
+Matching eliminiert die Variation von \texttt{male} zwischen den
+Gruppen. Eine Möglichkeit hierfür ist die Gewichtung der Beobachtungen
+in der Kontrollgruppe entsprechend der Anteile von Männern und
+Nicht-Männern in der Behandlungsgruppe, sodass die Vergleichbarkeit mit
+der Behandlungsgruppe hinsichtlich des Geschlechts gewährleistet ist.
+Dies wird in der Literatur als \emph{Balance} bezeichnet. Der
+Behandlungseffekt wird dann analog zu \eqref{eq:naivATEdarkmode}
+geschätzt.
+
+Die Gewichte für Beobachtungen in der Kontrollgruppe \(w_i\) werden
+berechnet als \begin{align}
+  w_i = 
+  \begin{cases}
+    \text{ant\_m}_B/\text{anz\_m}_{K}, & \text{falls } \text{male}_i = 1\\
+        \text{ant\_nm}_B/\text{anz\_nm}_{K}, & \text{sonst.}\\
+  \end{cases}\label{eq:darkmodeweights}
+\end{align} Anhand der Formel für einen gewichteten Durchschnitt,
+\begin{align}
+  \overline{X}_w = \frac{\sum_i w_i \cdot X_i}{\sum_i w_i},
+\end{align} berechnen wir die gewichteten Mittelwerte für \texttt{male}
+und \texttt{read\_time} in der Kontrollgruppe.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{\# Alle Variablen zu typ \textquotesingle{}numeric\textquotesingle{} formatieren...}
-\NormalTok{darkmode \textless{}{-} darkmode \%\textgreater{}\% }
-\NormalTok{  mutate\_all(.funs = as.numeric)}
+\CommentTok{\# Anteile und Anzahlen aus \textasciigrave{}anteile\textasciigrave{} auslesen}
+\NormalTok{anz\_m\_K }\OtherTok{\textless{}{-}}\NormalTok{ anteile }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(dark\_mode }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(anz\_m)}
 
-\NormalTok{\# ... und überprüfen}
-\NormalTok{glimpse(darkmode)}
+\NormalTok{anz\_nm\_K }\OtherTok{\textless{}{-}}\NormalTok{ anteile }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(dark\_mode }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(anz\_nm)}
+
+\NormalTok{ant\_m\_B }\OtherTok{\textless{}{-}}\NormalTok{ anteile }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(dark\_mode }\SpecialCharTok{==} \DecValTok{1}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(ant\_m)}
+
+\NormalTok{ant\_nm\_B }\OtherTok{\textless{}{-}}\NormalTok{ anteile }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(dark\_mode }\SpecialCharTok{==} \DecValTok{1}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(ant\_nm)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Gewichtete Mittel für Kontrollgruppe berechnen}
+\NormalTok{(}
+\NormalTok{gew\_K }\OtherTok{\textless{}{-}}\NormalTok{ darkmode }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(dark\_mode }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{select}\NormalTok{(read\_time, male) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{w =} \FunctionTok{ifelse}\NormalTok{(}
+\NormalTok{    male }\SpecialCharTok{==} \DecValTok{1}\NormalTok{, }
+\NormalTok{    ant\_m\_B}\SpecialCharTok{/}\NormalTok{anz\_m\_K, }
+\NormalTok{    ant\_nm\_B}\SpecialCharTok{/}\NormalTok{anz\_nm\_K)}
+\NormalTok{    ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{male\_k =} \FunctionTok{sum}\NormalTok{(male }\SpecialCharTok{*}\NormalTok{ w) }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(w),}
+    \AttributeTok{mean\_read\_time\_wK =} \FunctionTok{sum}\NormalTok{(read\_time }\SpecialCharTok{*}\NormalTok{ w) }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(w)}
+\NormalTok{  )}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+# A tibble: 1 x 2
+  male_k mean_read_time_wK
+   <dbl>             <dbl>
+1  0.658              18.1
+\end{verbatim}
+
+Ein Vergleich des gewichteten Mittelwertes von \texttt{male} in der
+Kontrollgruppe mit dem Mittelwert in der Behandlungsgruppe
+(\texttt{male\_k}) zeigt, dass die Gewichte die Variation in
+\texttt{male} zwischen beiden Gruppen eliminieren, sodass die Backdoor
+durch \texttt{male} geschlossen ist. Mit \texttt{wmean\_read\_time\_K}
+haben wir einen entsprechend gewichteten Mittelwert der Verweildauer für
+die Kontrollgruppe berechnet. Wir schätzen den Behandlungseffekt nun als
+\begin{align}
+  \widehat{\tau}^{\text{w}} = \overline{\text{read\_time}}_{B} - \overline{\text{read\_time}}_{w,K}.\label{eq:weightedATEdarkmode}
+\end{align}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mean}\NormalTok{(read\_time\_mTG)  }\SpecialCharTok{{-}}\NormalTok{ gew\_K}\SpecialCharTok{$}\NormalTok{mean\_read\_time\_wK}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] 0.6383579
+\end{verbatim}
+
+Entgegen der naiven Schätzung andhand von \eqref{eq:naivATEdarkmode}
+erhalten wir nach Matching für \texttt{male} eine positive Schätzung des
+Behandlungseffekts von etwa \(0.64\).
+
+Die Schätzung des Behandlungseffekts anhand von
+\eqref{eq:weightedATEdarkmode} entspricht dem geschätzten Koeffizienten
+\(\widehat{\beta}_1\) aus einer gewichteten KQ-Regression im Modell
+\begin{align*}
+  \text{read\_time} = \beta_0 + \beta_1 \text{dark\_mode} + u,
+\end{align*} wobei die Beobachtungen der Kontrollgruppe wie in
+\eqref{eq:darkmodeweights} gewichtet werden und \(w_i=1\) für
+Beobachtungen der Behandlungsgruppe ist. Wir überprüfen dies mit R.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{darkmode\_w }\OtherTok{\textless{}{-}}\NormalTok{ darkmode }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{w =} \FunctionTok{case\_when}\NormalTok{(}
+\NormalTok{      male }\SpecialCharTok{==} \DecValTok{1} \SpecialCharTok{\&}\NormalTok{ dark\_mode }\SpecialCharTok{==} \DecValTok{0} \SpecialCharTok{\textasciitilde{}}\NormalTok{ ant\_m\_B}\SpecialCharTok{/}\NormalTok{anz\_m\_K,}
+\NormalTok{      male }\SpecialCharTok{==} \DecValTok{0} \SpecialCharTok{\&}\NormalTok{ dark\_mode }\SpecialCharTok{==} \DecValTok{0} \SpecialCharTok{\textasciitilde{}}\NormalTok{ ant\_nm\_B}\SpecialCharTok{/}\NormalTok{anz\_nm\_K,}
+\NormalTok{      T }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}
+\NormalTok{    )}
+\NormalTok{  ) }
+
+\FunctionTok{lm}\NormalTok{(read\_time }\SpecialCharTok{\textasciitilde{}}\NormalTok{ dark\_mode, }\AttributeTok{weights =}\NormalTok{ w, }\AttributeTok{data =}\NormalTok{ darkmode\_w) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summary}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+
+Call:
+lm(formula = read_time ~ dark_mode, data = darkmode_w, weights = w)
+
+Weighted Residuals:
+     Min       1Q   Median       3Q      Max 
+-11.4302  -0.6929   0.0814   0.7230  12.8698 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  18.0918     3.4796   5.199 3.72e-07 ***
+dark_mode     0.6384     3.4912   0.183    0.855    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 3.48 on 298 degrees of freedom
+Multiple R-squared:  0.0001122, Adjusted R-squared:  -0.003243 
+F-statistic: 0.03343 on 1 and 298 DF,  p-value: 0.855
+\end{verbatim}
+
+Der geschätzte Koeffizient von \texttt{dark\_mode} entspricht
+\(\widehat{\tau}^w\).
+
+Da \texttt{male} eine binäre Variable ist, reduziert sich eine
+Beurteilung der Vergleichbarkeit der Verteilungen von \texttt{male} in
+Behandlungs- und Kontrollgruppe auf einen simplen Vergleich des
+Männeranteils beider Gruppen. In der Praxis gibt es meist eine Vielzahl
+potentieller Backdoor-Variablen, die zudem kontinuierlich verteilt sind.
+Es scheint plausibel, dass das Alter der Nutzer sowohl die Akzeptanz des
+Design-Updates als auch die Lesezeit beeinflusst. Die bisherige
+Verweildauer ist mindestens eine plausible Determinante der Lesezeit.
+
+Der erweiterte DGP ist in Abbildung Abbildung~\ref{fig-CDdarkmode}
+dargestellt, wobei der zusätzliche Backdoor-Pfad durch \texttt{age}
+ebenfalls mit roten Pfeilen gekennzeichnet sind.
+
+\begin{figure}
+
+{\centering 
+
+\begin{figure}[H]
+
+{\centering \includegraphics[width=4in,height=3in]{Matching_files/figure-latex/dot-figure-3.png}
+
+}
+
+\end{figure}
+
+}
+
+\caption{\label{fig-CDdarkmode}Erweiterter DGP im
+Website-Design-Beispiel}
+
+\end{figure}
+
+Die Beurteilung der \emph{Balance} von Kontrollgruppe und
+Behandlungsgruppe kann durch eine grafische Gegenüberstellung der
+empirischen Verteilungen der Kovariablen beider Gruppen erfolgen. Wir
+visualisieren die empirischen Verteilungen mit \texttt{ggplot2}. Hierzu
+standardisieren wir \texttt{age} und \texttt{hours} zunächst mit
+\texttt{scale()}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Datensatz für graphische Darstellung formatieren}
+\NormalTok{darkmode\_p }\OtherTok{\textless{}{-}}\NormalTok{ darkmode }\SpecialCharTok{\%\textgreater{}\%} 
+  \CommentTok{\# Standardisierung mit \textquotesingle{}scale()\textquotesingle{}}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{dark\_mode =} \FunctionTok{as\_factor}\NormalTok{(dark\_mode),}
+    \AttributeTok{age =} \FunctionTok{scale}\NormalTok{(age), }
+    \AttributeTok{hours =} \FunctionTok{scale}\NormalTok{(hours)}
+\NormalTok{  )}
+
+\FunctionTok{head}\NormalTok{(darkmode\_p)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+# A tibble: 6 x 5
+  read_time dark_mode  male age[,1] hours[,1]
+      <dbl> <fct>     <dbl>   <dbl>     <dbl>
+1      14.4 0             0  0.0377    -0.591
+2      15.4 0             1  1.11      -0.459
+3      20.9 1             0 -1.74       0.684
+4      20   0             0 -0.141     -0.451
+5      21.5 1             0 -1.21      -0.316
+6      19.5 0             0  1.91      -0.327
+\end{verbatim}
+
+Für \texttt{age} und \texttt{hours} eignen sich die geschätzten
+Dichtefunktionen für einen Vergleich der Verteilungen in Behandlungs-
+und Kontrollgruppe.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Vergleich mit Dichteschätzungen}
+\NormalTok{darkmode\_p }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(dark\_mode, hours, age) }\SpecialCharTok{\%\textgreater{}\%}
+  \CommentTok{\# in langes Format überführen}
+  \FunctionTok{pivot\_longer}\NormalTok{(}\AttributeTok{cols =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{dark\_mode)) }\SpecialCharTok{\%\textgreater{}\%}
+  
+  \FunctionTok{ggplot}\NormalTok{(}
+    \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ value, }\AttributeTok{fill =}\NormalTok{ dark\_mode)}
+\NormalTok{    ) }\SpecialCharTok{+}
+  \FunctionTok{geom\_density}\NormalTok{(}\AttributeTok{alpha =}\NormalTok{ .}\DecValTok{5}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{facet\_wrap}\NormalTok{(}
+    \AttributeTok{facets =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ name, }
+    \AttributeTok{scales =} \StringTok{"free"}\NormalTok{, }
+    \AttributeTok{nrow =} \DecValTok{2}
+\NormalTok{    )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-14-1.pdf}
+
+}
+
+\end{figure}
+
+Die graphische Analyse zeigt deutliche Unterschiede in den Verteilungen
+von \texttt{age} zwischen Kontroll- und Behandlungsgruppe. Für einen
+Beurteilung mit deskriptiven Statistiken wird häufig eine sogenannte
+\emph{Balance Table} herangezogen. Wir berechnen diese für \texttt{age},
+\texttt{hours} und \texttt{male} mit \texttt{cobalt::bal.tab()}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(cobalt)}
+
+\CommentTok{\# Balance table mit \textquotesingle{}cobalt::bal.tab()\textquotesingle{}}
+\FunctionTok{bal.tab}\NormalTok{(}
+  \AttributeTok{x =}\NormalTok{ darkmode }\SpecialCharTok{\%\textgreater{}\%} 
+    \FunctionTok{select}\NormalTok{(age, hours, male), }
+  \AttributeTok{treat =}\NormalTok{ darkmode}\SpecialCharTok{$}\NormalTok{dark\_mode, }
+   \CommentTok{\# berechne SMD für KG und TG:}
+  \AttributeTok{disp =} \StringTok{"m"}\NormalTok{, }
+  \AttributeTok{s.d.denom =} \StringTok{"pooled"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Balance Measures
+         Type   M.0.Un   M.1.Un Diff.Un
+age   Contin.  46.0132  39.0940 -0.6469
+hours Contin. 337.7775 328.5738 -0.0203
+male   Binary   0.3377   0.6577  0.3200
+
+Sample sizes
+    Control Treated
+All     151     149
+\end{verbatim}
+
+Die Einträge \texttt{M.0.Un} und \texttt{M.1.Un} zeigen die jeweiligen
+Stichprobenmittelwerte der Variablen für Kontroll- und
+Behandlungsgruppe. \texttt{Diff.Un} gibt eine standardisierte
+Mittelwertdifferenz \(SMD\) an, wobei \begin{align*}
+  SMD_j := \left(\overline{X}_{j,B} - \overline{X}_{j,K}\right) \bigg/ \sqrt{\frac{1}{2}\left(\widehat{\text{Var}}(X_{j,B}) + \widehat{\text{Var}}(X_{j,K})\right)},
+\end{align*} mit Stichprobenmitteln \(\overline{X}_{j,B}\) und
+\(\overline{X}_{j,K}\) und Stichprobenvarianzen
+\(\widehat{\text{Var}}(X_{j,B})\) und \(\widehat{\text{Var}}(X_{j,K})\)
+für eine kontinuierliche Kovariable \(j\).\footnote{Siehe Austin (2011)
+  für einen Überblick zu Balance-Statistiken.} Obwohl es keinen
+einheitlichen Schwellenwert für die standardisierte Differenz gibt, der
+ein erhebliches Ungleichgewicht anzeigt, gilt für kontinuierliche
+Variablen eine standardisierte (absolute) Differenz von weniger als
+\(0.1\) als Hinweis auf einen vernachlässigbaren Unterschied zwischen
+den Gruppen.
+
+Die Balance Table weist also auf einen vernachlässigbaren Unterschied
+für \texttt{hours} hin und bestätigt den aus den Grafiken abgeleiteten
+Eindruck einer relevanten Differenzen für \texttt{age}.
+
+\hypertarget{mehrere-matching-variablen-und-der-propensity-score}{%
+\subsection{Mehrere Matching-Variablen und der Propensity
+Score}\label{mehrere-matching-variablen-und-der-propensity-score}}
+
+Bei mehreren Backdoor-Variablen kann eine Gewichtung anhand der
+Behandlungswahrscheinlichkeit (\emph{Treatment Propensity}) erfolgen.
+Die Idee hierbei ist, dass der DGP wie in
+Abbildung~\ref{fig-propCDdarkmode} dargestellt werden kann.
 
 \begin{figure}
 
@@ -1250,361 +1792,1088 @@ Typ \texttt{numeric} transformieren.
 
 }
 
-\caption{\label{fig-CDdarkmode2}Möglicher DGP als Kausales Diagramm}
+\caption{\label{fig-propCDdarkmode}Propensity im
+Website-Design-Beispiel}
+
+\end{figure}
+
+Hierbei beeinflussen die Backdoor-Variablen \emph{age} und \emph{male}
+die Behandlungsvariable \emph{dark\_mode} lediglich durch die
+Behandlungswahrscheinlichkeit \emph{Treatment Propensity}. Diese
+Darstellung zeigt, das die mehrdimensionale Information bzgl. der
+Ähnlichkeit von Subjekten hinsichtlich der beobachteten Kovariablen in
+einer einzigen Variable zusammengefasst werden kann. Die Backdoor-Pfade
+können daher geschlossen werden, indem wir Subjekte anhand von
+\emph{Treatment Propensity} derart gewichten, dass beide Gruppen
+hinsichtlich der Verteilung der Behandlungswahrscheinlichkeit
+vergleichbar sind. Betrachte erneut \eqref{eq:cia} und beachte, dass
+\begin{align}
+  Y_i = Y_i^{(1)} D_i + Y_i^{(0)} (1-D_i).
+\end{align} Rosenbaum und Rubin (1983) zeigen, dass es hinsichtlich
+\eqref{eq:cia} äquivalent ist für die \emph{Treatment Propensity}
+\(P_i(X_i):=P(B_i=1\vert X_i = x)\) zu kontrollieren, d.h. \begin{align}
+  \left\{Y_i^{(1)},Y_i^{(0)}\right\} \perp B_i\vert X_i \quad\Leftrightarrow\quad \left\{Y_i^{(1)},Y_i^{(0)}\right\} \perp B_i\vert P_i(X_i).
+\end{align}
+
+Der Behandlungseffekt kann so als Differenz von gewichteten
+Gruppenmittelwerten berechnet werden, mit inversem
+Wahrscheinlichkeitsgewicht (IPW) \(w_{i,B} = 1/P_i(X_i)\) für
+Beobachtungen in der Behandlungsgruppe und \(w_{i,K} = 1/(1-P_i(X_i))\)
+für Beobachtungen in der Kontrollgruppe, \begin{align}
+  \tau^{\text{IPW}} = \frac{1}{n}\sum_{i=1}^n \left[\frac{B_i Y_i}{P_i(X_i)} - \frac{(1-B_i)Y_i}{1-P_i(X_i)} \right].\label{eq:tauipw}
+\end{align}
+
+Grundsätzlich ist \emph{TreatmentPropensity} eine nicht beobachtbare
+Variable und muss daher aus den Daten geschätzt werden. Eine geschätzte
+Behandlungswahrscheinlichkeiten \(\widehat{P}_i(X_i)\) wird als
+\emph{Propensity Score} bezeichnet. In der Praxis erfolgt die Schätzung
+von \emph{Propensity Scores} meist mit logistischer Regression. Ein
+erwartungstreuer Schätzer des ATE ist \begin{align}
+  \widehat{\tau}^{\text{IPW}} = \frac{1}{n}\sum_{i=1}^n \left[\frac{B_i Y_i}{\widehat{P}_i(X_i)} - \frac{(1-B_i)Y_i}{1-\widehat{P}_i(X_i)} \right].\label{eq:hattauipw}
+\end{align} Hirano, Imbens, und Ridder (2003) diskutieren Alternativen
+zu \eqref{eq:hattauipw} für die Schätzung anderer Typen von
+Behandlungseffekten.
+
+Wir schätzen nachfolgend die \emph{Propensity Scores} für unser
+Anwendungsbeispiel, erläutern die Berechnung der Gewichte sowie die
+Schätzung von Behandlungseffekten mit gewichteter Regression. Hierbei
+betrachten wir eine Variante von \eqref{eq:hattauipw} mit normalisierten
+Gewichten \(\tilde{w}_{i,B} = w_{i,B}/\sum_i w_{i,B}\) und
+\(\tilde{w}_{i,K} = w_{i,K}/\sum_i w_{i,K}\) die sich jeweils zu 1
+summieren.\footnote{Eine Normalisierung der Gewichte reduziert die
+  Varianz des Schätzers, vgl. Hirano, Imbens, und Ridder (2003)} Dies
+ergibt den Hájek-Schätzer\footnote{Siehe Hájek (1971).} \begin{align}
+    \widehat{\tau}_N^{\text{IPW}} = \frac{\sum_i\tilde{w}_{i,B}Y_i}{\sum_i\tilde{w}_{i,B}} -  \frac{\sum_i\tilde{w}_{i,K}Y_i}{\sum_i\tilde{w}_{i,K}}.\label{eq:hattauhajek}
+\end{align}
+
+Zunächst Schätzen wir ein logistisches Regressionsmodell mit
+\texttt{age}, \texttt{male} und \texttt{hours} als erklärende Variablen
+für \texttt{dark\_mode}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Logit{-}Modell mit \textquotesingle{}glm()\textquotesingle{} schätzen}
+\NormalTok{(}
+\NormalTok{  darkmode\_ps\_logit }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(}
+    \AttributeTok{formula =}\NormalTok{ dark\_mode }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ hours,}
+    \AttributeTok{data =}\NormalTok{ darkmode,}
+    \AttributeTok{family =}\NormalTok{ binomial}
+\NormalTok{  )}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+
+Call:  glm(formula = dark_mode ~ age + male + hours, family = binomial, 
+    data = darkmode)
+
+Coefficients:
+(Intercept)          age         male        hours  
+  2.330e+00   -7.330e-02    1.623e+00   -9.293e-05  
+
+Degrees of Freedom: 299 Total (i.e. Null);  296 Residual
+Null Deviance:      415.9 
+Residual Deviance: 346.4    AIC: 354.4
+\end{verbatim}
+
+Die \emph{Propensity Scores} erhalten wir als angepasste Werte aus der
+Regression \texttt{darkmode\_ps\_logit} mit \texttt{fitted()}. Wir
+erweitern den Datensatz mit den Ergebnissen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Datensatz um Propensity Scores erweitern}
+\NormalTok{(}
+\NormalTok{  darkmode\_probs }\OtherTok{\textless{}{-}} 
+\NormalTok{    darkmode }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{mutate}\NormalTok{(}
+      \AttributeTok{PS =} \FunctionTok{fitted}\NormalTok{(darkmode\_ps\_logit)}
+\NormalTok{    )}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+# A tibble: 300 x 6
+   read_time dark_mode  male   age  hours     PS
+       <dbl>     <dbl> <dbl> <dbl>  <dbl>  <dbl>
+ 1      14.4         0     0    43   65.6 0.304 
+ 2      15.4         0     1    55  125.  0.478 
+ 3      20.9         1     0    23  643.  0.642 
+ 4      20           0     0    41  129.  0.335 
+ 5      21.5         1     0    29  190.  0.547 
+ 6      19.5         0     0    64  185.  0.0849
+ 7      22           1     0    18  334.  0.727 
+ 8      17.4         0     0    53  279.  0.171 
+ 9      23.6         0     0    59 1303.  0.108 
+10      15.7         0     0    53   16.1 0.174 
+# i 290 more rows
+\end{verbatim}
+
+Zur Beurteilung der Überlappung (vgl. Annahme \eqref{eq:overlap} können
+wir die Verteilung der \emph{Propensity Scores} nach
+Behandlungs-Indikator mit Histogrammen visualisieren.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Überlappung prüfen:}
+\CommentTok{\# Histogramme der PS nach Treatment{-}Indikator}
+\NormalTok{darkmode\_probs }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ggplot}\NormalTok{(}
+    \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}
+      \AttributeTok{x =}\NormalTok{ PS, }
+      \AttributeTok{fill =} \FunctionTok{factor}\NormalTok{(dark\_mode)}
+\NormalTok{    )}
+\NormalTok{  ) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_histogram}\NormalTok{(}
+    \AttributeTok{alpha =}\NormalTok{ .}\DecValTok{5}\NormalTok{, }
+    \AttributeTok{bins =} \DecValTok{25}\NormalTok{, }
+    \AttributeTok{position =} \StringTok{"identity"}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-19-1.pdf}
+
+}
+
+\end{figure}
+
+Ein Vergleich der Histogramme zeigt, dass die Überlappung der
+\emph{Propensity Scores} in der linken Flanken der Verteilungen der
+Kontrollgruppe und in der rechten Flanke der Behandlungsgruppe
+schlechter wird. Wir entfernen zunächst Beobachtungen aus der Stichprobe
+deren \emph{Propensity Scores} wenig bzw. keine Überlappung aufweisen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Datensatz nach PS trimmen}
+\NormalTok{darkmode\_probs }\OtherTok{\textless{}{-}}\NormalTok{ darkmode\_probs }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(}
+    \FunctionTok{between}\NormalTok{(}
+      \AttributeTok{x =}\NormalTok{ PS,}
+      \AttributeTok{left =}\NormalTok{ .}\DecValTok{25}\NormalTok{,}
+      \AttributeTok{right =}\NormalTok{ .}\DecValTok{75}
+\NormalTok{    )}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Überlappung nach trimming prüfen:}
+\CommentTok{\# Dichteschätzung der PS nach Treatment{-}Indikator}
+\NormalTok{darkmode\_probs }\SpecialCharTok{\%\textgreater{}\%}
+\FunctionTok{ggplot}\NormalTok{(}
+  \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}
+    \AttributeTok{x =}\NormalTok{ PS, }
+    \AttributeTok{fill =} \FunctionTok{factor}\NormalTok{(dark\_mode))}
+\NormalTok{  ) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_histogram}\NormalTok{(}
+    \AttributeTok{alpha =}\NormalTok{ .}\DecValTok{5}\NormalTok{, }
+    \AttributeTok{bins =} \DecValTok{25}\NormalTok{, }
+    \AttributeTok{position =} \StringTok{"identity"}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-21-1.pdf}
+
+}
+
+\end{figure}
+
+IPWs anhand der \emph{Propensity Scores} können schnell mit der
+Vorschrift \begin{align}
+  \text{IPW} = \frac{\text{dark\_mode}}{\text{PS}} + \frac{1 - \text{dark\_mode}}{1 - \text{PS}},
+\end{align} berechnet werden.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Datensatz um IPWs erweitern}
+\NormalTok{darkmode\_IPW }\OtherTok{\textless{}{-}}\NormalTok{ darkmode\_probs }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{IPW =}\NormalTok{ dark\_mode }\SpecialCharTok{/}\NormalTok{ PS }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ dark\_mode) }\SpecialCharTok{/}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ PS)}
+\NormalTok{  )}
+
+\NormalTok{darkmode\_IPW }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{select}\NormalTok{(IPW)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+# A tibble: 194 x 1
+     IPW
+   <dbl>
+ 1  1.44
+ 2  1.91
+ 3  1.56
+ 4  1.50
+ 5  1.83
+ 6  1.38
+ 7  1.43
+ 8  1.47
+ 9  2.71
+10  1.42
+# i 184 more rows
+\end{verbatim}
+
+Eine Schätzung des durchschnittlichen Behandlungseffekts gemäß
+\eqref{eq:hattauhajek} implementieren wir mit \texttt{dplyr}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{darkmode\_IPW }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(dark\_mode) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{w =}\NormalTok{ IPW }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(IPW)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{weighted\_mean =} \FunctionTok{sum}\NormalTok{(read\_time }\SpecialCharTok{*}\NormalTok{ w)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{diff =} \FunctionTok{diff}\NormalTok{(weighted\_mean))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+# A tibble: 1 x 1
+   diff
+  <dbl>
+1  1.90
+\end{verbatim}
+
+Diese Schätzung des Behandlungseffekts ist äquivalent zur gewichteten
+KQ-Schätzung anhand eines einfachen linearen Regressionsmodells.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Mit IPWs gewichteter KQ{-}Schaetzer berechnet den ATE}
+\NormalTok{model\_ipw }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ read\_time }\SpecialCharTok{\textasciitilde{}}\NormalTok{ dark\_mode, }
+  \AttributeTok{data =}\NormalTok{ darkmode\_IPW,}
+  \AttributeTok{weights =}\NormalTok{ IPW}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(model\_ipw)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+
+Call:
+lm(formula = read_time ~ dark_mode, data = darkmode_IPW, weights = IPW)
+
+Weighted Residuals:
+     Min       1Q   Median       3Q      Max 
+-18.5086  -4.4579   0.6096   4.1345  20.4566 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  17.9709     0.4942  36.362  < 2e-16 ***
+dark_mode     1.9011     0.6952   2.735  0.00683 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 6.913 on 192 degrees of freedom
+Multiple R-squared:  0.03749,   Adjusted R-squared:  0.03248 
+F-statistic: 7.478 on 1 and 192 DF,  p-value: 0.006829
+\end{verbatim}
+
+Unsere Schätzung des ATE ist der geschätzte Koeffizient von
+\texttt{dark\_mode}. Die ausgegebenen Standardfehler und
+Inferenzstatistiken sind jedoch \emph{ungültig} aufgrund der Gewichtung
+mit IPWs, den inversen \emph{geschätzten} Wahrscheinlichkeiten für eine
+Behandlung. Der Grund hierfür ist, dass die Berechnung der
+Standardfehler in \texttt{summary()} die zusätzliche Unsicherheit durch
+die geschätzen \emph{Propensity Scores} nicht berücksichtigt! Später im
+Kapitel erläutern wir die Berechnung gültiger Standardfehler für
+IPW-Schätzer basierend auf \emph{Propensity Scores} mit dem Bootstrap.
+
+\hypertarget{matching-verfahren}{%
+\section{Matching-Verfahren}\label{matching-verfahren}}
+
+Das grundsätzliche Konzept von Matching wird in der nachstehenden
+interaktiven Grafik veranschaulicht. Hier betrachten wir beobachtete
+Ausprägungen von zwei (unabhängig und identisch verteilten)
+Matching-Variablen für Subjekte in der Behandlungsgruppe (blau) sowie
+Kontrollgruppe (rot). Per Klick auf eine Beobachtung werden Matches aus
+der anderen Gruppe in grün kenntlich gemacht. Als Matches zählen
+sämtliche Beobachtungen der anderen Gruppe, deren
+\href{https://de.wikipedia.org/wiki/Euklidischer_Abstand}{Euklidische
+Distanz} zu dem ausgewählten Punkt das über den Slider eingestellte
+Maximum \emph{Caliper} nicht überschreitet.\footnote{Es handelt sich
+  hierbei um einen Spezialfall von Matching anhand der
+  Mahalanobis-Distanz.} Diese Region wird durch den gestrichelten Kreis
+gekennzeichnet. Die Grafik illustriert inbesondere, dass Beobachtungen
+mehrfach (s.g. Matching mit zurücklegen) oder gar nicht gematcht werden
+können.
+
+\texttt{MatchIt::matchit()} nutzt standardmäßig Eins-zu-Eins-Matching
+(ohne Zurücklegen) von Beobachtungen der Treatment-Gruppe mit
+Beobachtungen der Kontrollgruppe. Die für das Matching zu verwendenden
+Variablen werden über das Argument \texttt{formula} als Funktion des
+Behandlungsindikators definiert. \texttt{matchit()} bereitet das Objekt
+für eine Schätzung des ATT mit einer geeigneten Funktionen, s.
+\texttt{?matchit} und hier insb. die Erläuterungen der Argumente
+\texttt{replace\ =\ F}, \texttt{ratio\ =\ 1} und
+\texttt{estimand\ =\ "ATT"} für Details. Mit \texttt{cobalt::balt.tab()}
+erhalten wir eine \emph{balance table} für den gematchten Datensatz.
+
+Wir zeigen als nächstes, wie \texttt{MatchIt::matchit()} für Matching
+anhand der Regressoren \texttt{age}, \texttt{hours}, und \texttt{male}
+in unserem Website-Beispiel für unterschiedliche Varianten durchgeführt
+werden kann.
+
+\textbf{Exaktes Matching}
+
+Exaktes Matching ordnet einem Subjekt aus der Behandlungsgruppe ein oder
+mehrere Subjekte aus der Kontrollgruppe zu, wenn die boebachteten
+Ausprägung der Matching-Variablen \emph{exakt} übereinstimmen. Hierbei
+muss die `Distanz' zwischen den Ausprägung der Matching-Variablen
+folglich \(0\) sein. Dieses Verfahren findet meist bei ausschließlich
+diskret verteilten Merkmalen Anwendung. Bei kontinuierlich verteilten
+Merkmalen (vgl. die obige interaktive Grafik) sind exakte Matches zwar
+theoretisch unmöglich, ergeben sich jedoch in der Praxis aus der
+Datenerfassung, bspw. durch Rundungsfehler. In \texttt{matchit()}
+erhalten wir exaktes Ein-zu-eins-Matching mit
+\texttt{method\ =\ "exact"}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(MatchIt)}
+
+\CommentTok{\# Exaktes Eins{-}zu{-}Eins{-}Matching durchführen}
+\NormalTok{res\_em }\OtherTok{\textless{}{-}} \FunctionTok{matchit}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ dark\_mode }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ hours, }
+  \AttributeTok{data =}\NormalTok{ darkmode,}
+  \AttributeTok{estimand =} \StringTok{"ATT"}\NormalTok{,}
+  \AttributeTok{method =} \StringTok{"exact"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Error in `matchit()`:
+! No exact matches were found.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{res\_em}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Error in eval(expr, envir, enclos): object 'res_em' not found
+\end{verbatim}
+
+Aufgrund der kontinulierliche Verteilten Variable \texttt{hours} gibt es
+in unserem Website-Beispiel keine exakten Matches. Dieses Verfahren ist
+hier folglich ungeeignet.
+
+\textbf{Coarsened Exact Matching}
+
+Bei dieser Methode werden kontinuierliche Matching-Variablen grob (Engl.
+\emph{coarse}) klassiert, ähnlich wie bei einem Histogram. Diese
+Diskretisierung ermöglicht es exakte Übereinstimmungen zwischen
+Behandlungs- und Kontrollgruppenbeobachtungen hinsichtlich ihrer
+klassierten Ausprägungen zu finden. Sowohl Behandlungs- als auch
+Kontrollbeobachtungen die mindestents einen exakten Match haben, werden
+Teil des gematchten Datensatzes. In \texttt{matchit()} wird Coarsened
+Exact Matching mit \texttt{method\ =\ "cem"} durchgeführt. Über das
+Argument \texttt{cutpoints} geben wir an, dass \texttt{hours} in 6
+Klassen und \texttt{age} in 4 Klassen eingeteilt werden soll.\footnote{Diese
+  Werte wurden ad-hoc gewählt da sie zu einem guten Ergebnis führen.}
+Mit \texttt{k1k\ =\ TRUE} erfolgt Eins-zu-eins-Matching: Bei mehreren
+exakten Matches wird die Beobachtung mit der geringsten
+Mahalanobis-Distanz (für die unklassierten Matching-Variablen) gewählt.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Coarsened Exact Matching}
+\NormalTok{res\_CEM }\OtherTok{\textless{}{-}} \FunctionTok{matchit}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ dark\_mode }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ hours, }
+  \AttributeTok{data =}\NormalTok{ darkmode, }
+  \AttributeTok{estimand =} \StringTok{"ATT"}\NormalTok{,}
+  \AttributeTok{method =} \StringTok{"cem"}\NormalTok{, }
+  \AttributeTok{k2k =} \ConstantTok{TRUE}\NormalTok{,}
+  \AttributeTok{cutpoints =} \FunctionTok{list}\NormalTok{(}
+    \StringTok{"hours"} \OtherTok{=} \DecValTok{6}\NormalTok{, }
+    \StringTok{"age"} \OtherTok{=} \DecValTok{4}
+\NormalTok{  ) }
+\NormalTok{)}
+\NormalTok{res\_CEM}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+A matchit object
+ - method: Coarsened exact matching
+ - number of obs.: 300 (original), 164 (matched)
+ - target estimand: ATT
+ - covariates: age, male, hours
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Balance{-}Table Coarsened Exact Matching}
+\FunctionTok{bal.tab}\NormalTok{(res\_CEM)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Balance Measures
+         Type Diff.Adj
+age   Contin.   0.0106
+male   Binary   0.0000
+hours Contin.  -0.0135
+
+Sample sizes
+          Control Treated
+All           151     149
+Matched        82      82
+Unmatched      69      67
+\end{verbatim}
+
+Mit Coarsened Exact Matching erhalten wir einen Datensatz mit 82
+Beobachtungen und guter Balance.
+
+\textbf{Matching anhand der Mahalanobis-Distanz}
+
+Die Euklidische Distanz misst den direkten Abstand zwischen zwei Punkten
+und ist nicht invariant gegenüber Transformationen, insbesondere bei
+unterschiedlichen Skalierungen und bei Korrelation der
+Matching-Variablen. Die Mahalanobis-Distanz hingegen ist ein
+standardisiertes Distanzmaß, das unter Berücksichtigung der
+Varianz-Kovarianz-Struktur der Daten angibt, wie viele
+Standardabweichungen zwei Datenpunkte voneinander entfernt sind. Die
+Mahalanobis-Distanz ist invariant gegenüber linearen Transformationen
+(Skalierung, Translation und Rotation) der Daten und bietet ein
+genaueres Maß für die Unähnlichkeit zweier Beobachtungen hinsichtlich
+ihrer Ausprägungen der Matching-Variablen.
+
+Betrachte die Datenpunkte \(P_1=(X_1,Y_1)'\) und \(P_2=(X_2,Y_2)'\) für
+die Matching-Variablen \(X\) und \(Y\). Die Mahalanobis-Distanz zwischen
+\(P_1\) und \(P_2\) ist definiert als \begin{align*}
+  d_M(P_1,\,P_2) = \sqrt{(P_1 - P_2)'\boldsymbol{S}^{-1} (P_1 - P_2)},
+\end{align*} wobei \(\boldsymbol{S}\) die Varianz-Kovarianz-Matrix von
+\(X\) und \(Y\) ist. Die Mahalanobis-Distanz \(d_M(\cdot,\cdot)\) ist
+also die Euklidische Distanz zwischen den standardisierten Datenpunkten.
+
+Für beobachtete Daten ersetzen wir die Komponenten der
+Varianz-Kovarianz-Matrix durch Stichprobenmaße. Dies ergibt die Formel
+
+\begin{align*}
+  \widehat{d}_M(P_1,\,P_2) = \sqrt{
+  \begin{pmatrix}
+    X_1 - X_2\\
+    \tilde  Y_1 - \tilde Y_2
+  \end{pmatrix}'
+  \begin{pmatrix}
+    \widehat{\text{Var}}(X^2) & \widehat{\text{Cov}}(X, Y) \\
+     \widehat{\text{Cov}}(X, Y) & \widehat{\text{Var}}(X^2) 
+  \end{pmatrix}^{-1}
+    \begin{pmatrix}
+    X_1 - X_2\\
+    \tilde Y_1 - \tilde Y_2
+  \end{pmatrix}
+}.
+\end{align*}
+
+Die nachstehende interaktive Grafik zeigt Beobachtungen zweier
+Matching-Variablen, die aus einer bivariaten Normalverteilung mit
+positiver Korrelation generiert wurden. Diese bivariate Verteilung ist
+identisch für Beobachtungen aus der Kontrollgruppe (rot) und
+Beobachtungen aus der Behandlungsgruppe (blau). Für die ausgewählte
+Beobachtung aus der Behandlungsgruppe (schwarzer Rand) werden
+potentielle Matches in der Kontrollgruppe innerhalb der vorgegebenen
+Mahalanobis-Distanz in Cyan kenntlich gemacht. Beachte, dass die
+Mahalanobis-Distanz Varianzen und Kovarianzen der Daten berücksichtigt,
+sodass die gematchten Beobachtungen in einem elliptischen Bereich um die
+betrachtete behandelte Beobachtung liegen. Eine Euklidische Distanz
+hingegen (gestrichelte Linie) ignoriert die Skalierung der Daten.
+
+Für Eins-zu-Eins-Matching im Website-Beispiel anhand der
+Mahalanobis-Distanz mit \texttt{matchit()} setzen wir
+\texttt{distance\ =\ "mahalanobis"} und wählen
+\texttt{method\ =\ "nearest"}. Mit diesen Parametern wird jeder
+Behandlung aus der Behandlungsgruppe die gemäß \(d_M\) am ehesten
+vergleichbarste Beobachtung aus der Kontrollgruppe zugewiesen, wobei
+keine mehrfachen Matches zulässig sind.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 1:1 Mahalanobis{-}Distanz{-}Matching}
+\NormalTok{res\_maha }\OtherTok{\textless{}{-}} \FunctionTok{matchit}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ dark\_mode }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ hours, }
+  \AttributeTok{data =}\NormalTok{ darkmode, }
+  \AttributeTok{estimand =} \StringTok{"ATT"}\NormalTok{,}
+  \AttributeTok{distance =} \StringTok{"mahalanobis"}\NormalTok{, }
+  \AttributeTok{method =} \StringTok{"nearest"}
+\NormalTok{)}
+\NormalTok{res\_maha}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+A matchit object
+ - method: 1:1 nearest neighbor matching without replacement
+ - distance: Mahalanobis
+ - number of obs.: 300 (original), 298 (matched)
+ - target estimand: ATT
+ - covariates: age, male, hours
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Balance{-}Table für 1:1 Mahalanobis{-}Matching}
+\FunctionTok{bal.tab}\NormalTok{(res\_maha)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Balance Measures
+         Type Diff.Adj
+age   Contin.  -0.5826
+male   Binary   0.3154
+hours Contin.   0.0106
+
+Sample sizes
+          Control Treated
+All           151     149
+Matched       149     149
+Unmatched       2       0
+\end{verbatim}
+
+Die Ergebnisse zeigen, dass für sämtliche \(149\) Beobachtungen aus der
+Behandlungsgruppe ein individueller Match in der Kontrollgruppe gefunden
+werden konnte. Es werden lediglich \(2\) Beobachtungen der \(151\)
+Beobachtungen in der Kontrollgruppe nicht gematcht.
+
+Entsprechend zeigt die Balance-Table eine ähnliche Diskrepanz beider
+Gruppen hinsichtlich der Matching-Variablen an.
+
+\textbf{Mahalanobis-Distanz mit Caliper .25 für Propensity Scores
+basierend auf logistischer Regression}
+
+Für eine strengeres Matching-Kriterium kann ein \emph{Caliper}, d.h.
+eine maximal zulässige Distanz, herangezogen werden. Die
+Mahalanobis-Distanz hat jedoch keine einheitliche Skala: Ob eine Distanz
+als groß oder klein betrachten werden kann, hängt von der Anzahl der
+Matching-Variablen und dem Überlappungsgrad zwischen den Gruppen ab.
+Daher wird die Beschränkung durch einen Caliper nicht auf
+\(\widehat{d}_M\) sondern auf Propensity Scores angewendet.
+
+Im nächsten Code-Beispiel spezifizieren wir mit
+\texttt{distance\ =\ "glm"}, dass Propensity Scores gemäß der Vorschrift
+in \texttt{formula} geschätzt werden. Mit
+\texttt{mahvars\ =\ \textasciitilde{}\ age\ +\ male\ +\ hours} legen wir
+die Matching-Variablen für die Berechnung von \(\widehat{d}_M\) fest.
+\texttt{caliper\ =\ .25} legt fest, dass lediglich Beobachtungen der
+Kontrollgruppe bei einer absoluten Differenz der Propensity Scores von
+höchstens \(0.25\) Standardabweichungen als Match für eine Beobachtung
+in der Behandlungsgruppe qualifiziert sind.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Mahalanobis{-}Matchig mit PS{-}Caliper}
+\NormalTok{res\_mahaC }\OtherTok{\textless{}{-}} \FunctionTok{matchit}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ dark\_mode }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ hours, }
+  \AttributeTok{data =}\NormalTok{ darkmode, }
+  \AttributeTok{distance =} \StringTok{"glm"}\NormalTok{,}
+  \AttributeTok{estimand =} \StringTok{"ATT"}\NormalTok{,}
+  \AttributeTok{method =} \StringTok{"nearest"}\NormalTok{,}
+  \AttributeTok{mahvars =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ hours,}
+  \AttributeTok{caliper =}\NormalTok{ .}\DecValTok{25}
+\NormalTok{)}
+\NormalTok{res\_mahaC}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+A matchit object
+ - method: 1:1 nearest neighbor matching without replacement
+ - distance: Mahalanobis [matching]
+             Propensity score [caliper]
+             - estimated with logistic regression
+ - caliper: <distance> (0.058)
+ - number of obs.: 300 (original), 208 (matched)
+ - target estimand: ATT
+ - covariates: age, male, hours
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Balance Table}
+\FunctionTok{bal.tab}\NormalTok{(res\_mahaC)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Balance Measures
+             Type Diff.Adj
+distance Distance   0.1812
+age       Contin.  -0.1176
+male       Binary   0.0481
+hours     Contin.  -0.0001
+
+Sample sizes
+          Control Treated
+All           151     149
+Matched       104     104
+Unmatched      47      45
+\end{verbatim}
+
+Die Balance-Table zeigt einen deutlichen Effekt der Beschränkung
+qualifizierter Beobachtungen durch \texttt{caliper\ =\ .25}: Aufgrund
+der oberen Grenze für die Propensity-Score-Differenz von \(0.058\) wird
+für lediglich \(104\) Beobachtungen aus der Behandlungsgruppe ein
+individueller Match in der Kontrollgruppe gefunden.\footnote{Die durch
+  \texttt{caliper} implizierte Obergrenze ergibt sich als
+  \texttt{.25\ *\ sd(fitted(darkmode\_ps\_logit)))}.} Weiterhin finden
+wir eine verbesserte Balance für den gematchten Datensatz.
+
+\textbf{Matching mit Propensity Scores und Caliper}
+
+Eine gängige Variante ist Matching ausschließlich anhand von Propensity
+Scores innerhalb eines Calipers.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 1:1 Matching mit PS und Caliper}
+\NormalTok{res\_PSC }\OtherTok{\textless{}{-}} \FunctionTok{matchit}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ dark\_mode }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ hours, }
+  \AttributeTok{data =}\NormalTok{ darkmode, }
+  \AttributeTok{estimand =} \StringTok{"ATT"}\NormalTok{,}
+  \AttributeTok{distance =} \StringTok{"glm"}\NormalTok{, }
+  \AttributeTok{method =} \StringTok{"nearest"}\NormalTok{, }
+  \AttributeTok{caliper =}\NormalTok{ .}\DecValTok{25}
+\NormalTok{)}
+\NormalTok{res\_PSC}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+A matchit object
+ - method: 1:1 nearest neighbor matching without replacement
+ - distance: Propensity score [caliper]
+             - estimated with logistic regression
+ - caliper: <distance> (0.058)
+ - number of obs.: 300 (original), 208 (matched)
+ - target estimand: ATT
+ - covariates: age, male, hours
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Balance Table}
+\FunctionTok{bal.tab}\NormalTok{(res\_PSC)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Balance Measures
+             Type Diff.Adj
+distance Distance   0.1640
+age       Contin.  -0.0976
+male       Binary   0.0481
+hours     Contin.   0.0134
+
+Sample sizes
+          Control Treated
+All           151     149
+Matched       104     104
+Unmatched      47      45
+\end{verbatim}
+
+Laut Balance-Table führt Eins-zu-Eins-Matching basierend auf Propensity
+Scores zu einem Datensatz mit \(104\) gematchten Beobachtungen in der
+Behandlungsgruppe. Hinsichtlich der standardisierten Mittelwertdifferenz
+(\texttt{Diff.Adj}) erzielt diese Methode die beste Balance unter den
+betrachteten Ansätzen.
+
+\textbf{Vergleich der Balance verschiedener Verfahren mit Love-Plot}
+
+Standardisierte Mittelwertdifferenzen für verschiedene
+Matching-Verfahren können grafisch mit einem Love-Plot (Love 2004)
+veranschaulicht werden. Hierzu nutzen wir \texttt{cobalt::love.plot()}
+und übergeben die mit \texttt{matchit()} generierten Objekte im Argument
+\texttt{weights}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Love{-}Plot für}
+\FunctionTok{love.plot}\NormalTok{(}
+  \AttributeTok{x =}\NormalTok{ dark\_mode }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ hours, }
+  \AttributeTok{weights =} \FunctionTok{list}\NormalTok{(}
+    \AttributeTok{CEM =}\NormalTok{ res\_CEM,}
+    \AttributeTok{Mahalanobis =}\NormalTok{ res\_maha,}
+    \AttributeTok{Mahalanobis\_Cal =}\NormalTok{ res\_mahaC,}
+    \AttributeTok{PSC =}\NormalTok{ res\_PSC}
+\NormalTok{  ),}
+  \AttributeTok{data =}\NormalTok{ darkmode, }
+  \AttributeTok{line =}\NormalTok{ T,}
+  \CommentTok{\# absolute Mittelwertdifferenz plotten}
+  \AttributeTok{abs =}\NormalTok{ T}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-34-1.pdf}
+
+}
+
+\end{figure}
+
+Die Grafik zeigt, dass Coarsened Exact Matching (CEM) unter allen
+betrachteten Verfahren die Stichprobe mit der besten Balance ergibt.
+Diesen gematchten Datensatz erhalten wir mit
+\texttt{MatchIt::match.data()}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# gematchten Datensatz zuweisen}
+\NormalTok{darkmode\_matched\_CEM }\OtherTok{\textless{}{-}} \FunctionTok{match.data}\NormalTok{(res\_CEM)}
+\FunctionTok{head}\NormalTok{(darkmode\_matched\_CEM)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+# A tibble: 6 x 7
+  read_time dark_mode  male   age hours weights subclass
+      <dbl>     <dbl> <dbl> <dbl> <dbl>   <dbl> <fct>   
+1      15.4         0     1    55  125.       1 26      
+2      20.9         1     0    23  643.       1 70      
+3      21.5         1     0    29  190.       1 79      
+4      22           1     0    18  334.       1 80      
+5      17.4         0     0    53  279.       1 11      
+6      20.4         0     0    43  138.       1 9       
+\end{verbatim}
+
+\texttt{darkmode\_matched} enthält Gewichte (\texttt{weights}) für die
+jeweilige Gruppe zu denen gemachte Beobachtungen gehören
+(\texttt{subclass}). Dies ist relevant, falls Beobachtungen mehrfach
+gematcht werden. Wegen Eins-zu-eins-Matching \emph{ohne} Zurücklegen
+gibt es in unserem Beispiel 82 Beobachtungspaare und sämtliche Gewichte
+sind 1. Die Berücksichtigung der Gewicht in den nachfolgenden Aufrufen
+von Schätzfunktionen (bspw.\texttt{lm()}) ist daher nicht nötig und
+erfolgt lediglich zur Illustration der grundsätzlichen Vorgehensweise.
+
+Eine Wiederholung der grafischen Analyse in Kapitel~\ref{sec-balance}
+zeigt eine deutlich verbesserte Vergleichbarkeit hinsichtlich der
+Verteilung der Matching-Variablen in \texttt{darkmode\_matched}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{darkmode\_matched\_CEM }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(dark\_mode) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(age, hours) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate\_all}\NormalTok{(scale) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{pivot\_longer}\NormalTok{(}\AttributeTok{cols =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{dark\_mode)) }\SpecialCharTok{\%\textgreater{}\%}
+  
+  \FunctionTok{ggplot}\NormalTok{(}
+    \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ value, }\AttributeTok{fill =} \FunctionTok{as.factor}\NormalTok{(dark\_mode))}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{geom\_density}\NormalTok{( }\AttributeTok{alpha =}\NormalTok{ .}\DecValTok{5}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{facet\_wrap}\NormalTok{(}
+    \AttributeTok{facets =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ name, }
+    \AttributeTok{scales =} \StringTok{"free"}\NormalTok{, }
+    \AttributeTok{nrow =} \DecValTok{3}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-36-1.pdf}
+
+}
 
 \end{figure}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{\# Logit{-}Modell mit \textquotesingle{}glm()\textquotesingle{} schätzen}
-\NormalTok{(}
-\NormalTok{  darkmode\_ps\_logit \textless{}{-} glm(}
-\NormalTok{    formula = dark\_mode \textasciitilde{} age + male + hours,}
-\NormalTok{    data = darkmode,}
-\NormalTok{    family = binomial}
-\NormalTok{  )}
-\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\# Datensatz um propensity scores erweitern}
-\NormalTok{(}
-\NormalTok{  darkmode\_probabilities \textless{}{-} }
-\NormalTok{    darkmode \%\textgreater{}\%}
-\NormalTok{    mutate(}
-\NormalTok{      propensity = fitted(darkmode\_ps\_logit)}
-\NormalTok{    )}
-\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-Inverse probability weights (IPWs) anhand der PS können schnell anhand
-der Vorschrift
-\[\texttt{ipw} = \texttt{dark\_mode} / \texttt{propensity} + (1 - \texttt{dark\_mode}) / (1 - \texttt{propensity}), \quad \texttt{dark\_mode} \in\{0,1\}\]
-berechnet werden.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\# Datensatz um IPWs erweitern}
-\NormalTok{darkmode\_ipw \textless{}{-} darkmode\_probabilities \%\textgreater{}\%}
-\NormalTok{  mutate(}
-\NormalTok{    ipw = dark\_mode / propensity + (1 {-} dark\_mode) / (1 {-} propensity)}
-\NormalTok{  )}
-
-\NormalTok{darkmode\_ipw \%\textgreater{}\% }
-\NormalTok{  select(ipw)}
-\end{Highlighting}
-\end{Shaded}
-
-Verteilung der Propensity Scores nach Behandlungs-Indikator:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\# Dichteschätzung der PS nach Treatment{-}Indikator}
-\NormalTok{darkmode\_ipw \%\textgreater{}\%}
-\NormalTok{ggplot(}
-\NormalTok{  mapping = aes(}
-\NormalTok{    x = propensity, }
-\NormalTok{    fill = factor(dark\_mode))}
-\NormalTok{  ) + }
-\NormalTok{  lims(x = c(0, 1)) +}
-\NormalTok{  geom\_density(alpha = .5, )}
-\end{Highlighting}
-\end{Shaded}
-
-Beobachtungen aus der Kontroll-Gruppe entfernen, die außerhalb des
-Supports der Treatment-Gruppe liegen.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\# Propensity scores auslesen}
-\NormalTok{darkmode\_ipws \textless{}{-} darkmode\_ipw \%\textgreater{}\% }
-\NormalTok{  filter(dark\_mode == 1) \%\textgreater{}\% }
-\NormalTok{  pull(propensity)}
-
-\NormalTok{\# Support sicherstellen }
-\NormalTok{\# (entfernt 13 Beobachtungen aus der Kontrollgruppe)}
-\NormalTok{darkmode\_ipw \textless{}{-} darkmode\_ipw \%\textgreater{}\% }
-\NormalTok{  filter(}
-\NormalTok{    between(}
-\NormalTok{      propensity,}
-\NormalTok{      darkmode\_ipws \%\textgreater{}\% }
-\NormalTok{        min(),}
-\NormalTok{      darkmode\_ipws \%\textgreater{}\% }
-\NormalTok{        max()}
-\NormalTok{    )}
-\NormalTok{  )}
-\end{Highlighting}
-\end{Shaded}
-
-Die Abdeckung können wir erneut mit einer Grafik geschätzter
-Dichtefunktionen vergleichen.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\# Dichteschätzung der PS per Treatment{-}Indikator nach Anpassung}
-\NormalTok{darkmode\_ipw \%\textgreater{}\%}
-\NormalTok{  ggplot(}
-\NormalTok{    mapping = aes(}
-\NormalTok{      x = propensity, }
-\NormalTok{      fill = factor(dark\_mode)}
-\NormalTok{    )}
-\NormalTok{  ) + }
-\NormalTok{  lims(x = c(0, 1)) +}
-\NormalTok{  geom\_density(alpha = .5)}
-\end{Highlighting}
-\end{Shaded}
-
-Wir finden etwas weniger Wahrscheinlichkeits-Masse nahe 0 für die
-Kontroll-Gruppe nach filtern von (Kontroll-)Beobachtungen mit PS in der
-Spannweite der PS in der Behandlungs-Gruppe. Als nächstes schätzen wir
-den ATE mit linearer Regression.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\# Mit IPWs gewichteter KQ{-}Schaetzer berechnet einen ATE}
-\NormalTok{model\_ipw \textless{}{-} lm(}
-\NormalTok{  formula = read\_time \textasciitilde{} dark\_mode, }
-\NormalTok{  data = darkmode\_ipw,}
-\NormalTok{  weights = ipw}
-\NormalTok{)}
-
-\NormalTok{summary(model\_ipw)}
-\end{Highlighting}
-\end{Shaded}
-
-Unsere Schätzung des ATE ist der geschätzte Koeffizient von
-\texttt{dark\_mode}. Die ausgegebenen Standardfehler und
-Inferenzstatistiken sind \emph{ungültig} aufgrund der Gewichtung mit
-IPWs, inversen \emph{geschätzten} Wahrscheinlichkeiten für eine
-Behandlung. Der Grund hierfür ist, dass die Standardformel in
-\texttt{summary()} die zusätzliche Unsicherheit durch die IPW-Schätzung
-nicht berücksichtigt!
-
-Die Vergleichbarkeit der Nutzer in Kontroll- und
-Behandlungsgruppe-Gruppe für die Variablen \texttt{age}, \texttt{hours}
-und \texttt{male} können wir graphisch und anhand einer \emph{balance
-table} vergleichen.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\# Dichteschätzungen}
-\NormalTok{darkmode \%\textgreater{}\% }
-\NormalTok{  group\_by(dark\_mode) \%\textgreater{}\%}
-\NormalTok{  select(age, hours) \%\textgreater{}\%}
-\NormalTok{  mutate\_all(scale) \%\textgreater{}\% \# Standardisierung mit \textquotesingle{}scale()\textquotesingle{}}
-\NormalTok{  pivot\_longer(cols = c({-}dark\_mode)) \%\textgreater{}\% \# langes Format}
+\NormalTok{darkmode\_matched\_CEM }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{group\_by}\NormalTok{(dark\_mode) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{male =} \FunctionTok{as.factor}\NormalTok{(male), }
+    \AttributeTok{dark\_mode =} \FunctionTok{as.factor}\NormalTok{(dark\_mode)}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
   
-\NormalTok{  ggplot(aes(x = value, fill = as.factor(dark\_mode))) +}
-\NormalTok{  geom\_density( alpha = .5) + }
-\NormalTok{  facet\_wrap(\textasciitilde{} name, scales = "free", nrow = 3) \# Facetting nach \textquotesingle{}name\textquotesingle{}}
-
-\NormalTok{\# Relative Hfkt. für \textquotesingle{}male\textquotesingle{} als barplot}
-\NormalTok{darkmode \%\textgreater{}\% }
-\NormalTok{  group\_by(dark\_mode) \%\textgreater{}\%}
-\NormalTok{  mutate(}
-\NormalTok{    male = as.factor(male), }
-\NormalTok{    dark\_mode = as.factor(dark\_mode)}
-\NormalTok{  ) \%\textgreater{}\%}
-  
-\NormalTok{  ggplot(aes(x = dark\_mode, fill = male)) +}
-\NormalTok{  geom\_bar(position = "fill") +}
-\NormalTok{  ylab("Anteil")}
-
-\NormalTok{\# Balance table mit \textquotesingle{}cobalt::bal.tab()\textquotesingle{}}
-\NormalTok{bal.tab(}
-\NormalTok{  x = darkmode \%\textgreater{}\% }
-\NormalTok{    select(age, hours, male), }
-\NormalTok{  treat = darkmode$dark\_mode, }
-\NormalTok{  disp = "m", \# zeige zusätzlich Mittelwerte für C und T}
-\NormalTok{)}
+  \FunctionTok{ggplot}\NormalTok{(}
+    \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ dark\_mode, }\AttributeTok{fill =}\NormalTok{ male)}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{position =} \StringTok{"fill"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Anteil"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-Wir zeigen als nächstes, wie \texttt{MatchIt::matchit()} für
-Nearest-neighbor-Matching anhand der Regressoren \texttt{age},
-\texttt{hours}, und \texttt{male} in unterschiedlichen Varianten
-durchgeführt werden kann.
+\begin{figure}[t]
 
-\texttt{MatchIt::matchit()} führt standardmäßig 1:1-Matching (ohne
-Zurücklegen) von Beobachtungen der Treatment-Gruppe mit Beobachtungen
-der Kontrollgruppe druch. Das Objekt wird für eine Schätzung des ATT mit
-einer geeigneten Funktionen vorbereitet, s. \texttt{?matchit}, und hier
-insb. die Argumente \texttt{replace\ =\ F}, \texttt{ratio\ =\ 1} und
-\texttt{estimand\ =\ "ATT"} für Details.
+{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-36-2.pdf}
 
-Mit \texttt{cobalt::balt.tab()} erhalten wir eine \emph{balance table}
-für den gematchten Datensatz.
+}
 
-\textbf{Exaktes Matching}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{res \textless{}{-} matchit(}
-\NormalTok{  formula = dark\_mode \textasciitilde{} age + male + hours, }
-\NormalTok{  data = darkmode, }
-\NormalTok{  method = "exact"}
-\NormalTok{)}
-\NormalTok{bal.tab(res)}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{Eins-zu-Eins-Matching: Mahalanobis-Distanz}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{res \textless{}{-} matchit(}
-\NormalTok{  formula = dark\_mode \textasciitilde{} age + male + hours, }
-\NormalTok{  data = darkmode, }
-\NormalTok{  distance = "mahalanobis", }
-\NormalTok{  method = "nearest"}
-\NormalTok{)}
-\NormalTok{bal.tab(res)}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{Eins-zu-Eins-Matching: Mahalanobis-Distanz mit Caliper 0.25 für
-propensity scores basierend auf logistischer Regression}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{res \textless{}{-} matchit(}
-\NormalTok{  formula = dark\_mode \textasciitilde{} age + male + hours, }
-\NormalTok{  data = darkmode, }
-\NormalTok{  distance = "glm", }
-\NormalTok{  caliper = .25,}
-\NormalTok{  mahvars = \textasciitilde{} age + male + hours}
-\NormalTok{)}
-\NormalTok{\# (Nur K{-}Beobachtungen mit PS bei Caliper .25 kommen für MHD{-}Matching in betracht.)}
-\NormalTok{bal.tab(res)}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{4. Eins-zu-Eins-Matching: Propensity scores basierend auf
-logistischer Regression mit Caliper 0.25}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{res \textless{}{-} matchit(}
-\NormalTok{  formula = dark\_mode \textasciitilde{} age + male + hours, }
-\NormalTok{  data = darkmode, }
-\NormalTok{  method = "nearest", }
-\NormalTok{  distance = "glm", }
-\NormalTok{  caliper = .25}
-\NormalTok{)}
-\NormalTok{bal.tab(res)}
-\end{Highlighting}
-\end{Shaded}
-
-Die Vergleichbarkeit der Nutzer in Kontroll- und Treatment-Gruppe
-hinsichtlich der Variablen \texttt{age}, \texttt{hours} und
-\texttt{male} können wir graphisch und anhand einer \emph{balance table}
-vergleichen. Wir berechnen die balance table mit
-\texttt{cobalt::bal.tab()} für den anhand von Variante 4 gematchten
-Datensatz.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{bal.tab(res, un = T, disp = "m")}
-
-\NormalTok{\# Der gematchte Datensatz enthält Gewichte für die jeweilige }
-\NormalTok{\# Subklasse zu denen die Beobachtungen gehören.}
-\NormalTok{\#}
-\NormalTok{\# Hier 1:1 matching \_ohne\_ Zurücklegen, d.h. sämtliche}
-\NormalTok{\# Gewichte sind 1 und wird müssten diese nicht für nachfolgende }
-\NormalTok{\# Aufrufe von avg comparisons berücksichtigen.}
-\NormalTok{darkmode\_matched \textless{}{-} match.data(res)}
-
-\NormalTok{darkmode\_matched \%\textgreater{}\%}
-\NormalTok{  group\_by(dark\_mode) \%\textgreater{}\%}
-\NormalTok{  select(age, hours) \%\textgreater{}\%}
-\NormalTok{  mutate\_all(scale) \%\textgreater{}\%}
-\NormalTok{  pivot\_longer(cols = c({-}dark\_mode)) \%\textgreater{}\%}
-  
-\NormalTok{  ggplot(aes(x = value, fill = as.factor(dark\_mode))) +}
-\NormalTok{  geom\_density( alpha = .5) + }
-\NormalTok{  facet\_wrap(\textasciitilde{} name, scales = "free", nrow = 3)}
-
-\NormalTok{darkmode\_matched \%\textgreater{}\% }
-\NormalTok{  group\_by(dark\_mode) \%\textgreater{}\%}
-\NormalTok{  mutate(}
-\NormalTok{    male = as.factor(male), }
-\NormalTok{    dark\_mode = as.factor(dark\_mode)}
-\NormalTok{  ) \%\textgreater{}\%}
-  
-\NormalTok{  ggplot(aes(x = dark\_mode, fill = male)) +}
-\NormalTok{  geom\_bar(position = "fill") +}
-\NormalTok{  ylab("Anteil")}
-\end{Highlighting}
-\end{Shaded}
+\end{figure}
 
 Wir beobachten eine bessere Balance bei \texttt{age} und \texttt{hours}.
-Am wichtigsten: \texttt{gender} (\texttt{male}) ist nahezu ausgeglichen
-für Kontroll- und Treatment-Gruppe!
+Inbesondere ist \texttt{male} für Kontroll- und Behandlungsgruppe
+ausgeglichen!
 
-Wir schätzen nun den ATT von \texttt{dark\_mode} auf \texttt{read\_time}
-mit linearer Regression für den gematchten Datensatz aus sowie für den
-ursprünglichen Datensatz und berechnen jeweils ein robustes
-95\%-Konfidenzintervall für den ATT.
+\hypertarget{schuxe4tzung-und-inferenz-fuxfcr-den-behandlungseffekts-nach-matching}{%
+\section{Schätzung und Inferenz für den Behandlungseffekts nach
+Matching}\label{schuxe4tzung-und-inferenz-fuxfcr-den-behandlungseffekts-nach-matching}}
+
+Wir schätzen nun den Behandlungseffekt von \texttt{dark\_mode} auf
+\texttt{read\_time} für die mit CEM und Propensity Score Matching
+ermittelten Datensätze mittels linearer Regression und vergleichen mit
+einer Regression anhand des ursprünglichen Datensatzes.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{\# ATT mit linearem Modell für ungematchten Datensatz schätzen}
-\NormalTok{ATT\_mod\_org \textless{}{-} lm(}
-\NormalTok{  formula = read\_time \textasciitilde{} age + male + hours + dark\_mode,}
-\NormalTok{  data = darkmode}
+\CommentTok{\# ATT mit linearem Modell schätzen: CEM Datensatz}
+\NormalTok{ATT\_mod\_CEM }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ read\_time }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ dark\_mode,}
+  \AttributeTok{data =}\NormalTok{ darkmode\_matched\_CEM, }
+  \AttributeTok{weights =}\NormalTok{ weights }
 \NormalTok{)}
-\NormalTok{summary(ATT\_mod\_org)}
-
-\NormalTok{\# ATT mit linearem Modell für gematchten Datensatz schätzen}
-\NormalTok{ATT\_mod \textless{}{-} lm(}
-\NormalTok{  formula = read\_time \textasciitilde{} age + male + hours + dark\_mode,}
-\NormalTok{  data = darkmode\_matched, }
-\NormalTok{  weights = weights }
-\NormalTok{)}
-\NormalTok{\# (weights = 1 für alle Beobachtungen weil wg. 1:1{-}Matching}
-\NormalTok{\# nur 2er{-}Paare von Beobachtungen. Hier also vernachlässigbar.}
-\NormalTok{\# Andere Gewichtung bei k:1{-}Matching!)}
-\NormalTok{summary(ATT\_mod)}
+\FunctionTok{summary}\NormalTok{(ATT\_mod\_CEM)}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{Achtung}: Für Matching-Verfahren (\texttt{ATT\_mod}) sind die
-von \texttt{summary()} berechneten Standardfehler (und damit KI,
-t-Statistiken und p-Werte) für den ATT \emph{grundsätzlich ungültig} Wir
-haben 3 Quellen von Schätzunsicherheit, die bei der Berechnung von
-Standardfehlern berücksichtigt werden müssen: Die Schätzung der PS, der
-Matching-Prozess und die ``übliche'' Stichproben-Variabilität. Wir
-nutzen daher nachfolgende Funktionen gem. Empfehlungen aus der aktuellen
-Forschung für Standardfehlerberechnung. S. auch Aufgabe 5 (a).
+\begin{verbatim}
+
+Call:
+lm(formula = read_time ~ age + male + hours + dark_mode, data = darkmode_matched_CEM, 
+    weights = weights)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-8.9310 -2.3856 -0.0194  2.5407 14.0020 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 16.6088953  1.5255529  10.887  < 2e-16 ***
+age          0.0380982  0.0344699   1.105  0.27072    
+male        -4.0915725  0.6858131  -5.966 1.53e-08 ***
+hours        0.0050129  0.0006977   7.185 2.45e-11 ***
+dark_mode    1.6532234  0.6149439   2.688  0.00794 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 3.937 on 159 degrees of freedom
+Multiple R-squared:  0.414, Adjusted R-squared:  0.3992 
+F-statistic: 28.08 on 4 and 159 DF,  p-value: < 2.2e-16
+\end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{library(marginaleffects)}
+\CommentTok{\# Datensatz für Propensity Score Matching zuweisen}
+\NormalTok{darkmode\_matched\_PSC }\OtherTok{\textless{}{-}} \FunctionTok{match.data}\NormalTok{(res\_PSC)}
 
-\NormalTok{\# Inferenz Multiple Regression bei ungematchten Beobachtungen}
-\NormalTok{\# identisch zu \textquotesingle{}coeftest(ATT\_mod\_org, vcovHC, type = "HC3")\textquotesingle{}}
-\NormalTok{avg\_comparisons(}
-\NormalTok{  model = ATT\_mod\_org,}
-\NormalTok{  variables = "dark\_mode",}
-\NormalTok{  vcov = "HC3", \# Heteroskedastie{-}robuster SE}
-\NormalTok{  newdata = subset(darkmode, dark\_mode == 1) \# Identifiziert Kontrollgruppe}
+\CommentTok{\# ATT mit linearem Modell schätzen: PSM Datensatz}
+\NormalTok{ATT\_mod\_PSC }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ read\_time }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ dark\_mode,}
+  \AttributeTok{data =}\NormalTok{ darkmode\_matched\_PSC, }
+  \AttributeTok{weights =}\NormalTok{ weights }
+\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(ATT\_mod\_PSC)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+
+Call:
+lm(formula = read_time ~ age + male + hours + dark_mode, data = darkmode_matched_PSC, 
+    weights = weights)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+-9.972 -2.605 -0.044  2.587 14.951 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 17.3654519  1.2762648  13.606  < 2e-16 ***
+age          0.0283941  0.0301484   0.942  0.34741    
+male        -3.9858702  0.6480072  -6.151 4.03e-09 ***
+hours        0.0046119  0.0006685   6.899 6.53e-11 ***
+dark_mode    1.6346636  0.5769812   2.833  0.00507 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 4.141 on 203 degrees of freedom
+Multiple R-squared:  0.3171,    Adjusted R-squared:  0.3037 
+F-statistic: 23.57 on 4 and 203 DF,  p-value: 5.098e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ATT mit linearem Modell für vollständigen Datensatz schätzen}
+\NormalTok{ATT\_mod\_org }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ read\_time }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ dark\_mode,}
+  \AttributeTok{data =}\NormalTok{ darkmode}
+\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(ATT\_mod\_org)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+
+Call:
+lm(formula = read_time ~ age + male + hours + dark_mode, data = darkmode)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-10.2697  -2.6710   0.0164   2.5909  14.5739 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 16.859075   1.082303  15.577  < 2e-16 ***
+age          0.051332   0.022215   2.311  0.02154 *  
+male        -4.485545   0.498957  -8.990  < 2e-16 ***
+hours        0.004348   0.000516   8.427 1.58e-15 ***
+dark_mode    1.385810   0.523793   2.646  0.00859 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 4.03 on 295 degrees of freedom
+Multiple R-squared:  0.3434,    Adjusted R-squared:  0.3345 
+F-statistic: 38.57 on 4 and 295 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+Beachte, dass für die gematchten Datensätze jeweils ein
+durchschnittlicher Behandlungseffekt für die Beobachtungen \emph{mit}
+erfolgter Behandlung ermittelt wird: In sämtlichen oben gezeigten
+Verfahren werden mit \texttt{estimand\ =\ "ATT"} vergleichbarere
+Kontrollbeobachtungen für die behandelten Beobachtungen ermittelt. Wir
+schätzen den Effekt der Behandlung, indem wir die Ergebnisse von
+behandelten Personen mit denen von gematchten (d.h.ähnlichen) Personen
+vergleichen, die keine Behandlung erhalten haben. Diese Vergleichsgruppe
+dient als Ersatz für den hypothetischen Zustand der Behandlungsgruppe,
+wenn keine Behandlung erfolgt wäre. Dies ist die Definition eines ATT
+--- ein average treatment effect \emph{on the treated}.
+
+Für Matching-Verfahren (\texttt{ATT\_mod}) sind die von
+\texttt{summary()} berechneten Standardfehler (und damit
+Konfidenzintervalle, t-Statistiken und p-Werte) für den
+Behandlungseffekt \emph{grundsätzlich ungültig}. Je nach
+Matching-Verfahren liegen unterschiedliche Quellen von
+Schätzunsicherheit vor, die bei der Berechnung von Standardfehlern
+zusätzlich zu der ``üblichen'' Stichproben-Variabilität berücksichtig
+werden müssen, bspw. aufgrund der Schätzung von Propensity Scores und
+der Matching-Prozess ansich. Wir nutzen daher nachfolgende Funktionen
+gem. Empfehlungen aus der aktuellen Forschung für
+Standardfehlerberechnung.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(marginaleffects)}
+
+\CommentTok{\# Inferenz: Multiple Regression bei ungematchten Beobachtungen}
+\NormalTok{(}
+\NormalTok{  sum\_orig }\OtherTok{\textless{}{-}} \FunctionTok{avg\_comparisons}\NormalTok{(}
+    \AttributeTok{model =}\NormalTok{ ATT\_mod\_org,}
+    \AttributeTok{variables =} \StringTok{"dark\_mode"}\NormalTok{,}
+    \CommentTok{\# Heteroskedastie{-}robuste SE:}
+    \AttributeTok{vcov =} \StringTok{"HC3"}\NormalTok{, }
+    \CommentTok{\# Identifizierung der Kontrollgruppe:}
+    \AttributeTok{newdata =} \FunctionTok{subset}\NormalTok{(darkmode, dark\_mode }\SpecialCharTok{==} \DecValTok{1}\NormalTok{) }
+\NormalTok{  )}
 \NormalTok{) }
-
-\NormalTok{\# Inferenz Multiple Regression bei \_gematchten\_ Beobachtungen}
-\NormalTok{avg\_comparisons(}
-\NormalTok{  model = ATT\_mod,}
-\NormalTok{  variables = "dark\_mode",}
-\NormalTok{  vcov = \textasciitilde{}subclass, \# cluster robust SE \textgreater{} als oben =\textgreater{} mehr Unsicherheit}
-\NormalTok{  newdata = subset(darkmode\_matched, dark\_mode == 1),}
-\NormalTok{  wts = "weights"  \# = 1}
-\NormalTok{)}
-\NormalTok{\# ( Weights = 1 wg. 1:1{-}Matching.}
-\NormalTok{\# Anzahl subclasses = Anzahl gematchter treatment/control units )}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+
+      Term Contrast Estimate Std. Error    z Pr(>|z|)   S 2.5 % 97.5 %
+ dark_mode    1 - 0     1.39      0.537 2.58  0.00988 6.7 0.333   2.44
+
+Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high 
+Type:  response 
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Inferenz: Multiple Regression bei CEM}
+\NormalTok{(}
+\NormalTok{  sum\_CEM }\OtherTok{\textless{}{-}} \FunctionTok{avg\_comparisons}\NormalTok{(}
+  \AttributeTok{model =}\NormalTok{ ATT\_mod\_CEM ,}
+  \AttributeTok{variables =} \StringTok{"dark\_mode"}\NormalTok{,}
+  \CommentTok{\# Cluster{-}robuster SE}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ subclass, }
+  \AttributeTok{newdata =} \FunctionTok{subset}\NormalTok{(darkmode\_matched\_CEM, dark\_mode }\SpecialCharTok{==} \DecValTok{1}\NormalTok{),}
+  \AttributeTok{wts =} \StringTok{"weights"}  \CommentTok{\# = 1}
+\NormalTok{  )}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+
+      Term Contrast Estimate Std. Error    z Pr(>|z|)   S 2.5 % 97.5 %
+ dark_mode    1 - 0     1.65      0.549 3.01  0.00262 8.6 0.576   2.73
+
+Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high 
+Type:  response 
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Inferenz: Multiple Regression bei PSM}
+\NormalTok{(}
+\NormalTok{  sum\_PSC }\OtherTok{\textless{}{-}} \FunctionTok{avg\_comparisons}\NormalTok{(}
+    \AttributeTok{model =}\NormalTok{ ATT\_mod\_PSC ,}
+    \AttributeTok{variables =} \StringTok{"dark\_mode"}\NormalTok{,}
+    \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ subclass, }
+    \AttributeTok{newdata =} \FunctionTok{subset}\NormalTok{(darkmode\_matched\_PSC, dark\_mode }\SpecialCharTok{==} \DecValTok{1}\NormalTok{),}
+    \AttributeTok{wts =} \StringTok{"weights"}  \CommentTok{\# = 1}
+\NormalTok{  )}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+
+      Term Contrast Estimate Std. Error    z Pr(>|z|)   S 2.5 % 97.5 %
+ dark_mode    1 - 0     1.63      0.565 2.89  0.00381 8.0 0.527   2.74
+
+Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high 
+Type:  response 
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(modelsummary)}
+\FunctionTok{modelsummary}\NormalTok{(}
+  \AttributeTok{models =} \FunctionTok{list}\NormalTok{(sum\_orig, sum\_CEM, sum\_PSC)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{table}
+\centering
+\begin{tabular}[t]{lccc}
+\toprule
+  & (1) & (2) & (3)\\
+\midrule
+dark\_mode & \num{1.386} & \num{1.653} & \num{1.635}\\
+ & (\num{0.537}) & (\num{0.549}) & (\num{0.565})\\
+\midrule
+Num.Obs. & \num{300} & \num{164} & \num{208}\\
+R2 & \num{0.343} & \num{0.414} & \num{0.317}\\
+R2 Adj. & \num{0.334} & \num{0.399} & \num{0.304}\\
+AIC & \num{1694.6} & \num{921.9} & \num{1188.4}\\
+BIC & \num{1716.9} & \num{940.5} & \num{1208.4}\\
+Log.Lik. & \num{-841.321} & \num{-454.933} & \num{-588.180}\\
+F & \num{38.569} & \num{28.079} & \num{23.567}\\
+RMSE & \num{4.00} & \num{3.88} & \num{4.09}\\
+Std.Errors & HC3 &  & \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \hypertarget{inferenz-fuxfcr-attate-propensity-score-matching-mit-bootstrap}{%
 \section{Inferenz für ATT/ATE: Propensity-Score-Matching mit
@@ -1631,29 +2900,35 @@ Wir Implementieren nun einen Bootstrap-Schätzer des ATT als
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{boot\_fun \textless{}{-} function(data, i) \{}
+\NormalTok{boot\_fun }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(data, i) \{}
   
-\NormalTok{  boot\_data \textless{}{-} data[i, ]}
+\NormalTok{  boot\_data }\OtherTok{\textless{}{-}}\NormalTok{ data[i, ]}
   
-\NormalTok{  \# 1:1 PS Matching \_mit\_ Zurücklegen}
-\NormalTok{  match\_res \textless{}{-} matchit(dark\_mode \textasciitilde{} age + hours + male,}
-\NormalTok{                       data = boot\_data,}
-\NormalTok{                       caliper = .25,}
-\NormalTok{                       replace = TRUE) \# Zurücklegen}
+  \CommentTok{\# 1:1 PS Matching \_mit\_ Zurücklegen}
+\NormalTok{  match\_res }\OtherTok{\textless{}{-}} \FunctionTok{matchit}\NormalTok{(}
+\NormalTok{    dark\_mode }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ male,}
+    \AttributeTok{estimand =} \StringTok{"ATT"}\NormalTok{,}
+    \AttributeTok{distance =} \StringTok{"glm"}\NormalTok{, }
+    \AttributeTok{method =} \StringTok{"nearest"}\NormalTok{, }
+    \AttributeTok{caliper =}\NormalTok{ .}\DecValTok{3}\NormalTok{,}
+    \AttributeTok{data =}\NormalTok{ boot\_data,}
+    \CommentTok{\# mit Zurücklegen:}
+    \AttributeTok{replace =} \ConstantTok{TRUE}
+\NormalTok{  ) }
   
-\NormalTok{  \# Gematchten Datensatz zuweisen}
-\NormalTok{  darkmode\_matched \textless{}{-} match.data(match\_res, data = boot\_data)}
+  \CommentTok{\# Gematchten Datensatz zuweisen}
+\NormalTok{  darkmode\_matched }\OtherTok{\textless{}{-}} \FunctionTok{match.data}\NormalTok{(match\_res, }\AttributeTok{data =}\NormalTok{ boot\_data)}
   
-\NormalTok{  \# Outcome{-}Modell schätzen}
-\NormalTok{  ATT\_mod \textless{}{-} lm(}
-\NormalTok{    formula = read\_time \textasciitilde{} age + male + hours + dark\_mode,}
-\NormalTok{    data = darkmode\_matched, }
-\NormalTok{    weights = weights \# hier teilweise \textgreater{} 1 wg. Matching mit Zurücklegen!}
+  \CommentTok{\# Outcome{-}Modell schätzen}
+\NormalTok{  ATT\_mod }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}
+    \AttributeTok{formula =}\NormalTok{ read\_time }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ dark\_mode,}
+    \AttributeTok{data =}\NormalTok{ darkmode\_matched, }
+    \AttributeTok{weights =}\NormalTok{ weights }\CommentTok{\# hier teilweise \textgreater{} 1 wg. Matching mit Zurücklegen!}
 \NormalTok{  )}
   
-\NormalTok{  \#  ATT{-}Schätzer auslesen}
-\NormalTok{  return(}
-\NormalTok{    ATT\_mod$coefficients["dark\_mode"]  }
+  \CommentTok{\#  ATT{-}Schätzer auslesen}
+  \FunctionTok{return}\NormalTok{(}
+\NormalTok{    ATT\_mod}\SpecialCharTok{$}\NormalTok{coefficients[}\StringTok{"dark\_mode"}\NormalTok{]  }
 \NormalTok{  )}
 \NormalTok{\}}
 \end{Highlighting}
@@ -1678,28 +2953,72 @@ Standardfehler und ein 95\%-KI mit der zuvor definierten Funktion
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{library("boot")}
-\NormalTok{set.seed(4321)}
-\NormalTok{boot\_out \textless{}{-} boot(darkmode, boot\_fun, R = 999)}
+\FunctionTok{library}\NormalTok{(}\StringTok{"boot"}\NormalTok{)}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{4321}\NormalTok{)}
+\NormalTok{boot\_out }\OtherTok{\textless{}{-}} \FunctionTok{boot}\NormalTok{(darkmode, boot\_fun, }\AttributeTok{R =} \DecValTok{999}\NormalTok{)}
 
 \NormalTok{boot\_out}
 \end{Highlighting}
 \end{Shaded}
 
+\begin{verbatim}
+
+ORDINARY NONPARAMETRIC BOOTSTRAP
+
+
+Call:
+boot(data = darkmode, statistic = boot_fun, R = 999)
+
+
+Bootstrap Statistics :
+    original    bias    std. error
+t1* 1.307298 -0.163572   0.8561828
+\end{verbatim}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{\# Bootstrap{-}Schätzer für den Treatment{-}Effekt}
-\NormalTok{mean(boot\_out$t) }
-\NormalTok{\# = mean(t0) + bias = mean(Bootstrap\_samples)}
-\NormalTok{\# vgl. \textquotesingle{}t0 = boot\_fun(darkmode, i = 1:1e3)\textquotesingle{}}
-
-\NormalTok{\# Bootstrap{-}Standardfehler}
-\NormalTok{sd(boot\_out$t)}
-
-\NormalTok{\# 95\% Bootstrap{-}KI für den Treatment{-}Effekt}
-\NormalTok{boot.ci(boot\_out, type = "perc")}
+\CommentTok{\# Bootstrap{-}Schätzer für den Treatment{-}Effekt}
+\FunctionTok{mean}\NormalTok{(boot\_out}\SpecialCharTok{$}\NormalTok{t) }
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+[1] 1.143725
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# = mean(t0) + bias = mean(Bootstrap\_samples)}
+\CommentTok{\# vgl. \textquotesingle{}t0 = boot\_fun(darkmode, i = 1:1e3)\textquotesingle{}}
+
+\CommentTok{\# Bootstrap{-}Standardfehler}
+\FunctionTok{sd}\NormalTok{(boot\_out}\SpecialCharTok{$}\NormalTok{t)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] 0.8561828
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 95\% Bootstrap{-}KI für den Treatment{-}Effekt}
+\FunctionTok{boot.ci}\NormalTok{(boot\_out, }\AttributeTok{type =} \StringTok{"perc"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
+Based on 999 bootstrap replicates
+
+CALL : 
+boot.ci(boot.out = boot_out, type = "perc")
+
+Intervals : 
+Level     Percentile     
+95%   (-0.660,  2.721 )  
+Calculations and Intervals on Original Scale
+\end{verbatim}
 
 \hypertarget{doubly-robust-schuxe4tzer-fuxfcr-attate}{%
 \section{Doubly-Robust-Schätzer für
@@ -1711,79 +3030,121 @@ Vergleichen Sie mit den Ergebnissen der Aufgaben 1 (d), 4 (f) und 5 (d).
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{\# IPW estimation with regression adjustment}
-\NormalTok{ipwra \textless{}{-} function(br, index = 1:nrow(br)) \{}
-\NormalTok{    \# slice bootstrapped observations}
-\NormalTok{    br \textless{}{-} br \%\textgreater{}\% slice(index)}
+\CommentTok{\# IPW estimation with regression adjustment}
+\NormalTok{ipwra }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(br, }\AttributeTok{index =} \DecValTok{1}\SpecialCharTok{:}\FunctionTok{nrow}\NormalTok{(br)) \{}
+    \CommentTok{\# slice bootstrapped observations}
+\NormalTok{    br }\OtherTok{\textless{}{-}}\NormalTok{ br }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{slice}\NormalTok{(index)}
     
-\NormalTok{    \# estimate and predict propensity score}
-\NormalTok{    m \textless{}{-} glm(formula = dark\_mode \textasciitilde{} age + hours + male,}
-\NormalTok{             data = br, }
-\NormalTok{             family = binomial(link = \textquotesingle{}logit\textquotesingle{}))}
+    \CommentTok{\# estimate and predict propensity score}
+\NormalTok{    m }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(}\AttributeTok{formula =}\NormalTok{ dark\_mode }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ male,}
+             \AttributeTok{data =}\NormalTok{ br, }
+             \AttributeTok{family =} \FunctionTok{binomial}\NormalTok{(}\AttributeTok{link =} \StringTok{\textquotesingle{}logit\textquotesingle{}}\NormalTok{))}
     
-\NormalTok{    br \textless{}{-} br \%\textgreater{}\%}
-\NormalTok{        mutate(ps = predict(m, type = \textquotesingle{}response\textquotesingle{}))}
+\NormalTok{    br }\OtherTok{\textless{}{-}}\NormalTok{ br }\SpecialCharTok{\%\textgreater{}\%}
+        \FunctionTok{mutate}\NormalTok{(}\AttributeTok{ps =} \FunctionTok{predict}\NormalTok{(m, }\AttributeTok{type =} \StringTok{\textquotesingle{}response\textquotesingle{}}\NormalTok{))}
     
-\NormalTok{    \# trim control observations outside of treated PS range}
-\NormalTok{    minps \textless{}{-} br \%\textgreater{}\%}
-\NormalTok{        filter(dark\_mode == 1) \%\textgreater{}\%}
-\NormalTok{        pull(ps) \%\textgreater{}\%}
-\NormalTok{        min(na.rm = TRUE)}
+    \CommentTok{\# trim control observations outside of treated PS range}
+    \CommentTok{\# minps \textless{}{-} br \%\textgreater{}\%}
+    \CommentTok{\#     filter(dark\_mode == 1) \%\textgreater{}\%}
+    \CommentTok{\#     pull(ps) \%\textgreater{}\%}
+    \CommentTok{\#     min(na.rm = TRUE)}
+    \CommentTok{\# }
+    \CommentTok{\# maxps \textless{}{-} br \%\textgreater{}\%}
+    \CommentTok{\#     filter(dark\_mode == 1) \%\textgreater{}\%}
+    \CommentTok{\#     pull(ps) \%\textgreater{}\%}
+    \CommentTok{\#     max(na.rm = TRUE)}
+    \CommentTok{\# }
+    \CommentTok{\# \# do the trimming}
+    \CommentTok{\# br \textless{}{-} br \%\textgreater{}\%}
+    \CommentTok{\#     filter(ps \textgreater{}= minps \& ps \textless{}= maxps)}
+   
+\NormalTok{    br }\OtherTok{\textless{}{-}}\NormalTok{ br }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{filter}\NormalTok{(}
+        \FunctionTok{between}\NormalTok{(}
+          \AttributeTok{x =}\NormalTok{ ps,}
+          \AttributeTok{left =}\NormalTok{ .}\DecValTok{2}\NormalTok{,}
+          \AttributeTok{right =}\NormalTok{ .}\DecValTok{7}
+\NormalTok{          )}
+\NormalTok{    )}
     
-\NormalTok{    maxps \textless{}{-} br \%\textgreater{}\%}
-\NormalTok{        filter(dark\_mode == 1) \%\textgreater{}\%}
-\NormalTok{        pull(ps) \%\textgreater{}\%}
-\NormalTok{        max(na.rm = TRUE)}
-    
-\NormalTok{    \# do the trimming}
-\NormalTok{    br \textless{}{-} br \%\textgreater{}\%}
-\NormalTok{        filter(ps \textgreater{}= minps \& ps \textless{}= maxps)}
-    
-\NormalTok{    \# compute IPWs}
-\NormalTok{    br \textless{}{-} br \%\textgreater{}\%}
-\NormalTok{      mutate(}
-\NormalTok{        ipw = case\_when(}
-\NormalTok{          dark\_mode == 1 \textasciitilde{} 1 / ps,}
-\NormalTok{          dark\_mode == 0 \textasciitilde{} 1 / (1 {-} ps))}
+    \CommentTok{\# compute IPWs}
+\NormalTok{    br }\OtherTok{\textless{}{-}}\NormalTok{ br }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{mutate}\NormalTok{(}
+        \AttributeTok{ipw =} \FunctionTok{case\_when}\NormalTok{(}
+\NormalTok{          dark\_mode }\SpecialCharTok{==} \DecValTok{1} \SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{/}\NormalTok{ ps,}
+\NormalTok{          dark\_mode }\SpecialCharTok{==} \DecValTok{0} \SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{/}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ ps))}
 \NormalTok{      )}
     
-\NormalTok{    \# Simple \_ATT\_ estimate:}
-\NormalTok{    \# w\_means \textless{}{-} br \%\textgreater{}\%}
-\NormalTok{    \#     group\_by(dark\_mode) \%\textgreater{}\%}
-\NormalTok{    \#     summarize(m = weighted.mean(read\_time, w = ipw)) \%\textgreater{}\% }
-\NormalTok{    \#     arrange(dark\_mode)}
-\NormalTok{    \# }
-\NormalTok{    \# \# simple diff{-}in{-}means \_ATT\_ estimate}
-\NormalTok{    \#  return(w\_means$m[2] {-} w\_means$m[1]) }
+    \CommentTok{\# Simple \_ATT\_ estimate:}
+    \CommentTok{\# w\_means \textless{}{-} br \%\textgreater{}\%}
+    \CommentTok{\#     group\_by(dark\_mode) \%\textgreater{}\%}
+    \CommentTok{\#     summarize(m = weighted.mean(read\_time, w = ipw)) \%\textgreater{}\% }
+    \CommentTok{\#     arrange(dark\_mode)}
+    \CommentTok{\# }
+    \CommentTok{\# \# simple diff{-}in{-}means \_ATT\_ estimate}
+    \CommentTok{\#  return(w\_means$m[2] {-} w\_means$m[1]) }
     
-\NormalTok{    \# Do regression adjustment for \_ATE\_ estimate}
-\NormalTok{    \# TE prediction for whole sample based on TG model}
-\NormalTok{    mtreat \textless{}{-} br \%\textgreater{}\%}
-\NormalTok{      filter(dark\_mode == 1) \%\textgreater{}\%}
-\NormalTok{      lm(read\_time \textasciitilde{} 1 + age + hours + male, data = ., weights = .$ipw) \%\textgreater{}\%}
-\NormalTok{      predict(newdata = br) \%\textgreater{}\%}
-\NormalTok{      mean()}
+    \CommentTok{\# Do regression adjustment for \_ATE\_ estimate}
+    \CommentTok{\# TE prediction for whole sample based on TG model}
+\NormalTok{    mtreat }\OtherTok{\textless{}{-}}\NormalTok{ br }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{filter}\NormalTok{(dark\_mode }\SpecialCharTok{==} \DecValTok{1}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{lm}\NormalTok{(read\_time }\SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{+}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ male, }\AttributeTok{data =}\NormalTok{ ., }\AttributeTok{weights =}\NormalTok{ .}\SpecialCharTok{$}\NormalTok{ipw) }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{predict}\NormalTok{(}\AttributeTok{newdata =}\NormalTok{ br) }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{mean}\NormalTok{()}
     
-\NormalTok{    \# TE prediction for whole sample based on CG model}
-\NormalTok{    mcont \textless{}{-} br \%\textgreater{}\%}
-\NormalTok{      filter(dark\_mode == 0) \%\textgreater{}\%}
-\NormalTok{      lm(read\_time \textasciitilde{} 1 + age + hours + male, data = ., weights = .$ipw) \%\textgreater{}\%}
-\NormalTok{      predict(newdata = br) \%\textgreater{}\%}
-\NormalTok{      mean()}
+    \CommentTok{\# TE prediction for whole sample based on CG model}
+\NormalTok{    mcont }\OtherTok{\textless{}{-}}\NormalTok{ br }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{filter}\NormalTok{(dark\_mode }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{lm}\NormalTok{(read\_time }\SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{+}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ male, }\AttributeTok{data =}\NormalTok{ ., }\AttributeTok{weights =}\NormalTok{ .}\SpecialCharTok{$}\NormalTok{ipw) }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{predict}\NormalTok{(}\AttributeTok{newdata =}\NormalTok{ br) }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{mean}\NormalTok{()}
 
-\NormalTok{    return(mtreat {-} mcont) \# Regression adjusted \_ATE\_ estimate}
+    \FunctionTok{return}\NormalTok{(mtreat }\SpecialCharTok{{-}}\NormalTok{ mcont) }\CommentTok{\# Regression adjusted \_ATE\_ estimate}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{b \textless{}{-} boot(data = darkmode, ipwra, R = 999)}
-\NormalTok{\# Bootstrap estimate and standard error}
-\NormalTok{mean(b$t)}
-\NormalTok{sd(b$t)}
+\NormalTok{b }\OtherTok{\textless{}{-}} \FunctionTok{boot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ darkmode, ipwra, }\AttributeTok{R =} \DecValTok{999}\NormalTok{)}
+\CommentTok{\# Bootstrap estimate and standard error}
+\FunctionTok{mean}\NormalTok{(b}\SpecialCharTok{$}\NormalTok{t)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+[1] 1.945025
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sd}\NormalTok{(b}\SpecialCharTok{$}\NormalTok{t)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] 0.6190766
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 95\% Bootstrap{-}KI für den Treatment{-}Effekt}
+\FunctionTok{boot.ci}\NormalTok{(b, }\AttributeTok{type =} \StringTok{"perc"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
+Based on 999 bootstrap replicates
+
+CALL : 
+boot.ci(boot.out = b, type = "perc")
+
+Intervals : 
+Level     Percentile     
+95%   ( 0.728,  3.085 )  
+Calculations and Intervals on Original Scale
+\end{verbatim}
 
 \vfill
 
@@ -4443,7 +5804,7 @@ Erklärungskraft werden durch die Regularisierung in Richtung 0 gezwungen
 und reduzieren so die Varianz der Vorhersage gegenüber der
 (idealerweise) unverzerrten KQ-Schätzung.
 
-\begin{tcolorbox}[enhanced jigsaw, colbacktitle=quarto-callout-note-color!10!white, bottomtitle=1mm, breakable, leftrule=.75mm, opacityback=0, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Ridge Regression}, left=2mm, arc=.35mm, titlerule=0mm, bottomrule=.15mm, opacitybacktitle=0.6, coltitle=black, toptitle=1mm, colback=white, colframe=quarto-callout-note-color-frame, toprule=.15mm, rightrule=.15mm]
+\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, left=2mm, coltitle=black, leftrule=.75mm, toprule=.15mm, titlerule=0mm, bottomrule=.15mm, colframe=quarto-callout-note-color-frame, breakable, opacitybacktitle=0.6, bottomtitle=1mm, arc=.35mm, colback=white, colbacktitle=quarto-callout-note-color!10!white, toptitle=1mm, opacityback=0, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Ridge Regression}]
 
 \begin{itemize}
 \item
@@ -5016,7 +6377,7 @@ und damit zu einer höheren Vorhersagegüte. Das ``sparsame'' mit
 Lasso-Regression geschätzte Modell ist dem ``großen'' mit KQ geschätztem
 Modell in dieser Hinsicht also überlegen.
 
-\begin{tcolorbox}[enhanced jigsaw, colbacktitle=quarto-callout-note-color!10!white, bottomtitle=1mm, breakable, leftrule=.75mm, opacityback=0, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Lasso-Regression}, left=2mm, arc=.35mm, titlerule=0mm, bottomrule=.15mm, opacitybacktitle=0.6, coltitle=black, toptitle=1mm, colback=white, colframe=quarto-callout-note-color-frame, toprule=.15mm, rightrule=.15mm]
+\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, left=2mm, coltitle=black, leftrule=.75mm, toprule=.15mm, titlerule=0mm, bottomrule=.15mm, colframe=quarto-callout-note-color-frame, breakable, opacitybacktitle=0.6, bottomtitle=1mm, arc=.35mm, colback=white, colbacktitle=quarto-callout-note-color!10!white, toptitle=1mm, opacityback=0, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Lasso-Regression}]
 
 \begin{itemize}
 \item
@@ -5991,7 +7352,7 @@ Der Post-Double-Selection-Schätzer liefert unter den betrachteten
 Verfahren die beste Schätzung von \(\alpha_0\) und erlaubt gülstige
 statistische Inferenz. Der geschätzte Effekt ist hoch-signifikant.
 
-\begin{tcolorbox}[enhanced jigsaw, colbacktitle=quarto-callout-note-color!10!white, bottomtitle=1mm, breakable, leftrule=.75mm, opacityback=0, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum Post-Double-Selection-Schätzer}, left=2mm, arc=.35mm, titlerule=0mm, bottomrule=.15mm, opacitybacktitle=0.6, coltitle=black, toptitle=1mm, colback=white, colframe=quarto-callout-note-color-frame, toprule=.15mm, rightrule=.15mm]
+\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, left=2mm, coltitle=black, leftrule=.75mm, toprule=.15mm, titlerule=0mm, bottomrule=.15mm, colframe=quarto-callout-note-color-frame, breakable, opacitybacktitle=0.6, bottomtitle=1mm, arc=.35mm, colback=white, colbacktitle=quarto-callout-note-color!10!white, toptitle=1mm, opacityback=0, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum Post-Double-Selection-Schätzer}]
 
 \begin{itemize}
 \item
@@ -6282,6 +7643,12 @@ Schätzung \(\widehat{\alpha}_0\approx-0.05\).
 
 \hypertarget{refs}{}
 \begin{CSLReferences}{1}{0}
+\leavevmode\vadjust pre{\hypertarget{ref-Austin2011}{}}%
+Austin, P. 2011. {„An Introduction to Propensity Score Methods for
+Reducing the Effects of Confounding in Observational Studies``}.
+\emph{Multivariate Behavioral Research} 46 (3): 399--424.
+\url{https://doi.org/10.1080/00273171.2011.568786}.
+
 \leavevmode\vadjust pre{\hypertarget{ref-BarroLee2013}{}}%
 Barro, Robert J., und Jong Wha Lee. 2013. {„A new data set of
 educational attainment in the world, 1950--2010``}. \emph{Journal of
@@ -6332,6 +7699,17 @@ Hahn, P Richard, Carlos M Carvalho, David Puelz, und Jingyu He. 2018.
 {„Regularization and confounding in linear regression for treatment
 effect estimation``}.
 
+\leavevmode\vadjust pre{\hypertarget{ref-Hajek1971}{}}%
+Hájek, J. 1971. {„Comment on {‚An essay on the logical foundations of
+survey sampling`} by Basu, D``}. \emph{Foundations of Statistical
+Inference} 236.
+
+\leavevmode\vadjust pre{\hypertarget{ref-Hiranoetal2003}{}}%
+Hirano, Keisuke, Guido Imbens, und Geert Ridder. 2003. {„Efficient
+Estimation of Average Treatment Effects Using the Estimated Propensity
+Score.``} \emph{Econometrica} 71 (4): 1161--89.
+\url{https://doi.org/10.1111/1468-0262.00442}.
+
 \leavevmode\vadjust pre{\hypertarget{ref-HoerlKennard1970}{}}%
 Hoerl, Arthur E, und Robert W Kennard. 1970. {„{Ridge regression: Biased
 estimation for nonorthogonal problems}``}. \emph{Technometrics} 12 (1):
@@ -6352,10 +7730,20 @@ Lee, David S. 2008. {„Randomized experiments from non-random selection
 in US House elections``}. \emph{Journal of Econometrics} 142 (2):
 675--97.
 
+\leavevmode\vadjust pre{\hypertarget{ref-Love2004}{}}%
+Love, Thomas. 2004. {„Graphical display of covariate balance``}.
+Presentation.
+
 \leavevmode\vadjust pre{\hypertarget{ref-McCrary2008}{}}%
 McCrary, Justin. 2008. {„Manipulation of the running variable in the
 regression discontinuity design: A density test``}. \emph{Journal of
 Econometrics} 142 (2): 698--714.
+
+\leavevmode\vadjust pre{\hypertarget{ref-RosenbaumRubin1983}{}}%
+Rosenbaum, Paul R., und Donald R. Rubin. 1983. {„The central role of the
+propensity score in observational studies for causal effects``}.
+\emph{Biometrika} 70 (1): 170--84.
+\url{https://doi.org/10.1017/cbo9780511810725.016}.
 
 \leavevmode\vadjust pre{\hypertarget{ref-Tibshirani1996}{}}%
 Tibshirani, Robert. 1996. {„Regression shrinkage and selection via the
