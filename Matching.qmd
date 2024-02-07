@@ -204,6 +204,8 @@ Der DGP in @fig-maleCDdarkmode führt zu einer verzerrten Schätzung des kausale
 
 Die Zusammenfassung `anteile_m` zeigt, dass der Anteil männlicher User in der Behandlungsgruppe deutlich höher ist als in der Kontrollgruppe.
 
+### Matching durch Gewichtung
+
 Matching eliminiert die Variation von `male` zwischen den Gruppen. Eine Möglichkeit hierfür ist die Gewichtung der Beobachtungen in der Kontrollgruppe entsprechend der Anteile von Männern und Nicht-Männern in der Behandlungsgruppe, sodass die Vergleichbarkeit mit der Behandlungsgruppe hinsichtlich des Geschlechts gewährleistet ist. Dies wird in der Literatur als *Balance* bezeichnet. Der Behandlungseffekt wird dann analog zu \eqref{eq:naivATEdarkmode} geschätzt.
 
 Die Gewichte für Beobachtungen in der Kontrollgruppe $w_i$ werden berechnet als \begin{align}
@@ -369,7 +371,42 @@ Die Einträge `M.0.Un` und `M.1.Un` zeigen die jeweiligen Stichprobenmittelwerte
 
 Die Balance Table weist also auf einen vernachlässigbaren Unterschied für `hours` hin und bestätigt den aus den Grafiken abgeleiteten Eindruck einer relevanten Differenzen für `age`.
 
-### Mehrere Matching-Variablen und der Propensity Score
+### Entropy Balancing
+
+*Entropy Balancing* [@Hainmueller2012] ist eine weitere Methode zur Gewährleistung der Vergleichbarkeit von Behandlungs- und Kontrollgruppe anhand von Gewichten. Das Verfahren nutzt Konzepte aus der [Informationstheorie](https://de.wikipedia.org/wiki/Informationstheorie) um die Gewichte für Subjekte in der Kontrollgruppe so anzupassen, dass die Verteilung der Matchingvariablen in der Kontrollgruppe die Verteilung in der Behandlungsgruppe möglichst gut approximiert. Dies geschieht unter der Restriktion, dass bestimmte empirische Momente (meist Mittelwerte und Varianzen) der Matchingvariablen exakt übereinstimmen. Mathematisch werden die Gewichte für Kontrollgruppenbeobachtungen durch Minimierung der [Kullback-Leibler-Divergenz](https://de.wikipedia.org/wiki/Kullback-Leibler-Divergenz) zwischen den Verteilungen gefunden, wobei die Divergenz ein Maß für den Unterschied von Wahrscheinlichkeitsverteilungen ist.
+
+Entropy Balancing ist im R-Paket `WeightIt` implementiert. Wir zeigen, wie die benötigten Gewichte für eine Schätzungen des ATT im Website-Beispiel mit `WeightIt::wightit()` bestimmt werden können. Über das Argument `moments` legen wir fest, dass die Gewichte unter der Restriktion übereinstimmender Mittelwerte aller Matching-Variablen zwischen Behandlungs- und Kontrollgruppe erfolgen soll. 
+
+```{r}
+library(WeightIt)
+
+# Gewichte für Entropy Balancing
+(
+  W1 <- weightit(
+  dark_mode ~ age + male + hours,
+  data = darkmode,
+  method = "ebal", 
+  estimand = "ATT",
+  moments = 1
+  )
+ )
+```
+
+Wir schätzen den Behandlungseffekt nach Entropy Balancing mit gewichteter Regression.
+
+```{r}
+# Mittelwert-Vergleich mit lm()
+fit <- lm(
+  formula = read_time ~ dark_mode, 
+  data = darkmode, 
+  weights = W1$weights
+)
+summary(fit)
+```
+
+Beachte, dass die von `summary()` berechneten Standardfehler bei Entropy Balancing ungültig sind. In Abschnitt @sec-bootmatching erläutern wir die Berechnung von Standardfehlern für Matching-Schätzer mit dem Bootstrap.
+
+### Mehrere Matching-Variablen und der Propensity Score {#sec-PSM}
 
 Bei mehreren Backdoor-Variablen kann eine Gewichtung anhand der Behandlungswahrscheinlichkeit (*Treatment Propensity*) erfolgen. Die Idee hierbei ist, dass der DGP wie in @fig-propCDdarkmode dargestellt werden kann.
 
@@ -538,18 +575,18 @@ summary(model_ipw)
 
 Unsere Schätzung des ATE ist der geschätzte Koeffizient von `dark_mode`. Die ausgegebenen Standardfehler und Inferenzstatistiken sind jedoch *ungültig* aufgrund der Gewichtung mit IPWs, den inversen *geschätzten* Wahrscheinlichkeiten für eine Behandlung. Der Grund hierfür ist, dass die Berechnung der Standardfehler in `summary()` die zusätzliche Unsicherheit durch die geschätzen *Propensity Scores* nicht berücksichtigt! Später im Kapitel erläutern wir die Berechnung gültiger Standardfehler für IPW-Schätzer basierend auf *Propensity Scores* mit dem Bootstrap.
 
-## Matching-Verfahren
+## Selektierende Matching-Verfahren
 
-Das grundsätzliche Konzept von Matching wird in der nachstehenden interaktiven Grafik veranschaulicht. Hier betrachten wir beobachtete Ausprägungen von zwei (unabhängig und identisch verteilten) Matching-Variablen für Subjekte in der Behandlungsgruppe (blau) sowie Kontrollgruppe (rot). Per Klick auf eine Beobachtung werden Matches aus der anderen Gruppe in grün kenntlich gemacht. Als Matches zählen sämtliche Beobachtungen der anderen Gruppe, deren [Euklidische Distanz](https://de.wikipedia.org/wiki/Euklidischer_Abstand) zu dem ausgewählten Punkt das über den Slider eingestellte Maximum *Caliper* nicht überschreitet.^[Es handelt sich hierbei um einen Spezialfall von Matching anhand der Mahalanobis-Distanz.] Diese Region wird durch den gestrichelten Kreis gekennzeichnet. Die Grafik illustriert inbesondere, dass Beobachtungen mehrfach (s.g. Matching mit zurücklegen) oder gar nicht gematcht werden können.
+Das grundsätzliche Konzept von selektierendem Matching wird in der nachstehenden interaktiven Grafik veranschaulicht. Hier betrachten wir beobachtete Ausprägungen von zwei (unabhängig und identisch verteilten) Matching-Variablen für Subjekte in der Behandlungsgruppe (blau) sowie Kontrollgruppe (rot). Per Klick auf eine Beobachtung werden Matches aus der anderen Gruppe in cyan farblich kenntlich gemacht. Als Matches zählen sämtliche Beobachtungen der anderen Gruppe, deren [Euklidische Distanz](https://de.wikipedia.org/wiki/Euklidischer_Abstand) zu dem ausgewählten Punkt das über den Slider eingestellte Maximum *Caliper* nicht überschreitet.^[Es handelt sich hierbei um einen Spezialfall von Matching anhand der Mahalanobis-Distanz.] Diese Region wird durch den gestrichelten Kreis gekennzeichnet. Die Grafik illustriert inbesondere, dass Beobachtungen mehrfach (s.g. Matching mit zurücklegen) oder gar nicht gematcht werden können.
 
 <iframe width="100%" height="629" frameborder="0" src="https://observablehq.com/embed/62067a02a72c9f90?cells=theplot%2Cviewof+caliper%2Cstyles">
 </iframe>
 
-`MatchIt::matchit()` nutzt standardmäßig Eins-zu-Eins-Matching (ohne Zurücklegen) von Beobachtungen der Treatment-Gruppe mit Beobachtungen der Kontrollgruppe. Die für das Matching zu verwendenden Variablen werden über das Argument `formula` als Funktion des Behandlungsindikators definiert. `matchit()` bereitet das Objekt für eine Schätzung des ATT mit einer geeigneten Funktionen, s. `?matchit` und hier insb. die Erläuterungen der Argumente `replace = F`, `ratio = 1` und `estimand = "ATT"` für Details. Mit `cobalt::balt.tab()` erhalten wir eine *balance table* für den gematchten Datensatz.
+Für die nachfolgenden Code-Beispiele verwenden wir das R-Paket `MatchIt`. `MatchIt::matchit()` nutzt standardmäßig Eins-zu-Eins-Matching (ohne Zurücklegen) von Beobachtungen der Treatment-Gruppe mit Beobachtungen der Kontrollgruppe.^[Dieses Schema zielt auf eine Schätzung des ATT ab.] Die für das Matching zu verwendenden Variablen werden über das Argument `formula` als Funktion des Behandlungsindikators definiert. `matchit()` bereitet das Objekt für eine Schätzung des ATT mit einer geeigneten Funktionen, s. `?matchit` und hier insb. die Erläuterungen der Argumente `replace = F`, `ratio = 1` und `estimand = "ATT"` für Details. Mit `cobalt::balt.tab()` erhalten wir eine *balance table* für den gematchten Datensatz.
 
 Wir zeigen als nächstes, wie `MatchIt::matchit()` für Matching anhand der Regressoren `age`, `hours`, und `male` in unserem Website-Beispiel für unterschiedliche Varianten durchgeführt werden kann.
 
-**Exaktes Matching**
+### Exaktes Matching 
 
 Exaktes Matching ordnet einem Subjekt aus der Behandlungsgruppe ein oder mehrere Subjekte aus der Kontrollgruppe zu, wenn die boebachteten Ausprägung der Matching-Variablen *exakt* übereinstimmen. Hierbei muss die 'Distanz' zwischen den Ausprägung der Matching-Variablen folglich $0$ sein. Dieses Verfahren findet meist bei ausschließlich diskret verteilten Merkmalen Anwendung. Bei kontinuierlich verteilten Merkmalen (vgl. die obige interaktive Grafik) sind exakte Matches zwar theoretisch unmöglich, ergeben sich jedoch in der Praxis aus der Datenerfassung, bspw. durch Rundungsfehler. In `matchit()` erhalten wir exaktes Ein-zu-eins-Matching mit `method = "exact"`.
 
@@ -568,7 +605,7 @@ res_em
 
 Aufgrund der kontinulierliche Verteilten Variable `hours` gibt es in unserem Website-Beispiel keine exakten Matches. Dieses Verfahren ist hier folglich ungeeignet.
 
-**Coarsened Exact Matching**
+### Coarsened Exact Matching
 
 Bei dieser Methode werden kontinuierliche Matching-Variablen grob (Engl. *coarse*) klassiert, ähnlich wie bei einem Histogram. Diese Diskretisierung ermöglicht es exakte Übereinstimmungen zwischen Behandlungs- und Kontrollgruppenbeobachtungen hinsichtlich ihrer klassierten Ausprägungen zu finden. Sowohl Behandlungs- als auch Kontrollbeobachtungen die mindestents einen exakten Match haben, werden Teil des gematchten Datensatzes. In `matchit()` wird Coarsened Exact Matching mit `method = "cem"` durchgeführt. Über das Argument `cutpoints` geben wir an, dass `hours` in 6 Klassen und `age` in 4 Klassen eingeteilt werden soll.^[Diese Werte wurden ad-hoc gewählt da sie zu einem guten Ergebnis führen.] Mit `k1k = TRUE` erfolgt Eins-zu-eins-Matching: Bei mehreren exakten Matches wird die Beobachtung mit der geringsten Mahalanobis-Distanz (für die unklassierten Matching-Variablen) gewählt.
 
@@ -595,7 +632,7 @@ bal.tab(res_CEM)
 
 Mit Coarsened Exact Matching erhalten wir einen Datensatz mit 82 Beobachtungen und guter Balance.
 
-**Matching anhand der Mahalanobis-Distanz**
+### Matching mit der Mahalanobis-Distanz
 
 Die Euklidische Distanz misst den direkten Abstand zwischen zwei Punkten und ist nicht invariant gegenüber Transformationen, insbesondere bei unterschiedlichen Skalierungen und bei Korrelation der Matching-Variablen. Die Mahalanobis-Distanz hingegen ist ein standardisiertes Distanzmaß, das unter Berücksichtigung der Varianz-Kovarianz-Struktur der Daten angibt, wie viele Standardabweichungen zwei Datenpunkte voneinander entfernt sind. Die Mahalanobis-Distanz ist invariant gegenüber linearen Transformationen (Skalierung, Translation und Rotation) der Daten und bietet ein genaueres Maß für die Unähnlichkeit zweier Beobachtungen hinsichtlich ihrer Ausprägungen der Matching-Variablen. 
 
@@ -611,7 +648,7 @@ Für beobachtete Daten ersetzen wir die Komponenten der Varianz-Kovarianz-Matrix
   \widehat{d}_M(P_1,\,P_2) = \sqrt{
   \begin{pmatrix}
     X_1 - X_2\\
-    \tilde  Y_1 - \tilde Y_2
+    Y_1 - Y_2
   \end{pmatrix}'
   \begin{pmatrix}
     \widehat{\text{Var}}(X^2) & \widehat{\text{Cov}}(X, Y) \\
@@ -619,7 +656,7 @@ Für beobachtete Daten ersetzen wir die Komponenten der Varianz-Kovarianz-Matrix
   \end{pmatrix}^{-1}
     \begin{pmatrix}
     X_1 - X_2\\
-    \tilde Y_1 - \tilde Y_2
+    Y_1 - Y_2
   \end{pmatrix}
 }.
 \end{align*}
@@ -679,7 +716,7 @@ bal.tab(res_mahaC)
 
 Die Balance-Table zeigt einen deutlichen Effekt der Beschränkung qualifizierter Beobachtungen durch `caliper = .25`: Aufgrund der oberen Grenze für die Propensity-Score-Differenz von $`r round(.25 * sd(fitted(darkmode_ps_logit)), 3)`$ wird für lediglich $104$ Beobachtungen aus der Behandlungsgruppe ein individueller Match in der Kontrollgruppe gefunden.^[Die durch `caliper` implizierte Obergrenze ergibt sich als `.25 * sd(fitted(darkmode_ps_logit)))`.] Weiterhin finden wir eine verbesserte Balance für den gematchten Datensatz.
 
-**Matching mit Propensity Scores und Caliper**
+### Propensity Score Matching
 
 Eine gängige Variante ist Matching ausschließlich anhand von Propensity Scores innerhalb eines Calipers. 
 
@@ -767,12 +804,14 @@ darkmode_matched_CEM %>%
   ylab("Anteil")
 ```
 
-Wir beobachten eine bessere Balance bei `age` und `hours`. Inbesondere ist `male` für Kontroll- und Behandlungsgruppe ausgeglichen!
+Wir beobachten eine bessere Balance bei `age` und `hours`. Inbesondere ist `male` für Kontroll- und Behandlungsgruppe ausgeglichen.
 
-## Schätzung und Inferenz für den Behandlungseffekts nach Matching
 
-Wir schätzen nun den Behandlungseffekt von `dark_mode` auf `read_time` für die mit CEM und Propensity Score Matching ermittelten Datensätze mittels linearer Regression und vergleichen mit einer Regression anhand des ursprünglichen Datensatzes. 
+## Schätzung und Inferenz für den Behandlungseffekt nach Matching
 
+Wir schätzen nun den Behandlungseffekt von `dark_mode` auf `read_time` für die mit CEM und Propensity Score Matching ermittelten Datensätzen und vergleichen die Ergebniss anschließend mit einer Regressionsschätzung ohne Matching. 
+
+Wir kombinieren die Matching-Verfahren mit linearer Regression, d.h. wir Schätzen den Behandlungseffekt anhand es gematchten Datensatzes als Mittelwertdifferenz nach zusätzlicher Kontrolle für die Matching-Variablen. Diese Kombination von Matching mit Regression wird in der Literatur als *Regression Adjustment* bezeichnet und ist insbesondere hilfreich, wenn Backdoors mit Matching geschlossen werden sollen, der kausale Effekt jedoch nur unter Verwendung einer nicht-trivialen Regressionsfunktion ermittelt werden kann. Zum Beispiel kann bei einer kontinuierlichen Behandlungsvariable und einem nicht-linearen Zusammenhang mit $Y$ der kausale Effekt nicht durch einen bloßen Mittelwertvergleich erfasst werden, sondern erfordert eine adäquate Modellierung dieses Zusammenhangs in der Regressionsfunktion. Die zusätzliche Kontrolle für Matching-Variablen kann die Varianz der Schätzung verringern und das Risiko einer verzerrten Schätzung abmildern, falls nach Matching noch Unterschiede in der Balance von Behandlungs- und Kontrollgruppe vorliegen.
 
 ```{r}
 # ATT mit linearem Modell schätzen: CEM Datensatz
@@ -781,6 +820,7 @@ ATT_mod_CEM <- lm(
   data = darkmode_matched_CEM, 
   weights = weights 
 )
+
 summary(ATT_mod_CEM)
 ```
 
@@ -794,26 +834,36 @@ ATT_mod_PSC <- lm(
   data = darkmode_matched_PSC, 
   weights = weights 
 )
+
 summary(ATT_mod_PSC)
 ```
 
 ```{r}
-# ATT mit linearem Modell für vollständigen Datensatz schätzen
+# ATT mit linearem Modell ohne Matching
 ATT_mod_org <- lm(
   formula = read_time ~ age + male + hours + dark_mode,
   data = darkmode
 )
+
 summary(ATT_mod_org)
 ```
 
-Beachte, dass für die gematchten Datensätze jeweils ein durchschnittlicher Behandlungseffekt für die Beobachtungen _mit_ erfolgter Behandlung ermittelt wird: In sämtlichen oben gezeigten Verfahren werden mit `estimand = "ATT"` vergleichbarere Kontrollbeobachtungen für die behandelten Beobachtungen ermittelt. Wir schätzen den Effekt der Behandlung, indem wir die Ergebnisse von behandelten Personen mit denen von  gematchten (d.h.ähnlichen) Personen vergleichen, die keine Behandlung erhalten haben. Diese Vergleichsgruppe dient als Ersatz für den hypothetischen Zustand der Behandlungsgruppe, wenn keine Behandlung erfolgt wäre. Dies ist die Definition eines ATT --- ein average treatment effect *on the treated*.
+Beachte, dass für die gematchten Datensätze jeweils ein durchschnittlicher Behandlungseffekt für die Beobachtungen _mit_ erfolgter Behandlung ermittelt wird: In sämtlichen oben gezeigten Matchibg-Verfahren werden mit `estimand = "ATT"` vergleichbarere Kontrollbeobachtungen für die behandelten Beobachtungen ermittelt. Wir schätzen den Effekt der Behandlung, indem wir die Ergebnisse von behandelten Personen mit denen von gematchten Personen vergleichen, die keine Behandlung erhalten haben. Diese Vergleichsgruppe dient als Ersatz für den hypothetischen Zustand der Behandlungsgruppe, wenn keine Behandlung erfolgt wäre. Dies entspricht der Definition eines ATT --- ein average treatment effect *on the treated*.
 
-Für Matching-Verfahren (`ATT_mod`) sind die von `summary()` berechneten Standardfehler (und damit Konfidenzintervalle, t-Statistiken und p-Werte) für den Behandlungseffekt *grundsätzlich ungültig*. Je nach Matching-Verfahren liegen unterschiedliche Quellen von Schätzunsicherheit vor, die bei der Berechnung von Standardfehlern zusätzlich zu der "üblichen" Stichproben-Variabilität berücksichtig werden müssen, bspw. aufgrund der Schätzung von Propensity Scores und der Matching-Prozess ansich. Wir nutzen daher nachfolgende Funktionen gem. Empfehlungen aus der aktuellen Forschung für Standardfehlerberechnung.
+### Cluster-robuste Standardfehler
+
+Für Matching-Verfahren sind die mit `summary()` berechneten Standardfehler (und damit auch Konfidenzintervalle, t-Statistiken und p-Werte) für den Behandlungseffekt *grundsätzlich ungültig*. Je nach Matching-Verfahren liegen unterschiedliche Quellen von Schätzunsicherheit vor, die bei der Berechnung von Standardfehlern zusätzlich zu der "üblichen" Stichproben-Variabilität berücksichtig werden müssen. Gründe hierfür sind der Matching-Prozess ansich oder weitere Unsicherheit durch die Schätzung zusätzlicher Parameter, etwa bei der Berechnung von Propensity Scores mit logistischer Regression. Eine weiterere Ursache zusätzlicher Variation durch den Matching-Prozess, die wir bisher nicht näher betrachtet haben ensteht durch Zurücklegen, d.h. wenn Beobachtungen mehrfach gematcht werden können. Auch dieser Faktor wird in der von `summary()` verwendeten Formel für den Standardfehler des Effekt-Schätzers nicht berücksichtigt.
+
+Standardfehlerberechnung für Matching-Schätzer von Behandlungseffekten ist Gegenstand aktueller Forschung. @AustinSmall2014 und @AbadieSpiess2022 belegen die Gültigkeit von cluster-robusten Standardfehlern mit Clustering auf Ebene der Beobachtungsgruppen (`subclass` im output von `match.data()`) bei Matching ohne Zurücklegen. Für Matching anhand von Propensity Scores (auch mit Zurücklegen) zeigen @AbadieImbens2016, dass ignorieren der zusätzlichen Unsicherheit durch die Schätzung der Propensity Scores zu konservativer Inferenz für den ATE anhand eines cluster-robusten Standardfehlerschätzers führt, jedoch ungültige Inferenz für die Schätzung des ATT bedeuten kann. Ähnlich zu @AustinSmall2014 deuten die Ergebnisse der Simulationsstudie von @Bodoryetal2020 auf grundsätzlich bessere Eigenschaften der Schätzung hin, wenn die Standardfehler nicht für die Schätzung der Propensity Scores adjustiert werden.
+
+Weiterhin ist die Kontrolle für Kovariablen mit Erklärungskraft für die Outcome-Variable und für die Matching-Variablen (wie oben erfolgt) mit *Regression Adjustment* für die Schätzung des Behandlungseffekts nach Matching eine etablierte Strategie, vgl. @HillReiter2006 und @AbadieSpiess2022. So können die Varianz der Schätzung und das Risiko einer Verzerrung der Standardfehler aufgrund verbleibender Imbalance von Behandlungs- und Kontrollgruppe nach Matching verringert werden.
+
+Zur Demonstration von (cluster)-robuster Inferenz und für eine  tabellarische Zusammenfassung der Ergebnisse nutzen wir die Pakete `marginaleffects` und `modelsummary`. Mit `marginaleffects::avg_comparisons()` können p-Werte und Kofindenzintervalle unter Berücksichtigung von robuster Standardfehlern und der Gewichte aus dem Matching-Verfahren berechnet werden.
 
 ```{r}
 library(marginaleffects)
 
-# Inferenz: Multiple Regression bei ungematchten Beobachtungen
+# Inferenz: Multiple Regression, ungematchter Datensatz
 (
   sum_orig <- avg_comparisons(
     model = ATT_mod_org,
@@ -824,19 +874,21 @@ library(marginaleffects)
     newdata = subset(darkmode, dark_mode == 1) 
   )
 ) 
-
+```
+```{r}
 # Inferenz: Multiple Regression bei CEM
 (
   sum_CEM <- avg_comparisons(
   model = ATT_mod_CEM ,
   variables = "dark_mode",
-  # Cluster-robuster SE
+  # Cluster-robuste SE
   vcov = ~ subclass, 
   newdata = subset(darkmode_matched_CEM, dark_mode == 1),
-  wts = "weights"  # = 1
+  wts = "weights"
   )
 )
-
+```
+```{r}
 # Inferenz: Multiple Regression bei PSM
 (
   sum_PSC <- avg_comparisons(
@@ -844,72 +896,108 @@ library(marginaleffects)
     variables = "dark_mode",
     vcov = ~ subclass, 
     newdata = subset(darkmode_matched_PSC, dark_mode == 1),
-    wts = "weights"  # = 1
+    wts = "weights"
   )
 )
 ```
 
+Wir fassen die Ergebnisse mit `modelsummary::modelsummary()` tabellarisch zusammen.
+
 ```{r}
 library(modelsummary)
+
+# Tabellarische Zusammenfassung erzeugen
 modelsummary(
-  models = list(sum_orig, sum_CEM, sum_PSC)
-)
+  models = list(
+   "Kein Matching" = sum_orig, 
+   "Coarsened Exact" = sum_CEM, 
+   "Propensity Scores" = sum_PSC
+  ),
+  stars = T, 
+  gof_map = "nobs", 
+  output = "gt"
+) %>%
+  tabopts()
 ```
 
 
-## Inferenz für ATT/ATE: Propensity-Score-Matching mit Bootstrap
-
-Bei Matching mit Zurücklegen besteht zusätzliche Unsicherheit durch Zurücklegen, d.h. Beobachtungen aus der Kontroll-Gruppe können mehrfach als Match für Beobachtungen aus der Treatment-Gruppe genutzt werden. Mit `summary()` berechnete Standardfehler berücksichtigen dies nicht!
+## Bootstrap-Schätzung kausaler Effekte bei Matching {#sec-bootmatching}
 
 Ein Bootstrap-Verfahren generiert mit Resampling (wiederholtes Ziehen mit Zurücklegen) aus dem Original-Datensatz (viele) künstliche Datensätze, für die der Schätzer (d.h. das gesamte Verfahren inkl. Matching!) jeweils berechnet wird. Die Verteilung der so gewonnenen Bootstrap-Schätzwerte approximiert die wahre, unbekannte Stichprobenverteilung des Schätzers des Behandlungseffekts. Mit dieser simulierten Verteilung können wir Inferenz betreiben: Wir können einen Bootstrap-Punktschätzer des Behandlungseffekts (Stichprobenmittel der Bootstrap-Schätzungen) sowie Standardfehler (Standardabweichung der der Bootstrap-Schätzungen) und p-Werte berechnen.
 
-Wir Implementieren nun einen Bootstrap-Schätzer des ATT als `R`-Funktion `boot_fun()`.
+Der Bootstrap kann hilfreich sein, wenn unklar ist, wie Standardfehler für die Unsicherheit des Matching-Prozesses zu adjustieren sind, um gültige Inferenzsstatistiken zu erhalten. @AbadieImbens2008 zeigen analytisch, dass der Standard-Bootstrap  die Stichprobenverteilung für Schätzer kausaler Effekte anhand von gematchten Datensätzen (d.h. bei Zuordnung/Selektion von Beobachtungen mit Matching) nicht korrekt abbilden kann. Grundsätzlich problematisch hierbei ist, wenn der Bootstrap eine verzerrte Schätzung produziert und/oder zu kleine Standardfehler liefert. @AbadieImbens2008 belegen die Tendenz des Bootstraps zu *konservative* (d.h. zu große) Standardfehler zu produzieren. Simulationsnachweise [@Bodoryetal2020; @HillReiter2006; @AustinSmall2014;@AustinStuart2017] finden, dass Bootstrap-Standardfehler u.a. bei Propensity Score Matching mit Zurücklegen leicht konservativ sind somit das gewünschte nominale Signifikanzniveau eines Bootstrap-Hypothesentests nicht überschritten wird, weshalb der Standard-Bootstrap trotz seiner Schwächen in der empirischen Forschung oft angewendet wird.
+
+
+Wir betrachen als nächstes einen Bootstrap-Algorithmus für Inferenz bezüglich eines kausalen Effekts nach Matching und demonstrieren die Schätzung anhand unseres Website-Beispiels für den ATT nach Propensity-Score-Matching.
+
+**Algorithmus: Bootstrap-Schätzer für Propensity-Score-Matching**
+
+1. Generiere eine Bootstrap-Stichprobe durch $N$ Züge *mit Zurücklegen* aus der $N$-elementigen originalen Stichprobe.
+
+2. Wende das Matching-Verfahren für die Bootstrap-Stichprobe an. Schätze den Behandlungseffekt $\beta$ anhand der gematchten Stichprobe mit Regression. Speichere den Punktschätzer des Behandlungseffekts $\widehat{\beta}_b^*$.
+
+3. Fürhre die Schritte 1 und 2 für $b=1,\dots,B$ aus, wobei $B$ eine hinreichend große Anzahl von Bootstrap-Replikationen ist.
+
+4. Berechne den Bootstrap-Schätzer des Behandlungseffekts $\overline{\beta}^* = \frac{1}{B}\sum_{b=1} \widehat{\beta}_b^*$ und den Standardfehler $\text{SE}(\overline{\beta}^*) = \sqrt{\frac{1}{B-1}\sum_{b=1}^B(\widehat{\beta}_b^*-\overline{\beta}^*)^2}$. Berechne Inferenz-Statistiken mit den üblichen Formeln.
+
+Wir Implementieren nun einen Bootstrap-Schätzer des ATT im Website-Beispiel für Propensity-Score-Matching. Hierzu definieren wir eine `R`-Funktion `boot_fun()` für die Schritte 1 und 2 im obigen Algorithmus.
 
 ```{r}
-boot_fun <- function(data, i) {
+# Bootstrap-Funktion für Schritte 1 und 2
+boot_fun <- function(
+    data, # originale Stichprobe
+    i     # Indexmenge f. Bootstrap-Stichprobe
+) {
   
+  # Bootstrap-Stichprobe
   boot_data <- data[i, ]
   
-  # 1:1 PS Matching _mit_ Zurücklegen
+  # 1:1 PS Matching
   match_res <- matchit(
     dark_mode ~ age + hours + male,
     estimand = "ATT",
     distance = "glm", 
     method = "nearest", 
-    caliper = .3,
-    data = boot_data,
-    # mit Zurücklegen:
-    replace = TRUE
+    caliper = .25,
+    data = boot_data
   ) 
   
   # Gematchten Datensatz zuweisen
-  darkmode_matched <- match.data(match_res, data = boot_data)
+  darkmode_matched <- match.data(
+    object = match_res, 
+    data = boot_data
+  )
   
   # Outcome-Modell schätzen
   ATT_mod <- lm(
     formula = read_time ~ age + male + hours + dark_mode,
     data = darkmode_matched, 
-    weights = weights # hier teilweise > 1 wg. Matching mit Zurücklegen!
+    weights = weights 
   )
   
-  #  ATT-Schätzer auslesen
+  #  ATT-Schätzung zurückgeben
   return(
     ATT_mod$coefficients["dark_mode"]  
   )
 }
 ```
 
-Abadie & Imbens (2008) zeigen analytisch, dass ein Standard-Bootstrap bei Matching grundsätzlich ungültig ist: Die unbekannte Varianz der Stichprobenverteilung des Matching-Schätzers (und damit der Standardfehler des Schätzers) kann durch den Bootstrap nicht repliziert werden. Problematisch hierbei sind grundsätzlich zu liberale (d.h. zu große) mit dem Bootstrap berechnete Standardfehler. Es gibt jedoch Simulationsnachweise die zeigen, dass Bootstrap-Standardfehler bei Matching mit Zurücklegen konservativ sind (Bodory et al., 2020), also tendentiell zu kleine Standardfehler produzieren und damit das gewünschte nominale Signifikanzniveau eines Bootstrap-Hypothesentests nicht überschritten wird.
+Wir berechnen nun eine Bootstrap-Schätzung des ATT von `dark_mode` auf `readingtime` nach Propensity Score Matching mit einem caliper von 0.25 sowie den zugehörigen Standardfehler und ein 95%-KI mit der zuvor definierten Funktion `boot_fun`.
 
-Wir berechnen nun eine Bootstrap-Schätzung des ATT von `dark_mode` auf `readingtime` sowie den zugehörigen Standardfehler und ein 95%-KI mit der zuvor definierten Funktion `boot_fun`.
-
-```{r}
+```{r, cache = F}
 library("boot")
 set.seed(4321)
-boot_out <- boot(darkmode, boot_fun, R = 999)
 
-boot_out
+# Anz. Bootstrap-Replikationen
+B <- 999
+
+# Bootstrap durchführen
+(
+  boot_out <- boot(darkmode, boot_fun, R = B)
+)
 ```
+
+Den Bootstrap-Schätzer des ATT sowie den Bootstrap-Standardfehler berechnen wir mit `mean()` und `sd()` anhand der `r B` Bootstrap-Replikationen in `boot_out$t`.
 
 ```{r}
 # Bootstrap-Schätzer für den Treatment-Effekt
@@ -919,14 +1007,103 @@ mean(boot_out$t)
 
 # Bootstrap-Standardfehler
 sd(boot_out$t)
-
-# 95% Bootstrap-KI für den Treatment-Effekt
-boot.ci(boot_out, type = "perc")
 ```
 
-## Doubly-Robust-Schätzer für ATT/ATE
+Ein 95\%-Konfidenzintervall für den kausalen Effekt erhalten wir mit `boot::boot.ci()`.^[`type = "bca"` (bias-corrected accelerated) ist eine gängige Implementierung für die Berechnung des Konfidenz-Intervalls.]
 
-Implementieren und berechnen Sie einen Doubly-Robust-Schätzer des ATT (vgl. Wooldridge, 2010) für den kausalen Effekt in Aufgabe 5. Vergleichen Sie mit den Ergebnissen der Aufgaben 1 (d), 4 (f) und 5 (d).
+```{r}
+# 95% Bootstrap-KI für den Treatment-Effekt
+boot.ci(
+  boot.out = boot_out, 
+  type = "bca", 
+  conf = .95
+)
+```
+
+Beachte, dass der Bootstrap-Standardfehler sowie das Bootstrap-Konfidenzintervall nahe der mit `avg_comarisons` berechneten Werte für `sum_PSC` sind.
+
+**Bootstrap-Standardfehler für IPW-Schätzer des ATE berechnen**
+
+Die Bootstrap-Funktion `boot_fun` kann leicht für eine Schätzung des Standardfehlers für den IPW-Schätzer des ATE aus @sec-PSM angepasst werden. Statt einer Matching-Prozedur berechnen wir hierzu für $B$ Bootstrap-Stichproben den Schätzer $\widehat{\tau}^\text{IPW}$.
+
+```{r}
+# IPW estimation with regression adjustment
+IPW_boot <- function(
+    data, 
+    i
+) {
+  
+  # Bootstrap-Stichprobe erstellen
+  data_boot  <- data %>% 
+    slice(i)
+  
+  # Logistischee Regression
+  glm_fit <- glm(
+    formula = dark_mode ~ age + hours + male,
+    data = data_boot, 
+    family = binomial
+  )
+  
+  # Propensity Scores berechnen
+  data_boot <- data_boot %>%
+    mutate(
+      ps = predict(glm_fit, type = 'response')
+    )
+  
+  # Beobachtungen anhand Propensity Scores trimmen
+  data_boot <- data_boot %>%
+    filter(
+      between(
+        x = ps,
+        left = .2,
+        right = .7
+      )
+    )
+  
+  # IPW berechnen
+  data_boot <- data_boot %>%
+    mutate(
+      ipw = case_when(
+        dark_mode == 1 ~ 1 / ps,
+        dark_mode == 0 ~ 1 / (1 - ps))
+    )
+  
+  # Gewichtete Mittelwerte der Gruppen   
+  w_means <- data_boot %>%
+    group_by(dark_mode) %>%
+    summarize(m = weighted.mean(read_time, w = ipw)) %>%
+    arrange(dark_mode)
+  
+  # ATT-Schätzwert
+  return(w_means$m[2] - w_means$m[1])
+}
+```
+
+```{r}
+# Bootstrap durchführen
+b_IPW <- boot(
+  data = darkmode,
+  statistic = IPW_boot, 
+  R = 999
+)
+```
+
+```{r}
+# Bootstrap-Schätzer und Standardfehler berechnen
+mean(b_IPW$t)
+sd(b_IPW$t)
+```
+
+In diesem Fall ist der Bootstrap-Standardfehler von ca. `r round(sd(b_IPW$t), 2)` gut mit dem anhand von `summary(model_ipw)` berechneten Standardfehler vergleichbar. Ein 95\%-Konfidenzintervall für den ATE erhalten wir mit `boot.ci()`.
+
+```{r}
+# 95% Bootstrap-KI für den ATE
+boot.ci(b_IPW, type = "bca")
+```
+
+## Doubly-Robust-Schätzung
+
+Implementieren und berechnen Sie einen Doubly-Robust-Schätzer des ATT, vgl. @Wooldrige2010.
 
 ```{r}
 # IPW estimation with regression adjustment
@@ -935,28 +1112,15 @@ ipwra <- function(br, index = 1:nrow(br)) {
     br <- br %>% slice(index)
     
     # estimate and predict propensity score
-    m <- glm(formula = dark_mode ~ age + hours + male,
-             data = br, 
-             family = binomial(link = 'logit'))
+    m <- glm(
+      formula = dark_mode ~ age + hours + male,
+      data = br, 
+      family = binomial(link = 'logit')
+    )
     
     br <- br %>%
         mutate(ps = predict(m, type = 'response'))
-    
-    # trim control observations outside of treated PS range
-    # minps <- br %>%
-    #     filter(dark_mode == 1) %>%
-    #     pull(ps) %>%
-    #     min(na.rm = TRUE)
-    # 
-    # maxps <- br %>%
-    #     filter(dark_mode == 1) %>%
-    #     pull(ps) %>%
-    #     max(na.rm = TRUE)
-    # 
-    # # do the trimming
-    # br <- br %>%
-    #     filter(ps >= minps & ps <= maxps)
-   
+
     br <- br %>%
       filter(
         between(
@@ -974,31 +1138,31 @@ ipwra <- function(br, index = 1:nrow(br)) {
           dark_mode == 0 ~ 1 / (1 - ps))
       )
     
-    # Simple _ATT_ estimate:
-    # w_means <- br %>%
-    #     group_by(dark_mode) %>%
-    #     summarize(m = weighted.mean(read_time, w = ipw)) %>% 
-    #     arrange(dark_mode)
-    # 
-    # # simple diff-in-means _ATT_ estimate
-    #  return(w_means$m[2] - w_means$m[1]) 
+#    Simple _ATT_ estimate:
+    w_means <- br %>%
+        group_by(dark_mode) %>%
+        summarize(m = weighted.mean(read_time, w = ipw)) %>%
+        arrange(dark_mode)
+
+    # simple diff-in-means _ATT_ estimate
+     return(w_means$m[2] - w_means$m[1])
     
     # Do regression adjustment for _ATE_ estimate
     # TE prediction for whole sample based on TG model
-    mtreat <- br %>%
-      filter(dark_mode == 1) %>%
-      lm(read_time ~ 1 + age + hours + male, data = ., weights = .$ipw) %>%
-      predict(newdata = br) %>%
-      mean()
-    
-    # TE prediction for whole sample based on CG model
-    mcont <- br %>%
-      filter(dark_mode == 0) %>%
-      lm(read_time ~ 1 + age + hours + male, data = ., weights = .$ipw) %>%
-      predict(newdata = br) %>%
-      mean()
-
-    return(mtreat - mcont) # Regression adjusted _ATE_ estimate
+    # mtreat <- br %>%
+    #   filter(dark_mode == 1) %>%
+    #   lm(read_time ~ 1 + age + hours + male, data = ., weights = .$ipw) %>%
+    #   predict(newdata = br) %>%
+    #   mean()
+    # 
+    # # TE prediction for whole sample based on CG model
+    # mcont <- br %>%
+    #   filter(dark_mode == 0) %>%
+    #   lm(read_time ~ 1 + age + hours + male, data = ., weights = .$ipw) %>%
+    #   predict(newdata = br) %>%
+    #   mean()
+    # 
+    # return(mtreat - mcont) # Regression adjusted _ATE_ estimate
 }
 ```
 
@@ -1010,15 +1174,3 @@ sd(b$t)
 # 95% Bootstrap-KI für den Treatment-Effekt
 boot.ci(b, type = "perc")
 ```
-
-
-
-\vfill
-
-# Literatur
-
-Abadie, Alberto, and Guido W. Imbens. (2008). *On the Failure of the Bootstrap for Matching Estimators.*Econometrica 76 (**6**): 1537–57.
-
-Bodory, H., Camponovo, L., Huber, M., & Lechner, M. (2020). *The Finite Sample Performance of Inference Methods for Propensity Score Matching and Weighting Estimators*. Journal of Business & Economic Statistics, 38(**1**), 183–200.
-
-Wooldridge, J. M. (2010). *Econometric analysis of cross section and panel data*. MIT press.
