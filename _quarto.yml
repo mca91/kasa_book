@@ -37,7 +37,9 @@ execute:
 format:
   html: 
     grid: 
-      body-width: 890px
+      body-width: 920px
+      margin-width: 350px
+    fontsize: "1.1rem"
     theme: cosmo
     cap-location: margin
     code-link: true

@@ -158,16 +158,6 @@
 \usepackage{makecell}
 \usepackage{xcolor}
 \usepackage{caption}
-\usepackage{siunitx}
-
-  \newcolumntype{d}{S[
-    input-open-uncertainty=,
-    input-close-uncertainty=,
-    parse-numbers = false,
-    table-align-text-pre=false,
-    table-align-text-post=false
-  ]}
-  
 \usepackage{lscape}
 \newcommand{\blandscape}{\begin{landscape}}
 \newcommand{\elandscape}{\end{landscape}}
@@ -299,7 +289,7 @@ breaksymbolleft={},
 breaklines
 }
 
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, frame hidden, interior hidden, borderline west={3pt}{0pt}{shadecolor}, breakable, boxrule=0pt, enhanced]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, enhanced, boxrule=0pt, borderline west={3pt}{0pt}{shadecolor}, interior hidden, breakable, frame hidden]}{\end{tcolorbox}}\fi
 
 \renewcommand*\contentsname{Inhaltsverzeichnis}
 {
@@ -452,7 +442,7 @@ Tabelle~\ref{tbl-Klausurergebnisse} händisch als R-Objekt der Klasse
 Variable \emph{Modul}. Der Datensatz liegt also \emph{nicht} im s.g.
 \emph{Tidy-Format} vor.
 
-\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, left=2mm, coltitle=black, leftrule=.75mm, toprule=.15mm, titlerule=0mm, bottomrule=.15mm, colframe=quarto-callout-tip-color-frame, breakable, opacitybacktitle=0.6, bottomtitle=1mm, arc=.35mm, colback=white, colbacktitle=quarto-callout-tip-color!10!white, toptitle=1mm, opacityback=0, title=\textcolor{quarto-callout-tip-color}{\faLightbulb}\hspace{0.5em}{Tidy-Format}]
+\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, bottomrule=.15mm, colbacktitle=quarto-callout-tip-color!10!white, bottomtitle=1mm, arc=.35mm, title=\textcolor{quarto-callout-tip-color}{\faLightbulb}\hspace{0.5em}{Tidy-Format}, opacitybacktitle=0.6, colback=white, left=2mm, breakable, leftrule=.75mm, opacityback=0, coltitle=black, titlerule=0mm, colframe=quarto-callout-tip-color-frame, toprule=.15mm, toptitle=1mm]
 
 Tidy-Format: Jede Spalte ist \textbf{\emph{eine}} Variable, jede Reihe
 ist \textbf{\emph{eine}} Beobachtung und jede Zelle enthält einen
@@ -1227,12 +1217,13 @@ Kontrollgruppe gewährleisten.
 In diesem Kapitel betrachten wir Methoden, die in solchen
 Forschungsdesigns -- bei hinreichenden Informationen über die
 Studiensubjekte -- eine Schätzung kausaler Effekte ermöglichen, indem
-eine Vergleichbarkeit von Behandlungs- und Kontrollgruppe hergestellt
-wird. Dies kann durch eine gezielte Gewichtung von Beobachtungen anhand
-invididueller Merkmale bei der Schätzung des Behandlungseffekts
-erfolgen. Andere etablierte Methoden schätzen den kausalen Effekt nach
-Selektion von vergleichbaren Teilmengen von Subjekten beider Gruppen aus
-der ursprünglichen Stichprobe, sogenanntes \emph{Matching}.
+eine statistische Vergleichbarkeit von Behandlungs- und Kontrollgruppe
+hergestellt wird. Dies kann durch eine gezielte Gewichtung von
+Beobachtungen anhand invididueller Merkmale bei der Schätzung des
+Behandlungseffekts erfolgen. Andere etablierte Methoden schätzen den
+kausalen Effekt nach Selektion von vergleichbaren Teilmengen von
+Subjekten beider Gruppen aus der ursprünglichen Stichprobe, sogenanntes
+\emph{Matching}.
 
 Da \emph{Matching} ähnliche Beobachtungen basierend auf beobachtbaren
 Merkmalen vergleicht, kann die Wahrscheinlichkeit einer verzerrten
@@ -1476,6 +1467,9 @@ Kontrollgruppe nicht ausgeglichen ist. Wir überprüfen dies mit R.
 Die Zusammenfassung \texttt{anteile\_m} zeigt, dass der Anteil
 männlicher User in der Behandlungsgruppe deutlich höher ist als in der
 Kontrollgruppe.
+
+\hypertarget{matching-durch-gewichtung}{%
+\subsection{Matching durch Gewichtung}\label{matching-durch-gewichtung}}
 
 Matching eliminiert die Variation von \texttt{male} zwischen den
 Gruppen. Eine Möglichkeit hierfür ist die Gewichtung der Beobachtungen
@@ -1757,8 +1751,8 @@ Mittelwertdifferenz \(SMD\) an, wobei \begin{align*}
 \end{align*} mit Stichprobenmitteln \(\overline{X}_{j,B}\) und
 \(\overline{X}_{j,K}\) und Stichprobenvarianzen
 \(\widehat{\text{Var}}(X_{j,B})\) und \(\widehat{\text{Var}}(X_{j,K})\)
-für eine kontinuierliche Kovariable \(j\).\footnote{Siehe Austin (2011)
-  für einen Überblick zu Balance-Statistiken.} Obwohl es keinen
+für eine kontinuierliche Kovariable \(j\).\footnote{Siehe P. Austin
+  (2011) für einen Überblick zu Balance-Statistiken.} Obwohl es keinen
 einheitlichen Schwellenwert für die standardisierte Differenz gibt, der
 ein erhebliches Ungleichgewicht anzeigt, gilt für kontinuierliche
 Variablen eine standardisierte (absolute) Differenz von weniger als
@@ -1769,9 +1763,103 @@ Die Balance Table weist also auf einen vernachlässigbaren Unterschied
 für \texttt{hours} hin und bestätigt den aus den Grafiken abgeleiteten
 Eindruck einer relevanten Differenzen für \texttt{age}.
 
-\hypertarget{mehrere-matching-variablen-und-der-propensity-score}{%
+\hypertarget{entropy-balancing}{%
+\subsection{Entropy Balancing}\label{entropy-balancing}}
+
+\emph{Entropy Balancing} (Hainmueller 2012) ist eine weitere Methode zur
+Gewährleistung der Vergleichbarkeit von Behandlungs- und Kontrollgruppe
+anhand von Gewichten. Das Verfahren nutzt Konzepte aus der
+\href{https://de.wikipedia.org/wiki/Informationstheorie}{Informationstheorie}
+um die Gewichte für Subjekte in der Kontrollgruppe so anzupassen, dass
+die Verteilung der Matchingvariablen in der Kontrollgruppe die
+Verteilung in der Behandlungsgruppe möglichst gut approximiert. Dies
+geschieht unter der Restriktion, dass bestimmte empirische Momente
+(meist Mittelwerte und Varianzen) der Matchingvariablen exakt
+übereinstimmen. Mathematisch werden die Gewichte für
+Kontrollgruppenbeobachtungen durch Minimierung der
+\href{https://de.wikipedia.org/wiki/Kullback-Leibler-Divergenz}{Kullback-Leibler-Divergenz}
+zwischen den Verteilungen gefunden, wobei die Divergenz ein Maß für den
+Unterschied von Wahrscheinlichkeitsverteilungen ist.
+
+Entropy Balancing ist im R-Paket \texttt{WeightIt} implementiert. Wir
+zeigen, wie die benötigten Gewichte für eine Schätzungen des ATT im
+Website-Beispiel mit \texttt{WeightIt::wightit()} bestimmt werden
+können. Über das Argument \texttt{moments} legen wir fest, dass die
+Gewichte unter der Restriktion übereinstimmender Mittelwerte aller
+Matching-Variablen zwischen Behandlungs- und Kontrollgruppe erfolgen
+soll.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(WeightIt)}
+
+\CommentTok{\# Gewichte für Entropy Balancing}
+\NormalTok{(}
+\NormalTok{  W1 }\OtherTok{\textless{}{-}} \FunctionTok{weightit}\NormalTok{(}
+\NormalTok{  dark\_mode }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ hours,}
+  \AttributeTok{data =}\NormalTok{ darkmode,}
+  \AttributeTok{method =} \StringTok{"ebal"}\NormalTok{, }
+  \AttributeTok{estimand =} \StringTok{"ATT"}\NormalTok{,}
+  \AttributeTok{moments =} \DecValTok{1}
+\NormalTok{  )}
+\NormalTok{ )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+A weightit object
+ - method: "ebal" (entropy balancing)
+ - number of obs.: 300
+ - sampling weights: none
+ - treatment: 2-category
+ - estimand: ATT (focal: 1)
+ - covariates: age, male, hours
+\end{verbatim}
+
+Wir schätzen den Behandlungseffekt nach Entropy Balancing mit
+gewichteter Regression.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Mittelwert{-}Vergleich mit lm()}
+\NormalTok{fit }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ read\_time }\SpecialCharTok{\textasciitilde{}}\NormalTok{ dark\_mode, }
+  \AttributeTok{data =}\NormalTok{ darkmode, }
+  \AttributeTok{weights =}\NormalTok{ W1}\SpecialCharTok{$}\NormalTok{weights}
+\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(fit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+
+Call:
+lm(formula = read_time ~ dark_mode, data = darkmode, weights = W1$weights)
+
+Weighted Residuals:
+     Min       1Q   Median       3Q      Max 
+-16.6662  -2.3552   0.8786   2.9583  27.1840 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  17.7598     0.4093  43.394   <2e-16 ***
+dark_mode     0.9704     0.5807   1.671   0.0958 .  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 5.029 on 298 degrees of freedom
+Multiple R-squared:  0.009283,  Adjusted R-squared:  0.005958 
+F-statistic: 2.792 on 1 and 298 DF,  p-value: 0.09578
+\end{verbatim}
+
+Beachte, dass die von \texttt{summary()} berechneten Standardfehler bei
+Entropy Balancing ungültig sind. In Abschnitt
+Kapitel~\ref{sec-bootmatching} erläutern wir die Berechnung von
+Standardfehlern für Matching-Schätzer mit dem Bootstrap.
+
+\hypertarget{sec-PSM}{%
 \subsection{Mehrere Matching-Variablen und der Propensity
-Score}\label{mehrere-matching-variablen-und-der-propensity-score}}
+Score}\label{sec-PSM}}
 
 Bei mehreren Backdoor-Variablen kann eine Gewichtung anhand der
 Behandlungswahrscheinlichkeit (\emph{Treatment Propensity}) erfolgen.
@@ -1936,7 +2024,7 @@ Behandlungs-Indikator mit Histogrammen visualisieren.
 
 \begin{figure}[t]
 
-{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-19-1.pdf}
+{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-21-1.pdf}
 
 }
 
@@ -1982,7 +2070,7 @@ deren \emph{Propensity Scores} wenig bzw. keine Überlappung aufweisen.
 
 \begin{figure}[t]
 
-{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-21-1.pdf}
+{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-23-1.pdf}
 
 }
 
@@ -2090,16 +2178,17 @@ die geschätzen \emph{Propensity Scores} nicht berücksichtigt! Später im
 Kapitel erläutern wir die Berechnung gültiger Standardfehler für
 IPW-Schätzer basierend auf \emph{Propensity Scores} mit dem Bootstrap.
 
-\hypertarget{matching-verfahren}{%
-\section{Matching-Verfahren}\label{matching-verfahren}}
+\hypertarget{selektierende-matching-verfahren}{%
+\section{Selektierende
+Matching-Verfahren}\label{selektierende-matching-verfahren}}
 
-Das grundsätzliche Konzept von Matching wird in der nachstehenden
-interaktiven Grafik veranschaulicht. Hier betrachten wir beobachtete
-Ausprägungen von zwei (unabhängig und identisch verteilten)
+Das grundsätzliche Konzept von selektierendem Matching wird in der
+nachstehenden interaktiven Grafik veranschaulicht. Hier betrachten wir
+beobachtete Ausprägungen von zwei (unabhängig und identisch verteilten)
 Matching-Variablen für Subjekte in der Behandlungsgruppe (blau) sowie
 Kontrollgruppe (rot). Per Klick auf eine Beobachtung werden Matches aus
-der anderen Gruppe in grün kenntlich gemacht. Als Matches zählen
-sämtliche Beobachtungen der anderen Gruppe, deren
+der anderen Gruppe in cyan farblich kenntlich gemacht. Als Matches
+zählen sämtliche Beobachtungen der anderen Gruppe, deren
 \href{https://de.wikipedia.org/wiki/Euklidischer_Abstand}{Euklidische
 Distanz} zu dem ausgewählten Punkt das über den Slider eingestellte
 Maximum \emph{Caliper} nicht überschreitet.\footnote{Es handelt sich
@@ -2109,14 +2198,16 @@ gekennzeichnet. Die Grafik illustriert inbesondere, dass Beobachtungen
 mehrfach (s.g. Matching mit zurücklegen) oder gar nicht gematcht werden
 können.
 
-\texttt{MatchIt::matchit()} nutzt standardmäßig Eins-zu-Eins-Matching
-(ohne Zurücklegen) von Beobachtungen der Treatment-Gruppe mit
-Beobachtungen der Kontrollgruppe. Die für das Matching zu verwendenden
-Variablen werden über das Argument \texttt{formula} als Funktion des
-Behandlungsindikators definiert. \texttt{matchit()} bereitet das Objekt
-für eine Schätzung des ATT mit einer geeigneten Funktionen, s.
-\texttt{?matchit} und hier insb. die Erläuterungen der Argumente
-\texttt{replace\ =\ F}, \texttt{ratio\ =\ 1} und
+Für die nachfolgenden Code-Beispiele verwenden wir das R-Paket
+\texttt{MatchIt}. \texttt{MatchIt::matchit()} nutzt standardmäßig
+Eins-zu-Eins-Matching (ohne Zurücklegen) von Beobachtungen der
+Treatment-Gruppe mit Beobachtungen der Kontrollgruppe.\footnote{Dieses
+  Schema zielt auf eine Schätzung des ATT ab.} Die für das Matching zu
+verwendenden Variablen werden über das Argument \texttt{formula} als
+Funktion des Behandlungsindikators definiert. \texttt{matchit()}
+bereitet das Objekt für eine Schätzung des ATT mit einer geeigneten
+Funktionen, s. \texttt{?matchit} und hier insb. die Erläuterungen der
+Argumente \texttt{replace\ =\ F}, \texttt{ratio\ =\ 1} und
 \texttt{estimand\ =\ "ATT"} für Details. Mit \texttt{cobalt::balt.tab()}
 erhalten wir eine \emph{balance table} für den gematchten Datensatz.
 
@@ -2125,7 +2216,8 @@ anhand der Regressoren \texttt{age}, \texttt{hours}, und \texttt{male}
 in unserem Website-Beispiel für unterschiedliche Varianten durchgeführt
 werden kann.
 
-\textbf{Exaktes Matching}
+\hypertarget{exaktes-matching}{%
+\subsection{Exaktes Matching}\label{exaktes-matching}}
 
 Exaktes Matching ordnet einem Subjekt aus der Behandlungsgruppe ein oder
 mehrere Subjekte aus der Kontrollgruppe zu, wenn die boebachteten
@@ -2172,7 +2264,8 @@ Aufgrund der kontinulierliche Verteilten Variable \texttt{hours} gibt es
 in unserem Website-Beispiel keine exakten Matches. Dieses Verfahren ist
 hier folglich ungeeignet.
 
-\textbf{Coarsened Exact Matching}
+\hypertarget{coarsened-exact-matching}{%
+\subsection{Coarsened Exact Matching}\label{coarsened-exact-matching}}
 
 Bei dieser Methode werden kontinuierliche Matching-Variablen grob (Engl.
 \emph{coarse}) klassiert, ähnlich wie bei einem Histogram. Diese
@@ -2239,7 +2332,9 @@ Unmatched      69      67
 Mit Coarsened Exact Matching erhalten wir einen Datensatz mit 82
 Beobachtungen und guter Balance.
 
-\textbf{Matching anhand der Mahalanobis-Distanz}
+\hypertarget{matching-mit-der-mahalanobis-distanz}{%
+\subsection{Matching mit der
+Mahalanobis-Distanz}\label{matching-mit-der-mahalanobis-distanz}}
 
 Die Euklidische Distanz misst den direkten Abstand zwischen zwei Punkten
 und ist nicht invariant gegenüber Transformationen, insbesondere bei
@@ -2268,7 +2363,7 @@ Varianz-Kovarianz-Matrix durch Stichprobenmaße. Dies ergibt die Formel
   \widehat{d}_M(P_1,\,P_2) = \sqrt{
   \begin{pmatrix}
     X_1 - X_2\\
-    \tilde  Y_1 - \tilde Y_2
+    Y_1 - Y_2
   \end{pmatrix}'
   \begin{pmatrix}
     \widehat{\text{Var}}(X^2) & \widehat{\text{Cov}}(X, Y) \\
@@ -2276,7 +2371,7 @@ Varianz-Kovarianz-Matrix durch Stichprobenmaße. Dies ergibt die Formel
   \end{pmatrix}^{-1}
     \begin{pmatrix}
     X_1 - X_2\\
-    \tilde Y_1 - \tilde Y_2
+    Y_1 - Y_2
   \end{pmatrix}
 }.
 \end{align*}
@@ -2434,7 +2529,8 @@ individueller Match in der Kontrollgruppe gefunden.\footnote{Die durch
   \texttt{.25\ *\ sd(fitted(darkmode\_ps\_logit)))}.} Weiterhin finden
 wir eine verbesserte Balance für den gematchten Datensatz.
 
-\textbf{Matching mit Propensity Scores und Caliper}
+\hypertarget{propensity-score-matching}{%
+\subsection{Propensity Score Matching}\label{propensity-score-matching}}
 
 Eine gängige Variante ist Matching ausschließlich anhand von Propensity
 Scores innerhalb eines Calipers.
@@ -2522,7 +2618,7 @@ und übergeben die mit \texttt{matchit()} generierten Objekte im Argument
 
 \begin{figure}[t]
 
-{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-34-1.pdf}
+{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-36-1.pdf}
 
 }
 
@@ -2588,7 +2684,7 @@ Verteilung der Matching-Variablen in \texttt{darkmode\_matched}.
 
 \begin{figure}[t]
 
-{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-36-1.pdf}
+{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-38-1.pdf}
 
 }
 
@@ -2613,7 +2709,7 @@ Verteilung der Matching-Variablen in \texttt{darkmode\_matched}.
 
 \begin{figure}[t]
 
-{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-36-2.pdf}
+{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-38-2.pdf}
 
 }
 
@@ -2621,16 +2717,33 @@ Verteilung der Matching-Variablen in \texttt{darkmode\_matched}.
 
 Wir beobachten eine bessere Balance bei \texttt{age} und \texttt{hours}.
 Inbesondere ist \texttt{male} für Kontroll- und Behandlungsgruppe
-ausgeglichen!
+ausgeglichen.
 
-\hypertarget{schuxe4tzung-und-inferenz-fuxfcr-den-behandlungseffekts-nach-matching}{%
-\section{Schätzung und Inferenz für den Behandlungseffekts nach
-Matching}\label{schuxe4tzung-und-inferenz-fuxfcr-den-behandlungseffekts-nach-matching}}
+\hypertarget{schuxe4tzung-und-inferenz-fuxfcr-den-behandlungseffekt-nach-matching}{%
+\section{Schätzung und Inferenz für den Behandlungseffekt nach
+Matching}\label{schuxe4tzung-und-inferenz-fuxfcr-den-behandlungseffekt-nach-matching}}
 
 Wir schätzen nun den Behandlungseffekt von \texttt{dark\_mode} auf
 \texttt{read\_time} für die mit CEM und Propensity Score Matching
-ermittelten Datensätze mittels linearer Regression und vergleichen mit
-einer Regression anhand des ursprünglichen Datensatzes.
+ermittelten Datensätzen und vergleichen die Ergebniss anschließend mit
+einer Regressionsschätzung ohne Matching.
+
+Wir kombinieren die Matching-Verfahren mit linearer Regression, d.h. wir
+Schätzen den Behandlungseffekt anhand es gematchten Datensatzes als
+Mittelwertdifferenz nach zusätzlicher Kontrolle für die
+Matching-Variablen. Diese Kombination von Matching mit Regression wird
+in der Literatur als \emph{Regression Adjustment} bezeichnet und ist
+insbesondere hilfreich, wenn Backdoors mit Matching geschlossen werden
+sollen, der kausale Effekt jedoch nur unter Verwendung einer
+nicht-trivialen Regressionsfunktion ermittelt werden kann. Zum Beispiel
+kann bei einer kontinuierlichen Behandlungsvariable und einem
+nicht-linearen Zusammenhang mit \(Y\) der kausale Effekt nicht durch
+einen bloßen Mittelwertvergleich erfasst werden, sondern erfordert eine
+adäquate Modellierung dieses Zusammenhangs in der Regressionsfunktion.
+Die zusätzliche Kontrolle für Matching-Variablen kann die Varianz der
+Schätzung verringern und das Risiko einer verzerrten Schätzung
+abmildern, falls nach Matching noch Unterschiede in der Balance von
+Behandlungs- und Kontrollgruppe vorliegen.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2640,6 +2753,7 @@ einer Regression anhand des ursprünglichen Datensatzes.
   \AttributeTok{data =}\NormalTok{ darkmode\_matched\_CEM, }
   \AttributeTok{weights =}\NormalTok{ weights }
 \NormalTok{)}
+
 \FunctionTok{summary}\NormalTok{(ATT\_mod\_CEM)}
 \end{Highlighting}
 \end{Shaded}
@@ -2680,6 +2794,7 @@ F-statistic: 28.08 on 4 and 159 DF,  p-value: < 2.2e-16
   \AttributeTok{data =}\NormalTok{ darkmode\_matched\_PSC, }
   \AttributeTok{weights =}\NormalTok{ weights }
 \NormalTok{)}
+
 \FunctionTok{summary}\NormalTok{(ATT\_mod\_PSC)}
 \end{Highlighting}
 \end{Shaded}
@@ -2711,11 +2826,12 @@ F-statistic: 23.57 on 4 and 203 DF,  p-value: 5.098e-16
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# ATT mit linearem Modell für vollständigen Datensatz schätzen}
+\CommentTok{\# ATT mit linearem Modell ohne Matching}
 \NormalTok{ATT\_mod\_org }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}
   \AttributeTok{formula =}\NormalTok{ read\_time }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ dark\_mode,}
   \AttributeTok{data =}\NormalTok{ darkmode}
 \NormalTok{)}
+
 \FunctionTok{summary}\NormalTok{(ATT\_mod\_org)}
 \end{Highlighting}
 \end{Shaded}
@@ -2747,32 +2863,72 @@ F-statistic: 38.57 on 4 and 295 DF,  p-value: < 2.2e-16
 Beachte, dass für die gematchten Datensätze jeweils ein
 durchschnittlicher Behandlungseffekt für die Beobachtungen \emph{mit}
 erfolgter Behandlung ermittelt wird: In sämtlichen oben gezeigten
-Verfahren werden mit \texttt{estimand\ =\ "ATT"} vergleichbarere
-Kontrollbeobachtungen für die behandelten Beobachtungen ermittelt. Wir
-schätzen den Effekt der Behandlung, indem wir die Ergebnisse von
-behandelten Personen mit denen von gematchten (d.h.ähnlichen) Personen
+Matchibg-Verfahren werden mit \texttt{estimand\ =\ "ATT"}
+vergleichbarere Kontrollbeobachtungen für die behandelten Beobachtungen
+ermittelt. Wir schätzen den Effekt der Behandlung, indem wir die
+Ergebnisse von behandelten Personen mit denen von gematchten Personen
 vergleichen, die keine Behandlung erhalten haben. Diese Vergleichsgruppe
 dient als Ersatz für den hypothetischen Zustand der Behandlungsgruppe,
-wenn keine Behandlung erfolgt wäre. Dies ist die Definition eines ATT
---- ein average treatment effect \emph{on the treated}.
+wenn keine Behandlung erfolgt wäre. Dies entspricht der Definition eines
+ATT --- ein average treatment effect \emph{on the treated}.
 
-Für Matching-Verfahren (\texttt{ATT\_mod}) sind die von
-\texttt{summary()} berechneten Standardfehler (und damit
-Konfidenzintervalle, t-Statistiken und p-Werte) für den
-Behandlungseffekt \emph{grundsätzlich ungültig}. Je nach
-Matching-Verfahren liegen unterschiedliche Quellen von
+\hypertarget{cluster-robuste-standardfehler}{%
+\subsection{Cluster-robuste
+Standardfehler}\label{cluster-robuste-standardfehler}}
+
+Für Matching-Verfahren sind die mit \texttt{summary()} berechneten
+Standardfehler (und damit auch Konfidenzintervalle, t-Statistiken und
+p-Werte) für den Behandlungseffekt \emph{grundsätzlich ungültig}. Je
+nach Matching-Verfahren liegen unterschiedliche Quellen von
 Schätzunsicherheit vor, die bei der Berechnung von Standardfehlern
 zusätzlich zu der ``üblichen'' Stichproben-Variabilität berücksichtig
-werden müssen, bspw. aufgrund der Schätzung von Propensity Scores und
-der Matching-Prozess ansich. Wir nutzen daher nachfolgende Funktionen
-gem. Empfehlungen aus der aktuellen Forschung für
-Standardfehlerberechnung.
+werden müssen. Gründe hierfür sind der Matching-Prozess ansich oder
+weitere Unsicherheit durch die Schätzung zusätzlicher Parameter, etwa
+bei der Berechnung von Propensity Scores mit logistischer Regression.
+Eine weiterere Ursache zusätzlicher Variation durch den
+Matching-Prozess, die wir bisher nicht näher betrachtet haben ensteht
+durch Zurücklegen, d.h. wenn Beobachtungen mehrfach gematcht werden
+können. Auch dieser Faktor wird in der von \texttt{summary()}
+verwendeten Formel für den Standardfehler des Effekt-Schätzers nicht
+berücksichtigt.
+
+Standardfehlerberechnung für Matching-Schätzer von Behandlungseffekten
+ist Gegenstand aktueller Forschung. P. C. Austin und Small (2014) und
+Abadie und Spiess (2022) belegen die Gültigkeit von cluster-robusten
+Standardfehlern mit Clustering auf Ebene der Beobachtungsgruppen
+(\texttt{subclass} im output von \texttt{match.data()}) bei Matching
+ohne Zurücklegen. Für Matching anhand von Propensity Scores (auch mit
+Zurücklegen) zeigen Imbens (2016), dass ignorieren der zusätzlichen
+Unsicherheit durch die Schätzung der Propensity Scores zu konservativer
+Inferenz für den ATE anhand eines cluster-robusten
+Standardfehlerschätzers führt, jedoch ungültige Inferenz für die
+Schätzung des ATT bedeuten kann. Ähnlich zu P. C. Austin und Small
+(2014) deuten die Ergebnisse der Simulationsstudie von Bodory u.~a.
+(2020) auf grundsätzlich bessere Eigenschaften der Schätzung hin, wenn
+die Standardfehler nicht für die Schätzung der Propensity Scores
+adjustiert werden.
+
+Weiterhin ist die Kontrolle für Kovariablen mit Erklärungskraft für die
+Outcome-Variable und für die Matching-Variablen (wie oben erfolgt) mit
+\emph{Regression Adjustment} für die Schätzung des Behandlungseffekts
+nach Matching eine etablierte Strategie, vgl. Hill und Reiter (2006) und
+Abadie und Spiess (2022). So können die Varianz der Schätzung und das
+Risiko einer Verzerrung der Standardfehler aufgrund verbleibender
+Imbalance von Behandlungs- und Kontrollgruppe nach Matching verringert
+werden.
+
+Zur Demonstration von (cluster)-robuster Inferenz und für eine
+tabellarische Zusammenfassung der Ergebnisse nutzen wir die Pakete
+\texttt{marginaleffects} und \texttt{modelsummary}. Mit
+\texttt{marginaleffects::avg\_comparisons()} können p-Werte und
+Kofindenzintervalle unter Berücksichtigung von robuster Standardfehlern
+und der Gewichte aus dem Matching-Verfahren berechnet werden.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{library}\NormalTok{(marginaleffects)}
 
-\CommentTok{\# Inferenz: Multiple Regression bei ungematchten Beobachtungen}
+\CommentTok{\# Inferenz: Multiple Regression, ungematchter Datensatz}
 \NormalTok{(}
 \NormalTok{  sum\_orig }\OtherTok{\textless{}{-}} \FunctionTok{avg\_comparisons}\NormalTok{(}
     \AttributeTok{model =}\NormalTok{ ATT\_mod\_org,}
@@ -2802,10 +2958,10 @@ Type:  response
 \NormalTok{  sum\_CEM }\OtherTok{\textless{}{-}} \FunctionTok{avg\_comparisons}\NormalTok{(}
   \AttributeTok{model =}\NormalTok{ ATT\_mod\_CEM ,}
   \AttributeTok{variables =} \StringTok{"dark\_mode"}\NormalTok{,}
-  \CommentTok{\# Cluster{-}robuster SE}
+  \CommentTok{\# Cluster{-}robuste SE}
   \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ subclass, }
   \AttributeTok{newdata =} \FunctionTok{subset}\NormalTok{(darkmode\_matched\_CEM, dark\_mode }\SpecialCharTok{==} \DecValTok{1}\NormalTok{),}
-  \AttributeTok{wts =} \StringTok{"weights"}  \CommentTok{\# = 1}
+  \AttributeTok{wts =} \StringTok{"weights"}
 \NormalTok{  )}
 \NormalTok{)}
 \end{Highlighting}
@@ -2829,7 +2985,7 @@ Type:  response
     \AttributeTok{variables =} \StringTok{"dark\_mode"}\NormalTok{,}
     \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ subclass, }
     \AttributeTok{newdata =} \FunctionTok{subset}\NormalTok{(darkmode\_matched\_PSC, dark\_mode }\SpecialCharTok{==} \DecValTok{1}\NormalTok{),}
-    \AttributeTok{wts =} \StringTok{"weights"}  \CommentTok{\# = 1}
+    \AttributeTok{wts =} \StringTok{"weights"}
 \NormalTok{  )}
 \NormalTok{)}
 \end{Highlighting}
@@ -2844,45 +3000,45 @@ Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.
 Type:  response 
 \end{verbatim}
 
+Wir fassen die Ergebnisse mit \texttt{modelsummary::modelsummary()}
+tabellarisch zusammen.
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{library}\NormalTok{(modelsummary)}
+
+\CommentTok{\# Tabellarische Zusammenfassung erzeugen}
 \FunctionTok{modelsummary}\NormalTok{(}
-  \AttributeTok{models =} \FunctionTok{list}\NormalTok{(sum\_orig, sum\_CEM, sum\_PSC)}
-\NormalTok{)}
+  \AttributeTok{models =} \FunctionTok{list}\NormalTok{(}
+   \StringTok{"Kein Matching"} \OtherTok{=}\NormalTok{ sum\_orig, }
+   \StringTok{"Coarsened Exact"} \OtherTok{=}\NormalTok{ sum\_CEM, }
+   \StringTok{"Propensity Scores"} \OtherTok{=}\NormalTok{ sum\_PSC}
+\NormalTok{  ),}
+  \AttributeTok{stars =}\NormalTok{ T, }
+  \AttributeTok{gof\_map =} \StringTok{"nobs"}\NormalTok{, }
+  \AttributeTok{output =} \StringTok{"gt"}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{tabopts}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{table}
-\centering
-\begin{tabular}[t]{lccc}
+\setlength{\LTpost}{0mm}
+\begin{longtable*}{lccc}
 \toprule
-  & (1) & (2) & (3)\\
-\midrule
-dark\_mode & \num{1.386} & \num{1.653} & \num{1.635}\\
- & (\num{0.537}) & (\num{0.549}) & (\num{0.565})\\
-\midrule
-Num.Obs. & \num{300} & \num{164} & \num{208}\\
-R2 & \num{0.343} & \num{0.414} & \num{0.317}\\
-R2 Adj. & \num{0.334} & \num{0.399} & \num{0.304}\\
-AIC & \num{1694.6} & \num{921.9} & \num{1188.4}\\
-BIC & \num{1716.9} & \num{940.5} & \num{1208.4}\\
-Log.Lik. & \num{-841.321} & \num{-454.933} & \num{-588.180}\\
-F & \num{38.569} & \num{28.079} & \num{23.567}\\
-RMSE & \num{4.00} & \num{3.88} & \num{4.09}\\
-Std.Errors & HC3 &  & \\
+  & Kein Matching & Coarsened Exact & Propensity Scores \\ 
+\midrule\addlinespace[2.5pt]
+dark\_mode & 1.386** & 1.653** & 1.635** \\ 
+ & (0.537) & (0.549) & (0.565) \\ 
+Num.Obs. & 300 & 164 & 208 \\ 
 \bottomrule
-\end{tabular}
-\end{table}
+\end{longtable*}
+\begin{minipage}{\linewidth}
++ p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001\\
+\end{minipage}
 
-\hypertarget{inferenz-fuxfcr-attate-propensity-score-matching-mit-bootstrap}{%
-\section{Inferenz für ATT/ATE: Propensity-Score-Matching mit
-Bootstrap}\label{inferenz-fuxfcr-attate-propensity-score-matching-mit-bootstrap}}
-
-Bei Matching mit Zurücklegen besteht zusätzliche Unsicherheit durch
-Zurücklegen, d.h. Beobachtungen aus der Kontroll-Gruppe können mehrfach
-als Match für Beobachtungen aus der Treatment-Gruppe genutzt werden. Mit
-\texttt{summary()} berechnete Standardfehler berücksichtigen dies nicht!
+\hypertarget{sec-bootmatching}{%
+\section{Bootstrap-Schätzung kausaler Effekte bei
+Matching}\label{sec-bootmatching}}
 
 Ein Bootstrap-Verfahren generiert mit Resampling (wiederholtes Ziehen
 mit Zurücklegen) aus dem Original-Datensatz (viele) künstliche
@@ -2895,38 +3051,92 @@ Bootstrap-Punktschätzer des Behandlungseffekts (Stichprobenmittel der
 Bootstrap-Schätzungen) sowie Standardfehler (Standardabweichung der der
 Bootstrap-Schätzungen) und p-Werte berechnen.
 
-Wir Implementieren nun einen Bootstrap-Schätzer des ATT als
-\texttt{R}-Funktion \texttt{boot\_fun()}.
+Der Bootstrap kann hilfreich sein, wenn unklar ist, wie Standardfehler
+für die Unsicherheit des Matching-Prozesses zu adjustieren sind, um
+gültige Inferenzsstatistiken zu erhalten. Abadie und Imbens (2008)
+zeigen analytisch, dass der Standard-Bootstrap die Stichprobenverteilung
+für Schätzer kausaler Effekte anhand von gematchten Datensätzen (d.h.
+bei Zuordnung/Selektion von Beobachtungen mit Matching) nicht korrekt
+abbilden kann. Grundsätzlich problematisch hierbei ist, wenn der
+Bootstrap eine verzerrte Schätzung produziert und/oder zu kleine
+Standardfehler liefert. Abadie und Imbens (2008) belegen die Tendenz des
+Bootstraps zu \emph{konservative} (d.h. zu große) Standardfehler zu
+produzieren. Simulationsnachweise (Bodory u.~a. 2020; Hill und Reiter
+2006; P. C. Austin und Small 2014; P. C. Austin und Stuart 2017) finden,
+dass Bootstrap-Standardfehler u.a. bei Propensity Score Matching mit
+Zurücklegen leicht konservativ sind somit das gewünschte nominale
+Signifikanzniveau eines Bootstrap-Hypothesentests nicht überschritten
+wird, weshalb der Standard-Bootstrap trotz seiner Schwächen in der
+empirischen Forschung oft angewendet wird.
+
+Wir betrachen als nächstes einen Bootstrap-Algorithmus für Inferenz
+bezüglich eines kausalen Effekts nach Matching und demonstrieren die
+Schätzung anhand unseres Website-Beispiels für den ATT nach
+Propensity-Score-Matching.
+
+\textbf{Algorithmus: Bootstrap-Schätzer für Propensity-Score-Matching}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Generiere eine Bootstrap-Stichprobe durch \(N\) Züge \emph{mit
+  Zurücklegen} aus der \(N\)-elementigen originalen Stichprobe.
+\item
+  Wende das Matching-Verfahren für die Bootstrap-Stichprobe an. Schätze
+  den Behandlungseffekt \(\beta\) anhand der gematchten Stichprobe mit
+  Regression. Speichere den Punktschätzer des Behandlungseffekts
+  \(\widehat{\beta}_b^*\).
+\item
+  Fürhre die Schritte 1 und 2 für \(b=1,\dots,B\) aus, wobei \(B\) eine
+  hinreichend große Anzahl von Bootstrap-Replikationen ist.
+\item
+  Berechne den Bootstrap-Schätzer des Behandlungseffekts
+  \(\overline{\beta}^* = \frac{1}{B}\sum_{b=1} \widehat{\beta}_b^*\) und
+  den Standardfehler
+  \(\text{SE}(\overline{\beta}^*) = \sqrt{\frac{1}{B-1}\sum_{b=1}^B(\widehat{\beta}_b^*-\overline{\beta}^*)^2}\).
+  Berechne Inferenz-Statistiken mit den üblichen Formeln.
+\end{enumerate}
+
+Wir Implementieren nun einen Bootstrap-Schätzer des ATT im
+Website-Beispiel für Propensity-Score-Matching. Hierzu definieren wir
+eine \texttt{R}-Funktion \texttt{boot\_fun()} für die Schritte 1 und 2
+im obigen Algorithmus.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{boot\_fun }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(data, i) \{}
+\CommentTok{\# Bootstrap{-}Funktion für Schritte 1 und 2}
+\NormalTok{boot\_fun }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(}
+\NormalTok{    data, }\CommentTok{\# originale Stichprobe}
+\NormalTok{    i     }\CommentTok{\# Indexmenge f. Bootstrap{-}Stichprobe}
+\NormalTok{) \{}
   
+  \CommentTok{\# Bootstrap{-}Stichprobe}
 \NormalTok{  boot\_data }\OtherTok{\textless{}{-}}\NormalTok{ data[i, ]}
   
-  \CommentTok{\# 1:1 PS Matching \_mit\_ Zurücklegen}
+  \CommentTok{\# 1:1 PS Matching}
 \NormalTok{  match\_res }\OtherTok{\textless{}{-}} \FunctionTok{matchit}\NormalTok{(}
 \NormalTok{    dark\_mode }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ male,}
     \AttributeTok{estimand =} \StringTok{"ATT"}\NormalTok{,}
     \AttributeTok{distance =} \StringTok{"glm"}\NormalTok{, }
     \AttributeTok{method =} \StringTok{"nearest"}\NormalTok{, }
-    \AttributeTok{caliper =}\NormalTok{ .}\DecValTok{3}\NormalTok{,}
-    \AttributeTok{data =}\NormalTok{ boot\_data,}
-    \CommentTok{\# mit Zurücklegen:}
-    \AttributeTok{replace =} \ConstantTok{TRUE}
+    \AttributeTok{caliper =}\NormalTok{ .}\DecValTok{25}\NormalTok{,}
+    \AttributeTok{data =}\NormalTok{ boot\_data}
 \NormalTok{  ) }
   
   \CommentTok{\# Gematchten Datensatz zuweisen}
-\NormalTok{  darkmode\_matched }\OtherTok{\textless{}{-}} \FunctionTok{match.data}\NormalTok{(match\_res, }\AttributeTok{data =}\NormalTok{ boot\_data)}
+\NormalTok{  darkmode\_matched }\OtherTok{\textless{}{-}} \FunctionTok{match.data}\NormalTok{(}
+    \AttributeTok{object =}\NormalTok{ match\_res, }
+    \AttributeTok{data =}\NormalTok{ boot\_data}
+\NormalTok{  )}
   
   \CommentTok{\# Outcome{-}Modell schätzen}
 \NormalTok{  ATT\_mod }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}
     \AttributeTok{formula =}\NormalTok{ read\_time }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ dark\_mode,}
     \AttributeTok{data =}\NormalTok{ darkmode\_matched, }
-    \AttributeTok{weights =}\NormalTok{ weights }\CommentTok{\# hier teilweise \textgreater{} 1 wg. Matching mit Zurücklegen!}
+    \AttributeTok{weights =}\NormalTok{ weights }
 \NormalTok{  )}
   
-  \CommentTok{\#  ATT{-}Schätzer auslesen}
+  \CommentTok{\#  ATT{-}Schätzung zurückgeben}
   \FunctionTok{return}\NormalTok{(}
 \NormalTok{    ATT\_mod}\SpecialCharTok{$}\NormalTok{coefficients[}\StringTok{"dark\_mode"}\NormalTok{]  }
 \NormalTok{  )}
@@ -2934,30 +3144,23 @@ Wir Implementieren nun einen Bootstrap-Schätzer des ATT als
 \end{Highlighting}
 \end{Shaded}
 
-Abadie \& Imbens (2008) zeigen analytisch, dass ein Standard-Bootstrap
-bei Matching grundsätzlich ungültig ist: Die unbekannte Varianz der
-Stichprobenverteilung des Matching-Schätzers (und damit der
-Standardfehler des Schätzers) kann durch den Bootstrap nicht repliziert
-werden. Problematisch hierbei sind grundsätzlich zu liberale (d.h. zu
-große) mit dem Bootstrap berechnete Standardfehler. Es gibt jedoch
-Simulationsnachweise die zeigen, dass Bootstrap-Standardfehler bei
-Matching mit Zurücklegen konservativ sind (Bodory et al., 2020), also
-tendentiell zu kleine Standardfehler produzieren und damit das
-gewünschte nominale Signifikanzniveau eines Bootstrap-Hypothesentests
-nicht überschritten wird.
-
 Wir berechnen nun eine Bootstrap-Schätzung des ATT von
-\texttt{dark\_mode} auf \texttt{readingtime} sowie den zugehörigen
-Standardfehler und ein 95\%-KI mit der zuvor definierten Funktion
-\texttt{boot\_fun}.
+\texttt{dark\_mode} auf \texttt{readingtime} nach Propensity Score
+Matching mit einem caliper von 0.25 sowie den zugehörigen Standardfehler
+und ein 95\%-KI mit der zuvor definierten Funktion \texttt{boot\_fun}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{library}\NormalTok{(}\StringTok{"boot"}\NormalTok{)}
 \FunctionTok{set.seed}\NormalTok{(}\DecValTok{4321}\NormalTok{)}
-\NormalTok{boot\_out }\OtherTok{\textless{}{-}} \FunctionTok{boot}\NormalTok{(darkmode, boot\_fun, }\AttributeTok{R =} \DecValTok{999}\NormalTok{)}
 
-\NormalTok{boot\_out}
+\CommentTok{\# Anz. Bootstrap{-}Replikationen}
+\NormalTok{B }\OtherTok{\textless{}{-}} \DecValTok{999}
+
+\CommentTok{\# Bootstrap durchführen}
+\NormalTok{(}
+\NormalTok{  boot\_out }\OtherTok{\textless{}{-}} \FunctionTok{boot}\NormalTok{(darkmode, boot\_fun, }\AttributeTok{R =}\NormalTok{ B)}
+\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -2967,13 +3170,17 @@ ORDINARY NONPARAMETRIC BOOTSTRAP
 
 
 Call:
-boot(data = darkmode, statistic = boot_fun, R = 999)
+boot(data = darkmode, statistic = boot_fun, R = B)
 
 
 Bootstrap Statistics :
-    original    bias    std. error
-t1* 1.307298 -0.163572   0.8561828
+    original      bias    std. error
+t1* 1.634664 -0.08144129   0.5935746
 \end{verbatim}
+
+Den Bootstrap-Schätzer des ATT sowie den Bootstrap-Standardfehler
+berechnen wir mit \texttt{mean()} und \texttt{sd()} anhand der 999
+Bootstrap-Replikationen in \texttt{boot\_out\$t}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2983,7 +3190,7 @@ t1* 1.307298 -0.163572   0.8561828
 \end{Shaded}
 
 \begin{verbatim}
-[1] 1.143725
+[1] 1.553222
 \end{verbatim}
 
 \begin{Shaded}
@@ -2997,13 +3204,22 @@ t1* 1.307298 -0.163572   0.8561828
 \end{Shaded}
 
 \begin{verbatim}
-[1] 0.8561828
+[1] 0.5935746
 \end{verbatim}
+
+Ein 95\%-Konfidenzintervall für den kausalen Effekt erhalten wir mit
+\texttt{boot::boot.ci()}.\footnote{\texttt{type\ =\ "bca"}
+  (bias-corrected accelerated) ist eine gängige Implementierung für die
+  Berechnung des Konfidenz-Intervalls.}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# 95\% Bootstrap{-}KI für den Treatment{-}Effekt}
-\FunctionTok{boot.ci}\NormalTok{(boot\_out, }\AttributeTok{type =} \StringTok{"perc"}\NormalTok{)}
+\FunctionTok{boot.ci}\NormalTok{(}
+  \AttributeTok{boot.out =}\NormalTok{ boot\_out, }
+  \AttributeTok{type =} \StringTok{"bca"}\NormalTok{, }
+  \AttributeTok{conf =}\NormalTok{ .}\DecValTok{95}
+\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -3012,52 +3228,210 @@ BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
 Based on 999 bootstrap replicates
 
 CALL : 
-boot.ci(boot.out = boot_out, type = "perc")
+boot.ci(boot.out = boot_out, conf = 0.95, type = "bca")
 
 Intervals : 
-Level     Percentile     
-95%   (-0.660,  2.721 )  
+Level       BCa          
+95%   ( 0.527,  2.839 )  
 Calculations and Intervals on Original Scale
 \end{verbatim}
 
-\hypertarget{doubly-robust-schuxe4tzer-fuxfcr-attate}{%
-\section{Doubly-Robust-Schätzer für
-ATT/ATE}\label{doubly-robust-schuxe4tzer-fuxfcr-attate}}
+Beachte, dass der Bootstrap-Standardfehler sowie das
+Bootstrap-Konfidenzintervall nahe der mit \texttt{avg\_comarisons}
+berechneten Werte für \texttt{sum\_PSC} sind.
 
-Implementieren und berechnen Sie einen Doubly-Robust-Schätzer des ATT
-(vgl. Wooldridge, 2010) für den kausalen Effekt in Aufgabe 5.
-Vergleichen Sie mit den Ergebnissen der Aufgaben 1 (d), 4 (f) und 5 (d).
+\textbf{Bootstrap-Standardfehler für IPW-Schätzer des ATE berechnen}
+
+Die Bootstrap-Funktion \texttt{boot\_fun} kann leicht für eine Schätzung
+des Standardfehlers für den IPW-Schätzer des ATE aus
+Kapitel~\ref{sec-PSM} angepasst werden. Statt einer Matching-Prozedur
+berechnen wir hierzu für \(B\) Bootstrap-Stichproben den Schätzer
+\(\widehat{\tau}^\text{IPW}\).
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# IPW estimation with regression adjustment}
-\NormalTok{ipwra }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(br, }\AttributeTok{index =} \DecValTok{1}\SpecialCharTok{:}\FunctionTok{nrow}\NormalTok{(br)) \{}
+\NormalTok{IPW\_boot }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(}
+\NormalTok{    data, }
+\NormalTok{    i}
+\NormalTok{) \{}
+  
+  \CommentTok{\# Bootstrap{-}Stichprobe erstellen}
+\NormalTok{  data\_boot  }\OtherTok{\textless{}{-}}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%} 
+    \FunctionTok{slice}\NormalTok{(i)}
+  
+  \CommentTok{\# Logistischee Regression}
+\NormalTok{  glm\_fit }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(}
+    \AttributeTok{formula =}\NormalTok{ dark\_mode }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ male,}
+    \AttributeTok{data =}\NormalTok{ data\_boot, }
+    \AttributeTok{family =}\NormalTok{ binomial}
+\NormalTok{  )}
+  
+  \CommentTok{\# Propensity Scores berechnen}
+\NormalTok{  data\_boot }\OtherTok{\textless{}{-}}\NormalTok{ data\_boot }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{mutate}\NormalTok{(}
+      \AttributeTok{ps =} \FunctionTok{predict}\NormalTok{(glm\_fit, }\AttributeTok{type =} \StringTok{\textquotesingle{}response\textquotesingle{}}\NormalTok{)}
+\NormalTok{    )}
+  
+  \CommentTok{\# Beobachtungen anhand Propensity Scores trimmen}
+\NormalTok{  data\_boot }\OtherTok{\textless{}{-}}\NormalTok{ data\_boot }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{filter}\NormalTok{(}
+      \FunctionTok{between}\NormalTok{(}
+        \AttributeTok{x =}\NormalTok{ ps,}
+        \AttributeTok{left =}\NormalTok{ .}\DecValTok{2}\NormalTok{,}
+        \AttributeTok{right =}\NormalTok{ .}\DecValTok{7}
+\NormalTok{      )}
+\NormalTok{    )}
+  
+  \CommentTok{\# IPW berechnen}
+\NormalTok{  data\_boot }\OtherTok{\textless{}{-}}\NormalTok{ data\_boot }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{mutate}\NormalTok{(}
+      \AttributeTok{ipw =} \FunctionTok{case\_when}\NormalTok{(}
+\NormalTok{        dark\_mode }\SpecialCharTok{==} \DecValTok{1} \SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{/}\NormalTok{ ps,}
+\NormalTok{        dark\_mode }\SpecialCharTok{==} \DecValTok{0} \SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{/}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ ps))}
+\NormalTok{    )}
+  
+  \CommentTok{\# Gewichtete Mittelwerte der Gruppen   }
+\NormalTok{  w\_means }\OtherTok{\textless{}{-}}\NormalTok{ data\_boot }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{group\_by}\NormalTok{(dark\_mode) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{summarize}\NormalTok{(}\AttributeTok{m =} \FunctionTok{weighted.mean}\NormalTok{(read\_time, }\AttributeTok{w =}\NormalTok{ ipw)) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{arrange}\NormalTok{(dark\_mode)}
+  
+  \CommentTok{\# ATT{-}Schätzwert}
+  \FunctionTok{return}\NormalTok{(w\_means}\SpecialCharTok{$}\NormalTok{m[}\DecValTok{2}\NormalTok{] }\SpecialCharTok{{-}}\NormalTok{ w\_means}\SpecialCharTok{$}\NormalTok{m[}\DecValTok{1}\NormalTok{])}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Bootstrap durchführen}
+\NormalTok{b\_IPW }\OtherTok{\textless{}{-}} \FunctionTok{boot}\NormalTok{(}
+  \AttributeTok{data =}\NormalTok{ darkmode,}
+  \AttributeTok{statistic =}\NormalTok{ IPW\_boot, }
+  \AttributeTok{R =} \DecValTok{999}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Bootstrap{-}Schätzer und Standardfehler berechnen}
+\FunctionTok{mean}\NormalTok{(b\_IPW}\SpecialCharTok{$}\NormalTok{t)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] 2.026179
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sd}\NormalTok{(b\_IPW}\SpecialCharTok{$}\NormalTok{t)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] 0.6823184
+\end{verbatim}
+
+In diesem Fall ist der Bootstrap-Standardfehler von ca. 0.68 gut mit dem
+anhand von \texttt{summary(model\_ipw)} berechneten Standardfehler
+vergleichbar. Ein 95\%-Konfidenzintervall für den ATE erhalten wir mit
+\texttt{boot.ci()}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 95\% Bootstrap{-}KI für den ATE}
+\FunctionTok{boot.ci}\NormalTok{(b\_IPW, }\AttributeTok{type =} \StringTok{"bca"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
+Based on 999 bootstrap replicates
+
+CALL : 
+boot.ci(boot.out = b_IPW, type = "bca")
+
+Intervals : 
+Level       BCa          
+95%   ( 0.658,  3.225 )  
+Calculations and Intervals on Original Scale
+\end{verbatim}
+
+\hypertarget{regression-matching-und-doubly-robust-schuxe4tzung}{%
+\section{Regression, Matching und
+Doubly-Robust-Schätzung}\label{regression-matching-und-doubly-robust-schuxe4tzung}}
+
+Als \emph{Doubly-Robust-Schätzer} bezeichnet man Methoden, die bei
+Fehlspezifikationen im Matching-Verfahrens \emph{oder} der funktionalen
+Form der Regressionsfunktion für die Outcome-Variable eine zuverlässige
+Schätzungen des kausalen Effekts ermöglichen.\footnote{Bspw. kann eine
+  falsche funktionale Form bei logistischer Regression eine verzerrte
+  Schätzung von Propensity Scores und damit eine unzureichende Balance
+  bedeuten.} Unter der Vorraussetzung, dass die verwendeten
+Matching-Variablen sämliche Backdoors schließen, ist so mit
+Doubly-Robust-Schätzung eine konsistente Schätzung des
+Behandlungseffekts unter abgeschwächten Annahmen gewähtleistet. Dies
+macht Doubly-Robust-Schätzer besonders nützlich in Forschungskontexten,
+in denen präzise Modellspezifikationen herausfordernd sind.
+
+Der von Wooldridge (2010) vorgeschlagene Doubly-Robust-Schätzer (IPWRA)
+für den ATE erreicht seine vorteilhaften Eigenschaften durch eine
+geschickte Kombination von IPW und Regression Adjustment.
+
+\textbf{Algorithmus: IPWRA-Schätzer des ATE (Wooldridge 2010)}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Berechne IPW anhand von Propensity Score mit logistischer Regression
+  unter Verwendung der Matching-Variablen.
+\item
+  Regression Adjustment:
+\end{enumerate}
+
+A. Schätze für die \emph{Behandlungsgruppe} eine mit den IPW gewichtete
+Regressionspezifikation der Outcome-Variable mit Kontrolle für die
+Matching-Variablen.
+
+B. Wiederhole Schritt A für die Kontrollgruppe.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\item
+  Berechne Vorhersagen der Outcome-Variable für die angepassten Modelle
+  aus 2.A und 2.B.
+\item
+  Schätze den ATE als Mittelwert-Differenz der Vorhersagen aus Schritt
+  3.
+\end{enumerate}
+
+Wir implementieren den Doubly-Robust-Schätzer des ATE von Wooldridge
+(2010) für das Website-Beispiel in der Funktion \texttt{IPWRA()}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# IPW estimation with regression adjustment}
+\NormalTok{IPWRA }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(}
+\NormalTok{    br, }
+    \AttributeTok{i =}\NormalTok{ i) \{}
     \CommentTok{\# slice bootstrapped observations}
-\NormalTok{    br }\OtherTok{\textless{}{-}}\NormalTok{ br }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{slice}\NormalTok{(index)}
+\NormalTok{    br }\OtherTok{\textless{}{-}}\NormalTok{ br }\SpecialCharTok{\%\textgreater{}\%} 
+      \FunctionTok{slice}\NormalTok{(i)}
     
     \CommentTok{\# estimate and predict propensity score}
-\NormalTok{    m }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(}\AttributeTok{formula =}\NormalTok{ dark\_mode }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ male,}
-             \AttributeTok{data =}\NormalTok{ br, }
-             \AttributeTok{family =} \FunctionTok{binomial}\NormalTok{(}\AttributeTok{link =} \StringTok{\textquotesingle{}logit\textquotesingle{}}\NormalTok{))}
+\NormalTok{    m }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(}
+      \AttributeTok{formula =}\NormalTok{ dark\_mode }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ male,}
+      \AttributeTok{data =}\NormalTok{ br, }
+      \AttributeTok{family =} \FunctionTok{binomial}\NormalTok{(}\AttributeTok{link =} \StringTok{\textquotesingle{}logit\textquotesingle{}}\NormalTok{)}
+\NormalTok{    )}
     
 \NormalTok{    br }\OtherTok{\textless{}{-}}\NormalTok{ br }\SpecialCharTok{\%\textgreater{}\%}
         \FunctionTok{mutate}\NormalTok{(}\AttributeTok{ps =} \FunctionTok{predict}\NormalTok{(m, }\AttributeTok{type =} \StringTok{\textquotesingle{}response\textquotesingle{}}\NormalTok{))}
-    
-    \CommentTok{\# trim control observations outside of treated PS range}
-    \CommentTok{\# minps \textless{}{-} br \%\textgreater{}\%}
-    \CommentTok{\#     filter(dark\_mode == 1) \%\textgreater{}\%}
-    \CommentTok{\#     pull(ps) \%\textgreater{}\%}
-    \CommentTok{\#     min(na.rm = TRUE)}
-    \CommentTok{\# }
-    \CommentTok{\# maxps \textless{}{-} br \%\textgreater{}\%}
-    \CommentTok{\#     filter(dark\_mode == 1) \%\textgreater{}\%}
-    \CommentTok{\#     pull(ps) \%\textgreater{}\%}
-    \CommentTok{\#     max(na.rm = TRUE)}
-    \CommentTok{\# }
-    \CommentTok{\# \# do the trimming}
-    \CommentTok{\# br \textless{}{-} br \%\textgreater{}\%}
-    \CommentTok{\#     filter(ps \textgreater{}= minps \& ps \textless{}= maxps)}
-   
+
 \NormalTok{    br }\OtherTok{\textless{}{-}}\NormalTok{ br }\SpecialCharTok{\%\textgreater{}\%}
       \FunctionTok{filter}\NormalTok{(}
         \FunctionTok{between}\NormalTok{(}
@@ -3075,27 +3449,18 @@ Vergleichen Sie mit den Ergebnissen der Aufgaben 1 (d), 4 (f) und 5 (d).
 \NormalTok{          dark\_mode }\SpecialCharTok{==} \DecValTok{0} \SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{/}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ ps))}
 \NormalTok{      )}
     
-    \CommentTok{\# Simple \_ATT\_ estimate:}
-    \CommentTok{\# w\_means \textless{}{-} br \%\textgreater{}\%}
-    \CommentTok{\#     group\_by(dark\_mode) \%\textgreater{}\%}
-    \CommentTok{\#     summarize(m = weighted.mean(read\_time, w = ipw)) \%\textgreater{}\% }
-    \CommentTok{\#     arrange(dark\_mode)}
-    \CommentTok{\# }
-    \CommentTok{\# \# simple diff{-}in{-}means \_ATT\_ estimate}
-    \CommentTok{\#  return(w\_means$m[2] {-} w\_means$m[1]) }
-    
     \CommentTok{\# Do regression adjustment for \_ATE\_ estimate}
     \CommentTok{\# TE prediction for whole sample based on TG model}
 \NormalTok{    mtreat }\OtherTok{\textless{}{-}}\NormalTok{ br }\SpecialCharTok{\%\textgreater{}\%}
       \FunctionTok{filter}\NormalTok{(dark\_mode }\SpecialCharTok{==} \DecValTok{1}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-      \FunctionTok{lm}\NormalTok{(read\_time }\SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{+}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ male, }\AttributeTok{data =}\NormalTok{ ., }\AttributeTok{weights =}\NormalTok{ .}\SpecialCharTok{$}\NormalTok{ipw) }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{lm}\NormalTok{(read\_time }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ male, }\AttributeTok{data =}\NormalTok{ ., }\AttributeTok{weights =}\NormalTok{ .}\SpecialCharTok{$}\NormalTok{ipw) }\SpecialCharTok{\%\textgreater{}\%}
       \FunctionTok{predict}\NormalTok{(}\AttributeTok{newdata =}\NormalTok{ br) }\SpecialCharTok{\%\textgreater{}\%}
       \FunctionTok{mean}\NormalTok{()}
-    
+
     \CommentTok{\# TE prediction for whole sample based on CG model}
 \NormalTok{    mcont }\OtherTok{\textless{}{-}}\NormalTok{ br }\SpecialCharTok{\%\textgreater{}\%}
       \FunctionTok{filter}\NormalTok{(dark\_mode }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-      \FunctionTok{lm}\NormalTok{(read\_time }\SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{+}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ male, }\AttributeTok{data =}\NormalTok{ ., }\AttributeTok{weights =}\NormalTok{ .}\SpecialCharTok{$}\NormalTok{ipw) }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{lm}\NormalTok{(read\_time }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ male, }\AttributeTok{data =}\NormalTok{ ., }\AttributeTok{weights =}\NormalTok{ .}\SpecialCharTok{$}\NormalTok{ipw) }\SpecialCharTok{\%\textgreater{}\%}
       \FunctionTok{predict}\NormalTok{(}\AttributeTok{newdata =}\NormalTok{ br) }\SpecialCharTok{\%\textgreater{}\%}
       \FunctionTok{mean}\NormalTok{()}
 
@@ -3106,14 +3471,15 @@ Vergleichen Sie mit den Ergebnissen der Aufgaben 1 (d), 4 (f) und 5 (d).
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{b }\OtherTok{\textless{}{-}} \FunctionTok{boot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ darkmode, ipwra, }\AttributeTok{R =} \DecValTok{999}\NormalTok{)}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{1234}\NormalTok{)}
+\NormalTok{b }\OtherTok{\textless{}{-}} \FunctionTok{boot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ darkmode, IPWRA, }\AttributeTok{R =} \DecValTok{999}\NormalTok{)}
 \CommentTok{\# Bootstrap estimate and standard error}
 \FunctionTok{mean}\NormalTok{(b}\SpecialCharTok{$}\NormalTok{t)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-[1] 1.945025
+[1] 1.947387
 \end{verbatim}
 
 \begin{Shaded}
@@ -3123,13 +3489,13 @@ Vergleichen Sie mit den Ergebnissen der Aufgaben 1 (d), 4 (f) und 5 (d).
 \end{Shaded}
 
 \begin{verbatim}
-[1] 0.6190766
+[1] 0.5959568
 \end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# 95\% Bootstrap{-}KI für den Treatment{-}Effekt}
-\FunctionTok{boot.ci}\NormalTok{(b, }\AttributeTok{type =} \StringTok{"perc"}\NormalTok{)}
+\FunctionTok{boot.ci}\NormalTok{(b, }\AttributeTok{type =} \StringTok{"bca"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -3138,32 +3504,13 @@ BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
 Based on 999 bootstrap replicates
 
 CALL : 
-boot.ci(boot.out = b, type = "perc")
+boot.ci(boot.out = b, type = "bca")
 
 Intervals : 
-Level     Percentile     
-95%   ( 0.728,  3.085 )  
+Level       BCa          
+95%   ( 0.737,  3.057 )  
 Calculations and Intervals on Original Scale
 \end{verbatim}
-
-\vfill
-
-\bookmarksetup{startatroot}
-
-\hypertarget{literatur}{%
-\chapter{Literatur}\label{literatur}}
-
-Abadie, Alberto, and Guido W. Imbens. (2008). \emph{On the Failure of
-the Bootstrap for Matching Estimators.}Econometrica 76 (\textbf{6}):
-1537--57.
-
-Bodory, H., Camponovo, L., Huber, M., \& Lechner, M. (2020). \emph{The
-Finite Sample Performance of Inference Methods for Propensity Score
-Matching and Weighting Estimators}. Journal of Business \& Economic
-Statistics, 38(\textbf{1}), 183--200.
-
-Wooldridge, J. M. (2010). \emph{Econometric analysis of cross section
-and panel data}. MIT press.
 
 \bookmarksetup{startatroot}
 
@@ -5804,7 +6151,7 @@ Erklärungskraft werden durch die Regularisierung in Richtung 0 gezwungen
 und reduzieren so die Varianz der Vorhersage gegenüber der
 (idealerweise) unverzerrten KQ-Schätzung.
 
-\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, left=2mm, coltitle=black, leftrule=.75mm, toprule=.15mm, titlerule=0mm, bottomrule=.15mm, colframe=quarto-callout-note-color-frame, breakable, opacitybacktitle=0.6, bottomtitle=1mm, arc=.35mm, colback=white, colbacktitle=quarto-callout-note-color!10!white, toptitle=1mm, opacityback=0, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Ridge Regression}]
+\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, bottomrule=.15mm, colbacktitle=quarto-callout-note-color!10!white, bottomtitle=1mm, arc=.35mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Ridge Regression}, opacitybacktitle=0.6, colback=white, left=2mm, breakable, leftrule=.75mm, opacityback=0, coltitle=black, titlerule=0mm, colframe=quarto-callout-note-color-frame, toprule=.15mm, toptitle=1mm]
 
 \begin{itemize}
 \item
@@ -6377,7 +6724,7 @@ und damit zu einer höheren Vorhersagegüte. Das ``sparsame'' mit
 Lasso-Regression geschätzte Modell ist dem ``großen'' mit KQ geschätztem
 Modell in dieser Hinsicht also überlegen.
 
-\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, left=2mm, coltitle=black, leftrule=.75mm, toprule=.15mm, titlerule=0mm, bottomrule=.15mm, colframe=quarto-callout-note-color-frame, breakable, opacitybacktitle=0.6, bottomtitle=1mm, arc=.35mm, colback=white, colbacktitle=quarto-callout-note-color!10!white, toptitle=1mm, opacityback=0, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Lasso-Regression}]
+\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, bottomrule=.15mm, colbacktitle=quarto-callout-note-color!10!white, bottomtitle=1mm, arc=.35mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Lasso-Regression}, opacitybacktitle=0.6, colback=white, left=2mm, breakable, leftrule=.75mm, opacityback=0, coltitle=black, titlerule=0mm, colframe=quarto-callout-note-color-frame, toprule=.15mm, toptitle=1mm]
 
 \begin{itemize}
 \item
@@ -7352,7 +7699,7 @@ Der Post-Double-Selection-Schätzer liefert unter den betrachteten
 Verfahren die beste Schätzung von \(\alpha_0\) und erlaubt gülstige
 statistische Inferenz. Der geschätzte Effekt ist hoch-signifikant.
 
-\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, left=2mm, coltitle=black, leftrule=.75mm, toprule=.15mm, titlerule=0mm, bottomrule=.15mm, colframe=quarto-callout-note-color-frame, breakable, opacitybacktitle=0.6, bottomtitle=1mm, arc=.35mm, colback=white, colbacktitle=quarto-callout-note-color!10!white, toptitle=1mm, opacityback=0, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum Post-Double-Selection-Schätzer}]
+\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, bottomrule=.15mm, colbacktitle=quarto-callout-note-color!10!white, bottomtitle=1mm, arc=.35mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum Post-Double-Selection-Schätzer}, opacitybacktitle=0.6, colback=white, left=2mm, breakable, leftrule=.75mm, opacityback=0, coltitle=black, titlerule=0mm, colframe=quarto-callout-note-color-frame, toprule=.15mm, toptitle=1mm]
 
 \begin{itemize}
 \item
@@ -7635,19 +7982,42 @@ Schätzung \(\widehat{\alpha}_0\approx-0.05\).
 
 \bookmarksetup{startatroot}
 
-\hypertarget{literatur-1}{%
-\chapter*{Literatur}\label{literatur-1}}
+\hypertarget{literatur}{%
+\chapter*{Literatur}\label{literatur}}
 \addcontentsline{toc}{chapter}{Literatur}
 
 \markboth{Literatur}{Literatur}
 
 \hypertarget{refs}{}
 \begin{CSLReferences}{1}{0}
+\leavevmode\vadjust pre{\hypertarget{ref-AbadieImbens2008}{}}%
+Abadie, Alberto, und Guido W. Imbens. 2008. {„On the Failure of the
+Bootstrap for Matching Estimators.``} \emph{Econometrica. Journal of the
+Econometric Society} 76 (6): 1537--57.
+\url{https://doi.org/10.3982/ECTA6474}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-AbadieSpiess2022}{}}%
+Abadie, Alberto, und Jann Spiess. 2022. {„Robust Post-Matching
+Inference.``} \emph{Journal of the American Statistical Association} 117
+(538): 983--95. \url{https://doi.org/10.1080/01621459.2020.1840383}.
+
 \leavevmode\vadjust pre{\hypertarget{ref-Austin2011}{}}%
 Austin, P. 2011. {„An Introduction to Propensity Score Methods for
 Reducing the Effects of Confounding in Observational Studies``}.
 \emph{Multivariate Behavioral Research} 46 (3): 399--424.
 \url{https://doi.org/10.1080/00273171.2011.568786}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-AustinSmall2014}{}}%
+Austin, Peter C., und Dylan S. Small. 2014. {„The use of bootstrapping
+when using propensity-score matching without replacement: A simulation
+study.``} \emph{Statistics in Medicine} 33 (24): 4306--19.
+\url{https://doi.org/10.1002/sim.6276}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-AustinStuart2017}{}}%
+Austin, Peter C., und Elizabeth A. Stuart. 2017. {„Estimating the Effect
+of Treatment on Binary Outcomes Using Full Matching on the Propensity
+Score.``} \emph{Statistical Methods in Medical Research} 26 (6):
+2505--25. \url{https://doi.org/10.1177/0962280215601134}.
 
 \leavevmode\vadjust pre{\hypertarget{ref-BarroLee2013}{}}%
 Barro, Robert J., und Jong Wha Lee. 2013. {„A new data set of
@@ -7676,6 +8046,13 @@ Belloni, Alexandre, Victor Chernozhukov, und Christian Hansen. 2014.
 {„High-dimensional methods and inference on structural and treatment
 effects``}. \emph{Journal of Economic Perspectives} 28 (2): 29--50.
 
+\leavevmode\vadjust pre{\hypertarget{ref-Bodoryetal2020}{}}%
+Bodory, Hugo, Lorenzo Camponovo, Martin Huber, und Michael Lechner.
+2020. {„The Finite Sample Performance of Inference Methods for
+Propensity Score Matching and Weighting Estimators.``} \emph{Journal of
+Business \& Economic Statistics}.
+\url{https://doi.org/10.2139/ssrn.2731969}.
+
 \leavevmode\vadjust pre{\hypertarget{ref-CJM2020}{}}%
 Cattaneo, Matias D, Michael Jansson, und Xinwei Ma. 2020. {„Simple local
 polynomial density estimators``}. \emph{Journal of the American
@@ -7699,10 +8076,22 @@ Hahn, P Richard, Carlos M Carvalho, David Puelz, und Jingyu He. 2018.
 {„Regularization and confounding in linear regression for treatment
 effect estimation``}.
 
+\leavevmode\vadjust pre{\hypertarget{ref-Hainmueller2012}{}}%
+Hainmueller, Jens. 2012. {„Entropy Balancing for Causal Effects: A
+Multivariate Reweighting Method to Produce Balanced Samples in
+Observational Studies``}. \emph{Political Analysis} 20 (1): 25--46.
+\url{https://doi.org/10.1093/pan/mpr025}.
+
 \leavevmode\vadjust pre{\hypertarget{ref-Hajek1971}{}}%
 Hájek, J. 1971. {„Comment on {‚An essay on the logical foundations of
 survey sampling`} by Basu, D``}. \emph{Foundations of Statistical
 Inference} 236.
+
+\leavevmode\vadjust pre{\hypertarget{ref-HillReiter2006}{}}%
+Hill, Jennifer, und Jerome P. Reiter. 2006. {„Interval estimation for
+treatment effects using propensity score matching. Statistics in
+Medicine``}. \emph{Statistics in Medicine} 25 (13): 2230--56.
+\url{https://doi.org/10.1002/sim.2277}.
 
 \leavevmode\vadjust pre{\hypertarget{ref-Hiranoetal2003}{}}%
 Hirano, Keisuke, Guido Imbens, und Geert Ridder. 2003. {„Efficient
@@ -7714,6 +8103,11 @@ Score.``} \emph{Econometrica} 71 (4): 1161--89.
 Hoerl, Arthur E, und Robert W Kennard. 1970. {„{Ridge regression: Biased
 estimation for nonorthogonal problems}``}. \emph{Technometrics} 12 (1):
 55--67.
+
+\leavevmode\vadjust pre{\hypertarget{ref-AbadieImbens2016}{}}%
+Imbens. 2016. {„Matching on the Estimated Propensity Score.``}
+\emph{Econometrica} 84 (2): 781--807.
+\url{https://doi.org/10.3982/ecta11293}.
 
 \leavevmode\vadjust pre{\hypertarget{ref-ImbensLemieux2008}{}}%
 Imbens, G. W., und Thomas Lemieux. 2008. {„Regression discontinuity
@@ -7753,6 +8147,10 @@ Statistical Methodology} 58 (1): 267--88.
 \leavevmode\vadjust pre{\hypertarget{ref-Weber2004}{}}%
 Weber, Max. 2004. \emph{Die protestantische Ethik und der Geist des
 Kapitalismus}. Bd. 1614. CH Beck.
+
+\leavevmode\vadjust pre{\hypertarget{ref-Wooldrige2010}{}}%
+Wooldridge, Jeffrey. 2010. \emph{Econometric Analysis of Cross Section
+and Panel Data}. Second edition. Cambridge, Massachusetts: MIT.
 
 \end{CSLReferences}
 
