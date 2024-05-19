@@ -5428,7 +5428,6 @@ class QuartoInspector extends Inspector {
     this._cellAst = cellAst;
   }
   rejected(error) {
-    console.error(`Error evaluating OJS cell\n${this._cellAst.input}\n${String(error)}`);
     return super.rejected(error);
   }
 }

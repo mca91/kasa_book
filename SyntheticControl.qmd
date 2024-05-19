@@ -1,0 +1,819 @@
+---
+webr: 
+  show-startup-message: true
+  packages: [
+            'dplyr',
+            'ggplot2',
+            'sandwich',
+            'tidyr',
+            'readr',
+            'Synth'
+            ]
+---
+
+```{=html}
+<style>
+.qwebr-code-output-stdout {background-color: powderblue;}
+
+.qwebr-button-run, .qwebr-button-reset, .qwebr-button-copy {
+  background-color:  rgba(0, 0, 0, 0);
+  border-style: none;
+  font-weight: 400;
+  color: white; 
+  transition: none;
+}
+
+.qwebr-editor-toolbar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+  border-radius: 0 0 6px 6px;
+  background-color: darkgreen;
+  border-color: darkgreen;
+  border-width: 1px;
+  border-style: solid;
+  padding: 0 0; 
+  transition: color .1s ease-in-out, background-color .1s ease-in-out,border-color .1s ease-in-out,box-shadow .1s ease-in-out;
+}
+
+.qwebr-editor-toolbar:hover {
+  background-color: white;
+  border-color: darkgreen;
+  border-width: 1px;
+}
+
+.qwebr-editor-toolbar:hover * {
+  color: darkgreen;
+}
+
+.overflow-guard, .qwebr-editor, .monaco-editor {
+  border-radius: 6px 6px 0 0;
+  border-width: 1px 1px 0 1px;
+  border-color: darkgreen;
+}
+
+</style>
+```
+
+# Synthetic Control
+
+```{r, echo=F,message=F,warning=F}
+# Formatierung von gt-Tabellen
+library(gt)
+tabopts <- function(x) {
+    fmt_number(x, decimals = 3, drop_trailing_zeros = T) %>%
+    tab_options(table_body.hlines.color = "white",
+              column_labels.border.bottom.color = "black", 
+             column_labels.border.top.color = "black",
+             table_body.border.bottom.color = "black", 
+             table.border.bottom.color = "black",
+             column_labels.font.weight = "bold", 
+             table.font.color = "black", 
+             table.font.size = 16)
+}
+
+library(tidyverse)
+# load the brexit data
+download.file(
+    "https://raw.githubusercontent.com/mca91/kausal_data/main/brexit.csv",
+    'datasets/brexit.csv',
+)
+brexit <- read_csv("datasets/brexit.csv") %>% as.data.frame
+
+# load the Synth package
+library(Synth)
+options(pillar.sigfig = 2)
+```
+
+
+```{webr-r}
+#| context: setup
+
+# install wabassem nlopt from astamm's repository
+install.packages('nloptr', repos = 'https://astamm.r-universe.dev')
+
+# create dataset directory
+dir.create("datasets")
+# Download the dataset
+download.file(
+    "https://raw.githubusercontent.com/mca91/kausal_data/main/brexit.csv",
+    'datasets/brexit.csv',
+)
+
+# load the brexit data
+brexit <- read_csv("datasets/brexit.csv") %>% as.data.frame
+
+# load the Synth package
+library(Synth)
+options(pillar.sigfig = 2)
+```
+
+Synthetic Control Methoden (SCM) wurden in @Abadieetal2010 für die Auswertung kausaler Effekte von politischen Interventionen vorgeschlagen. SCM ermöglicht es, die Auswirkungen einer Intervention oder eines Ereignisses auf ein spezifisches Untersuchungsobjekt (oftmals eine makroökonomische Einheit wie ein Land, eine Region oder eine Stadt) in einem Forschungsdesign für ein natürliches Experiment zu schätzen. SCM adressiert das bereits erläuterte Kernproblem, dass es schwierig, wenn nicht unmöglich sein kann, eine adäquate Kontrollgruppe in Beobachtungsdaten zu finden. Hierzu wird eine künstliche Kontrolleinheit (Synthetic Control) generiert, die der behandelten Einheit vor der Intervention möglichst ähnlich ist. Dieser synthetische Doppelgänger kann die unbeobachtbare Entwicklungen der behandelten Einheit *nach* der Intervention repräsentieren und so eine plausible Schätzung des kausalen Effekts der Intervention für die Post-Interventionsperioden gewährleisten. 
+
+## Schätzung von Interventionseffekten mit SCM {#sec-siscm}
+
+Ähnlich wie bei manchen Matching-Methoden wird bei SCM die Ähnlichkeit der synthetischen Einheit mit der untersuchten Einheit durch eine gewichtete Kombination von Kontrolleinheiten basierend auf ihren Prä-Interventionsmerkmalen erreicht. Seien $i = 1, 2, \ldots, N$ die Einheiten in der Stichprobe, wobei $i = 1$ die behandelte Einheit und $i = 2, \ldots, N$ potenziellen Kontrolleinheiten (auch *Donor pool* genannt) sind. Die Daten liegen für die Perioden $t = 1, 2, \ldots, T$ vor, mit $T_0$ dem Zeitpunkt direkt vor der Intervention und $T_1, \ldots, T$ den Perioden nach der Intervention.
+
+Für SCM bestimmen wir einen Vektor von Gewichten $\mathbf{w}^* := (w_2^*, \ldots, w_k^*)^T$, der die Summe der quadrierten Differenzen zwischen den Ausprägungen von $k$ Charakteristika der behandelten Einheit vor der Intervention, $X_{1,\,m}^{\text{Pre}}$, $m=1,\dots,k$, und der gewichteten Summe dieser Charakteristika für die Kontrolleinheiten, $X_{i,\,m}^{\text{Pre}}$, minimiert:
+
+\begin{align}
+  \mathbf{w}^* := \arg\min_{\mathbf{w}} \sum_{m=1}^{k} v_m \left( X_{1,\,m}^{\text{Pre}} - \sum_{i=2}^{N} w_i X_{i,m}^{\text{Pre}} \right)^2,\label{eq:scopt}
+\end{align}
+
+unter der Nebenbedingung, dass $\sum_{i=2}^{N} w_i = 1$ und $w_i \geq 0$ für alle $i$. Die $v_m$ sind weitere Gewichte, welche die Relevanz der Variablen für die Vorhersage der Outcome-Variable der interessierenden Einheit, $Y_{1,\,t}$, beinflussen. Diese Gewichte werden meist in einem weiteren Optimierungsverfahren (bspw. mit Cross-Validation) bestimmt [vgl. @Abadieetal2014]. Als Verlustfunktion hierbei wird meist der mittlere quadratische Fehler bei der Vorhersage von $Y_{1,\,t}$ (MSPE)^[Engl. für *Mean squared prediction error*] vor der Behandlung anhand der synthetischen Einheit verwendet,
+
+\begin{align}
+  \sum_{t=1}^{T_0} \left( Y_{1,\,t} - \sum_{i=2}^N w_i(\mathbf{v}) Y_{i,\,t} \right)^2, \label{eq:scopt2}
+\end{align}
+mit $\mathbf{v} := (v_1,\dots,v_k)'$.
+
+Durch die Lösung des Optimierungsproblems \eqref{eq:scopt} unter Berücksichtigung von \eqref{eq:scopt2} erhalten wir die geschätzten Gewichte $\widehat{w}_i$, welche den Einfluss der Kontrolleinheit $i=2,\dots,N$-ten bei der Zusammensetzung der Kontrollgruppe festlegen. Anhand der $\widehat{w}_i$ wird die Outcome-Variable der synthetischen Kontrolleinheit konstruiert, welche als Referenz für die Schätzung des kausalen Effekts der Intervention dient. Die Outcome-Variable der synthetischen Kontrollgruppe für die Nach-Interventionsperiode kann formal ausgedrückt werden als
+
+\begin{align}
+  Y_{1,\,t}^{\text{Synth}} = \sum_{i=2}^{N} \widehat{w}_i Y_{i,\,t},\quad t > T_0,\label{eq:dgkonst}
+\end{align}
+
+wobei $Y_{1,t}^{\text{Synth}}$ der Wert der Outcome-Variable $Y$ für die synthetische Kontrollgruppe zum Zeitpunkt $t$ und $Y_{i,t}$ der entsprechende Wert des Outcomes für die $i$-te Kontrolleinheit ist. Bei SCM schätzen wir den kausalen Effekt $\tau_t$ der Intervention zum Zeitpunkt $t$ als die Differenz der Post-Interventionswerte von $Y$ zwischen der behandelten Einheit und dem synthetischen Doppelgänger,
+
+$$
+\widehat{\tau}_t = Y_{1,\,t} - Y_{1,\,t}^{\text{synth}},\quad t > T_0.
+$$
+
+Der mit SCM geschätzte Effekt ermittelt also für $t > T_0$, wie sich die Intervention auf die behandelte Einheit ausgewirkt hat durch einen Vergleich mit der Situation, die eingetreten wäre, wenn die Einheit nicht behandelt worden wäre, repräsentiert durch die synthetische Kontrollgruppe.
+
+Der SCM-Schätzer von @Abadieetal2010 ist im R-Paket `Synth` [@Hainmuelleretal2011] implementiert. Wir illustrieren die Methode nachfolgend mit einer empirischen Anwendung zu den Konsequenzen des Brexit auf die nachfolgende Entwicklung der britischen Volkswirtschaft.
+
+## Case Study: Ökonomische Kosten des Brexit
+
+@Bornetal2019 untersuchen die ökonomischen Kosten des Brexits mit einem kausalanalytischen Forschungsansatz. Der Kern der empirischen Analyse ist eine Kombination von quasi-experimenteller Identifikation und struktureller Zeitreihenanalyse. Hiermit können nicht nur die aggregierten Kosten des EU-Ausstiegs für Großbrittanien zu quantifiziert, sondern auch die Kanäle indentifiziert werden, durch die die erwartete wirtschaftliche Desintegration die britische Makroökonomie beeinflusst hat. Hierbei identifizieren @Bornetal2019 einen Anstieg der wirtschaftspolitischen Unsicherheit und eine Abwärtskorrektur der Wachstumserwartungen als Haupttreiber für den Rückgang der Wirtschaftsleistung.  
+
+Der quasi-experimentelle Ansatz betrachtet das Brexit-Referendum als ein natürliches makroökonomisches Experiment und untersucht die Konsequenzn der wirtschaftlichen Desintegration für das Bruttoinlandsprodukt (BIP) im Nachfolgezeitraum mit SCM. Hierzu wird gemäß der in @sec-siscm erläuterten Vorgehensweise ein syntetischer Doppelgänger für die britische Wirtschaft aus einem Donor Pool von 23 Volkswirtschaften konstruiert, und der Effekt des Referendums als Unterschied zwischen der tatsächlichen und synthetischen Trajektorien des BIP für Folgeperioden ermittelt. Die Analyse zeigt, dass das Brexit-Votum bis Ende 2018 zu einem BIP-Rückgang von etwa 1.7\% bis 2.5\% geführt hat.
+
+Wie reproduzieren nun die wesentlichen Ergebnisse des SCM-Ansatzes der Studie mit R. Hierfür lesen zunächst den Datensatz `brexit.csv` ([hier verfügbar](https://raw.githubusercontent.com/mca91/kausal_data/main/brexit.csv)) in R ein. Dieser enthält vierteljährliche Beobachtungen makroökonomischer Variablen für 24 Länder für den Zeitraum 1995-Q1--2021-Q4.
+
+```{r}
+#| eval: false
+library(readr)
+library(dplyr)
+
+# Datensatz 'brexit.csv' einlesen
+brexit <- read_csv("datasets/brexit.csv") %>%
+  as.data.frame()
+```
+
+`brexit` ist ein Datensatz mit einer Panel-Struktur. Die Zeit- und Entitätsvariablen sind `Year`/`quarter` und `Country`/`ID`. Beachte, dass die Variable `Time` zusätzlich das Jahr und das Quartal als numerische Variable angibt.
+
+```{r}
+# Überblick über 'brexit'
+glimpse(brexit)
+
+# 'Time' zeigt Jahr + Quartal
+brexit %>% 
+  filter(Country == "United Kingdom") %>% 
+  select(Time) %>%
+  slice_head(n = 5)
+```
+
+Für die Schätzung der Gewichte $w_i$ für die Konstruktion des UK-Doppelgängers werden die in gelisteten Charakteristika der Volkswirtschaften verwendet.
+
+| Variable      | Definition                                                |
+|---------------|-----------------------------------------------------------|
+| `gdp`         | Veränderung des BIP relativ zu 2016                       |  
+| `ConGDP`      | Anteil: Konsum/BIP (%)                                    |
+| `InvGDP`      | Anteil: Investitionen/BIP (%)                             |
+| `ExpGDP`      | Anteil: Exporte/BIP (%)                                   |
+| `ImpGDP`      | Anteil: Importe/BIP (%)                                   |
+| `EmpSha`      | Anteil: Beschäftigte/Erwerbsbevölkerung (%)               |
+| `LPG`         | Wachstum der Arbeitsproduktivität (%)                     |
+    
+: `brexit` -- Variablen und Definitionen {#tbl-Born2019preds}
+
+Zur Berechnung von SCM mit dem R-Paket `Synth` müssen die Daten zunächst mit der Funktion `Synth::dataprep()` aufbereitet werden, s. `?Synth::dataprep()` für weitere Details. Neben dem Datensatz (`foo`) unter expliziter Nennung der Prädiktoren (`predictors`) und der Outcome-Variable (`dependent`) übergeben wir Variablen für die Indentifikation von Einheiten (`ID`) und Zeitpunkten (`Time`), sowie Donor Pool (`controls.identifier`) und behandelter Einheit (`treatment.identifier`). Weiterhin werden die Vorbehandlungsperiode (`time.predictors.prior`) sowie der Zeitraum über den die Regressor-Gewichte $v_m$ bestimmt werden sollen (`time.optimize.ssr`), festgelegt. Für letztere übergeben wir einen numerischen Vektor für sämtliche Zeitpunkte von 1995-Q1 bis zum Brexit-Referendum in 2016-Q2.
+
+Um einen ersten Überblick über die Entwicklung der BIP im Datensatz zu gewinnen, vergleichen wir die Zeitreihen für Donor-Pool-Länder (grau) und Großbritannien (blau) mit `ggplot`. 
+```{r}
+#| fig-cap: "BIP relativ zu 2016"
+#| label: "fig-bipv"
+library(cowplot)
+
+brexit %>%
+  mutate(
+    group = ifelse(
+      Country == "United Kingdom", 
+      yes = "UK", 
+      no ="else"
+    )
+  ) %>%
+  
+  ggplot(
+    mapping = aes(
+      x = Time, 
+      y = gdp, 
+      color = group, 
+      group = Country, 
+      lwd = group
+    )
+  ) +
+  scale_color_manual(
+    values = c(
+      "UK" = "#00BFC4", "else" = alpha("gray", .75)
+    )
+  ) +
+  scale_linewidth_manual(
+    values = c("UK" = 1, "else" = .5)
+  ) +
+  geom_line() +
+  # Brexit-Referendum
+  geom_vline(
+    xintercept = 2016.25, 
+    lty = "dotted"
+  ) +
+  theme_cowplot() +
+  guides(
+    lwd = "none", 
+    color = guide_legend(position = "inside")
+  ) +
+  theme(legend.position.inside = c(.1, .9))
+```
+
+@fig-bipv zeigt, dass das BIP von Großbritannien zwar auch nach dem Brexit-Referendum (gepunktete Linie) gewachsen ist, jedoch vergleichsweise schwach. Eine Analyse mit SCM kann statistische Evidenz für den mutmaßlich negativen Effekt des Referendums auf das Wachstum in den Folgeperioden liefern.
+
+Wir laden nun das Paket `Synth` und bereiten die Daten für die Analyse vor.
+
+```{r}
+# R-Paket 'Synth' laden
+library(Synth)
+
+# Daten für die Optimierung vorbereiten
+dataprep_out <- dataprep(
+  foo = brexit, 
+  predictors = c(
+    "ConGDP", "InvGDP", 
+    "ExpGDP", "ImpGDP", 
+    "LPG", "EmpSha"
+  ), 
+  dependent = "gdp", 
+  unit.variable = "ID",
+  time.variable = "Time", 
+  treatment.identifier = 23, 
+  controls.identifier = (brexit$ID %>% unique())[-23], 
+  time.predictors.prior = seq(1995, 2016.25, .25),
+  time.optimize.ssr = seq(1995, 2016.25, .25),
+  unit.names.variable = "Country"
+)
+```
+
+Anhand der vorbereiteten Daten `dataprep_out` wird nun die Bestimmung der Gewichte mit `Synth::synth()` durchgeführt.
+
+```{r}
+# Gewichte per Optimierung bestimmen
+synth_out <- synth(dataprep_out)
+```
+
+`Synth::synth()` gibt Infos über den Optimierungsprozess und dessen Ergebnisse automatisch in der Konsole aus. Wir können diese mit `Synth::synth.tab()` leicht tabellarisch zusammenfassen und mit `gt::gt()` darstellen.
+
+```{r}
+# Zusammenfassung der Ergebnisse
+(
+  tb <- synth.tab(
+    synth.res = synth_out, 
+    dataprep.res = dataprep_out
+  )  
+)
+```
+
+Für die tabellarische Darstellung mit `gt::gt()` berücksichtigen wir lediglich Volkswirtschaften mit Gewicht > .0001.
+
+```{r}
+#| tbl-cap: "Gewichte für den synthetischen UK-Doppelgänger"
+#| label: tbl-brexitcw
+# Darstellung mit gt()
+tb$tab.w %>% 
+  # Berücksichtige nur Länder mit relevanten Gewichten
+  filter(w.weights > .0001) %>% 
+  arrange(desc(w.weights)) %>% 
+  gt::gt() %>%
+  tabopts
+```
+
+Der synthetische UK-Doppelgänger kann nun gemäß der Vorschrift \eqref{eq:dgkonst} konstruiert werden. Wir erzeugen hierzu ein `tibble`-Objekt mit den entsprechenden ID-Variablen.
+
+```{r}
+# Doppelgänger konstruieren
+doppelganger <- left_join(
+  x = brexit, 
+  y = tb$tab.w, 
+  by = c("Country" = "unit.names")
+) %>% 
+  select(Time, Year, Country, gdp, w.weights) %>%
+  group_by(Time, Year) %>%
+  summarise(
+    gdp = sum(gdp * w.weights, na.rm = T)
+  ) %>%
+  mutate(type = "Doppelgaenger") %>%
+  ungroup()
+
+glimpse(doppelganger)
+```
+
+Für die nachfolgenden Schritte der Analyse führen wir das beobachtete GDP für Großbritannien mit dem syntethischen GDP des Doppelgängers zusammen.
+
+```{r}
+# tibble mit UK-GDP erstellen
+UK <- brexit %>% 
+  filter(Country == "United Kingdom") %>% 
+  select(Time, Year, gdp) %>%
+  mutate(type = "UK")
+
+# UK und Doppelgänger zusammenführen
+the_gdps <- bind_rows(
+  doppelganger, UK
+)
+```
+
+Für einen Vergleich von UK- und Doppelgänger-BIP folgen wir @Bornetal2019 und berechnen die Differenz der BIP über den gesamten Zeitraum, die so genannte *Doppelgänger-Gap*. 
+
+```{r}
+# UK-Doppelgänger-Gap berechnen
+gdp_gap <- the_gdps %>% 
+  pivot_wider(
+    values_from = gdp, 
+    names_from = "type"
+  ) %>%
+  mutate(gdp_gap = UK - Doppelgaenger)
+```
+
+Als ein Maß für die Unsicherheit bei der Schätzung des GDPs für den Doppelgänger berechnen @Bornetal2019 die Standardabweichung der Doppelgänger-Gap für den Zeitraum *vor* dem Brexit-Referendum.
+
+```{r}
+# Standardabweichung der Gap vor dem Brexit-Vote
+sd_gap <- gdp_gap %>%
+  filter(Time < 2016.25) %>% 
+  summarise(
+    sd = sd(gdp_gap)
+  ) %>% 
+  pull(sd)
+```
+
+Wir nutzen nun `ggplot2::ggplot()`, um den syntetischen Doppelgänger und das BIP für Großbritannien über den gesamten Zeitraum darzustellen. Für die Darstellung von Unsicherheit bei der Konstruktion des Doppelgängers unterlegen wir die Doppelgänger-Zeitreihe mit einer Schattierung in der Breite der geschätzten Standardabweichung von `r round(sd_gap, 2)` für die Periode vor dem Referendum.
+
+```{r}
+#| fig-cap: "UK-BIP und synthetischer Doppelgänger"
+#| label: fig-ukuksdg
+(
+  p_gdp <- ggplot() +
+    # 1-SD-Band um das Doppelgänger-GDP
+    geom_ribbon(
+      data = the_gdps %>% 
+        filter(type == "Doppelgaenger"), 
+      mapping = aes(
+        x = Time, 
+        ymin = gdp - sd_gap, 
+        ymax = gdp + sd_gap
+      ), 
+      fill = alpha("red", alpha = .2), 
+      color = "white"
+    ) +
+    # UK- und Doppelgänger-GDP
+    geom_line(
+      data = the_gdps, 
+      mapping = aes(
+        x = Time, 
+        y = gdp, 
+        col = type
+      ),
+      lwd = 1
+    ) +
+    # Brexit-Referendum
+    geom_vline(
+      xintercept = 2016.25, 
+      lty = "dotted"
+    ) +
+    scale_color_discrete(name = "") +
+    # Legende hinzufügen
+    cowplot::theme_cowplot() +
+    theme(legend.position = c(.025, .9))  
+)
+```
+
+@fig-ukuksdg zeigt, dass der synthetische Doppelgänger über weite Teile der Vorperiode eine gute Anpassung an das beobachtete BIP von Großbritannien aufweist, insbesondere für den Zeitraum unmittelbar vor dem Brexit-Referendum. Nach dem Referendum zeigt sich bereits nach wenigen Quartalen eine deutliche Abweichung zwischen der geschätzten und der beobachteten Trajektorie. Eine Beschränkung der in `p_gdp` verwendeten Datenpunkte auf einen Bereich nahe des Referendums bestärkt diese Schlussfolgerung.
+
+```{r}
+#| fig-cap: "UK-BIP und synthetischer Doppelgänger -- Close-Up"
+#| label: fig-ukuksdgclose
+# Close-up im Bereich des Referendums
+p_gdp +
+  scale_x_continuous(
+    limits = c(2015, 2021), 
+    expand = c(0, .1)
+    ) +
+  scale_y_continuous(limits = c(-4, 12))
+```
+
+In @fig-ukuksdg ist eine ab Mitte 2017 außerhalb des Standardabweichungsbereichs verlaufende Divergenz der Zeitreihen zu erkennen. Diese stellen wir nachfolgend anhand der Doppelgänger-Gap mit `ggplot2::ggplot()` dar.
+
+```{r}
+#| fig-cap: "UK-BIP und synthetischer Doppelgänger -- Doppelgänger-Gap"
+#| label: fig-ukdggap
+# BIP-Doppelgänger-Gap
+ggplot(data = gdp_gap) +
+  geom_hline(yintercept = 0) +
+  geom_line(
+    mapping = aes(x = Time, y = gdp_gap),
+    lwd = 1
+  ) + 
+  geom_ribbon(
+    mapping = aes(
+      x = Time, 
+      ymin = gdp_gap - sd_gap, 
+      ymax = gdp_gap + sd_gap
+    ), 
+    fill = alpha("darkgray", alpha = .2), 
+    color = "white"
+  ) +
+  # Referendum
+  geom_vline(
+    xintercept = 2016.25,
+    lty = "dotted"
+  ) +
+  scale_x_continuous(
+    expand = c(0, .1), 
+    limits = c(2015, 2021)
+  ) +
+  scale_y_continuous(limits = c(-6, 1.5)) +
+  cowplot::theme_cowplot()
+```
+
+Die in @fig-ukdggap gezeigte Doppelgänger-Gap stimmt gut mit dem von @Bornetal2019 geschätzten verlorenen Wachstums des BIP relativ zu 2016 um bis zu 2.5\% bis Ende des Jahres 2018 überein.
+
+Als weiteres Maß für den Effekt des Referendums im Folgezeitraum können wir die mittlere Doppelgänger-Gap für sämtliche Beobachtungsperioden nach dem Brexit-Referendum schnell bestimmen.
+
+```{r}
+# Mittlerer Unterschied nach dem Brexit-Referendum
+gdp_gap %>% 
+  filter(Time > 2016.25) %>% 
+  pull(gdp_gap) %>% 
+  mean()
+```
+
+### Placebo-Tests: Grafische Inferenz
+
+Auch für SCM sind Placebo-Tests ein hilfreiches Instrument zur Überprüfung der Gültigkeit von Studienergebnissen. Eine gründliche Placebo-Analyse kann festzustellen, ob der beobachtete Effekt tatsächlich auf die Intervention zurückzuführen ist und nicht auf unberücksichtigte (möglicherweise unbeobachtbare) Faktoren. 
+
+Ein Ansatz ist hierfür ist es, den synthetische-Doppelgänger für *fiktive Interventionszeitpunkte* vor dem tatsächlichen Behandlungszeitpunkt zu konstruieren, und die entsprechenden Trajektorien mit dem ursprünglichen Doppelgänger zu vergleichen. So kann die Validität der ursprünglichen Doppelgänger-Trajektorie im Hinblick auf mögliche anderweitige Ereignisse vor der Intervention geprüft werden: Doppelgänger-Trajektorien für fiktive, frühere Interventionen sollten sich nicht systematisch von der andhand von Daten bis zur tatsächlichen Intervention berechneten Trajektorie unterscheiden.
+
+Wir definieren hierzu eine Funktion `placebo()`, die einen syntethischen Doppelgänger des BIP Großbritanniens mit Gewichten auf Basis eines vorgegebenen Interventionszeitpunktes (`treat`) zurückgibt. Abgesehen vom früheren Interventionszeitpunkt (und der damit einhergehenden verkleinerten Stichprobe) erfolgt die Berechnung der Gewichte mit derselben Spezifikation wie zuvor.
+
+```{r}
+# Funktion für Placebo-Doppelgänger:
+# Fiktive frühere Intervention
+placebo <- function(treat) {
+  
+  # Datenvorbereitung für fiktives Datum 'treat'
+  dataprep_out <- dataprep(
+    foo = brexit, 
+    predictors = c(
+      "ConGDP", "InvGDP",
+      "ExpGDP", "ImpGDP",
+      "LPG", "EmpSha"
+    ), 
+    dependent = "gdp", 
+    unit.variable = "ID",
+    time.variable = "Time", 
+    treatment.identifier = 23, 
+    controls.identifier = (brexit$ID %>% unique())[-23], 
+    time.predictors.prior = seq(1995, treat, .25),
+    time.optimize.ssr = seq(1995, treat, .25),
+    unit.names.variable = "Country"
+    )
+  
+  # Doppelgänger bestimmen
+  synth_out <- quietly(synth)(dataprep_out)$result
+  
+  # Ergebnisse auslesen
+  tb <- synth.tab(
+    synth.res = synth_out, 
+    dataprep.res = dataprep_out
+    )
+  
+  return(
+    
+    # Doppelgänger konstruieren 
+    left_join(
+      x = brexit, 
+      y = tb$tab.w, 
+      by = c("Country" = "unit.names")
+    ) %>% 
+      select(Time, Country, gdp, w.weights) %>%
+      group_by(Time) %>%
+      summarise(
+        gdp = sum(gdp * w.weights, na.rm = T)
+      ) %>%
+      mutate(type = paste0("Placebo", treat))  
+    )
+  
+}
+```
+
+Wie in @Bornetal2019 berechnen wir nun 12 Placebo-Doppelgänger des BIP von Großbritannien für fiktive Zeitpunkte eines Referendums über sämtliche Quartale im Zeitraum 2010-Q1 bis 2016-Q1. Dies ist komfortabel durch Iteration von `placebo()` über diese Zeitpunkte mit `purrr::map_dfr()` umsetzbar.
+
+```{r}
+#| cache: true
+# Iteration über fiktive frühere Referenden
+placebos_tbl <- map_dfr(
+  .x = seq(2010, 2016, .25), 
+  .f =  \(x) placebo(x) 
+)
+```
+
+`placebos_tbl` ist ein `tibble`-Objekt im tidy-Format. Wir können die Placebo-Doppelgänger sowie den ursprünglich berechneten Doppelgänger und das tatsächliche BIP also ähnlich wie in @fig-ukuksdg mit `ggplot2::ggplot()` darstellen.
+
+```{r}
+#| fig-cap: "Placebo-Doppelgänger"
+#| label: fig-pdgukbip
+# Vergleich mit Placebo-Doppelgänger
+(
+  p_UKDG <- ggplot(
+    data = placebos_tbl,
+    mapping = aes(
+      x = Time, 
+      y = gdp, 
+      group = type
+    )
+  ) +
+    # Placebos (mit jitter)
+    geom_line(
+      lwd = .25, 
+      col = "gray80",
+      position = position_jitter(height = .25)
+    ) +
+    # Ursprünglicher Doppelgänger
+    geom_line(
+      data = the_gdps %>% 
+        filter(type == "Doppelgaenger"), 
+      mapping = aes(col = type), 
+      lwd = 1
+    ) +
+    # Beobachtetes BIP
+    geom_line(
+      data = the_gdps %>% 
+        filter(type == "UK"), 
+      mapping = aes(col = type), 
+      lwd = 1
+    ) +
+    # Intikator für Referendum
+    geom_vline(xintercept = 2016.25, lty = "dotted") +
+    # Formatierung
+    cowplot::theme_cowplot() +
+    theme(legend.position = c(.05, .9))
+)
+```
+
+```{r}
+#| fig-cap: "Placebo-Doppelgänger -- Close-Up"
+#| label: fig-pdgukbipcu
+# Close-up bei Referendum
+p_UKDG +
+      scale_x_continuous(
+      limits = c(2015, 2021), expand = c(0, .05)
+    ) +
+      scale_y_continuous(
+      limits = c(-3, 13),  expand = c(0, 0)
+    )
+```
+
+Beachte, dass `position = position_jitter(height = .25)` eine zufällige, kleine Verschiebung (jitter) der Trajektorien der Placebo-Doppelgänger für eine bessere Unterscheidbarkeit bewirkt. @fig-pdgukbip und @fig-pdgukbipcu zeigen, dass sich die Placebo-Pfade für fiktive frühere Referenden (grau) nicht systematisch vom ursprünglich berechneten synthetischen Doppelgänger (rot) unterscheiden. Insbesondere finden wir keinen Rückgang der synthetischen BIP relativ zum beobachteten BIP für Großbritannien *vor* dem Referendum. Deutliche Abweichungen vom tatsächlichen BIP ergeben sich erst jenseits der tatsächlichen Referendums. Diese Placebo-Analyse bekräftigt also die Validität der Konstruktion des "Benchmark-Doppelgängers" für die Periode bis 2016-Q2 und die Schätzung des kausalen Effekts des Referendums anhand der entsprechenden Doppelgänger-Gap.
+
+Ein weiterer Placebo-Test in @Bornetal2019 ist ein Vergleich der Doppelgänger-Gap Großbritanniens mit Doppelgänger-Gaps für fiktive Referenden in 2016-Q2 in Ländern mit wesentlichem Einfluss bei der Konstruktion des synthetischen Doppelgängers für Großbritannien: Die Schätzung des kausalen Effekts des Referendums auf das BIP in Großbritannien ist glaubwürdig, wenn lediglich die Doppelgänger-Gap für Großbritannien durch das Referendum beeinflusst wird, *nicht* aber die Doppelgänger-Gaps für Länder in der Kontrollgruppe. 
+
+Für diese grafische Placebo-Analyse modifizieren wir die Funktion `placebo()` entsprechend. `placebo_gap()` berechnet die Doppelgänger-Gap für das mit `treat` identifizierte Land. Das `if`-Statement zu Beginn stellt sicher, dass Großbritannien *nicht* als Kontroll-Einheit für die Placebo-Gaps verwendet wird. 
+
+```{r}
+# Funktion für Placebo-Gaps
+placebo_gap <- function(treat) {
+  
+  # Kontrollgruppe definieren
+  if(treat != 23) {
+    controls <- (1:24)[-c(23, treat)]
+  } else {
+    controls <- (1:24)[-23]
+  }
+  
+  # Daten vorbereiten
+  dataprep_out <- dataprep(
+    foo = brexit, 
+    predictors = c(
+      "ConGDP", "InvGDP",
+      "ExpGDP", "ImpGDP",
+      "LPG", "EmpSha"
+    ), 
+    dependent = "gdp", 
+    unit.variable = "ID",
+    time.variable = "Time", 
+    treatment.identifier = treat, 
+    controls.identifier = controls, 
+    time.predictors.prior = seq(1995, 2016.25, .25),
+    time.optimize.ssr = seq(1995, 2016.25, .25),
+    unit.names.variable = "Country"
+  )
+  
+  # Gewichte bestimmen
+  synth_out <- quietly(synth)(dataprep_out)$result
+  
+  # Ergebnisse zusammenfassen
+  tb <- synth.tab(
+    synth.res = synth_out, 
+    dataprep.res = dataprep_out
+  )
+  
+  # Doppelgänger bestimmen
+  doppel <- left_join(
+    x = brexit, 
+    y = tb$tab.w, 
+    by = c("Country" = "unit.names")
+  ) %>% 
+    select(Time, gdp, Country, w.weights) %>%
+    group_by(Time) %>%
+    summarise(
+      gdp_synth = sum(gdp * w.weights, na.rm = T), 
+    )
+  
+  # Beobachtetes BIP auslesen
+  gdp <- brexit %>% filter(ID == treat) %>% pull(gdp)
+  
+  return(
+    
+    # Doppelgänger-Gap berechnen
+    doppel %>% 
+      mutate(
+        ID = treat,
+        gdp = gdp,
+        gdp_gap = gdp - gdp_synth
+      )
+    
+  )
+  
+}
+```
+
+Für die Berechnung der Placebo-Gaps iterieren wir über die Indizes der in @tbl-brexitcw gelisteten Volkswirtschaften der Kontrollgruppe für Großbritannien. 
+
+```{r}
+# Indizes für "Donor Countries" und UK
+donors_and_UK <- brexit %>% 
+  select(ID, Country) %>% 
+  distinct() %>%
+  filter(
+    Country %in% 
+      c(
+        "United States", "Italy", "Iceland", 
+        "Luxembourg", "Germany", "United Kingdom"
+      )
+  ) %>%
+  pull(ID)
+```
+
+```{r}
+# Placebo-Doppelgänger-Gaps berechnen
+placebo_gaps_tbl <- map_dfr(
+  .x = donors_and_UK, 
+  .f =  \(x) placebo_gap(x) 
+)
+```
+
+Für die grafische Darstellung ergänzen wir die Variable `Country` zur Unterscheidung der Doppelgänger-Gaps für Großbritannien und die Kontroll-Länder.
+
+```{r}
+# ID-Variable für UK und Kontroll-Länder
+placebo_gaps_tbl <- placebo_gaps_tbl %>%
+  mutate(
+    Country = ifelse(ID == 23, "UK", "else")
+  )
+```
+
+Um die Vergleichbarkeit der Doppelgänger-Gaps zu gewährleisten, standardisieren @Bornetal2019 die Schätzungen der Gaps anhand der jeweiligen Mittelwerte für das Jahr 2015 und der Standardabweichungen im Zeitraum vor dem Brexit-Referendum. Wir berechnen diese Statistiken zunächst.
+
+```{r}
+# Mittelwerte für 2015
+means <- placebo_gaps_tbl %>% 
+  group_by(ID) %>% 
+  filter(between(Time, 2015, 2015.75)) %>% 
+  summarise(
+    mean2015 = mean(gdp_gap)
+  )
+
+# Standardabweichungen vor Referendum
+sds <- placebo_gaps_tbl %>% 
+  group_by(ID) %>% 
+  filter(Time < 2016.25) %>% 
+  summarise(
+    thesd = sd(gdp_gap)
+  )
+```
+
+Mit `dplyr::left_join()` führen wir diese Statistiken mit `placebo_gaps_tbl` zusammen und berechnen die standardisierten Doppelgänger-Gaps.
+
+```{r}
+# Join + Standardisierung
+placebo_gaps_std <- 
+  left_join(placebo_gaps_tbl, means) %>% 
+  left_join(sds) %>%
+  mutate(gdp_gap_std = (gdp_gap - mean2015)/thesd)
+```
+
+Analog zum Code für @fig-ukdggap plotten wir die Placebo-Gap-Zeitreihen mit `ggplot2::ggplot()`.
+
+```{r}
+#| fig-cap: "Placebo- und UK-Doppelgänger-Gaps"
+#| label: fig-pdgukg
+# Placebo-Gaps mit UK-Gap vergleichen
+ggplot(
+  data = placebo_gaps_std,
+  mapping = aes(
+    x = Time, 
+    y = gdp_gap_std,
+    group = ID,
+    lwd = Country,
+    color = Country
+  )
+) +
+  # Hilfslinie bei Differenz = 0
+  geom_hline(yintercept = 0) +
+  # Gaps
+  geom_line() +
+  # Referendum
+  geom_vline(xintercept = 2016.25, lty = "dotted") +
+  # Formatierung
+  scale_color_manual(
+    values = c("UK" = "steelblue", "else" = alpha("darkgray", .5))
+  ) +
+  scale_linewidth_manual(
+    values = c("UK" = 1, "else" = .5)
+  ) +
+  scale_x_continuous(
+    limits = c(2015, 2021), expand = c(0, .05)
+  ) +
+  theme_cowplot() +
+  theme(legend.position = c(.05, .9))
+```
+
+@fig-pdgukg zeigt die standardisierten Placebo-Doppelgänger-Gaps für ein fiktives Referendum zum Zeitpunkt 2016-Q2 in den 5 Kontroll-Volkswirtschaften, die für Konstruktion des BIP-Doppelgängers von Großbrittannien relevant sind (grau). Der Vergleich mit der standardisierten Doppelgänger-Gap für Großbritannien (blau). Der Verlauf der Placebo-Gaps zeigt an, dass keine Abweichungen mit negativem Trend von der Referenzlinie bei 0 (kein Unterschied zwischen beobachtetem und syntetischem BIP) nach dem Referendum vorliegen. Damit liefert die Grafik keine Hinweise auf einen  Effekt fiktiver Interventionen in den Kontroll-Ländern. Für Großbritannien jedoch ist, ähnlich wie in @fig-ukdggap, ein negativer Trend nach dem Referendum deutlich erkennbar.
+
+### Statistische Inferenz
+
+Die bisherigen Placebo-Tests liefern lediglich grafische Evidenz für die Signifikanz des negativen Effekts des Brexit-Referendums auf die Britische Volkswirtschaft. Methoden für statistische Inferenz für SCM sind Gegenstand aktueller Forschung. @Bornetal2019 verwenden den End-Of-Sample Instability Test ($S$) von @Andrews2003. Dieses Verfahren kann für einen Test auf einen Strukturbruch gegen Ende einer Zeitreihe verwendet werden. In der vorliegende Studie wird der Test angewendet, um zu überprüfen, ob die Verteilung der Doppelgänger-Gap Großbritanniens für die letzen $m$ Perioden jenseits des Referendums signifikant verschieden ist von Verteilung vorheriger Perioden.
+
+Wir zeigen nachfolgend, wie diese Analyse in R mit der Funktion `CPAT::Andrews.test()` aus dem Paket `CPAT` durchgeführt werden kann. Wir testen zunächst auf eine signifikante Diskrepanz der Doppelgänger-Gap in Form eines Sturkturbruchs ab 2017 und fassen die Ergebnisse tabellarisch mit `broom::tidy()` und `gt::gt()` zusammen.
+
+```{r}
+#| tbl-cap: "Andrews' (1993) End-of-Sample Instability Test"
+#| label: tbl-growthpdssek
+library(CPAT)
+
+# Andrews' (2003) Test für 2017 durchführen
+Andrews.test(
+  x = gdp_gap$gdp_gap, 
+  M = which(gdp_gap$Time == 2017)
+) %>% 
+  broom::tidy() %>% 
+  gt::gt() %>%
+  tabopts
+```
+
+Gem. des großen $p$-Werts kann die Nullhypothese (keine strukturelle Veränderung ab 2017) nicht abgelehnt werden. Wir führen den Test nun für sämtliche Zeitpunkte ab 2017 durch und plotten die $p$-Werte nebst gepunkteten roten Hilfslinien für die gängigen Signifikanzniveaus (10\%, 5\%, 1\%).
+
+```{r}
+# Andrews' (1993) test für 
+# Post-Referendumsperioden
+pvals_andrews <- map(seq(2017, 2020.5, .25), \(time) {
+  tibble(
+    Time = time,
+    gap = gdp_gap %>% filter(Time == time) %>% pull(gdp_gap),
+    pvalue = CPAT::Andrews.test(
+      x = gdp_gap$gdp_gap, 
+      M = which(gdp_gap$Time == time)
+    )$p.value
+  )
+}) %>% 
+  bind_rows()
+```
+
+```{r}
+#| fig-cap: "P-Werte für Andrews' (2003) Test"
+#| label: fig-andrewspvals
+# p-Werte für Post-Interventionsperioden
+pvals_andrews %>%
+  ggplot(mapping = aes(x = Time, y = pvalue)) + 
+  geom_hline(
+    yintercept = c(.1,.05, .01), 
+    lty = "dotted", 
+    col = "red"
+  ) +
+  geom_line() +
+  scale_x_continuous(expand = c(0, 0)) +
+  cowplot::theme_cowplot()
+```
+
+Der Verlauf der $p$-Werte zeigt deutlich, dass es für Zeitpunkte jenseits von 2018-Q3 Evidenz für eine strukturelle Veränderung der Doppelgänger-Gap für Großbrittannien gibt. Diese Ergebnisse untermauern die Signifikanz der in @Bornetal2019 mit SCM gefundenen negativen Effekte des Brexit-Votums auf die Britische Volkswirtschaft weiter.
+

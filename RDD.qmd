@@ -498,7 +498,7 @@ function a(d) { return LLRURegression(
 ::: {.content-visible when-format="pdf"}
 ----
 
-***Diese interaktive Komponente des Buchs ist nur in der Online-Version verfügbar***
+***Diese interaktive Komponente des Buchs ist nur in der Online-Version verfügbar.***
 
 ----
 :::
@@ -1322,9 +1322,8 @@ FS4 <- update(
 ```
 
 ```{r}
-#| tbl-cap: "First-Stage Regressionen"
+#| tbl-cap: "First-Stage-Regressionen"
 #| label: tbl-BastenBetzFS
-#| cap-location: margin
 
 # Tabellarische Darstellung
 modelsummary(
@@ -1417,7 +1416,6 @@ SS_gini <- update(
 ```{r}
 #| tbl-cap: "Ergebnisse der Second-Stage-Regressionen"
 #| label: tbl-BastenBetzSS
-#| cap-location: margin
 
 # Tabellarische Darstellung
 modelsummary(
