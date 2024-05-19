@@ -2,9 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.9">
+<meta name="generator" content="quarto-1.4.553">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Kausalanalyse und Machinelles Lernen mit R – 4&nbsp; Regression Discontiniuty Designs</title>
+<title>Kausalanalyse und Machinelles Lernen mit R - 5&nbsp; Regression Discontiniuty Designs</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -81,7 +81,7 @@ div.csl-indent {
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
 <link href="./RegReg.html" rel="next">
-<link href="./Matching.html" rel="prev">
+<link href="./DiD.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -134,7 +134,7 @@ div.csl-indent {
  width = 100%; 
 }
 
-figcaption {
+.centered-caption {
    text-align: center;
 }
 </style>
@@ -172,7 +172,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./RDD.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./RDD.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span></a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -220,14 +220,26 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./DiD.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./RDD.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./RegReg.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Regularisierte Regression</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regularisierte Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./SyntheticControl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Synthetic Control</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -241,33 +253,33 @@ window.Quarto = {
     <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title"><a href="./index.html">Übersicht</a></h2>
    
   <ul>
-<li><a href="#sharp-regression-discontinuity-design" id="toc-sharp-regression-discontinuity-design" class="nav-link active" data-scroll-target="#sharp-regression-discontinuity-design"><span class="header-section-number">4.1</span> Sharp Regression Discontinuity Design</a></li>
+<li><a href="#sharp-regression-discontinuity-design" id="toc-sharp-regression-discontinuity-design" class="nav-link active" data-scroll-target="#sharp-regression-discontinuity-design"><span class="header-section-number">5.1</span> Sharp Regression Discontinuity Design</a></li>
   <li>
-<a href="#manipulation-am-schwellenwert" id="toc-manipulation-am-schwellenwert" class="nav-link" data-scroll-target="#manipulation-am-schwellenwert"><span class="header-section-number">4.2</span> Manipulation am Schwellenwert</a>
+<a href="#manipulation-am-schwellenwert" id="toc-manipulation-am-schwellenwert" class="nav-link" data-scroll-target="#manipulation-am-schwellenwert"><span class="header-section-number">5.2</span> Manipulation am Schwellenwert</a>
   <ul class="collapse">
-<li><a href="#case-study-amtsinhaber-vorteil-lee2008" id="toc-case-study-amtsinhaber-vorteil-lee2008" class="nav-link" data-scroll-target="#case-study-amtsinhaber-vorteil-lee2008"><span class="header-section-number">4.2.1</span> Case Study: Amtsinhaber-Vorteil <span class="citation" data-cites="Lee2008">(Lee 2008)</span></a></li>
+<li><a href="#case-study-amtsinhaber-vorteil-lee2008" id="toc-case-study-amtsinhaber-vorteil-lee2008" class="nav-link" data-scroll-target="#case-study-amtsinhaber-vorteil-lee2008"><span class="header-section-number">5.2.1</span> Case Study: Amtsinhaber-Vorteil <span class="citation" data-cites="Lee2008">(Lee 2008)</span></a></li>
   </ul>
 </li>
-  <li><a href="#fuzzy-regression-discontinuity-design" id="toc-fuzzy-regression-discontinuity-design" class="nav-link" data-scroll-target="#fuzzy-regression-discontinuity-design"><span class="header-section-number">4.3</span> Fuzzy Regression Discontinuity Design</a></li>
+  <li><a href="#fuzzy-regression-discontinuity-design" id="toc-fuzzy-regression-discontinuity-design" class="nav-link" data-scroll-target="#fuzzy-regression-discontinuity-design"><span class="header-section-number">5.3</span> Fuzzy Regression Discontinuity Design</a></li>
   <li>
-<a href="#case-study-protestantische-arbeitsethik" id="toc-case-study-protestantische-arbeitsethik" class="nav-link" data-scroll-target="#case-study-protestantische-arbeitsethik"><span class="header-section-number">4.4</span> Case Study: Protestantische Arbeitsethik</a>
+<a href="#case-study-protestantische-arbeitsethik" id="toc-case-study-protestantische-arbeitsethik" class="nav-link" data-scroll-target="#case-study-protestantische-arbeitsethik"><span class="header-section-number">5.4</span> Case Study: Protestantische Arbeitsethik</a>
   <ul class="collapse">
-<li><a href="#aufbereitung-der-daten" id="toc-aufbereitung-der-daten" class="nav-link" data-scroll-target="#aufbereitung-der-daten"><span class="header-section-number">4.4.1</span> Aufbereitung der Daten</a></li>
-  <li><a href="#deskriptive-statistiken" id="toc-deskriptive-statistiken" class="nav-link" data-scroll-target="#deskriptive-statistiken"><span class="header-section-number">4.4.2</span> Deskriptive Statistiken</a></li>
-  <li><a href="#modellspezifikation-und-first-stage-ergebnisse" id="toc-modellspezifikation-und-first-stage-ergebnisse" class="nav-link" data-scroll-target="#modellspezifikation-und-first-stage-ergebnisse"><span class="header-section-number">4.4.3</span> Modellspezifikation und First-Stage-Ergebnisse</a></li>
-  <li><a href="#second-stage-ergebnisse" id="toc-second-stage-ergebnisse" class="nav-link" data-scroll-target="#second-stage-ergebnisse"><span class="header-section-number">4.4.4</span> Second-Stage-Ergebnisse</a></li>
-  <li><a href="#addendum-frdd-sch%C3%A4tzung-mit-rdrobust" id="toc-addendum-frdd-schätzung-mit-rdrobust" class="nav-link" data-scroll-target="#addendum-frdd-sch%C3%A4tzung-mit-rdrobust"><span class="header-section-number">4.4.5</span> Addendum: FRDD-Schätzung mit <code>rdrobust()</code></a></li>
+<li><a href="#aufbereitung-der-daten" id="toc-aufbereitung-der-daten" class="nav-link" data-scroll-target="#aufbereitung-der-daten"><span class="header-section-number">5.4.1</span> Aufbereitung der Daten</a></li>
+  <li><a href="#deskriptive-statistiken" id="toc-deskriptive-statistiken" class="nav-link" data-scroll-target="#deskriptive-statistiken"><span class="header-section-number">5.4.2</span> Deskriptive Statistiken</a></li>
+  <li><a href="#modellspezifikation-und-first-stage-ergebnisse" id="toc-modellspezifikation-und-first-stage-ergebnisse" class="nav-link" data-scroll-target="#modellspezifikation-und-first-stage-ergebnisse"><span class="header-section-number">5.4.3</span> Modellspezifikation und First-Stage-Ergebnisse</a></li>
+  <li><a href="#second-stage-ergebnisse" id="toc-second-stage-ergebnisse" class="nav-link" data-scroll-target="#second-stage-ergebnisse"><span class="header-section-number">5.4.4</span> Second-Stage-Ergebnisse</a></li>
+  <li><a href="#addendum-frdd-sch%C3%A4tzung-mit-rdrobust" id="toc-addendum-frdd-schätzung-mit-rdrobust" class="nav-link" data-scroll-target="#addendum-frdd-sch%C3%A4tzung-mit-rdrobust"><span class="header-section-number">5.4.5</span> Addendum: FRDD-Schätzung mit <code>rdrobust()</code></a></li>
   </ul>
 </li>
   </ul></nav>
 </nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
     </div>
 <!-- main -->
 <main class="content page-columns page-full" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
 <div class="quarto-title-block"><div><h1 class="title">
-<span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span>
+<span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span>
 </h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Gesamten Code zeigen</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Gesamten Code verbergen</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">Quellcode anzeigen</a></li></ul></div></div>
 </div>
 
@@ -294,7 +306,7 @@ window.Quarto = {
 <div class="cell">
 
 </div>
-<p>Regression Discontinuity Design (RDD) ist ein Ansatz für die Schätzung von Behandlungseffekten mit Regression, wenn durch einen experimentell oder natürlich gegebenen Umstand die Behandlung an einem Schwellenwert (<span class="math inline">\(c\)</span>) einer <em>Laufvariable</em> (<span class="math inline">\(X\)</span>) sprunghaft beeinflusst wird. Ein RDD-Schätzer wird so implementiert, dass lediglich Beobachtungen mit Ausprägungen von <span class="math inline">\(X\)</span>, die knapp ober- oder knapp unterhalb von <span class="math inline">\(c\)</span> liegen, berücksichtigt werden. Die zentrale Idee hierbei ist, dass Individuen nahe bei <span class="math inline">\(c\)</span> im Durchschnitt ähnliche Merkmale aufweisen. Beobachtungen nahe <span class="math inline">\(c\)</span> sind dann insbesondere hinsichtlich potentieller Backdoor-Variablen vergleichbar, sodass deren problematische Pfade geschlossen sind. Das kausale Diagram in <a href="#fig-CDRDD" class="quarto-xref">Abbildung&nbsp;<span>4.1</span></a> zeigt den grundsätzlichen Zusammenhang.</p>
+<p>Regression Discontinuity Design (RDD) ist ein Ansatz für die Schätzung von Behandlungseffekten mit Regression, wenn durch einen experimentell oder natürlich gegebenen Umstand die Behandlung an einem Schwellenwert (<span class="math inline">\(c\)</span>) einer <em>Laufvariable</em> (<span class="math inline">\(X\)</span>) sprunghaft beeinflusst wird. Ein RDD-Schätzer wird so implementiert, dass lediglich Beobachtungen mit Ausprägungen von <span class="math inline">\(X\)</span>, die knapp ober- oder knapp unterhalb von <span class="math inline">\(c\)</span> liegen, berücksichtigt werden. Die zentrale Idee hierbei ist, dass Individuen nahe bei <span class="math inline">\(c\)</span> im Durchschnitt ähnliche Merkmale aufweisen. Beobachtungen nahe <span class="math inline">\(c\)</span> sind dann insbesondere hinsichtlich potentieller Backdoor-Variablen vergleichbar, sodass deren problematische Pfade geschlossen sind. Das kausale Diagram in <a href="#fig-CDRDD" class="quarto-xref">Abbildung&nbsp;<span>5.1</span></a> zeigt den grundsätzlichen Zusammenhang.</p>
 <div class="cell page-columns page-full" data-fig-width="5" data-fig-height="3" data-layout-align="center">
 <div class="cell-output-display page-columns page-full">
 <div id="fig-CDRDD" class="quarto-figure quarto-figure-center quarto-float anchored page-columns page-full">
@@ -316,16 +328,16 @@ window.Quarto = {
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-CDRDD-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;4.1: Kausales Diagramm für Sharp RDD
+Abbildung&nbsp;5.1: Kausales Diagramm für Sharp RDD
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p>RDD isoliert Variation auf dem Pfad <em>Oberhalb C → Behandlung B → Y</em>. Somit können Backdoor-Pfade über <span class="math inline">\(X\)</span> oder weitere (möglichweise unbeobachtbare) Confounder (<span class="math inline">\(Z\)</span>) vermieden werden, siehe <a href="#fig-CDRDD" class="quarto-xref">Abbildung&nbsp;<span>4.1</span></a>. Der kausale Effekt wird dabei als (lokaler) durchschnittlicher Behandlungseffekt der Diskontinuität auf die Outcome-Variable (<span class="math inline">\(Y\)</span>) anhand von Beobachtungen <em>nahe bei c</em> ermittelt.</p>
+<p>RDD isoliert Variation auf dem Pfad <em>Oberhalb C → Behandlung B → Y</em>. Somit können Backdoor-Pfade über <span class="math inline">\(X\)</span> oder weitere (möglichweise unbeobachtbare) Confounder (<span class="math inline">\(Z\)</span>) vermieden werden, siehe <a href="#fig-CDRDD" class="quarto-xref">Abbildung&nbsp;<span>5.1</span></a>. Der kausale Effekt wird dabei als (lokaler) durchschnittlicher Behandlungseffekt der Diskontinuität auf die Outcome-Variable (<span class="math inline">\(Y\)</span>) anhand von Beobachtungen <em>nahe bei c</em> ermittelt.</p>
 <p>Hinsichtlich der Beeinflussung der Behandlung unterscheiden wir zwischen <em>Sharp</em> und <em>Fuzzy</em> Regression Discontinuity Designs (SRDD/FRDD). Bei einem SRDD ist die Zuweisung der Behandlung <em>deterministisch</em>, d.h. der Schwellenwert in der Laufvariable ist eine harte Grenze für die Gruppenzugehörigkeit: Die <em>Wahrscheinlichkeit</em> der Behandlung <span class="math inline">\(p\)</span> springt bei <span class="math inline">\(X=c\)</span> von <span class="math inline">\(p=0\)</span> um <span class="math inline">\(\Delta p = 1\)</span> auf <span class="math inline">\(p=1\)</span>.</p>
 <p>Bei einem FRDD ist die Zuordnung in Behandlungs- und Kontrollgruppe nicht perfekt durch den Schwellenwert <span class="math inline">\(c\)</span> bestimmt: Die Behandlungswahrscheinlichkeit <span class="math inline">\(p\)</span> springt bei <span class="math inline">\(X=c\)</span> um <span class="math inline">\(\Delta p&lt;1\)</span>. Im FRDD können grundsätzlich also sowohl behandelte Subjekte als auch Kontroll-Beobachtungen auf beiden Seiten der Diskontinuität vorliegen – die Trennung der Gruppen ist “unscharf”<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. Dieser Umstand ist oft in empirischen Studien mit nicht-experimentellen Daten gegeben, wenn es neben der Überschreitung von <span class="math inline">\(c\)</span> weitere Determinanten der Behandlung gibt (für die wir nicht kontrollieren können). Die Wahl zwischen SRDD und FRDD hängt grundsätzlich vom datenerzeugenden Prozess und der Forschungsfrage ab.</p>
-<div class="no-row-height column-margin column-container"><p><sup>1</sup>&nbsp;Engl. <em>fuzzy</em>.</p></div><section id="sharp-regression-discontinuity-design" class="level2 page-columns page-full" data-number="4.1"><h2 data-number="4.1" class="anchored" data-anchor-id="sharp-regression-discontinuity-design">
-<span class="header-section-number">4.1</span> Sharp Regression Discontinuity Design</h2>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;Engl. <em>fuzzy</em>.</p></div></div><section id="sharp-regression-discontinuity-design" class="level2 page-columns page-full" data-number="5.1"><h2 data-number="5.1" class="anchored" data-anchor-id="sharp-regression-discontinuity-design">
+<span class="header-section-number">5.1</span> Sharp Regression Discontinuity Design</h2>
 <p><strong>Modell und funktionale Form</strong></p>
 <p>Die korrekte Spezifikation der funktionalen Form für ein RDD ist wichtig, um eine verzerrte Schätzung des Effekts zu vermeiden. Die einfachste Form eines SRDD kann anhand der linearen Regression <span class="math display">\[\begin{align}
 Y_i = \beta_0 + \beta_1 B_i + \beta_2 X_i + u_i\label{eq-simpleSRDD}
@@ -342,11 +354,11 @@ Y_i = \beta_0 + \beta_1 B_i + \beta_2 (X_i - c) + \beta_3(X_i - c)\times B_i + u
   Y_i =&amp;\, \beta_0 + \beta_1 B_i + \beta_2 (X_i - c) + \beta_3 (X_i - c)^2\\
        &amp;+\, \beta_4(X_i - c)\times B_i + \beta_5(X_i - c)\times B_i + u_i.\label{eq:quadSRDD}
 \end{align}\]</span> <span class="citation" data-cites="GelmanImbens2019">Gelman und Imbens (<a href="Literatur.html#ref-GelmanImbens2019" role="doc-biblioref">2019</a>)</span> zeigen, dass Polynome höherer Ordnung zu verzerrten Schätzern und hoher Varianz führen können.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> Die Authoren empfehlen stattdessen die Schätzung mit lokaler Regression.</p>
-<div class="no-row-height column-margin column-container"><p><sup>2</sup>&nbsp;Ursachen sind Überanpassung an die Daten sowie instabiles Verhalten der Schätzung nahe des Schwellenwertes.</p></div><p><strong>Nicht-parametrische Schätzung und Bandweite</strong></p>
+<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;Ursachen sind Überanpassung an die Daten sowie instabiles Verhalten der Schätzung nahe des Schwellenwertes.</p></div></div><p><strong>Nicht-parametrische Schätzung und Bandweite</strong></p>
 <p>Aktuelle Studien nutzen nicht-parametrische Schätzer, die den Behandlungseffekt als Differenz der geschätzten Regressionsfunktionen am Schwellenwert <span class="math inline">\(c\)</span> berechnen. Um auch nicht-lineare Regressionsfunktionen abzubilden zu können, wird häufig lokale Regression verwendet. Dieses Verfahren liefert eine “lokale” Schätzung der Regressionsfunktionen am Schwellenwert, bei der nur Beobachtungen nahe <span class="math inline">\(X = c\)</span> für die Schätzung berücksichtigt werden. Hinreichende Nähe wird hierbei durch eine sogenannte Bandweite <span class="math inline">\(h\)</span> festgelegt, wobei <span class="math display">\[\begin{align}
   \lvert(X_i-c)\rvert\leq h \label{eq:bwc}
 \end{align}\]</span> das Kriterium für eine Berücksichtigung von Beobachtung <span class="math inline">\(i\)</span> bei der Schätzung ist.</p>
-<p>Unter Verwendung einer Bandweite <span class="math inline">\(h\)</span> wird der Regressionsansatz <span class="math inline">\(\eqref{eq:linearSRDD}\)</span> als <em>lokale lineare Regression</em> mit Uniform-Kernelfunktion bezeichnet. Der Uniform-Kernel gibt allen Beobachtungen, innerhalb der Bandweite <span class="math inline">\(h\)</span> dasselbe Gewicht. Ist <span class="math inline">\(h\)</span> so groß, dass der gesamte Datensatz in die Schätzung einbezogen wird, entspricht der lokale lineare Regressions-Schätzer mit Uniform-Kernel dem (globalen) KQ-Schätzer in einem linearen Interaktionsmodell anhand aller Beobachtungen. Neben dem Uniform-Kernel ist der Triangular-Kernel eine in der Praxis häufig genutzte lineare Kernelfunktion. Der nachstehende Code plottet die Uniform- (grün) sowie die Triangular-Kernelfunktion (blau), siehe <a href="#fig-linearkern" class="quarto-xref">Abbildung&nbsp;<span>4.2</span></a>.</p>
+<p>Unter Verwendung einer Bandweite <span class="math inline">\(h\)</span> wird der Regressionsansatz <span class="math inline">\(\eqref{eq:linearSRDD}\)</span> als <em>lokale lineare Regression</em> mit Uniform-Kernelfunktion bezeichnet. Der Uniform-Kernel gibt allen Beobachtungen, innerhalb der Bandweite <span class="math inline">\(h\)</span> dasselbe Gewicht. Ist <span class="math inline">\(h\)</span> so groß, dass der gesamte Datensatz in die Schätzung einbezogen wird, entspricht der lokale lineare Regressions-Schätzer mit Uniform-Kernel dem (globalen) KQ-Schätzer in einem linearen Interaktionsmodell anhand aller Beobachtungen. Neben dem Uniform-Kernel ist der Triangular-Kernel eine in der Praxis häufig genutzte lineare Kernelfunktion. Der nachstehende Code plottet die Uniform- (grün) sowie die Triangular-Kernelfunktion (blau), siehe <a href="#fig-linearkern" class="quarto-xref">Abbildung&nbsp;<span>5.2</span></a>.</p>
 <div class="cell page-columns page-full">
 <details class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/">cowplot</a></span><span class="op">)</span></span>
@@ -388,7 +400,7 @@ Y_i = \beta_0 + \beta_1 B_i + \beta_2 (X_i - c) + \beta_3(X_i - c)\times B_i + u
 <img src="RDD_files/figure-html/fig-linearkern-1.png" class="img-fluid figure-img" width="384">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-linearkern-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;4.2: Kernelfunktionen auf [-1, 1]
+Abbildung&nbsp;5.2: Kernelfunktionen auf [-1, 1]
 </figcaption></figure>
 </div>
 </div>
@@ -704,7 +716,7 @@ Abbildung&nbsp;4.2: Kernelfunktionen auf [-1, 1]
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-srddviz-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;4.3: Nicht-parametrische Regression auf beiden Seiten des Cut-offs
+Abbildung&nbsp;5.3: Nicht-parametrische Regression auf beiden Seiten des Cut-offs
 </figcaption></figure>
 </div>
 </div>
@@ -715,8 +727,8 @@ Abbildung&nbsp;4.3: Nicht-parametrische Regression auf beiden Seiten des Cut-off
 <li><p>Größere Bandweiten <span class="math inline">\(h\)</span> erhöhen die Datenbasis der Schätzung, führen aber zu einer Annäherung der lokalen Schätzung an die globale KQ-Schätzung. Linksseitig des Schwellenwertes erzielen wir damit eine Schätzung mit hoher Güte. Rechsseitig von <span class="math inline">\(X_i = c\)</span> verschlechtert sich die lokale Anpassung am Schwellenwert deutlich, weil die lineare Schätzung den tatsächlichen (nicht-linearen) Zusammenhang nicht adäquat abbilden kann. Die Schätzung des Behandlungseffekts ist hier deutlich verzerrt.</p></li>
 </ul>
 <p>Die Wahl der Bandweite ist also eine wichtige Komponenten der RDD-Schätzung: Kleine Bandweiten erlauben eine Schätzung der Regressionsfunktion nahe des Schwellenwertes mit wenig Verzerrung. Allerdings kann diese Schätzung unpräzise sein, wenn nur wenige Beobachtungen <span class="math inline">\(\eqref{eq:bwc}\)</span> erfüllen. In der Praxis wird <span class="math inline">\(h\)</span> daher mit einem analytischen Schätzer <span class="citation" data-cites="ImbensKalyanaraman2012">(vgl. <a href="Literatur.html#ref-ImbensKalyanaraman2012" role="doc-biblioref">G. Imbens und Kalyanaraman 2012</a>)</span> oder anhand von <em>Cross Validation</em> <span class="citation" data-cites="ImbensLemieux2008">(bspw. <a href="Literatur.html#ref-ImbensLemieux2008" role="doc-biblioref">G. W. Imbens und Lemieux 2008</a>)</span> bestimmt. Die später in diesem Kapitel betrachteten R-Pakete halten diese Methoden bereit.</p>
-</section><section id="manipulation-am-schwellenwert" class="level2 page-columns page-full" data-number="4.2"><h2 data-number="4.2" class="anchored" data-anchor-id="manipulation-am-schwellenwert">
-<span class="header-section-number">4.2</span> Manipulation am Schwellenwert</h2>
+</section><section id="manipulation-am-schwellenwert" class="level2 page-columns page-full" data-number="5.2"><h2 data-number="5.2" class="anchored" data-anchor-id="manipulation-am-schwellenwert">
+<span class="header-section-number">5.2</span> Manipulation am Schwellenwert</h2>
 <p>Eine wichtige Annahmen für die Gültigkeit einer RDD-Schätzung ist, dass keine Manipulation der Gruppenzugehörigkeit am Schwellenwert vorliegt. Wenn sich Subjekte nahe des Schwellenwertes <span class="math inline">\(c\)</span> — d.h. in Abhängigkeit der Laufvariable <span class="math inline">\(X\)</span> — systematisch in den Confoundern <span class="math inline">\(Z\)</span> unterscheiden, können wir den Backdoor-Pfad <em>Oberhalb C → Behandlung B → Y</em> nicht isolieren. Wir erhalten dann eine verzerrte Schätzung des Behandlungseffekts.</p>
 <p>In empirischen Studien mit Individuen kann Selbstselektion auftreten: Menschen mit <span class="math inline">\(X&lt;c\)</span> aber nahe <span class="math inline">\(c\)</span> (hier Kontrollgruppe) könnten aufgrund unbeobachtbarer Eigenschaften <span class="math inline">\(Z\)</span> die Ausprägung ihrer Laufvariable zu <span class="math inline">\(X&gt;c\)</span> (hier Behandlungsgruppe) manipulieren. Wenn <span class="math inline">\(Z\)</span> die Outcome-Variable beeinflusst, bleibt der Backdoor-Pfad <em>Oberhalb C → Behandlung B → Y</em> so bestehen.</p>
 <p>Manipulation resultiert in Häufung von Beobachtungen am Schwellenwert. Dei Verteilung der Laufvariable kann auf diese Unregelmäßigkeit hin untersucht werden. <span class="citation" data-cites="McCrary2008">McCrary (<a href="Literatur.html#ref-McCrary2008" role="doc-biblioref">2008</a>)</span> schlägt hierfür einen Verfahren vor, das die Kontinuität der Dichtefunktion von <span class="math inline">\(X\)</span> am Schwellenwert testet.</p>
@@ -743,7 +755,7 @@ Abbildung&nbsp;4.3: Nicht-parametrische Regression auf beiden Seiten des Cut-off
 <span><span class="co"># CJM Schätzer berechnen</span></span>
 <span><span class="va">CJM</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rddensity/man/rddensity.html">rddensity</a></span><span class="op">(</span><span class="va">X</span>, c <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Mit der Funktion <code><a href="https://rdrr.io/pkg/rddensity/man/rdplotdensity.html">rddensity::rdplotdensity()</a></code> erzeugen wir <a href="#fig-cjmtsim" class="quarto-xref">Abbildung&nbsp;<span>4.4</span></a>.</p>
+<p>Mit der Funktion <code><a href="https://rdrr.io/pkg/rddensity/man/rdplotdensity.html">rddensity::rdplotdensity()</a></code> erzeugen wir <a href="#fig-cjmtsim" class="quarto-xref">Abbildung&nbsp;<span>5.4</span></a>.</p>
 <div class="cell page-columns page-full">
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Plot für Dichtefunktion erstellen</span></span>
 <span><span class="va">plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rddensity/man/rdplotdensity.html">rdplotdensity</a></span><span class="op">(</span></span>
@@ -758,12 +770,12 @@ Abbildung&nbsp;4.3: Nicht-parametrische Regression auf beiden Seiten des Cut-off
 <img src="RDD_files/figure-html/fig-cjmtsim-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-cjmtsim-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;4.4: CJM-Test – geschätzte Dichtefunktionen der Laufvariable auf beiden Seiten des Schwellenwerts c = 5
+Abbildung&nbsp;5.4: CJM-Test – geschätzte Dichtefunktionen der Laufvariable auf beiden Seiten des Schwellenwerts c = 5
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p><a href="#fig-cjmtsim" class="quarto-xref">Abbildung&nbsp;<span>4.4</span></a> zeigt die geschätzten Dichtefunktionen. Erwartungsgemäß finden wir eine große Überlappung der zugehörigen Konfidenzbänder (schattierte Flächen) am Schwellenwert <span class="math inline">\(c=5\)</span>.</p>
+<p><a href="#fig-cjmtsim" class="quarto-xref">Abbildung&nbsp;<span>5.4</span></a> zeigt die geschätzten Dichtefunktionen. Erwartungsgemäß finden wir eine große Überlappung der zugehörigen Konfidenzbänder (schattierte Flächen) am Schwellenwert <span class="math inline">\(c=5\)</span>.</p>
 <p>Mit <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> erhalten wir eine detaillierte Zusammenfassung des Tests.</p>
 <div class="cell">
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Statistische Zusammenfassung des CJM-Tests</span></span>
@@ -805,8 +817,8 @@ Window Length              &lt;c     &gt;=c    P&gt;|T|
 </div>
 </div>
 <p>Gemäß des p-Werts (<code>P &gt; |T|</code>) von 0.74 spricht der CJM-Test noch deutlicher gegen eine Diskontinuität als der McCrary-Test.</p>
-<section id="case-study-amtsinhaber-vorteil-lee2008" class="level3 page-columns page-full" data-number="4.2.1"><h3 data-number="4.2.1" class="anchored" data-anchor-id="case-study-amtsinhaber-vorteil-lee2008">
-<span class="header-section-number">4.2.1</span> Case Study: Amtsinhaber-Vorteil <span class="citation" data-cites="Lee2008">(<a href="Literatur.html#ref-Lee2008" role="doc-biblioref">Lee 2008</a>)</span>
+<section id="case-study-amtsinhaber-vorteil-lee2008" class="level3 page-columns page-full" data-number="5.2.1"><h3 data-number="5.2.1" class="anchored" data-anchor-id="case-study-amtsinhaber-vorteil-lee2008">
+<span class="header-section-number">5.2.1</span> Case Study: Amtsinhaber-Vorteil <span class="citation" data-cites="Lee2008">(<a href="Literatur.html#ref-Lee2008" role="doc-biblioref">Lee 2008</a>)</span>
 </h3>
 <p><span class="citation" data-cites="Lee2008">Lee (<a href="Literatur.html#ref-Lee2008" role="doc-biblioref">2008</a>)</span> untersucht den Einfluss des Amtsinhaber-Vorteils auf die Wahl von Mitgliedern des US-Repräsentantenhaus. In den meisten Wahlkreisen entfallen große Anteile der Stimmen (oder gar ausschließlich) auf demokratische und republikanische Kanditat*innen, sodass sich die Studie auf diese Parteien beschränkt. Entfällt die Mehrheit der Stimmen auf eine*n Kandiat*in, gewinnt diese*r den Sitz für den Wahlkreis. Durch die Analyse der 6558 Wahlen im Zeitraum 1946-1998 mit einem SRDD kommt die Studie zu dem Ergebnis, dass Amtsinhabende im Durchschnitt einen Vorteil von etwa 8% bis 10% bei der Wahl haben. Dieses Ergebnis kann verschiedene Ursachen haben, bspw. dass die amtierende Partei höhere finanzielle Ressourcen besitzt und von einer besseren Organisation und durch Instrumenalisierung staatlicher Strukturen für die eigenen Zwecke profitiert.</p>
 <p>Anhand der Datensätze <code>house</code> und <code>house_binned</code> illustrieren wir nachfolgend die Schätzung von SRDD-Modellen für den Wahlerfolg der demokratischen Partei, wenn diese Amtsinhaber ist. Wir lesen hierfür zunächst die Datensätze <code>house</code> und <code>house_binned</code> ein und verschaffen uns einen Überblick.</p>
@@ -851,7 +863,7 @@ $ StimmenTm1 &lt;dbl&gt; 0.104764444, 0.135005263, -0.075690769, 0.084570886, 0.
 <img src="RDD_files/figure-html/fig-LeeDataClass-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-LeeDataClass-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;4.5: Klassierte Daten aus Lee (2008)
+Abbildung&nbsp;5.5: Klassierte Daten aus Lee (2008)
 </figcaption></figure>
 </div>
 </div>
@@ -928,12 +940,12 @@ Window Length / 2          &lt;c     &gt;=c    P&gt;|T|
 <img src="RDD_files/figure-html/fig-cjm-lee-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-cjm-lee-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;4.6: CJM-Test – geschätzte Dichtefunktionen der Laufvariable
+Abbildung&nbsp;5.6: CJM-Test – geschätzte Dichtefunktionen der Laufvariable
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p><a href="#fig-cjm-lee" class="quarto-xref">Abbildung&nbsp;<span>4.6</span></a> und der p-Wert von <span class="math inline">\(0.15\)</span> sind Evidenz gegen eine Manipulation am Schwellenwert.</p>
+<p><a href="#fig-cjm-lee" class="quarto-xref">Abbildung&nbsp;<span>5.6</span></a> und der p-Wert von <span class="math inline">\(0.15\)</span> sind Evidenz gegen eine Manipulation am Schwellenwert.</p>
 <p>Um den Behandlungseffekt anhand eines SRDDs zu ermitteln, schätzen wir das Interaktionsmodell <span class="math display">\[\begin{align*}
   \text{StimmenT}_i =&amp;\, \beta_0 + \beta_1 B_i + \beta_2 (\text{StimmenTm1}_i - 50)\\
   +&amp;\, \beta_3(\text{StimmenTm1}_i - 50)\times B_i + u_i
@@ -946,7 +958,7 @@ Abbildung&nbsp;4.6: CJM-Test – geschätzte Dichtefunktionen der Laufvariable
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Zusammenfassung anzeigen  </span></span>
-<span><span class="fu"><a href="https://modelsummary.com/reference/modelsummary.html">modelsummary</a></span><span class="op">(</span></span>
+<span><span class="fu"><a href="https://modelsummary.com/man/modelsummary.html">modelsummary</a></span><span class="op">(</span></span>
 <span>  models <span class="op">=</span> <span class="va">house_llr1</span>, </span>
 <span>  vcov <span class="op">=</span> <span class="st">"HC1"</span>, <span class="co"># robuste Standardfehler</span></span>
 <span>  stars <span class="op">=</span> <span class="cn">T</span>, </span>
@@ -1447,7 +1459,7 @@ Abbildung&nbsp;4.6: CJM-Test – geschätzte Dichtefunktionen der Laufvariable
 </div>
 </div>
 </div>
-<p>Der geschätzte Koeffizient von <span class="math inline">\(B\)</span> (<code>BTRUE</code>) beträgt etwa <span class="math inline">\(0.12\)</span> und ist hochsignifikant. Übereinstimmend mit <a href="#fig-LeeDataClass" class="quarto-xref">Abbildung&nbsp;<span>4.5</span></a> erhalten wir also eine positive Schätzung des Behandlungseffekts. Die Interpretation ist, dass die amtierenden Demokraten bei der Wahl von einem Amtsinhabervorteil profitieren. Dieser Effekt schlägt sich als Stimmenbonus von geschätzten 12% nieder. Diese Schätzung des Behandlungseffekts könnte jedoch verzerrt sein:</p>
+<p>Der geschätzte Koeffizient von <span class="math inline">\(B\)</span> (<code>BTRUE</code>) beträgt etwa <span class="math inline">\(0.12\)</span> und ist hochsignifikant. Übereinstimmend mit <a href="#fig-LeeDataClass" class="quarto-xref">Abbildung&nbsp;<span>5.5</span></a> erhalten wir also eine positive Schätzung des Behandlungseffekts. Die Interpretation ist, dass die amtierenden Demokraten bei der Wahl von einem Amtsinhabervorteil profitieren. Dieser Effekt schlägt sich als Stimmenbonus von geschätzten 12% nieder. Diese Schätzung des Behandlungseffekts könnte jedoch verzerrt sein:</p>
 <ul>
 <li><p>Die (implizite) Wahl von <span class="math inline">\(h=0.5\)</span> in unserer Schätzung macht die Isolation des relevanten Frontdoor-Paths (<span class="math inline">\(c=0\)</span> → Treatment → StimmenT) wenig plausibel. <span class="math inline">\(h\)</span> sollte mit einer datengetriebenen Methode gewählt werden.</p></li>
 <li><p>Weiterhin könnte die lineare funktionale Form der Regression inadäquat sein: Die lineare Approximation der wahren Regressionsfunktion nahe des Schwellenwerts <span class="math inline">\(0\)</span> könnte unzureichend sein und in einer verzerrten Schätzung des Effekts resultieren. Zur Überprüfung der Robustheit der Ergebnisse sollte mit Schätzungen anhand nicht-linearer Spezifikationen verglichen werden.</p></li>
@@ -1485,10 +1497,10 @@ Abbildung&nbsp;4.6: CJM-Test – geschätzte Dichtefunktionen der Laufvariable
 <span>  formula <span class="op">=</span> <span class="va">StimmenT</span> <span class="op">~</span> <span class="va">B</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html">poly</a></span><span class="op">(</span><span class="va">StimmenTm1</span>, degree <span class="op">=</span> <span class="fl">2</span>, raw <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Für eine Gegenüberstellung der Ergebnisse verwenden wir <code><a href="https://modelsummary.com/reference/modelsummary.html">modelsummary()</a></code>.</p>
+<p>Für eine Gegenüberstellung der Ergebnisse verwenden wir <code><a href="https://modelsummary.com/man/modelsummary.html">modelsummary()</a></code>.</p>
 <div class="cell page-columns page-full">
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Tabellarischer Modellvergleich</span></span>
-<span><span class="fu"><a href="https://modelsummary.com/reference/modelsummary.html">modelsummary</a></span><span class="op">(</span></span>
+<span><span class="fu"><a href="https://modelsummary.com/man/modelsummary.html">modelsummary</a></span><span class="op">(</span></span>
 <span>  models <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
 <span>    <span class="st">"Linear int."</span> <span class="op">=</span> <span class="va">house_llin_IK</span>, </span>
 <span>    <span class="st">"Quadratisch int."</span> <span class="op">=</span> <span class="va">house_poly_IK</span></span>
@@ -2045,14 +2057,14 @@ Abbildung&nbsp;4.6: CJM-Test – geschätzte Dichtefunktionen der Laufvariable
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-intmodsLee-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;4.1: Vergleich von SRDD-Interaktionsmodellen für Lee (2008)
+Tabelle&nbsp;5.1: Vergleich von SRDD-Interaktionsmodellen für Lee (2008)
 </figcaption></figure>
 </div>
 </div>
-<p>Die Spalte (1) in <a href="#tbl-intmodsLee" class="quarto-xref">Tabelle&nbsp;<span>4.1</span></a> zeigt die lokale Schätzung mit einem linearen Interaktionsmodell. Wir erhalten damit einen Behandlungseffekt von etwa <span class="math inline">\(8.5\%\)</span>. Der Schätzwert fällt also etwas geringer aus als für die globale KQ-Schätzung des linearen Interaktionsmodells. Für das Modell (2) mit quadratischer Spezifikation liegt der Schätzwert mit <span class="math inline">\(6.8\%\)</span> in der selben Größenordnung. Beide Schätzungen ergeben einen signifikant von <span class="math inline">\(0\)</span> verschieden Effekt. Weiterhin fällt auf, dass in beiden Modellen keine Evidenz für unterschiedliche Formen der Regressionsfunktionen auf beiden Seiten des Schwellenwerts vorliegen: sämtliche Koeffizientenschätzwerte der Interaktionsterme haben hohe Standardfehler und sind nicht signifikant. Im quadratischen Modell hat auch der Term <span class="math inline">\(StimmenTm1^2\)</span> keinen signifikanten Effekt. Diese Ergebnisse deuten darauf hin, dass eine lineare Spezifikation ausreichend ist.</p>
+<p>Die Spalte (1) in <a href="#tbl-intmodsLee" class="quarto-xref">Tabelle&nbsp;<span>5.1</span></a> zeigt die lokale Schätzung mit einem linearen Interaktionsmodell. Wir erhalten damit einen Behandlungseffekt von etwa <span class="math inline">\(8.5\%\)</span>. Der Schätzwert fällt also etwas geringer aus als für die globale KQ-Schätzung des linearen Interaktionsmodells. Für das Modell (2) mit quadratischer Spezifikation liegt der Schätzwert mit <span class="math inline">\(6.8\%\)</span> in der selben Größenordnung. Beide Schätzungen ergeben einen signifikant von <span class="math inline">\(0\)</span> verschieden Effekt. Weiterhin fällt auf, dass in beiden Modellen keine Evidenz für unterschiedliche Formen der Regressionsfunktionen auf beiden Seiten des Schwellenwerts vorliegen: sämtliche Koeffizientenschätzwerte der Interaktionsterme haben hohe Standardfehler und sind nicht signifikant. Im quadratischen Modell hat auch der Term <span class="math inline">\(StimmenTm1^2\)</span> keinen signifikanten Effekt. Diese Ergebnisse deuten darauf hin, dass eine lineare Spezifikation ausreichend ist.</p>
 <p><strong>SRDD-Schätzung mit LOESS</strong></p>
 <p>Wir illustrieren nachfolgend die Schätzung des Behandlungseffekts mit einer flexiblen und in der Praxis häufig verwendeten Methode für lokale Regression. Die nachfolgende interaktive Grafik zeigt die klassierten Daten aus <span class="citation" data-cites="Lee2008">Lee (<a href="Literatur.html#ref-Lee2008" role="doc-biblioref">2008</a>)</span> auf dem Intervall <span class="math inline">\([-0.5,0.5]\)</span> gemeinsam mit einer nicht-parametrischen Schätzung des Zusammenhangs von <code>StimmenT</code> und <code>StimmenTm1</code> mittels LOESS.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> Diese Implementierung von lokaler Regression nutzt einen <a href="https://en.wikipedia.org/wiki/Kernel_(statistics)">tricube kernel</a>. Über den Input kann eine Bandweite <span class="math inline">\(l\in(0,1]\)</span> für den LOESS-Schätzer auf beiden Seiten des Schwellenwerts <span class="math inline">\(0\)</span> gewählt werden. Die Bandweite ist hier der <em>Anteil der Beobachtungen an der gesamten Anzahl an Beobachtungen</em>, die in die Schätzung einbezogen werden sollen.</p>
-<div class="no-row-height column-margin column-container"><p><sup>3</sup>&nbsp;<a href="https://en.wikipedia.org/wiki/Local_regression">LOESS</a> ist eine Variante von lokaler Polynom-Regression.</p></div><p>Für die Schätzung am Schwellenwert berücksichtigte Daten sind in orange kenntlich gemacht. Die rote linie zeigt die geschätzte Regressionsfunktion über gleichmäßig verteilte Werte von <code>StimmenTm1</code> auf <span class="math inline">\([-0.5,0.5]\)</span>. Die Grafik verdeutlicht, dass die LOESS-Methode flexibel genug ist, um lineare und nicht-lineare Zusammenhänge abbilden zu können. Wie zuvor ist eine adäquate Wahl der Bandweite wichtig:</p>
+<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;<a href="https://en.wikipedia.org/wiki/Local_regression">LOESS</a> ist eine Variante von lokaler Polynom-Regression.</p></div></div><p>Für die Schätzung am Schwellenwert berücksichtigte Daten sind in orange kenntlich gemacht. Die rote linie zeigt die geschätzte Regressionsfunktion über gleichmäßig verteilte Werte von <code>StimmenTm1</code> auf <span class="math inline">\([-0.5,0.5]\)</span>. Die Grafik verdeutlicht, dass die LOESS-Methode flexibel genug ist, um lineare und nicht-lineare Zusammenhänge abbilden zu können. Wie zuvor ist eine adäquate Wahl der Bandweite wichtig:</p>
 <ul>
 <li><p>Der mit LOESS geschätzte Zusammenhang auf beiden Seiten des Schwellenwerts ist etwa linear für den voreingestellten Parameter (<span class="math inline">\(l = 0.28\)</span>).</p></li>
 <li><p>Für größere Werte von <span class="math inline">\(l\)</span> nähert sich die Schätzung weiter einem linearen Verlauf an. Die Schätzung des Effekts bleibt vergleichbar mit den Ergebnissen des linearen Interaktionsmodell (s. oben).</p></li>
@@ -2286,12 +2298,12 @@ Tabelle&nbsp;4.1: Vergleich von SRDD-Interaktionsmodellen für Lee (2008)
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-ojs-cell-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;4.7: Nicht-parametrische Regression auf beiden Seiten des Cut-offs.
+Abbildung&nbsp;5.7: Nicht-parametrische Regression auf beiden Seiten des Cut-offs.
 </figcaption></figure>
 </div>
 </div>
-</section></section><section id="fuzzy-regression-discontinuity-design" class="level2 page-columns page-full" data-number="4.3"><h2 data-number="4.3" class="anchored" data-anchor-id="fuzzy-regression-discontinuity-design">
-<span class="header-section-number">4.3</span> Fuzzy Regression Discontinuity Design</h2>
+</section></section><section id="fuzzy-regression-discontinuity-design" class="level2 page-columns page-full" data-number="5.3"><h2 data-number="5.3" class="anchored" data-anchor-id="fuzzy-regression-discontinuity-design">
+<span class="header-section-number">5.3</span> Fuzzy Regression Discontinuity Design</h2>
 <div class="cell page-columns page-full" data-fig-width="5" data-fig-height="3" data-layout-align="center">
 <div class="cell-output-display page-columns page-full">
 <div id="fig-CDFRDD" class="quarto-figure quarto-figure-center quarto-float anchored page-columns page-full">
@@ -2314,13 +2326,13 @@ Abbildung&nbsp;4.7: Nicht-parametrische Regression auf beiden Seiten des Cut-off
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-CDFRDD-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;4.8: Kausales Diagram für FRDD
+Abbildung&nbsp;5.8: Kausales Diagram für FRDD
 </figcaption></figure>
 </div>
 </div>
 </div>
 <p>Ein FRDD liegt vor, wenn die Zuweisung der Behandlung <span class="math inline">\(B\)</span> durch die Laufvariable <span class="math inline">\(X\)</span> (und möglicherweise weitere Variablen <span class="math inline">\(Z\)</span>) beeinflusst wird. Im Vergleich zum SRDD ist die Behandlung dann also <em>nicht</em> ausschließlich durch Überschreiten des Schwellenwerts <span class="math inline">\(X = c\)</span> bestimmt.</p>
-<p><a href="#fig-CDFRDD" class="quarto-xref">Abbildung&nbsp;<span>4.8</span></a> zeigt den grundsätzlichen Zusammenhang. Hier genügt es weiterhin für <span class="math inline">\(X\)</span> (und ggf. <span class="math inline">\(Z\)</span>) zu kontrollieren, um den Pfad <em>oberhalb <span class="math inline">\(C\)</span> → Behandlung <span class="math inline">\(B\)</span> → <span class="math inline">\(Y\)</span></em> zu isolieren. Der so für <em>Behandlung <span class="math inline">\(B\)</span></em> ermittelte Effekt auf <span class="math inline">\(Y\)</span> entspricht jedoch <em>nicht</em> dem “vollständigen” Behandlungseffekt, da bei <span class="math inline">\(c\)</span> die Zuweisung der Behandlung nicht von <span class="math inline">\(0\)</span> auf <span class="math inline">\(100\%\)</span> springt. Die Schätzung des FRDD berücksichtigt dies und skaliert den geschätzten Effekt entsprechend.</p>
+<p><a href="#fig-CDFRDD" class="quarto-xref">Abbildung&nbsp;<span>5.8</span></a> zeigt den grundsätzlichen Zusammenhang. Hier genügt es weiterhin für <span class="math inline">\(X\)</span> (und ggf. <span class="math inline">\(Z\)</span>) zu kontrollieren, um den Pfad <em>oberhalb <span class="math inline">\(C\)</span> → Behandlung <span class="math inline">\(B\)</span> → <span class="math inline">\(Y\)</span></em> zu isolieren. Der so für <em>Behandlung <span class="math inline">\(B\)</span></em> ermittelte Effekt auf <span class="math inline">\(Y\)</span> entspricht jedoch <em>nicht</em> dem “vollständigen” Behandlungseffekt, da bei <span class="math inline">\(c\)</span> die Zuweisung der Behandlung nicht von <span class="math inline">\(0\)</span> auf <span class="math inline">\(100\%\)</span> springt. Die Schätzung des FRDD berücksichtigt dies und skaliert den geschätzten Effekt entsprechend.</p>
 <p>Wir betrachten zunächst den Zusammenhang <span class="math display">\[\begin{align}
   Y_i = \beta_0 + \beta_1 B_i + \beta_2 (X_i - c) + u_i.\label{eq-simpleFRDD}
 \end{align}\]</span> In einem FRDD springt die Behandlungswahrscheinlichkeit am Schwellenwert <span class="math inline">\(c\)</span> um <span class="math inline">\(\Delta p&lt;1\)</span>. Wir können <span class="math inline">\(B\)</span> also nicht als deterministische Funktion von <span class="math inline">\(X\)</span>, welche die Zuweisung zu Behandlungs- bzw. Kontrollgruppe am Schwellenwert <span class="math inline">\(c\)</span> anzeigt (wie im SRDD), definieren. Stattdessen betrachten wir <span class="math display">\[\begin{align}
@@ -2329,7 +2341,7 @@ Abbildung&nbsp;4.8: Kausales Diagram für FRDD
     g_{X_i&lt;c}(X_i), &amp; X_i &lt; c \\
     g_{X_i\geq c}(X_i) &amp; X_i \geq c
   \end{cases}\,. \label{eq-BFRDD}
-\end{align}\]</span> Die Funktionen <span class="math inline">\(g_{X_i&lt;c}\)</span> und <span class="math inline">\(g_{X_i\geq c}\)</span> können verschieden sein. Es muss jedoch <span class="math display">\[g_{X_i&lt;c}(X_i = c) \neq g_{X_i\geq c}(X_i = c)\]</span> gelten. Die Behandlungsvariable <span class="math inline">\(B_i\)</span> ist im FRDD also eine (binäre) Zufallsvariable, deren bedingte Wahrscheinlichkeitsfunktion <span class="math inline">\(P(B_i=1\vert X_i)\)</span> am Schwellenwert <span class="math inline">\(c\)</span> eine Diskontinuität aufweist. <a href="#fig-FRDDprobD" class="quarto-xref">Abbildung&nbsp;<span>4.9</span></a> zeigt heispielhafte Verläufe nicht-linearer bedingter Wahrscheinlichkeitsfunktion für die Behandlung mit einer Diskontinuität bei <span class="math inline">\(X_i = c\)</span>.</p>
+\end{align}\]</span> Die Funktionen <span class="math inline">\(g_{X_i&lt;c}\)</span> und <span class="math inline">\(g_{X_i\geq c}\)</span> können verschieden sein. Es muss jedoch <span class="math display">\[g_{X_i&lt;c}(X_i = c) \neq g_{X_i\geq c}(X_i = c)\]</span> gelten. Die Behandlungsvariable <span class="math inline">\(B_i\)</span> ist im FRDD also eine (binäre) Zufallsvariable, deren bedingte Wahrscheinlichkeitsfunktion <span class="math inline">\(P(B_i=1\vert X_i)\)</span> am Schwellenwert <span class="math inline">\(c\)</span> eine Diskontinuität aufweist. <a href="#fig-FRDDprobD" class="quarto-xref">Abbildung&nbsp;<span>5.9</span></a> zeigt heispielhafte Verläufe nicht-linearer bedingter Wahrscheinlichkeitsfunktion für die Behandlung mit einer Diskontinuität bei <span class="math inline">\(X_i = c\)</span>.</p>
 <div class="cell page-columns page-full">
 <details class="code-fold"><summary>Code</summary><div class="sourceCode" id="cb31"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/">cowplot</a></span><span class="op">)</span></span>
@@ -2372,7 +2384,7 @@ Abbildung&nbsp;4.8: Kausales Diagram für FRDD
 <img src="RDD_files/figure-html/fig-FRDDprobD-1.png" class="img-fluid figure-img" width="288">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-FRDDprobD-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;4.9: Bedingte Behandlungswahrscheinlichkeiten im FRDD
+Abbildung&nbsp;5.9: Bedingte Behandlungswahrscheinlichkeiten im FRDD
 </figcaption></figure>
 </div>
 </div>
@@ -2383,7 +2395,7 @@ Abbildung&nbsp;4.9: Bedingte Behandlungswahrscheinlichkeiten im FRDD
     1, &amp; X_i \geq c.
   \end{cases}
 \end{align*}\]</span></p>
-<p>Angenommen <span class="math inline">\(g_{X_i\geq c}(X_i) = \alpha_0\)</span> und <span class="math inline">\(g_{X_i&lt;c}(X_i) = \alpha_0 + \alpha_1\)</span> mit <span class="math inline">\(\alpha_0 + \alpha_1 &lt; 1\)</span> (vgl. rote Funktion in <a href="#fig-CDFRDD" class="quarto-xref">Abbildung&nbsp;<span>4.8</span></a>). Der FRDD-Schätzer des Behandlungseffekts ist dann <span class="math inline">\(\widehat{\gamma}_\textup{FRDD}\)</span> im 2SLS-Verfahren mit den Regressionen <span class="math display">\[\begin{align}
+<p>Angenommen <span class="math inline">\(g_{X_i\geq c}(X_i) = \alpha_0\)</span> und <span class="math inline">\(g_{X_i&lt;c}(X_i) = \alpha_0 + \alpha_1\)</span> mit <span class="math inline">\(\alpha_0 + \alpha_1 &lt; 1\)</span> (vgl. rote Funktion in <a href="#fig-CDFRDD" class="quarto-xref">Abbildung&nbsp;<span>5.8</span></a>). Der FRDD-Schätzer des Behandlungseffekts ist dann <span class="math inline">\(\widehat{\gamma}_\textup{FRDD}\)</span> im 2SLS-Verfahren mit den Regressionen <span class="math display">\[\begin{align}
   \begin{split}
   (\mathrm{I})\qquad B_i =&amp;\, \alpha_0 + \alpha_1 D_i + \alpha_2 (X_i - c) + e_i,\\
   (\mathrm{II})\qquad Y_i =&amp;\, \gamma_0 + \gamma_1 \widehat{B}_i + \gamma_2 (X_i - c) + \epsilon_i,
@@ -2399,13 +2411,13 @@ Abbildung&nbsp;4.9: Bedingte Behandlungswahrscheinlichkeiten im FRDD
   \end{split},\label{eq:FRDD_lintIV}
 \end{align}\]</span> d.h. wir instrumentieren <span class="math inline">\(B_i\)</span> mit <span class="math inline">\(D_i\)</span> und dem Interaktionsterm <span class="math inline">\((X_i-c)\times D_i\)</span>.</p>
 <p>Wie im SRDD werden die IV-Ansätze für das FRDD <span class="math inline">\(\eqref{eq:FRDD_simpleIV}\)</span> und <span class="math inline">\(\eqref{eq:FRDD_lintIV}\)</span> in empirischen Studien unter Berücksichtigung einer Bandweite (i.d.R. dieselbe Bandweite für beide Stufen) angewendet.</p>
-</section><section id="case-study-protestantische-arbeitsethik" class="level2 page-columns page-full" data-number="4.4"><h2 data-number="4.4" class="anchored" data-anchor-id="case-study-protestantische-arbeitsethik">
-<span class="header-section-number">4.4</span> Case Study: Protestantische Arbeitsethik</h2>
+</section><section id="case-study-protestantische-arbeitsethik" class="level2 page-columns page-full" data-number="5.4"><h2 data-number="5.4" class="anchored" data-anchor-id="case-study-protestantische-arbeitsethik">
+<span class="header-section-number">5.4</span> Case Study: Protestantische Arbeitsethik</h2>
 <div class="cell">
 
 </div>
 <p>Die Studie <em>Beyond Work Ethic: Religion, Individual, and Political Preferences</em> <span class="citation" data-cites="BastenBetz2013">(<a href="Literatur.html#ref-BastenBetz2013" role="doc-biblioref">Basten und Betz 2013</a>)</span> untersucht den Zusammenhang zwischen Religion, individuellen Merkmalen und politischen Präferenzen. Das Hauptaugenmerk ist die Rolle von Religiosität als Einflussfaktor auf politische Einstellungen. Die Hypothese der Autoren ist, dass Religiosität eines Individuums über den traditionellen Rahmen von Moralvorstellungen und sozialen Normen hinaus auch die politischen Präferenzen beeinflusst. Eine entsprechende Theorie wurde zu Beginn des 20. Jahrhunderts entwickelt und prominent von Max Weber <span class="citation" data-cites="Weber2004">(vgl. <a href="Literatur.html#ref-Weber2004" role="doc-biblioref">Weber 2004</a>)</span> vertreten. Weber argumentiert, dass die protestantische Arbeitsethik einen entscheidenden Einfluss auf die Entwicklung des Kapitalismus hatte. Laut Weber führte der protestantische Glaube an harte Arbeit, ein sparsames Leben und ethisches Verhalten zur einer in den damaligen Gesellschaften weit verbreiteten Geisteshaltung, die wirtschaftliches Wachstum förderte und den Aufstieg des Kapitalismus begünstigte.</p>
-<p><span class="citation" data-cites="BastenBetz2013">Basten und Betz (<a href="Literatur.html#ref-BastenBetz2013" role="doc-biblioref">2013</a>)</span> nutzen Wahlergebnisse sowie geo- und soziodemographische Datensätze für schweizer Gemeinden, um den Zusammenhang zwischen Religiosität und politischen Präferenzen wie links-rechts-Ausrichtung, Einstellungen zur Umverteilung und Einwanderung zu untersuchen. Hierfür verwenden die Autoren ein FRDD, dass eine historisch bedingte Diskontinuität der geographischen Verteilung von evanglischer bzw. katholischer Religionszugehörigkeit zwischen den Kantonen Freiburg (überwiegend dunkelrote Region, frz. <em>Fribourg</em>) und Waadt (kleinere hellrote Region, frz. <em>Vaud</em>) ausnutzt. Die historische Verteilung der Konfessionen in der betrachteten Region im 16. Jahrhundert durch Abspaltung des Kantons Freiburg ist in <a href="#fig-vaudfb" class="quarto-xref">Abbildung&nbsp;<span>4.10</span></a> dargestellt.</p>
+<p><span class="citation" data-cites="BastenBetz2013">Basten und Betz (<a href="Literatur.html#ref-BastenBetz2013" role="doc-biblioref">2013</a>)</span> nutzen Wahlergebnisse sowie geo- und soziodemographische Datensätze für schweizer Gemeinden, um den Zusammenhang zwischen Religiosität und politischen Präferenzen wie links-rechts-Ausrichtung, Einstellungen zur Umverteilung und Einwanderung zu untersuchen. Hierfür verwenden die Autoren ein FRDD, dass eine historisch bedingte Diskontinuität der geographischen Verteilung von evanglischer bzw. katholischer Religionszugehörigkeit zwischen den Kantonen Freiburg (überwiegend dunkelrote Region, frz. <em>Fribourg</em>) und Waadt (kleinere hellrote Region, frz. <em>Vaud</em>) ausnutzt. Die historische Verteilung der Konfessionen in der betrachteten Region im 16. Jahrhundert durch Abspaltung des Kantons Freiburg ist in <a href="#fig-vaudfb" class="quarto-xref">Abbildung&nbsp;<span>5.10</span></a> dargestellt.</p>
 <p>Aufgrund von Bevölkerungsbewegungen ist die Verteilung der Konfessionen zwar nicht mehr eindeutig durch die Kantonsgrenze bestimmt, jedoch sind die Gemeinden der betrachteten Kantone auch heute noch mehrheitlich protestantisch bzw. katholisch. Es ist plausibel, dass eine Prägung gemäß Webers Theorie vorliegt, sich die Gemeinden nahe der Grenz aber hinsichtlich anderer Charakteristika (insb. der Bevölkerungsstruktur) nicht systematisch unterscheiden. Somit liegt ein quai</p>
 <div class="cell page-columns page-full" data-layout-align="center" data-cap-location="margin">
 <div class="cell-output-display page-columns page-full">
@@ -2414,14 +2426,14 @@ Abbildung&nbsp;4.9: Bedingte Behandlungswahrscheinlichkeiten im FRDD
 <img src="img/WaadtFribourg.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="400">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-vaudfb-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;4.10: Historische Verteilung von Religionszugehörigkeit in Schweizer Gemeinden im 16. Jahrhundert. Quelle: Basten und Betz (2013).
+Abbildung&nbsp;5.10: Historische Verteilung von Religionszugehörigkeit in Schweizer Gemeinden im 16. Jahrhundert. Quelle: Basten und Betz (2013).
 </figcaption></figure>
 </div>
 </div>
 </div>
 <p>Die Ergebnisse der Studie zeigen einen signifikanten Einfluss von Protestantismus auf politische Präferenzen, die über traditionelle Moralvorstellungen hinausgehen: Die Autoren finden Hinweise, dass Einwohner evangelisch geprägter Gemeinden eher konservative soziale und politische Ansichten vertreten. Eine mögliche Erklärung für diesen Effekt ist, dass religiöse Institutionen auch eine soziale und politische Agenda verfolgen, die von den Gläubigen internalisiert wird.</p>
-<section id="aufbereitung-der-daten" class="level3 page-columns page-full" data-number="4.4.1"><h3 data-number="4.4.1" class="anchored" data-anchor-id="aufbereitung-der-daten">
-<span class="header-section-number">4.4.1</span> Aufbereitung der Daten</h3>
+<section id="aufbereitung-der-daten" class="level3 page-columns page-full" data-number="5.4.1"><h3 data-number="5.4.1" class="anchored" data-anchor-id="aufbereitung-der-daten">
+<span class="header-section-number">5.4.1</span> Aufbereitung der Daten</h3>
 <p>In diesem Kapitel zeigen wir, wie die Kernergebnisse der Studie mit R reproduziert werden können. Hierfür werden folgende Pakete benötigt.</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></span>
@@ -2430,7 +2442,7 @@ Abbildung&nbsp;4.10: Historische Verteilung von Religionszugehörigkeit in Schwe
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">rdrobust</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Das Papier sowie der Datensatz <code>BastenBetz.dta</code> sind auf der <a href="https://www.aeaweb.org/articles?id=10.1257/pol.5.3.67">Übersichtsseite der AEA</a> verfügbar und liegt im STATA-Format <code>.dta</code> vor.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
-<div class="no-row-height column-margin column-container"><p><sup>4</sup>&nbsp;Siehe alternativ das <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2133848">working paper</a>, falls kein Abbonement für AEA-Journals vorliegt.</p></div><div class="cell" data-layout-align="center">
+<div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;Siehe alternativ das <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2133848">working paper</a>, falls kein Abbonement für AEA-Journals vorliegt.</p></div></div><div class="cell" data-layout-align="center">
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Datensatz einlesen</span></span>
 <span><span class="va">BastenBetz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://haven.tidyverse.org/reference/read_dta.html">read_dta</a></span><span class="op">(</span><span class="st">'BastenBetz.dta'</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -2448,7 +2460,7 @@ Abbildung&nbsp;4.10: Historische Verteilung von Religionszugehörigkeit in Schwe
 <span>    <span class="va">pfi</span></span>
 <span>  <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Die Definitionen der Variablen sind in <a href="#tbl-BastenBetzRed" class="quarto-xref">Tabelle&nbsp;<span>4.2</span></a> gegeben. Die Präferenzen <code>pfl</code>, <code>pfr</code> und <code>pfi</code> basieren auf Wahlergebnissen auf Gemeindeebene zu Volksentscheiden.</p>
+<p>Die Definitionen der Variablen sind in <a href="#tbl-BastenBetzRed" class="quarto-xref">Tabelle&nbsp;<span>5.2</span></a> gegeben. Die Präferenzen <code>pfl</code>, <code>pfr</code> und <code>pfi</code> basieren auf Wahlergebnissen auf Gemeindeebene zu Volksentscheiden.</p>
 <div id="tbl-BastenBetzRed" class="quarto-float anchored page-columns page-full">
 <figure class="quarto-float quarto-float-tbl figure page-columns page-full"><div aria-describedby="tbl-BastenBetzRed-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="table">
@@ -2493,11 +2505,11 @@ Abbildung&nbsp;4.10: Historische Verteilung von Religionszugehörigkeit in Schwe
 </table>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-BastenBetzRed-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;4.2: <code>BastenBetz</code> – Variablen und Definitionen
+Tabelle&nbsp;5.2: <code>BastenBetz</code> – Variablen und Definitionen
 </figcaption></figure>
 </div>
 <p>Für die Berechnung der optimalen Bandweite des FRDD verwenden wir einen MSE-optimalen Schätzer, der in der Funktion <code><a href="https://rdrr.io/pkg/rdrobust/man/rdbwselect.html">rdrobust::rdbwselect()</a></code> implementiert ist.<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a></p>
-<div class="no-row-height column-margin column-container"><p><sup>5</sup>&nbsp;<span class="citation" data-cites="BastenBetz2013">Basten und Betz (<a href="Literatur.html#ref-BastenBetz2013" role="doc-biblioref">2013</a>)</span> setzen BW = 5.01, den Durchschnitt von IK-Schätzungen über Modelle sämtlicher betrachteter Outcome-Variablen. Diese Bandweite liegt nahe des Ergebnisses von <code>rdbwselect</code>. Wir verwenden nachfolgend die Schätzung <code>OB</code>.</p></div><div class="cell" data-layout-align="center">
+<div class="no-row-height column-margin column-container"><div id="fn5"><p><sup>5</sup>&nbsp;<span class="citation" data-cites="BastenBetz2013">Basten und Betz (<a href="Literatur.html#ref-BastenBetz2013" role="doc-biblioref">2013</a>)</span> setzen BW = 5.01, den Durchschnitt von IK-Schätzungen über Modelle sämtlicher betrachteter Outcome-Variablen. Diese Bandweite liegt nahe des Ergebnisses von <code>rdbwselect</code>. Wir verwenden nachfolgend die Schätzung <code>OB</code>.</p></div></div><div class="cell" data-layout-align="center">
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Bandweite schätzen (Bsp. für Freizeitpräferenz)</span></span>
 <span><span class="va">bw_selection</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rdrobust/man/rdbwselect.html">rdbwselect</a></span><span class="op">(</span></span>
 <span>  y <span class="op">=</span> <span class="va">BastenBetz</span><span class="op">$</span><span class="va">pfl</span>,</span>
@@ -2513,8 +2525,8 @@ Tabelle&nbsp;4.2: <code>BastenBetz</code> – Variablen und Definitionen
 <pre><code>[1] 5.078001</code></pre>
 </div>
 </div>
-</section><section id="deskriptive-statistiken" class="level3 page-columns page-full" data-number="4.4.2"><h3 data-number="4.4.2" class="anchored" data-anchor-id="deskriptive-statistiken">
-<span class="header-section-number">4.4.2</span> Deskriptive Statistiken</h3>
+</section><section id="deskriptive-statistiken" class="level3 page-columns page-full" data-number="5.4.2"><h3 data-number="5.4.2" class="anchored" data-anchor-id="deskriptive-statistiken">
+<span class="header-section-number">5.4.2</span> Deskriptive Statistiken</h3>
 <p>Zur Reproduktion von Tabelle 1 aus <span class="citation" data-cites="BastenBetz2013">Basten und Betz (<a href="Literatur.html#ref-BastenBetz2013" role="doc-biblioref">2013</a>)</span> erzeugen wir eine nach Kantonen gruppierte Zusammenfassung der Daten und berechnen deskriptive Statistiken. Wie im Paper berücksichtigen wir hierbei nur Gemeinden innerhalb der geschätzten optimalen Bandweite <code>OB</code>.</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Datensatz für Reproduktion von Table 1 formatieren</span></span>
@@ -3084,13 +3096,13 @@ Tabelle&nbsp;4.2: <code>BastenBetz</code> – Variablen und Definitionen
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-sumstat-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;4.3: Datensatz <code>BastenBetz</code> – Zusammenfassende Statistiken
+Tabelle&nbsp;5.3: Datensatz <code>BastenBetz</code> – Zusammenfassende Statistiken
 </figcaption></figure>
 </div>
 </div>
-<p>Die Statistiken in <a href="#tbl-sumstat" class="quarto-xref">Tabelle&nbsp;<span>4.3</span></a> scheinen konsistent mit der (historischen) Verteilung der Religionszugehörigkeit und politischen Einstellung gemäß der Hypothese: Im überwiegend katholischen Freiburg finden wir eine größere Einkommensungleichkeit und höhere aus Wahlergebnissen abgeleitete Präferenzen für Freizeit, Umverteilung sowie staatliche Interventionen.</p>
-</section><section id="modellspezifikation-und-first-stage-ergebnisse" class="level3 page-columns page-full" data-number="4.4.3"><h3 data-number="4.4.3" class="anchored" data-anchor-id="modellspezifikation-und-first-stage-ergebnisse">
-<span class="header-section-number">4.4.3</span> Modellspezifikation und First-Stage-Ergebnisse</h3>
+<p>Die Statistiken in <a href="#tbl-sumstat" class="quarto-xref">Tabelle&nbsp;<span>5.3</span></a> scheinen konsistent mit der (historischen) Verteilung der Religionszugehörigkeit und politischen Einstellung gemäß der Hypothese: Im überwiegend katholischen Freiburg finden wir eine größere Einkommensungleichkeit und höhere aus Wahlergebnissen abgeleitete Präferenzen für Freizeit, Umverteilung sowie staatliche Interventionen.</p>
+</section><section id="modellspezifikation-und-first-stage-ergebnisse" class="level3 page-columns page-full" data-number="5.4.3"><h3 data-number="5.4.3" class="anchored" data-anchor-id="modellspezifikation-und-first-stage-ergebnisse">
+<span class="header-section-number">5.4.3</span> Modellspezifikation und First-Stage-Ergebnisse</h3>
 <p>Die Kantone Waadt und Freiburg haben bis heute mehrheitlich protestantische bzw. katholische Gemeinden. Die Verteilung von Protestantismus ist also, u.a. aufgrund von Bevölkerungsbewegungen, nicht mehr deterministisch. An der Kantonsgrenze besteht jedoch eine deutliche Diskontinuität im Anteil protestantischer Einwohner, die auf die historische Verteilung der Religionszugehörigkeit zurückzuführen ist. Damit kann ein FRDD implementiert werden, bei dem die Distanz zur Grenze (<code>bord</code>) die zentrierte Laufvariable ist und die Zugehörigkeit zum Kanton Waadt (<code>vaud</code>) ein Instrument für die Behandlungsvariable (<code>prot</code>) ist.</p>
 <p>Wir nutzen die Funktion <code><a href="https://rdrr.io/pkg/rdrobust/man/rdplot.html">rdrobust::rdplot</a></code> um diesen Zusammenhang für verschiedene Bandweiten anhand des linearen Interaktionsmodells <span class="math display">\[\begin{align}
   \begin{split}
@@ -3154,24 +3166,24 @@ Tabelle&nbsp;4.3: Datensatz <code>BastenBetz</code> – Zusammenfassende Statist
 <span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Wir sammeln die Ergebnisse in einem Plot-Gitter mit <code><a href="https://wilkelab.org/cowplot/reference/plot_grid.html">cowplot::plot_grid()</a></code>.</p>
-<div class="cell page-columns page-full" data-layout-align="center" data-fig-cap-location="margin">
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Reproduktion von Abbildung 3 in Basten und Betz (2013)</span></span>
+<div class="cell page-columns page-full" data-layout-align="center">
+<div class="sourceCode" id="cb41" data-cap-location="margin"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Reproduktion von Abbildung 3 in Basten und Betz (2013)</span></span>
 <span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html">plot_grid</a></span><span class="op">(</span></span>
 <span>  plotlist <span class="op">=</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="va">plots_BB</span>, <span class="op">~</span> <span class="va">.</span><span class="op">$</span><span class="va">rdplot</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display page-columns page-full">
-<div id="fig-BastenBetzFS" class="quarto-figure quarto-figure-center quarto-float anchored page-columns page-full" data-fig-align="center">
+<div id="fig-BastenBetzFS" class="quarto-figure quarto-figure-center quarto-float anchored page-columns page-full" data-cap-location="margin" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure page-columns page-full"><div aria-describedby="fig-BastenBetzFS-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="RDD_files/figure-html/fig-BastenBetzFS-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-BastenBetzFS-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;4.11: First-Stage-Regressionen
+Abbildung&nbsp;5.11: First-Stage-Regressionen
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p>Die Grafiken in <a href="#fig-BastenBetzFS" class="quarto-xref">Abbildung&nbsp;<span>4.11</span></a> zeigen deutliche Hinweise auf die Diskontinuität in <code>prot</code> nahe der Kantonsgrenze. Die Größe des geschätzten Sprungs scheint nur wenig sensitiv gegenüber der gewählten Bandweite zu sein. Die Signifikanz des Effekts können wir anhand der jeweiligen KQ-Regressionen beurteilen.<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a></p>
-<div class="no-row-height column-margin column-container"><p><sup>6</sup>&nbsp;Wir nutzen <code><a href="https://rdrr.io/r/stats/update.html">update()</a></code> um die Regression mit weniger Code für verschiedene Bandweiten zu schätzen.</p></div><div class="cell" data-layout-align="center">
+<p>Die Grafiken in <a href="#fig-BastenBetzFS" class="quarto-xref">Abbildung&nbsp;<span>5.11</span></a> zeigen deutliche Hinweise auf die Diskontinuität in <code>prot</code> nahe der Kantonsgrenze. Die Größe des geschätzten Sprungs scheint nur wenig sensitiv gegenüber der gewählten Bandweite zu sein. Die Signifikanz des Effekts können wir anhand der jeweiligen KQ-Regressionen beurteilen.<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a></p>
+<div class="no-row-height column-margin column-container"><div id="fn6"><p><sup>6</sup>&nbsp;Wir nutzen <code><a href="https://rdrr.io/r/stats/update.html">update()</a></code> um die Regression mit weniger Code für verschiedene Bandweiten zu schätzen.</p></div></div><div class="cell" data-layout-align="center">
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Reproduktion der First-Stage-Regressionen</span></span>
 <span><span class="co"># s. Tabelle 2 in Basten und Betz (2013)</span></span>
 <span></span>
@@ -3208,9 +3220,9 @@ Abbildung&nbsp;4.11: First-Stage-Regressionen
 <span>  data <span class="op">=</span> <span class="va">BastenBetz</span></span>
 <span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell page-columns page-full" data-layout-align="center" data-cap-location="margin">
+<div class="cell page-columns page-full" data-layout-align="center">
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Tabellarische Darstellung</span></span>
-<span><span class="fu"><a href="https://modelsummary.com/reference/modelsummary.html">modelsummary</a></span><span class="op">(</span></span>
+<span><span class="fu"><a href="https://modelsummary.com/man/modelsummary.html">modelsummary</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
 <span>    <span class="st">"BW = OB"</span><span class="op">=</span> <span class="va">FS1</span>, </span>
 <span>    <span class="st">"BW = 10"</span> <span class="op">=</span> <span class="va">FS2</span>, </span>
@@ -3223,7 +3235,7 @@ Abbildung&nbsp;4.11: First-Stage-Regressionen
 <span>  output <span class="op">=</span> <span class="st">"gt"</span></span>
 <span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">tabopts</span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div id="tbl-BastenBetzFS" class="cell quarto-float anchored page-columns page-full" data-cap-location="margin" data-layout-align="center">
+<div id="tbl-BastenBetzFS" class="cell quarto-float anchored page-columns page-full" data-layout-align="center">
 <figure class="quarto-float quarto-float-tbl figure page-columns page-full"><div aria-describedby="tbl-BastenBetzFS-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
 <div>
@@ -3749,14 +3761,14 @@ Abbildung&nbsp;4.11: First-Stage-Regressionen
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-BastenBetzFS-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;4.4: First-Stage Regressionen
+Tabelle&nbsp;5.4: First-Stage-Regressionen
 </figcaption></figure>
 </div>
 </div>
 <p>Für die geschätze Bandweite schätzen wir einen hochsignifikanten Sprung in <code>prot</code> von etwa 67% an der Kantonsgrenze. Auch für größere Bandweiten von 10km und 20km sowie für den gesamten Datensatz finden wir vergleichbare signifikante Effekte, was eine bei zunehmender Distanz zur Grenze persistente Diskrepanz der Religionszugehörigkeit bestätigt.</p>
-</section><section id="second-stage-ergebnisse" class="level3 page-columns page-full" data-number="4.4.4"><h3 data-number="4.4.4" class="anchored" data-anchor-id="second-stage-ergebnisse">
-<span class="header-section-number">4.4.4</span> Second-Stage-Ergebnisse</h3>
-<p>Wir schätzen nun den LATE von Protestantismus für die Outcome-Variablen <code>gini</code>, <code>pfl</code>, <code>pfi</code> und <code>pfr</code>, vgl. <a href="#tbl-BastenBetzRed" class="quarto-xref">Tabelle&nbsp;<span>4.2</span></a>. Die Spezifikation für die Second-Stage-Regression der FRDD-Schätzung ist <span class="math display">\[\begin{align}
+</section><section id="second-stage-ergebnisse" class="level3 page-columns page-full" data-number="5.4.4"><h3 data-number="5.4.4" class="anchored" data-anchor-id="second-stage-ergebnisse">
+<span class="header-section-number">5.4.4</span> Second-Stage-Ergebnisse</h3>
+<p>Wir schätzen nun den LATE von Protestantismus für die Outcome-Variablen <code>gini</code>, <code>pfl</code>, <code>pfi</code> und <code>pfr</code>, vgl. <a href="#tbl-BastenBetzRed" class="quarto-xref">Tabelle&nbsp;<span>5.2</span></a>. Die Spezifikation für die Second-Stage-Regression der FRDD-Schätzung ist <span class="math display">\[\begin{align}
   \begin{split}
     Y_i = \gamma_0 + \gamma_1 \widehat{prot}_i +  \gamma_2 bord_i + \gamma_3 bord_i  \times vaud_i + e_i
   \end{split},
@@ -3805,7 +3817,7 @@ F-statistic: 26.69 on 3 and 129 DF,  p-value: 1.704e-13</code></pre>
 </div>
 </div>
 <p>Der Koeffizient <code>prot_fitted</code> ist der gesuchte Behandlungseffekt. Beachte, dass die von <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> berechneten Standardfehler ungültig sind, weil diese die zusätzliche Unsicherheit durch die Berechnung von <span class="math inline">\(\widehat{prot}\)</span> über die First-Stage-Regression nicht berücksichtigen. Nachfolgend nutzen wir <code><a href="https://rdrr.io/pkg/AER/man/ivreg.html">AER::ivreg()</a></code>, um komfortabel gültige (heteroskedastie-robuste) Inferenz betreiben zu können.<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a></p>
-<div class="no-row-height column-margin column-container"><p><sup>7</sup>&nbsp;Die Autoren geben an, robuste SEs zu nutzen. Das scheint nicht der Fall zu sein, denn <code>vcov = "HC0"</code> liefert die Ergebinsse im Paper. Die von Stata berechneten HC1-SEs weichen ab. Dies ändert allerdings nichts an der Signifikanz der Koeffizienten. Wir nutzen <code>vcov = "HC1"</code>.</p></div><div class="cell" data-layout-align="center">
+<div class="no-row-height column-margin column-container"><div id="fn7"><p><sup>7</sup>&nbsp;Die Autoren geben an, robuste SEs zu nutzen. Das scheint nicht der Fall zu sein, denn <code>vcov = "HC0"</code> liefert die Ergebinsse im Paper. Die von Stata berechneten HC1-SEs weichen ab. Dies ändert allerdings nichts an der Signifikanz der Koeffizienten. Wir nutzen <code>vcov = "HC1"</code>.</p></div></div><div class="cell" data-layout-align="center">
 <div class="sourceCode" id="cb47"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Schätzung mit 2SlS</span></span>
 <span><span class="co"># s. Tabelle 4 in Basten und Betz (2013)</span></span>
 <span><span class="co">#</span></span>
@@ -3837,9 +3849,9 @@ F-statistic: 26.69 on 3 and 129 DF,  p-value: 1.704e-13</code></pre>
 <span>  formula <span class="op">=</span> <span class="va">pfi</span> <span class="op">~</span> <span class="va">prot</span> <span class="op">+</span> <span class="va">bord</span><span class="op">:</span><span class="va">vaud</span> <span class="op">+</span> <span class="va">bord</span> <span class="op">|</span> <span class="va">vaud</span> <span class="op">*</span> <span class="va">bord</span>,</span>
 <span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell page-columns page-full" data-layout-align="center" data-cap-location="margin">
+<div class="cell page-columns page-full" data-layout-align="center">
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Tabellarische Darstellung</span></span>
-<span><span class="fu"><a href="https://modelsummary.com/reference/modelsummary.html">modelsummary</a></span><span class="op">(</span></span>
+<span><span class="fu"><a href="https://modelsummary.com/man/modelsummary.html">modelsummary</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
 <span>    <span class="st">"(1) Freizeit"</span><span class="op">=</span> <span class="va">SS_pfl</span>, </span>
 <span>    <span class="st">"(2) Umverteilung"</span> <span class="op">=</span> <span class="va">SS_pfr</span>, </span>
@@ -3852,7 +3864,7 @@ F-statistic: 26.69 on 3 and 129 DF,  p-value: 1.704e-13</code></pre>
 <span>  output <span class="op">=</span> <span class="st">"gt"</span></span>
 <span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">tabopts</span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div id="tbl-BastenBetzSS" class="cell quarto-float anchored page-columns page-full" data-cap-location="margin" data-layout-align="center">
+<div id="tbl-BastenBetzSS" class="cell quarto-float anchored page-columns page-full" data-layout-align="center">
 <figure class="quarto-float quarto-float-tbl figure page-columns page-full"><div aria-describedby="tbl-BastenBetzSS-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
 <div>
@@ -4378,14 +4390,14 @@ F-statistic: 26.69 on 3 and 129 DF,  p-value: 1.704e-13</code></pre>
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-BastenBetzSS-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;4.5: Ergebnisse der Second-Stage-Regressionen
+Tabelle&nbsp;5.5: Ergebnisse der Second-Stage-Regressionen
 </figcaption></figure>
 </div>
 </div>
-<p>Die Koeffizienten von <code>prot</code> in <a href="#tbl-BastenBetzSS" class="quarto-xref">Tabelle&nbsp;<span>4.5</span></a> sind die mit 2SLS ermittelten erwarteten Behandlungseffekte einer 100%-Reformation (d.h. von 100% katholisch zu 100% protestantisch) für eine durchschnittliche Gemeine nahe der Kantonsgrnze. Es handelt sich jeweils um einen lokalen durchschnittlichen Behandlungseffekt (LATE). Gem. der Definition der abhängigen Variablen, interpretieren wir die Koeffizienten von <code>prot</code> in de Regressionen (1), (2) und (3) als erwartete Prozentänderung durch Reformation. Der Koeffizient in Regression (4) gibt die erwartete Änderung des Gini-Index an. Sämtliche geschätzte Effekte sind signifikant und haben ein mit der Hypothese der Autoren konsistentes negatives Vorzeichen.</p>
+<p>Die Koeffizienten von <code>prot</code> in <a href="#tbl-BastenBetzSS" class="quarto-xref">Tabelle&nbsp;<span>5.5</span></a> sind die mit 2SLS ermittelten erwarteten Behandlungseffekte einer 100%-Reformation (d.h. von 100% katholisch zu 100% protestantisch) für eine durchschnittliche Gemeine nahe der Kantonsgrnze. Es handelt sich jeweils um einen lokalen durchschnittlichen Behandlungseffekt (LATE). Gem. der Definition der abhängigen Variablen, interpretieren wir die Koeffizienten von <code>prot</code> in de Regressionen (1), (2) und (3) als erwartete Prozentänderung durch Reformation. Der Koeffizient in Regression (4) gibt die erwartete Änderung des Gini-Index an. Sämtliche geschätzte Effekte sind signifikant und haben ein mit der Hypothese der Autoren konsistentes negatives Vorzeichen.</p>
 <p>Die Ergebnisse sind Evidenz, dass Protestantismus zu verringerter Präferenz für Freizeit, Umverteilung sowie wirtschaftspolitische Intervention seitens des Staats führt. Auch die ökonomische Ungleichheit ist signifikant geringer, als in einer durchschnittlichen vollständig katholischen Gemeinde.</p>
-</section><section id="addendum-frdd-schätzung-mit-rdrobust" class="level3" data-number="4.4.5"><h3 data-number="4.4.5" class="anchored" data-anchor-id="addendum-frdd-schätzung-mit-rdrobust">
-<span class="header-section-number">4.4.5</span> Addendum: FRDD-Schätzung mit <code>rdrobust()</code>
+</section><section id="addendum-frdd-schätzung-mit-rdrobust" class="level3" data-number="5.4.5"><h3 data-number="5.4.5" class="anchored" data-anchor-id="addendum-frdd-schätzung-mit-rdrobust">
+<span class="header-section-number">5.4.5</span> Addendum: FRDD-Schätzung mit <code>rdrobust()</code>
 </h3>
 <p>Die Funktion <code><a href="https://rdrr.io/pkg/rdrobust/man/rdrobust.html">rdrobust::rdrobust()</a></code> erlaubt die Schätzung von SRDD und FRDD mit einer Vielzahl von Optionen, s. <code><a href="https://rdrr.io/pkg/rdrobust/man/rdrobust.html">?rdrobust</a></code>. Dies erleichtert die Schätzung mehrerer Modellspezifikationenen und Bandweiten. Mit dem nachstehenden Befehl schätzen wir den LATE von Reformation auf die Präferenz für Umverteilung anhand lokaler quadratischer Regression. Der Output gibt einen Überblick der Bandweitenschätzung sowie der 2 Stufen des 2SLS-Schätzers, inkl. robuster Inferenzstatistiken.</p>
 <div class="cell" data-layout-align="center">
@@ -4436,7 +4448,7 @@ Treatment effect estimates.
 =============================================================================</code></pre>
 </div>
 </div>
-<p>Auch für die quadratische Spezifikation erhalten wir mit -5.047 ein vergleichbares signifikantes Ergebnis für den LATE von Protestantismus auf Umverteilung, vgl. Spalte (2) in <a href="#tbl-BastenBetzSS" class="quarto-xref">Tabelle&nbsp;<span>4.5</span></a>.</p>
+<p>Auch für die quadratische Spezifikation erhalten wir mit -5.047 ein vergleichbares signifikantes Ergebnis für den LATE von Protestantismus auf Umverteilung, vgl. Spalte (2) in <a href="#tbl-BastenBetzSS" class="quarto-xref">Tabelle&nbsp;<span>5.5</span></a>.</p>
 <p>Mit der Option <code>bwselect = "msetwo"</code> kann die Bandweite jeweils für die lokale Regression links- und rechtssetig des Schwellenwerts geschätzt werden.</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode" id="cb51"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">pfr_rdr</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> </span>
@@ -4648,6 +4660,24 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   if (showAllCode) {
     showAllCode.addEventListener("click", toggleCodeHandler(true));
   }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
@@ -4682,7 +4712,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
     });
   }
   const xrefs = window.document.querySelectorAll('a.quarto-xref');
@@ -4956,13 +4990,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><nav class="page-navigation"><div class="nav-page nav-page-previous">
-      <a href="./Matching.html" class="pagination-link" aria-label="Matching">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Matching</span></span>
+      <a href="./DiD.html" class="pagination-link" aria-label="Difference-in-Differences">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./RegReg.html" class="pagination-link" aria-label="Regularisierte Regression">
-        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Regularisierte Regression</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regularisierte Regression</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Quellcode</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
@@ -5466,7 +5500,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb53-512"><a href="#cb53-512" aria-hidden="true" tabindex="-1"></a>::: {.content-visible when-format="pdf"}</span>
 <span id="cb53-513"><a href="#cb53-513" aria-hidden="true" tabindex="-1"></a>----</span>
 <span id="cb53-514"><a href="#cb53-514" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-515"><a href="#cb53-515" aria-hidden="true" tabindex="-1"></a>***Diese interaktive Komponente des Buchs ist nur in der Online-Version verfügbar***</span>
+<span id="cb53-515"><a href="#cb53-515" aria-hidden="true" tabindex="-1"></a>***Diese interaktive Komponente des Buchs ist nur in der Online-Version verfügbar.***</span>
 <span id="cb53-516"><a href="#cb53-516" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb53-517"><a href="#cb53-517" aria-hidden="true" tabindex="-1"></a>----</span>
 <span id="cb53-518"><a href="#cb53-518" aria-hidden="true" tabindex="-1"></a>:::</span>
@@ -6290,151 +6324,149 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb53-1386"><a href="#cb53-1386" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb53-1387"><a href="#cb53-1387" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb53-1390"><a href="#cb53-1390" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb53-1391"><a href="#cb53-1391" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "First-Stage Regressionen"</span></span>
+<span id="cb53-1391"><a href="#cb53-1391" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "First-Stage-Regressionen"</span></span>
 <span id="cb53-1392"><a href="#cb53-1392" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-BastenBetzFS</span></span>
-<span id="cb53-1393"><a href="#cb53-1393" aria-hidden="true" tabindex="-1"></a><span class="co">#| cap-location: margin</span></span>
-<span id="cb53-1394"><a href="#cb53-1394" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1395"><a href="#cb53-1395" aria-hidden="true" tabindex="-1"></a><span class="co"># Tabellarische Darstellung</span></span>
-<span id="cb53-1396"><a href="#cb53-1396" aria-hidden="true" tabindex="-1"></a><span class="fu">modelsummary</span>(</span>
-<span id="cb53-1397"><a href="#cb53-1397" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
-<span id="cb53-1398"><a href="#cb53-1398" aria-hidden="true" tabindex="-1"></a>    <span class="st">"BW = OB"</span><span class="ot">=</span> FS1, </span>
-<span id="cb53-1399"><a href="#cb53-1399" aria-hidden="true" tabindex="-1"></a>    <span class="st">"BW = 10"</span> <span class="ot">=</span> FS2, </span>
-<span id="cb53-1400"><a href="#cb53-1400" aria-hidden="true" tabindex="-1"></a>    <span class="st">"BW=20"</span> <span class="ot">=</span> FS3, </span>
-<span id="cb53-1401"><a href="#cb53-1401" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Ges. Datensatz"</span> <span class="ot">=</span> FS4</span>
-<span id="cb53-1402"><a href="#cb53-1402" aria-hidden="true" tabindex="-1"></a>  ), </span>
-<span id="cb53-1403"><a href="#cb53-1403" aria-hidden="true" tabindex="-1"></a>  <span class="at">vcov =</span> <span class="st">"HC1"</span>, </span>
-<span id="cb53-1404"><a href="#cb53-1404" aria-hidden="true" tabindex="-1"></a>  <span class="at">stars =</span> T, </span>
-<span id="cb53-1405"><a href="#cb53-1405" aria-hidden="true" tabindex="-1"></a>  <span class="at">gof_map =</span> <span class="st">"nobs"</span>, </span>
-<span id="cb53-1406"><a href="#cb53-1406" aria-hidden="true" tabindex="-1"></a>  <span class="at">output =</span> <span class="st">"gt"</span></span>
-<span id="cb53-1407"><a href="#cb53-1407" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
-<span id="cb53-1408"><a href="#cb53-1408" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tabopts</span>()</span>
-<span id="cb53-1409"><a href="#cb53-1409" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb53-1410"><a href="#cb53-1410" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1411"><a href="#cb53-1411" aria-hidden="true" tabindex="-1"></a>Für die geschätze Bandweite schätzen wir einen hochsignifikanten Sprung in <span class="in">`prot`</span> von etwa 67\% an der Kantonsgrenze. Auch für größere Bandweiten von 10km und 20km sowie für den gesamten Datensatz finden wir vergleichbare signifikante Effekte, was eine bei zunehmender Distanz zur Grenze persistente Diskrepanz der Religionszugehörigkeit bestätigt. </span>
-<span id="cb53-1412"><a href="#cb53-1412" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1413"><a href="#cb53-1413" aria-hidden="true" tabindex="-1"></a><span class="fu">### Second-Stage-Ergebnisse</span></span>
-<span id="cb53-1414"><a href="#cb53-1414" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1415"><a href="#cb53-1415" aria-hidden="true" tabindex="-1"></a>Wir schätzen nun den LATE von Protestantismus für die Outcome-Variablen <span class="in">`gini`</span>, <span class="in">`pfl`</span>, <span class="in">`pfi`</span> und <span class="in">`pfr`</span>, vgl. @tbl-BastenBetzRed. Die Spezifikation für die Second-Stage-Regression der FRDD-Schätzung ist</span>
-<span id="cb53-1416"><a href="#cb53-1416" aria-hidden="true" tabindex="-1"></a>\begin{align}</span>
-<span id="cb53-1417"><a href="#cb53-1417" aria-hidden="true" tabindex="-1"></a>  \begin{split}</span>
-<span id="cb53-1418"><a href="#cb53-1418" aria-hidden="true" tabindex="-1"></a>    Y_i = \gamma_0 + \gamma_1 \widehat{prot}_i +  \gamma_2 bord_i + \gamma_3 bord_i  \times vaud_i + e_i</span>
-<span id="cb53-1419"><a href="#cb53-1419" aria-hidden="true" tabindex="-1"></a>  \end{split},</span>
-<span id="cb53-1420"><a href="#cb53-1420" aria-hidden="true" tabindex="-1"></a>\end{align}</span>
-<span id="cb53-1421"><a href="#cb53-1421" aria-hidden="true" tabindex="-1"></a>wobei $\widehat{prot}_i$ angepasste Werte aus der KQ-Schätzung von \eqref{eq:BBFSR} mit Bandweite <span class="in">`OB`</span> sind. Dazu erzeugen wir zunächst eine angepasste Version des Objekts <span class="in">`BastenBetz`</span>, welche nur Gemeinden innerhalb der Bandweite enthält.</span>
-<span id="cb53-1422"><a href="#cb53-1422" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1425"><a href="#cb53-1425" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb53-1426"><a href="#cb53-1426" aria-hidden="true" tabindex="-1"></a><span class="co"># Gemeinden innerhalb der Bandweite filtern</span></span>
-<span id="cb53-1427"><a href="#cb53-1427" aria-hidden="true" tabindex="-1"></a>BastenBetz_OB <span class="ot">&lt;-</span> BastenBetz <span class="sc">%&gt;%</span> </span>
-<span id="cb53-1428"><a href="#cb53-1428" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
-<span id="cb53-1429"><a href="#cb53-1429" aria-hidden="true" tabindex="-1"></a>    <span class="fu">abs</span>(bord) <span class="sc">&lt;=</span> OB</span>
-<span id="cb53-1430"><a href="#cb53-1430" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb53-1431"><a href="#cb53-1431" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb53-1432"><a href="#cb53-1432" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1433"><a href="#cb53-1433" aria-hidden="true" tabindex="-1"></a>Zur Illustration schätzen wir nun die Second-Stage-Regression für $Y = pfl$. </span>
-<span id="cb53-1434"><a href="#cb53-1434" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1437"><a href="#cb53-1437" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb53-1438"><a href="#cb53-1438" aria-hidden="true" tabindex="-1"></a><span class="co"># Second-Stage-Regression für `pfl`</span></span>
-<span id="cb53-1439"><a href="#cb53-1439" aria-hidden="true" tabindex="-1"></a>BastenBetz_OB <span class="sc">%&gt;%</span> </span>
-<span id="cb53-1440"><a href="#cb53-1440" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb53-1441"><a href="#cb53-1441" aria-hidden="true" tabindex="-1"></a>    <span class="at">prot_fitted =</span> <span class="fu">fitted</span>(FS1)</span>
-<span id="cb53-1442"><a href="#cb53-1442" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb53-1443"><a href="#cb53-1443" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1444"><a href="#cb53-1444" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(</span>
-<span id="cb53-1445"><a href="#cb53-1445" aria-hidden="true" tabindex="-1"></a>  pfl <span class="sc">~</span> prot_fitted <span class="sc">+</span> bord <span class="sc">+</span> vaud<span class="sc">:</span>bord, </span>
-<span id="cb53-1446"><a href="#cb53-1446" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> .</span>
-<span id="cb53-1447"><a href="#cb53-1447" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
-<span id="cb53-1448"><a href="#cb53-1448" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span>
-<span id="cb53-1449"><a href="#cb53-1449" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb53-1450"><a href="#cb53-1450" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1451"><a href="#cb53-1451" aria-hidden="true" tabindex="-1"></a>Der Koeffizient <span class="in">`prot_fitted`</span> ist der gesuchte Behandlungseffekt. Beachte, dass die von <span class="in">`summary()`</span> berechneten Standardfehler ungültig sind, weil diese die zusätzliche Unsicherheit durch die Berechnung von $\widehat{prot}$ über die First-Stage-Regression nicht berücksichtigen. Nachfolgend nutzen wir <span class="in">`AER::ivreg()`</span>, um komfortabel gültige (heteroskedastie-robuste) Inferenz betreiben zu können.^[Die Autoren geben an, robuste SEs zu nutzen. Das scheint nicht der Fall zu sein, denn <span class="in">`vcov = "HC0"`</span> liefert die Ergebinsse im Paper. Die von Stata berechneten HC1-SEs weichen ab. Dies ändert allerdings nichts</span>
-<span id="cb53-1452"><a href="#cb53-1452" aria-hidden="true" tabindex="-1"></a>an der Signifikanz der Koeffizienten. Wir nutzen <span class="in">`vcov = "HC1"`</span>.]</span>
-<span id="cb53-1453"><a href="#cb53-1453" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1456"><a href="#cb53-1456" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb53-1457"><a href="#cb53-1457" aria-hidden="true" tabindex="-1"></a><span class="co"># Schätzung mit 2SlS</span></span>
-<span id="cb53-1458"><a href="#cb53-1458" aria-hidden="true" tabindex="-1"></a><span class="co"># s. Tabelle 4 in Basten und Betz (2013)</span></span>
-<span id="cb53-1459"><a href="#cb53-1459" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb53-1460"><a href="#cb53-1460" aria-hidden="true" tabindex="-1"></a><span class="co"># Wir instrumentieren Treatment (`prot1980s`) mit dem Schwellenindikator (`vaud`)</span></span>
-<span id="cb53-1461"><a href="#cb53-1461" aria-hidden="true" tabindex="-1"></a><span class="co"># ivreg: exogene Variablen instrumentieren sich selbst, daher</span></span>
-<span id="cb53-1462"><a href="#cb53-1462" aria-hidden="true" tabindex="-1"></a><span class="co"># ' | vaud * borderdis '</span></span>
-<span id="cb53-1463"><a href="#cb53-1463" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(AER)</span>
-<span id="cb53-1464"><a href="#cb53-1464" aria-hidden="true" tabindex="-1"></a><span class="co"># (1) Präferenz für Freizeit</span></span>
-<span id="cb53-1465"><a href="#cb53-1465" aria-hidden="true" tabindex="-1"></a>SS_pfl <span class="ot">&lt;-</span> <span class="fu">ivreg</span>(</span>
-<span id="cb53-1466"><a href="#cb53-1466" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> pfl <span class="sc">~</span> prot <span class="sc">+</span> bord<span class="sc">:</span>vaud <span class="sc">+</span> bord <span class="sc">|</span> vaud <span class="sc">*</span> bord,</span>
-<span id="cb53-1467"><a href="#cb53-1467" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> BastenBetz_OB</span>
-<span id="cb53-1468"><a href="#cb53-1468" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb53-1469"><a href="#cb53-1469" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1470"><a href="#cb53-1470" aria-hidden="true" tabindex="-1"></a><span class="co"># (2) Präferenz für Umverteilung</span></span>
-<span id="cb53-1471"><a href="#cb53-1471" aria-hidden="true" tabindex="-1"></a>SS_pfr <span class="ot">&lt;-</span> <span class="fu">update</span>(</span>
-<span id="cb53-1472"><a href="#cb53-1472" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> SS_pfl,</span>
-<span id="cb53-1473"><a href="#cb53-1473" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> pfr <span class="sc">~</span> prot <span class="sc">+</span> bord<span class="sc">:</span>vaud <span class="sc">+</span> bord <span class="sc">|</span> vaud <span class="sc">*</span> bord,</span>
-<span id="cb53-1474"><a href="#cb53-1474" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb53-1475"><a href="#cb53-1475" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1476"><a href="#cb53-1476" aria-hidden="true" tabindex="-1"></a><span class="co"># (3) Präferenz für Intervention</span></span>
-<span id="cb53-1477"><a href="#cb53-1477" aria-hidden="true" tabindex="-1"></a>SS_pfi <span class="ot">&lt;-</span> <span class="fu">update</span>(</span>
-<span id="cb53-1478"><a href="#cb53-1478" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> SS_pfl,</span>
-<span id="cb53-1479"><a href="#cb53-1479" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> pfi <span class="sc">~</span> prot <span class="sc">+</span> bord<span class="sc">:</span>vaud <span class="sc">+</span> bord <span class="sc">|</span> vaud <span class="sc">*</span> bord,</span>
-<span id="cb53-1480"><a href="#cb53-1480" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb53-1481"><a href="#cb53-1481" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1482"><a href="#cb53-1482" aria-hidden="true" tabindex="-1"></a><span class="co"># (4) Einkommensungleichheit</span></span>
-<span id="cb53-1483"><a href="#cb53-1483" aria-hidden="true" tabindex="-1"></a>SS_gini <span class="ot">&lt;-</span> <span class="fu">update</span>(</span>
-<span id="cb53-1484"><a href="#cb53-1484" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> SS_pfl,</span>
-<span id="cb53-1485"><a href="#cb53-1485" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> pfi <span class="sc">~</span> prot <span class="sc">+</span> bord<span class="sc">:</span>vaud <span class="sc">+</span> bord <span class="sc">|</span> vaud <span class="sc">*</span> bord,</span>
-<span id="cb53-1486"><a href="#cb53-1486" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb53-1487"><a href="#cb53-1487" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb53-1488"><a href="#cb53-1488" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1491"><a href="#cb53-1491" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb53-1492"><a href="#cb53-1492" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "Ergebnisse der Second-Stage-Regressionen"</span></span>
-<span id="cb53-1493"><a href="#cb53-1493" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-BastenBetzSS</span></span>
-<span id="cb53-1494"><a href="#cb53-1494" aria-hidden="true" tabindex="-1"></a><span class="co">#| cap-location: margin</span></span>
-<span id="cb53-1495"><a href="#cb53-1495" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1496"><a href="#cb53-1496" aria-hidden="true" tabindex="-1"></a><span class="co"># Tabellarische Darstellung</span></span>
-<span id="cb53-1497"><a href="#cb53-1497" aria-hidden="true" tabindex="-1"></a><span class="fu">modelsummary</span>(</span>
-<span id="cb53-1498"><a href="#cb53-1498" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
-<span id="cb53-1499"><a href="#cb53-1499" aria-hidden="true" tabindex="-1"></a>    <span class="st">"(1) Freizeit"</span><span class="ot">=</span> SS_pfl, </span>
-<span id="cb53-1500"><a href="#cb53-1500" aria-hidden="true" tabindex="-1"></a>    <span class="st">"(2) Umverteilung"</span> <span class="ot">=</span> SS_pfr, </span>
-<span id="cb53-1501"><a href="#cb53-1501" aria-hidden="true" tabindex="-1"></a>    <span class="st">"(3) Intervention"</span> <span class="ot">=</span> SS_pfi, </span>
-<span id="cb53-1502"><a href="#cb53-1502" aria-hidden="true" tabindex="-1"></a>    <span class="st">"(4) Ungleichheit"</span> <span class="ot">=</span> SS_gini</span>
-<span id="cb53-1503"><a href="#cb53-1503" aria-hidden="true" tabindex="-1"></a>  ), </span>
-<span id="cb53-1504"><a href="#cb53-1504" aria-hidden="true" tabindex="-1"></a>  <span class="at">vcov =</span> <span class="st">"HC1"</span>, </span>
-<span id="cb53-1505"><a href="#cb53-1505" aria-hidden="true" tabindex="-1"></a>  <span class="at">stars =</span> T, </span>
-<span id="cb53-1506"><a href="#cb53-1506" aria-hidden="true" tabindex="-1"></a>  <span class="at">gof_map =</span> <span class="st">"nobs"</span>, </span>
-<span id="cb53-1507"><a href="#cb53-1507" aria-hidden="true" tabindex="-1"></a>  <span class="at">output =</span> <span class="st">"gt"</span></span>
-<span id="cb53-1508"><a href="#cb53-1508" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
-<span id="cb53-1509"><a href="#cb53-1509" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tabopts</span>()</span>
-<span id="cb53-1510"><a href="#cb53-1510" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb53-1393"><a href="#cb53-1393" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-1394"><a href="#cb53-1394" aria-hidden="true" tabindex="-1"></a><span class="co"># Tabellarische Darstellung</span></span>
+<span id="cb53-1395"><a href="#cb53-1395" aria-hidden="true" tabindex="-1"></a><span class="fu">modelsummary</span>(</span>
+<span id="cb53-1396"><a href="#cb53-1396" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb53-1397"><a href="#cb53-1397" aria-hidden="true" tabindex="-1"></a>    <span class="st">"BW = OB"</span><span class="ot">=</span> FS1, </span>
+<span id="cb53-1398"><a href="#cb53-1398" aria-hidden="true" tabindex="-1"></a>    <span class="st">"BW = 10"</span> <span class="ot">=</span> FS2, </span>
+<span id="cb53-1399"><a href="#cb53-1399" aria-hidden="true" tabindex="-1"></a>    <span class="st">"BW=20"</span> <span class="ot">=</span> FS3, </span>
+<span id="cb53-1400"><a href="#cb53-1400" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Ges. Datensatz"</span> <span class="ot">=</span> FS4</span>
+<span id="cb53-1401"><a href="#cb53-1401" aria-hidden="true" tabindex="-1"></a>  ), </span>
+<span id="cb53-1402"><a href="#cb53-1402" aria-hidden="true" tabindex="-1"></a>  <span class="at">vcov =</span> <span class="st">"HC1"</span>, </span>
+<span id="cb53-1403"><a href="#cb53-1403" aria-hidden="true" tabindex="-1"></a>  <span class="at">stars =</span> T, </span>
+<span id="cb53-1404"><a href="#cb53-1404" aria-hidden="true" tabindex="-1"></a>  <span class="at">gof_map =</span> <span class="st">"nobs"</span>, </span>
+<span id="cb53-1405"><a href="#cb53-1405" aria-hidden="true" tabindex="-1"></a>  <span class="at">output =</span> <span class="st">"gt"</span></span>
+<span id="cb53-1406"><a href="#cb53-1406" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb53-1407"><a href="#cb53-1407" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tabopts</span>()</span>
+<span id="cb53-1408"><a href="#cb53-1408" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb53-1409"><a href="#cb53-1409" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-1410"><a href="#cb53-1410" aria-hidden="true" tabindex="-1"></a>Für die geschätze Bandweite schätzen wir einen hochsignifikanten Sprung in <span class="in">`prot`</span> von etwa 67\% an der Kantonsgrenze. Auch für größere Bandweiten von 10km und 20km sowie für den gesamten Datensatz finden wir vergleichbare signifikante Effekte, was eine bei zunehmender Distanz zur Grenze persistente Diskrepanz der Religionszugehörigkeit bestätigt. </span>
+<span id="cb53-1411"><a href="#cb53-1411" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-1412"><a href="#cb53-1412" aria-hidden="true" tabindex="-1"></a><span class="fu">### Second-Stage-Ergebnisse</span></span>
+<span id="cb53-1413"><a href="#cb53-1413" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-1414"><a href="#cb53-1414" aria-hidden="true" tabindex="-1"></a>Wir schätzen nun den LATE von Protestantismus für die Outcome-Variablen <span class="in">`gini`</span>, <span class="in">`pfl`</span>, <span class="in">`pfi`</span> und <span class="in">`pfr`</span>, vgl. @tbl-BastenBetzRed. Die Spezifikation für die Second-Stage-Regression der FRDD-Schätzung ist</span>
+<span id="cb53-1415"><a href="#cb53-1415" aria-hidden="true" tabindex="-1"></a>\begin{align}</span>
+<span id="cb53-1416"><a href="#cb53-1416" aria-hidden="true" tabindex="-1"></a>  \begin{split}</span>
+<span id="cb53-1417"><a href="#cb53-1417" aria-hidden="true" tabindex="-1"></a>    Y_i = \gamma_0 + \gamma_1 \widehat{prot}_i +  \gamma_2 bord_i + \gamma_3 bord_i  \times vaud_i + e_i</span>
+<span id="cb53-1418"><a href="#cb53-1418" aria-hidden="true" tabindex="-1"></a>  \end{split},</span>
+<span id="cb53-1419"><a href="#cb53-1419" aria-hidden="true" tabindex="-1"></a>\end{align}</span>
+<span id="cb53-1420"><a href="#cb53-1420" aria-hidden="true" tabindex="-1"></a>wobei $\widehat{prot}_i$ angepasste Werte aus der KQ-Schätzung von \eqref{eq:BBFSR} mit Bandweite <span class="in">`OB`</span> sind. Dazu erzeugen wir zunächst eine angepasste Version des Objekts <span class="in">`BastenBetz`</span>, welche nur Gemeinden innerhalb der Bandweite enthält.</span>
+<span id="cb53-1421"><a href="#cb53-1421" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-1424"><a href="#cb53-1424" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb53-1425"><a href="#cb53-1425" aria-hidden="true" tabindex="-1"></a><span class="co"># Gemeinden innerhalb der Bandweite filtern</span></span>
+<span id="cb53-1426"><a href="#cb53-1426" aria-hidden="true" tabindex="-1"></a>BastenBetz_OB <span class="ot">&lt;-</span> BastenBetz <span class="sc">%&gt;%</span> </span>
+<span id="cb53-1427"><a href="#cb53-1427" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb53-1428"><a href="#cb53-1428" aria-hidden="true" tabindex="-1"></a>    <span class="fu">abs</span>(bord) <span class="sc">&lt;=</span> OB</span>
+<span id="cb53-1429"><a href="#cb53-1429" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb53-1430"><a href="#cb53-1430" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb53-1431"><a href="#cb53-1431" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-1432"><a href="#cb53-1432" aria-hidden="true" tabindex="-1"></a>Zur Illustration schätzen wir nun die Second-Stage-Regression für $Y = pfl$. </span>
+<span id="cb53-1433"><a href="#cb53-1433" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-1436"><a href="#cb53-1436" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb53-1437"><a href="#cb53-1437" aria-hidden="true" tabindex="-1"></a><span class="co"># Second-Stage-Regression für `pfl`</span></span>
+<span id="cb53-1438"><a href="#cb53-1438" aria-hidden="true" tabindex="-1"></a>BastenBetz_OB <span class="sc">%&gt;%</span> </span>
+<span id="cb53-1439"><a href="#cb53-1439" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb53-1440"><a href="#cb53-1440" aria-hidden="true" tabindex="-1"></a>    <span class="at">prot_fitted =</span> <span class="fu">fitted</span>(FS1)</span>
+<span id="cb53-1441"><a href="#cb53-1441" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb53-1442"><a href="#cb53-1442" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-1443"><a href="#cb53-1443" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(</span>
+<span id="cb53-1444"><a href="#cb53-1444" aria-hidden="true" tabindex="-1"></a>  pfl <span class="sc">~</span> prot_fitted <span class="sc">+</span> bord <span class="sc">+</span> vaud<span class="sc">:</span>bord, </span>
+<span id="cb53-1445"><a href="#cb53-1445" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> .</span>
+<span id="cb53-1446"><a href="#cb53-1446" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb53-1447"><a href="#cb53-1447" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span>
+<span id="cb53-1448"><a href="#cb53-1448" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb53-1449"><a href="#cb53-1449" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-1450"><a href="#cb53-1450" aria-hidden="true" tabindex="-1"></a>Der Koeffizient <span class="in">`prot_fitted`</span> ist der gesuchte Behandlungseffekt. Beachte, dass die von <span class="in">`summary()`</span> berechneten Standardfehler ungültig sind, weil diese die zusätzliche Unsicherheit durch die Berechnung von $\widehat{prot}$ über die First-Stage-Regression nicht berücksichtigen. Nachfolgend nutzen wir <span class="in">`AER::ivreg()`</span>, um komfortabel gültige (heteroskedastie-robuste) Inferenz betreiben zu können.^[Die Autoren geben an, robuste SEs zu nutzen. Das scheint nicht der Fall zu sein, denn <span class="in">`vcov = "HC0"`</span> liefert die Ergebinsse im Paper. Die von Stata berechneten HC1-SEs weichen ab. Dies ändert allerdings nichts</span>
+<span id="cb53-1451"><a href="#cb53-1451" aria-hidden="true" tabindex="-1"></a>an der Signifikanz der Koeffizienten. Wir nutzen <span class="in">`vcov = "HC1"`</span>.]</span>
+<span id="cb53-1452"><a href="#cb53-1452" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-1455"><a href="#cb53-1455" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb53-1456"><a href="#cb53-1456" aria-hidden="true" tabindex="-1"></a><span class="co"># Schätzung mit 2SlS</span></span>
+<span id="cb53-1457"><a href="#cb53-1457" aria-hidden="true" tabindex="-1"></a><span class="co"># s. Tabelle 4 in Basten und Betz (2013)</span></span>
+<span id="cb53-1458"><a href="#cb53-1458" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb53-1459"><a href="#cb53-1459" aria-hidden="true" tabindex="-1"></a><span class="co"># Wir instrumentieren Treatment (`prot1980s`) mit dem Schwellenindikator (`vaud`)</span></span>
+<span id="cb53-1460"><a href="#cb53-1460" aria-hidden="true" tabindex="-1"></a><span class="co"># ivreg: exogene Variablen instrumentieren sich selbst, daher</span></span>
+<span id="cb53-1461"><a href="#cb53-1461" aria-hidden="true" tabindex="-1"></a><span class="co"># ' | vaud * borderdis '</span></span>
+<span id="cb53-1462"><a href="#cb53-1462" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(AER)</span>
+<span id="cb53-1463"><a href="#cb53-1463" aria-hidden="true" tabindex="-1"></a><span class="co"># (1) Präferenz für Freizeit</span></span>
+<span id="cb53-1464"><a href="#cb53-1464" aria-hidden="true" tabindex="-1"></a>SS_pfl <span class="ot">&lt;-</span> <span class="fu">ivreg</span>(</span>
+<span id="cb53-1465"><a href="#cb53-1465" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> pfl <span class="sc">~</span> prot <span class="sc">+</span> bord<span class="sc">:</span>vaud <span class="sc">+</span> bord <span class="sc">|</span> vaud <span class="sc">*</span> bord,</span>
+<span id="cb53-1466"><a href="#cb53-1466" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> BastenBetz_OB</span>
+<span id="cb53-1467"><a href="#cb53-1467" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb53-1468"><a href="#cb53-1468" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-1469"><a href="#cb53-1469" aria-hidden="true" tabindex="-1"></a><span class="co"># (2) Präferenz für Umverteilung</span></span>
+<span id="cb53-1470"><a href="#cb53-1470" aria-hidden="true" tabindex="-1"></a>SS_pfr <span class="ot">&lt;-</span> <span class="fu">update</span>(</span>
+<span id="cb53-1471"><a href="#cb53-1471" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> SS_pfl,</span>
+<span id="cb53-1472"><a href="#cb53-1472" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> pfr <span class="sc">~</span> prot <span class="sc">+</span> bord<span class="sc">:</span>vaud <span class="sc">+</span> bord <span class="sc">|</span> vaud <span class="sc">*</span> bord,</span>
+<span id="cb53-1473"><a href="#cb53-1473" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb53-1474"><a href="#cb53-1474" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-1475"><a href="#cb53-1475" aria-hidden="true" tabindex="-1"></a><span class="co"># (3) Präferenz für Intervention</span></span>
+<span id="cb53-1476"><a href="#cb53-1476" aria-hidden="true" tabindex="-1"></a>SS_pfi <span class="ot">&lt;-</span> <span class="fu">update</span>(</span>
+<span id="cb53-1477"><a href="#cb53-1477" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> SS_pfl,</span>
+<span id="cb53-1478"><a href="#cb53-1478" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> pfi <span class="sc">~</span> prot <span class="sc">+</span> bord<span class="sc">:</span>vaud <span class="sc">+</span> bord <span class="sc">|</span> vaud <span class="sc">*</span> bord,</span>
+<span id="cb53-1479"><a href="#cb53-1479" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb53-1480"><a href="#cb53-1480" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-1481"><a href="#cb53-1481" aria-hidden="true" tabindex="-1"></a><span class="co"># (4) Einkommensungleichheit</span></span>
+<span id="cb53-1482"><a href="#cb53-1482" aria-hidden="true" tabindex="-1"></a>SS_gini <span class="ot">&lt;-</span> <span class="fu">update</span>(</span>
+<span id="cb53-1483"><a href="#cb53-1483" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> SS_pfl,</span>
+<span id="cb53-1484"><a href="#cb53-1484" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> pfi <span class="sc">~</span> prot <span class="sc">+</span> bord<span class="sc">:</span>vaud <span class="sc">+</span> bord <span class="sc">|</span> vaud <span class="sc">*</span> bord,</span>
+<span id="cb53-1485"><a href="#cb53-1485" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb53-1486"><a href="#cb53-1486" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb53-1487"><a href="#cb53-1487" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-1490"><a href="#cb53-1490" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb53-1491"><a href="#cb53-1491" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "Ergebnisse der Second-Stage-Regressionen"</span></span>
+<span id="cb53-1492"><a href="#cb53-1492" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-BastenBetzSS</span></span>
+<span id="cb53-1493"><a href="#cb53-1493" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-1494"><a href="#cb53-1494" aria-hidden="true" tabindex="-1"></a><span class="co"># Tabellarische Darstellung</span></span>
+<span id="cb53-1495"><a href="#cb53-1495" aria-hidden="true" tabindex="-1"></a><span class="fu">modelsummary</span>(</span>
+<span id="cb53-1496"><a href="#cb53-1496" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb53-1497"><a href="#cb53-1497" aria-hidden="true" tabindex="-1"></a>    <span class="st">"(1) Freizeit"</span><span class="ot">=</span> SS_pfl, </span>
+<span id="cb53-1498"><a href="#cb53-1498" aria-hidden="true" tabindex="-1"></a>    <span class="st">"(2) Umverteilung"</span> <span class="ot">=</span> SS_pfr, </span>
+<span id="cb53-1499"><a href="#cb53-1499" aria-hidden="true" tabindex="-1"></a>    <span class="st">"(3) Intervention"</span> <span class="ot">=</span> SS_pfi, </span>
+<span id="cb53-1500"><a href="#cb53-1500" aria-hidden="true" tabindex="-1"></a>    <span class="st">"(4) Ungleichheit"</span> <span class="ot">=</span> SS_gini</span>
+<span id="cb53-1501"><a href="#cb53-1501" aria-hidden="true" tabindex="-1"></a>  ), </span>
+<span id="cb53-1502"><a href="#cb53-1502" aria-hidden="true" tabindex="-1"></a>  <span class="at">vcov =</span> <span class="st">"HC1"</span>, </span>
+<span id="cb53-1503"><a href="#cb53-1503" aria-hidden="true" tabindex="-1"></a>  <span class="at">stars =</span> T, </span>
+<span id="cb53-1504"><a href="#cb53-1504" aria-hidden="true" tabindex="-1"></a>  <span class="at">gof_map =</span> <span class="st">"nobs"</span>, </span>
+<span id="cb53-1505"><a href="#cb53-1505" aria-hidden="true" tabindex="-1"></a>  <span class="at">output =</span> <span class="st">"gt"</span></span>
+<span id="cb53-1506"><a href="#cb53-1506" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb53-1507"><a href="#cb53-1507" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tabopts</span>()</span>
+<span id="cb53-1508"><a href="#cb53-1508" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb53-1509"><a href="#cb53-1509" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-1510"><a href="#cb53-1510" aria-hidden="true" tabindex="-1"></a>Die Koeffizienten von <span class="in">`prot`</span> in @tbl-BastenBetzSS sind die mit 2SLS ermittelten erwarteten Behandlungseffekte einer 100%-Reformation (d.h. von 100% katholisch zu 100% protestantisch) für eine durchschnittliche Gemeine nahe der Kantonsgrnze. Es handelt sich jeweils um einen lokalen durchschnittlichen Behandlungseffekt (LATE). Gem. der Definition der abhängigen Variablen, interpretieren wir die Koeffizienten von <span class="in">`prot`</span> in de Regressionen (1), (2) und (3) als erwartete Prozentänderung durch Reformation. Der Koeffizient in Regression (4) gibt die erwartete Änderung des Gini-Index an. Sämtliche geschätzte Effekte sind signifikant und haben ein mit der Hypothese der Autoren konsistentes negatives Vorzeichen. </span>
 <span id="cb53-1511"><a href="#cb53-1511" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1512"><a href="#cb53-1512" aria-hidden="true" tabindex="-1"></a>Die Koeffizienten von <span class="in">`prot`</span> in @tbl-BastenBetzSS sind die mit 2SLS ermittelten erwarteten Behandlungseffekte einer 100%-Reformation (d.h. von 100% katholisch zu 100% protestantisch) für eine durchschnittliche Gemeine nahe der Kantonsgrnze. Es handelt sich jeweils um einen lokalen durchschnittlichen Behandlungseffekt (LATE). Gem. der Definition der abhängigen Variablen, interpretieren wir die Koeffizienten von <span class="in">`prot`</span> in de Regressionen (1), (2) und (3) als erwartete Prozentänderung durch Reformation. Der Koeffizient in Regression (4) gibt die erwartete Änderung des Gini-Index an. Sämtliche geschätzte Effekte sind signifikant und haben ein mit der Hypothese der Autoren konsistentes negatives Vorzeichen. </span>
+<span id="cb53-1512"><a href="#cb53-1512" aria-hidden="true" tabindex="-1"></a>Die Ergebnisse sind Evidenz, dass Protestantismus zu verringerter Präferenz für Freizeit, Umverteilung sowie wirtschaftspolitische Intervention seitens des Staats führt. Auch die ökonomische Ungleichheit ist signifikant geringer, als in einer durchschnittlichen vollständig katholischen Gemeinde.</span>
 <span id="cb53-1513"><a href="#cb53-1513" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1514"><a href="#cb53-1514" aria-hidden="true" tabindex="-1"></a>Die Ergebnisse sind Evidenz, dass Protestantismus zu verringerter Präferenz für Freizeit, Umverteilung sowie wirtschaftspolitische Intervention seitens des Staats führt. Auch die ökonomische Ungleichheit ist signifikant geringer, als in einer durchschnittlichen vollständig katholischen Gemeinde.</span>
+<span id="cb53-1514"><a href="#cb53-1514" aria-hidden="true" tabindex="-1"></a><span class="fu">### Addendum: FRDD-Schätzung mit `rdrobust()`</span></span>
 <span id="cb53-1515"><a href="#cb53-1515" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1516"><a href="#cb53-1516" aria-hidden="true" tabindex="-1"></a><span class="fu">### Addendum: FRDD-Schätzung mit `rdrobust()`</span></span>
+<span id="cb53-1516"><a href="#cb53-1516" aria-hidden="true" tabindex="-1"></a>Die Funktion <span class="in">`rdrobust::rdrobust()`</span> erlaubt die Schätzung von SRDD und FRDD mit einer Vielzahl von Optionen, s. <span class="in">`?rdrobust`</span>. Dies erleichtert die Schätzung mehrerer Modellspezifikationenen und Bandweiten. Mit dem nachstehenden Befehl schätzen wir den LATE von Reformation auf die Präferenz für Umverteilung anhand lokaler quadratischer Regression. Der Output gibt einen Überblick der Bandweitenschätzung sowie der 2 Stufen des 2SLS-Schätzers, inkl. robuster Inferenzstatistiken.</span>
 <span id="cb53-1517"><a href="#cb53-1517" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1518"><a href="#cb53-1518" aria-hidden="true" tabindex="-1"></a>Die Funktion <span class="in">`rdrobust::rdrobust()`</span> erlaubt die Schätzung von SRDD und FRDD mit einer Vielzahl von Optionen, s. <span class="in">`?rdrobust`</span>. Dies erleichtert die Schätzung mehrerer Modellspezifikationenen und Bandweiten. Mit dem nachstehenden Befehl schätzen wir den LATE von Reformation auf die Präferenz für Umverteilung anhand lokaler quadratischer Regression. Der Output gibt einen Überblick der Bandweitenschätzung sowie der 2 Stufen des 2SLS-Schätzers, inkl. robuster Inferenzstatistiken.</span>
-<span id="cb53-1519"><a href="#cb53-1519" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1522"><a href="#cb53-1522" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb53-1523"><a href="#cb53-1523" aria-hidden="true" tabindex="-1"></a>pfr_rdr <span class="ot">&lt;-</span> <span class="fu">rdrobust</span>(</span>
-<span id="cb53-1524"><a href="#cb53-1524" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> BastenBetz<span class="sc">$</span>pfr,</span>
-<span id="cb53-1525"><a href="#cb53-1525" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> BastenBetz<span class="sc">$</span>bord,</span>
-<span id="cb53-1526"><a href="#cb53-1526" aria-hidden="true" tabindex="-1"></a>  <span class="at">fuzzy =</span> BastenBetz<span class="sc">$</span>prot, </span>
-<span id="cb53-1527"><a href="#cb53-1527" aria-hidden="true" tabindex="-1"></a>  <span class="at">p =</span> <span class="dv">2</span>,</span>
-<span id="cb53-1528"><a href="#cb53-1528" aria-hidden="true" tabindex="-1"></a>  <span class="at">kernel =</span> <span class="st">"uniform"</span>,</span>
-<span id="cb53-1529"><a href="#cb53-1529" aria-hidden="true" tabindex="-1"></a>  <span class="at">vce =</span> <span class="st">"HC1"</span></span>
-<span id="cb53-1530"><a href="#cb53-1530" aria-hidden="true" tabindex="-1"></a>) </span>
-<span id="cb53-1531"><a href="#cb53-1531" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1532"><a href="#cb53-1532" aria-hidden="true" tabindex="-1"></a>pfr_rdr <span class="sc">%&gt;%</span> </span>
-<span id="cb53-1533"><a href="#cb53-1533" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span>
-<span id="cb53-1534"><a href="#cb53-1534" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb53-1535"><a href="#cb53-1535" aria-hidden="true" tabindex="-1"></a>Auch für die quadratische Spezifikation erhalten wir mit -5.047 ein vergleichbares signifikantes Ergebnis für den LATE von Protestantismus auf Umverteilung, vgl. Spalte (2) in @tbl-BastenBetzSS.</span>
+<span id="cb53-1520"><a href="#cb53-1520" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb53-1521"><a href="#cb53-1521" aria-hidden="true" tabindex="-1"></a>pfr_rdr <span class="ot">&lt;-</span> <span class="fu">rdrobust</span>(</span>
+<span id="cb53-1522"><a href="#cb53-1522" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> BastenBetz<span class="sc">$</span>pfr,</span>
+<span id="cb53-1523"><a href="#cb53-1523" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> BastenBetz<span class="sc">$</span>bord,</span>
+<span id="cb53-1524"><a href="#cb53-1524" aria-hidden="true" tabindex="-1"></a>  <span class="at">fuzzy =</span> BastenBetz<span class="sc">$</span>prot, </span>
+<span id="cb53-1525"><a href="#cb53-1525" aria-hidden="true" tabindex="-1"></a>  <span class="at">p =</span> <span class="dv">2</span>,</span>
+<span id="cb53-1526"><a href="#cb53-1526" aria-hidden="true" tabindex="-1"></a>  <span class="at">kernel =</span> <span class="st">"uniform"</span>,</span>
+<span id="cb53-1527"><a href="#cb53-1527" aria-hidden="true" tabindex="-1"></a>  <span class="at">vce =</span> <span class="st">"HC1"</span></span>
+<span id="cb53-1528"><a href="#cb53-1528" aria-hidden="true" tabindex="-1"></a>) </span>
+<span id="cb53-1529"><a href="#cb53-1529" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-1530"><a href="#cb53-1530" aria-hidden="true" tabindex="-1"></a>pfr_rdr <span class="sc">%&gt;%</span> </span>
+<span id="cb53-1531"><a href="#cb53-1531" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span>
+<span id="cb53-1532"><a href="#cb53-1532" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb53-1533"><a href="#cb53-1533" aria-hidden="true" tabindex="-1"></a>Auch für die quadratische Spezifikation erhalten wir mit -5.047 ein vergleichbares signifikantes Ergebnis für den LATE von Protestantismus auf Umverteilung, vgl. Spalte (2) in @tbl-BastenBetzSS.</span>
+<span id="cb53-1534"><a href="#cb53-1534" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-1535"><a href="#cb53-1535" aria-hidden="true" tabindex="-1"></a>Mit der Option <span class="in">`bwselect = "msetwo"`</span> kann die Bandweite jeweils für die lokale Regression links- und rechtssetig des Schwellenwerts geschätzt werden.</span>
 <span id="cb53-1536"><a href="#cb53-1536" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1537"><a href="#cb53-1537" aria-hidden="true" tabindex="-1"></a>Mit der Option <span class="in">`bwselect = "msetwo"`</span> kann die Bandweite jeweils für die lokale Regression links- und rechtssetig des Schwellenwerts geschätzt werden.</span>
-<span id="cb53-1538"><a href="#cb53-1538" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1541"><a href="#cb53-1541" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb53-1542"><a href="#cb53-1542" aria-hidden="true" tabindex="-1"></a>pfr_rdr <span class="sc">%&gt;%</span> </span>
-<span id="cb53-1543"><a href="#cb53-1543" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update</span>(<span class="at">bwselect =</span> <span class="st">"msetwo"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb53-1544"><a href="#cb53-1544" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span>
-<span id="cb53-1545"><a href="#cb53-1545" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb53-1546"><a href="#cb53-1546" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-1547"><a href="#cb53-1547" aria-hidden="true" tabindex="-1"></a>Trotz Diskrepanz der geschätzten Bandweiten erhalten wir eine größere aber vergleichbare Schätzung für einen negativen Effekt.</span>
+<span id="cb53-1539"><a href="#cb53-1539" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb53-1540"><a href="#cb53-1540" aria-hidden="true" tabindex="-1"></a>pfr_rdr <span class="sc">%&gt;%</span> </span>
+<span id="cb53-1541"><a href="#cb53-1541" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update</span>(<span class="at">bwselect =</span> <span class="st">"msetwo"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb53-1542"><a href="#cb53-1542" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span>
+<span id="cb53-1543"><a href="#cb53-1543" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb53-1544"><a href="#cb53-1544" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-1545"><a href="#cb53-1545" aria-hidden="true" tabindex="-1"></a>Trotz Diskrepanz der geschätzten Bandweiten erhalten wir eine größere aber vergleichbare Schätzung für einen negativen Effekt.</span>
 </code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

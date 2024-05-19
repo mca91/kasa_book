@@ -1,4 +1,4 @@
-# Regularisierte Regression
+# {{< fa stairs >}}  Regularisierte Regression
 
 ```{r, echo=F, message=FALSE}
 library(gt)
@@ -17,35 +17,30 @@ tabopts <- function(x) {
 }
 ```
 
-In diesem Kapitel betrachten wir Varianten von Koeffizientenschätzern im linearen Modell
-\begin{align}
+In diesem Kapitel betrachten wir Varianten von Koeffizientenschätzern im linearen Modell \begin{align}
  Y_i = \beta_1 X_{1,i} + \dots + \beta_k X_{k,i} + u_i, \quad i = 1,\dots,n,\label{eq:slm}
-\end{align}
-deren Motivation die Schätzung von $\boldsymbol{\beta} := (\beta_1, \dots,\beta_k)'$ in Anwendungen ist, in denen der KQ-Schätzer 
-\begin{align}
+\end{align} deren Motivation die Schätzung von $\boldsymbol{\beta} := (\beta_1, \dots,\beta_k)'$ in Anwendungen ist, in denen der KQ-Schätzer \begin{align}
   \begin{split}
   \widehat{\boldsymbol{\beta}} =&\, \arg\min_{\boldsymbol{\beta}}\mathrm{RSS}(\boldsymbol{\beta})\\ 
   =&\,  \arg\min_{\boldsymbol{\beta}}  \sum_{i=1}^n\left(Y_i-\beta_1 X_{1,i} + \dots + \beta_k X_{k,i}\right)^2
   \end{split}\label{eq:KQLoss}
-\end{align}
-keine stabile Schätzung zulässt oder nicht eindeutig definiert ist, und damit gar nicht erst berechnet werden kann. Solche Szenarien ergeben sich in der empirischen Forschung, wenn die Regressoren stark korreliert sind und/oder das Modell viele Regressoren enthält ($k\lesssim n$), oder das Regressionsproblem hoch-dimensional ist ($k>n$). 
+\end{align} keine stabile Schätzung zulässt oder nicht eindeutig definiert ist, und damit gar nicht erst berechnet werden kann. Solche Szenarien ergeben sich in der empirischen Forschung, wenn die Regressoren stark korreliert sind und/oder das Modell viele Regressoren enthält ($k\lesssim n$), oder das Regressionsproblem hoch-dimensional ist ($k>n$).
 
-Regularisierte Regressionsschätzer begegnen dieser Problematik mit einer Modifikation der Verlustfunktion $\mathrm{RSS}$ in \eqref{eq:KQLoss},
-\begin{align}
+Regularisierte Regressionsschätzer begegnen dieser Problematik mit einer Modifikation der Verlustfunktion $\mathrm{RSS}$ in \eqref{eq:KQLoss}, \begin{align}
   \mathrm{RSS}(\boldsymbol{\beta}, p, \lambda) := \mathrm{RSS}(\boldsymbol{\beta}) + \lambda\lVert\boldsymbol{\beta}\rVert_p.
-\end{align}
-Hierbei ist $\lambda>0$ ein Tuning-Parameter und $p\geq1$ definiert die $p$-Norm des Koeffizientenvektors,
-\begin{align}
+\end{align} Hierbei ist $\lambda>0$ ein Tuning-Parameter und $p\geq1$ definiert die $p$-Norm des Koeffizientenvektors, \begin{align}
   \lVert\boldsymbol{\beta}\rVert_p := \left(\sum_{j=1}^k \lvert\beta_j\rvert^{p}\right)^{1/p}>0.\label{eq:pnorm}
 \end{align}
 
-Wegen $\lambda\lVert\boldsymbol{\beta}\rVert_p>0$ kann die $p$-Norm des Koeffizientenvektors $\boldsymbol{\beta}$ das Optimierungsproblem $$\min_{\boldsymbol{\beta}} \mathrm{RSS}(\boldsymbol{\beta}, p, \lambda) \vert\, p,\, \lambda$$ derart restringieren, dass die geschätzten Koeffizienten
-\begin{align*}
+Wegen $\lambda\lVert\boldsymbol{\beta}\rVert_p>0$ kann die $p$-Norm des Koeffizientenvektors $\boldsymbol{\beta}$ das Optimierungsproblem $$\min_{\boldsymbol{\beta}} \mathrm{RSS}(\boldsymbol{\beta}, p, \lambda) \vert\, p,\, \lambda$$ derart restringieren, dass die geschätzten Koeffizienten \begin{align*}
   \widehat{\boldsymbol{\beta}}_{p,\,\lambda} := \arg\min_{\boldsymbol{\beta}} \mathrm{RSS}(\boldsymbol{\beta}, p, \lambda)
-\end{align*}
-im Erwartungswert absolut kleiner ausfallen als bei der KQ-Schätzung: Der Schätzer ist in Richtung 0 verzerrt.^[Beachte, dass für $\lambda=0$ die Verlustfunktion des KQ-Schätzers folgt.] Dieser Effekt der Regularisierung wird in der Literatur als *Shrinkage* bezeichnet. 
+\end{align*} im Erwartungswert absolut kleiner ausfallen als bei der KQ-Schätzung: Der Schätzer ist in Richtung 0 verzerrt.[^regreg-1] Dieser Effekt der Regularisierung wird in der Literatur als *Shrinkage* bezeichnet.
 
-Die grundlegenden Eigenschaften des Schätzers $\widehat{\boldsymbol{\beta}}_{p,\,\lambda}$ werden maßgeblich durch den Parameter $p$ bestimmt, der hinsichtlich des zu lösenden Regressionsproblems *a priori* gewählt wird.^[D.h. wir wählen $p$, um einen Schätzer mit für die konkrete Anwendung hilfreichen Eigenschaften zu erhalten.] 
+[^regreg-1]: Beachte, dass für $\lambda=0$ die Verlustfunktion des KQ-Schätzers folgt.
+
+Die grundlegenden Eigenschaften des Schätzers $\widehat{\boldsymbol{\beta}}_{p,\,\lambda}$ werden maßgeblich durch den Parameter $p$ bestimmt, der hinsichtlich des zu lösenden Regressionsproblems *a priori* gewählt wird.[^regreg-2]
+
+[^regreg-2]: D.h. wir wählen $p$, um einen Schätzer mit für die konkrete Anwendung hilfreichen Eigenschaften zu erhalten.
 
 Shrinkage ist eine Motivation für die Anwendung regularisierter Schätzer in Modellen, die auch mit KQ geschätzt werden könnten. Um dies zu verstehen, nehmen wir an, dass die Gauss-Markov-Annahmen in \eqref{eq:slm} gelten. Dann hat der KQ-Schätzer die kleinste Varianz unter allen *unverzerrten* Schätzern. Aufgrund der Shrinkage fallen regularisierte Schätzer zwar nicht unter das Gauss-Markov-Theorem, können dafür aber eine geringere Varianz haben als KQ. Schätzer mit solchen Eigenschaften sind nützlich, wenn eine unverzerrte Schätzung von $\boldsymbol{\beta}$ nicht unser primäres Ziel ist: Für Vorhersagen kann es hilfreich sein, etwas Verzerrung bei der Koeffizientenschätzung in Kauf zu nehmen, um eine hinreichend große Varianzreduktion zu erreichen, sodass ein geringerer erwarteter Vorhersagefehler als für KQ resultiert. Hierbei liegt, eine Abwägung zwischen Verzerrung und Varianz (*Bias Variance Tradeoff*) vor, der durch den Regularisierungsparameter $\lambda$ beeinflusst wird.
 
@@ -55,73 +50,68 @@ Nachfolgend betrachten wir zwei häufig verwendete regularisierte Schätzer, die
 
 ## Ridge Regression
 
-Ridge Regression wurde von @HoerlKennard1970 als Alternative zur KQ-Schätzung bei hoch-korrelierten Regressoren eingeführt. Die Verlustfunktion lautet
-\begin{align}
+Ridge Regression wurde von @HoerlKennard1970 als Alternative zur KQ-Schätzung bei hoch-korrelierten Regressoren eingeführt. Die Verlustfunktion lautet \begin{align}
   \mathrm{RSS}(\boldsymbol{\beta},p=2,\lambda) = \mathrm{RSS}(\boldsymbol{\beta}) + \lambda \lVert\boldsymbol{\beta}\rVert_2,\label{eq:ridgeloss}
-\end{align}
-d.h. der Parameter $\lambda$ reguliert den Einfluss eines $\ell_2$-Strafterms 
-\begin{align*}
+\end{align} d.h. der Parameter $\lambda$ reguliert den Einfluss eines $\ell_2$-Strafterms \begin{align*}
   \lVert\boldsymbol{\beta}\rVert_2 = \sqrt{\sum_{j=1}^k\beta_j^2}
-\end{align*}
-auf die Verlustfunktion $\mathrm{RSS}(\boldsymbol{\beta},p=2,\lambda)$. Der Ridge-Schätzer ergibt sich als
-\begin{align}
+\end{align*} auf die Verlustfunktion $\mathrm{RSS}(\boldsymbol{\beta},p=2,\lambda)$. Der Ridge-Schätzer ergibt sich als \begin{align}
   \widehat{\boldsymbol{\beta}}^{\mathrm{R}}_\lambda := \arg\min_{\boldsymbol{\beta}}\mathrm{RSS}(\boldsymbol{\beta}) + \lambda \lVert\boldsymbol{\beta}\rVert_2.\label{eq:ridgereg}
 \end{align}
 
-Für Das Optimierungsproblem \eqref{eq:ridgereg} kann wir aus den Bedingungen 1. Ordnung 
-\begin{align}
+Für Das Optimierungsproblem \eqref{eq:ridgereg} kann wir aus den Bedingungen 1. Ordnung \begin{align}
   -2\boldsymbol{X}'(\boldsymbol{Y} - \boldsymbol{X}\boldsymbol{\beta}) + 2\lambda\boldsymbol{\beta} = \boldsymbol{0}
-\end{align}
-die analytische Lösung
-\begin{align}
+\end{align} die analytische Lösung \begin{align}
   \widehat{\boldsymbol{\beta}}^{\mathrm{R}}_\lambda = (\boldsymbol{X}'\boldsymbol{X} + \lambda\boldsymbol{I}_p)^{-1}\boldsymbol{X}'\boldsymbol{Y},\label{eq:ridgecf}
-\end{align}
-bestimmt werden, wobei $\boldsymbol{I}_k$ die $k\times k$ Einheitsmatrix ist. Aus Gleichung \eqref{eq:ridgecf} kann die Wirkungsweise des Strafterms $\lambda \lVert\boldsymbol{\beta}\rVert_2$ abgeleitet werden: Ridge Regression modifiziert die Diagonale der zu invertierenden Matrix $\boldsymbol{X}'\boldsymbol{X}$ durch Addition von $\lambda>0$. Dies ist hilfreich, wenn 
+\end{align} bestimmt werden, wobei $\boldsymbol{I}_k$ die $k\times k$ Einheitsmatrix ist. Aus Gleichung \eqref{eq:ridgecf} kann die Wirkungsweise des Strafterms $\lambda \lVert\boldsymbol{\beta}\rVert_2$ abgeleitet werden: Ridge Regression modifiziert die Diagonale der zu invertierenden Matrix $\boldsymbol{X}'\boldsymbol{X}$ durch Addition von $\lambda>0$. Dies ist hilfreich, wenn
 
-- $k\geq n$ und damit $\boldsymbol{X}'\boldsymbol{X}$ nicht invertiertbar (singulär) ist. Dann kann der KQ-Schätzer nicht berechnet werden.^[Beispiel: `X <- matrix(rnorm(100), ncol = 10)`. Vergleiche `solve(t(X) %*% X)` und `solve(t(X) %*% X + diag(.01, nrow = 10))`] Die Inverse $(\boldsymbol{X}'\boldsymbol{X} + \lambda\boldsymbol{I}_p)^{-1}$ hingegen existiert unter milden Bedingungen.
+-   $k\geq n$ und damit $\boldsymbol{X}'\boldsymbol{X}$ nicht invertiertbar (singulär) ist. Dann kann der KQ-Schätzer nicht berechnet werden.[^regreg-3] Die Inverse $(\boldsymbol{X}'\boldsymbol{X} + \lambda\boldsymbol{I}_p)^{-1}$ hingegen existiert unter milden Bedingungen.
 
-- hohe Kollinearität vorliegt, sodass $(\boldsymbol{X}'\boldsymbol{X})^{-1}$ zwar existiert, aber zu einer instablilen KQ-Schätzung mit hoher Varianz führt. 
+-   hohe Kollinearität vorliegt, sodass $(\boldsymbol{X}'\boldsymbol{X})^{-1}$ zwar existiert, aber zu einer instablilen KQ-Schätzung mit hoher Varianz führt.
 
-Für eine grafische Betrachtung des Optimierungskalküls \eqref{eq:ridgereg} betrachten wir die äquivalente Darstellung als Lagrange-Problem
-\begin{align}
+[^regreg-3]: Beispiel: `X <- matrix(rnorm(100), ncol = 10)`. Vergleiche `solve(t(X) %*% X)` und `solve(t(X) %*% X + diag(.01, nrow = 10))`
+
+Für eine grafische Betrachtung des Optimierungskalküls \eqref{eq:ridgereg} betrachten wir die äquivalente Darstellung als Lagrange-Problem \begin{align}
   \widehat{\boldsymbol{\beta}}^{\mathrm{R}}_\lambda := \arg\min_{\lVert\boldsymbol{\beta}\rVert<t}\mathrm{RSS}(\boldsymbol{\beta}).\label{eq:ridgeLg}
-\end{align}
-In der folgenden interaktiven Grafik illustrieren wir das Optimierungsproblem \eqref{eq:ridgeLg} sowie den resultierenden Schätzer der Koeffizienten $(\beta_1, \beta_2)$ in einem multiplen Regressionsmodell mit den Regressoren $X_1$ und $X_2$.
+\end{align} In der folgenden interaktiven Grafik illustrieren wir das Optimierungsproblem \eqref{eq:ridgeLg} sowie den resultierenden Schätzer der Koeffizienten $(\beta_1, \beta_2)$ in einem multiplen Regressionsmodell mit den Regressoren $X_1$ und $X_2$.
 
-- Die blaue Ellipse ist die Menge aller Schätzwerte $\left(\widehat\beta_{1},\, \widehat\beta_{2}\right)$ für den angegebenen Wert von $\mathrm{RSS}$. Im Zentrum der Ellipse liegt der KQ-Schätzer, welcher $\mathrm{RSS}$ minimiert.
+-   Die blaue Ellipse ist die Menge aller Schätzwerte $\left(\widehat\beta_{1},\, \widehat\beta_{2}\right)$ für den angegebenen Wert von $\mathrm{RSS}$. Im Zentrum der Ellipse liegt der KQ-Schätzer, welcher $\mathrm{RSS}$ minimiert.
 
-- Der blaue Kreis ist die Menge aller Koeffizienten-Paare $(\beta_1, \beta_2)$, welche die Restriktion $\beta_1^2 + \beta_2^2\leq t$ erfüllen. Beachte, dass die Größe des Kreises nur durch den Parameter $t$ bestimmt wird, welcher für einen vorgegebenen Wertebereich variiert werden kann.
+-   Der blaue Kreis ist die Menge aller Koeffizienten-Paare $(\beta_1, \beta_2)$, welche die Restriktion $\beta_1^2 + \beta_2^2\leq t$ erfüllen. Beachte, dass die Größe des Kreises nur durch den Parameter $t$ bestimmt wird, welcher für einen vorgegebenen Wertebereich variiert werden kann.
 
-- Der blaue Punkt ist der Ridge-Schätzer $(\widehat\beta^R_{1,t},\, \widehat\beta^R_{2,t})$. Dieser ergibt sich als Schnittpunkt zwischen der blauen $\mathrm{RSS}$-Ellipse und der Restriktionsregion und variiert mit $t$. Die gestrichelte rote Kurve zeigt den Ridge-Lösungspfad.
+-   Der blaue Punkt ist der Ridge-Schätzer $(\widehat\beta^R_{1,t},\, \widehat\beta^R_{2,t})$. Dieser ergibt sich als Schnittpunkt zwischen der blauen $\mathrm{RSS}$-Ellipse und der Restriktionsregion und variiert mit $t$. Die gestrichelte rote Kurve zeigt den Ridge-Lösungspfad.
 
-- Für kleine Werte $t$ drückt die Shrinkage die geschätzten Koeffizienten Richtung 0, wobei der Lösungspfad i.d.R. nicht-linear verläuft, d.h. die Shrinkage auf den Koeffizienten ist grundsätzlich unterschiedlich. Die Lösung $(\widehat\beta^R_{1,t},\, \widehat\beta^R_{2,t}) = (0,0)$ existiert nur als Grenzwert für $t\to0$.
+-   Für kleine Werte $t$ drückt die Shrinkage die geschätzten Koeffizienten Richtung 0, wobei der Lösungspfad i.d.R. nicht-linear verläuft, d.h. die Shrinkage auf den Koeffizienten ist grundsätzlich unterschiedlich. Die Lösung $(\widehat\beta^R_{1,t},\, \widehat\beta^R_{2,t}) = (0,0)$ existiert nur als Grenzwert für $t\to0$.
 
-- Beachte, dass der Effekt von $t$ auf die Schätzung umgekehrt für $\lambda$ verläuft: Größere $\lambda$ führen zu stärkerer Regularisierung.
+-   Beachte, dass der Effekt von $t$ auf die Schätzung umgekehrt für $\lambda$ verläuft: Größere $\lambda$ führen zu stärkerer Regularisierung.
 
 ::: {.content-visible when-format="html"}
+<iframe width="100%" height="500" frameborder="0" src="https://observablehq.com/embed/45a59e74a4330581?cells=viewof+m%2Cchart114">
 
-<iframe width="100%" height="500" frameborder="0"
-  src="https://observablehq.com/embed/45a59e74a4330581?cells=viewof+m%2Cchart114"></iframe>
-
+</iframe>
 :::
 
 ::: {.content-visible when-format="pdf"}
-----
+
+------------------------------------------------------------------------
 
 ***Diese Interaktive Komponente des Buchs ist nur in der Online-Version verfügbar.***
 
-----
+------------------------------------------------------------------------
 :::
 
 ### Eigenschaften des Schätzers
 
-Der Ridge-Schätzer $\widehat{\boldsymbol{\beta}}^{\mathrm{R}}_\lambda$ ist nicht invariant gegenüber der Skalierung der Regressoren. Für empirische Daten sollte daher vorab eine Standardisierung der erklärenden Variablen durchgeführt werden.^[Bspw. mit der Funktion `scale()`.] Um die Eigenschaften des Ridge-Schätzers besser zu verstehen, betrachten wir hier den Fall orthonormaler Regressoren $\boldsymbol{X}_j$.^[Orthonormalität heißt $\boldsymbol{X}_i'\boldsymbol{X}_j = 1$ für $i=j$ und $0$ sonst. Dann ist $\boldsymbol{X}$'$\boldsymbol{X} = \boldsymbol{I}_k$.] Dann ist
-\begin{align}
+Der Ridge-Schätzer $\widehat{\boldsymbol{\beta}}^{\mathrm{R}}_\lambda$ ist nicht invariant gegenüber der Skalierung der Regressoren. Für empirische Daten sollte daher vorab eine Standardisierung der erklärenden Variablen durchgeführt werden.[^regreg-4] Um die Eigenschaften des Ridge-Schätzers besser zu verstehen, betrachten wir hier den Fall orthonormaler Regressoren $\boldsymbol{X}_j$.[^regreg-5] Dann ist \begin{align}
   \widehat{\beta}^{\mathrm{R}}_{\lambda,\,j} = (1+\lambda)^{-1} \cdot\widehat{\beta}_j,\quad j = 1,\dots,k,\label{eq:ridgeortho}
-\end{align}
-d.h. der Ridge-Schätzer skaliert die KQ-Lösung mit einem von $\lambda$ abhängigen Faktor.^[$(1+\lambda)^{-1}$ wird auch als *Shrinkage-Faktor* bezeichnet.] 
+\end{align} d.h. der Ridge-Schätzer skaliert die KQ-Lösung mit einem von $\lambda$ abhängigen Faktor.[^regreg-6]
 
-Wir illustrieren dies, indem wir den Zusammenhang zwischen KQ- und Ridge-Schätzer im orthonormalen Fall als R-Funktion `ridge_ortho()` implementieren und für die Parameterwerte $\lambda\in\{0,0.5,2\}$ plotten. 
+[^regreg-4]: Bspw. mit der Funktion `scale()`.
+
+[^regreg-5]: Orthonormalität heißt $\boldsymbol{X}_i'\boldsymbol{X}_j = 1$ für $i=j$ und $0$ sonst. Dann ist $\boldsymbol{X}$'$\boldsymbol{X} = \boldsymbol{I}_k$.
+
+[^regreg-6]: $(1+\lambda)^{-1}$ wird auch als *Shrinkage-Faktor* bezeichnet.
+
+Wir illustrieren dies, indem wir den Zusammenhang zwischen KQ- und Ridge-Schätzer im orthonormalen Fall als R-Funktion `ridge_ortho()` implementieren und für die Parameterwerte $\lambda\in\{0,0.5,2\}$ plotten.
 
 ```{r, warning=F}
 library(tidyverse)
@@ -154,20 +144,17 @@ ggplot(dat) +
   ylab("Ridge-Schätzer von beta_1")
 ```
 
-@fig-ridgeortho zeigt, dass der Ridge-Schätzer eine lineare Transformation des KQ-Schätzers (gestrichelte Linie) ist. Größere Werte des Regularisierungsparameters $\lambda$ führen zu stärkerer Shrinkage des Koeffizientenschätzers in Richtung 0. Die $\ell_2$-Norm führt zu proportional zum Absolutwert des KQ-Schätzers verlaufender Shrinkage: Größere Koeffizienten werden stärker bestraft als kleine Koeffizienten. 
+@fig-ridgeortho zeigt, dass der Ridge-Schätzer eine lineare Transformation des KQ-Schätzers (gestrichelte Linie) ist. Größere Werte des Regularisierungsparameters $\lambda$ führen zu stärkerer Shrinkage des Koeffizientenschätzers in Richtung 0. Die $\ell_2$-Norm führt zu proportional zum Absolutwert des KQ-Schätzers verlaufender Shrinkage: Größere Koeffizienten werden stärker bestraft als kleine Koeffizienten.
 
-Die Eigenschaft $$\mathrm{E}\left(\widehat{\boldsymbol{\beta}}^{\mathrm{R}}_{\lambda,\,j}\right) = (1+\lambda)^{-1} \cdot \beta_j$$ zeigt, dass $\widehat{\boldsymbol{\beta}}^{\mathrm{R}}_{\lambda,\,j}$ (für fixes $\lambda>0$) nicht erwartungstreu für $\beta_j$ ist. Weiterhin ist
-\begin{align*}
+Die Eigenschaft $$\mathrm{E}\left(\widehat{\boldsymbol{\beta}}^{\mathrm{R}}_{\lambda,\,j}\right) = (1+\lambda)^{-1} \cdot \beta_j$$ zeigt, dass $\widehat{\boldsymbol{\beta}}^{\mathrm{R}}_{\lambda,\,j}$ (für fixes $\lambda>0$) nicht erwartungstreu für $\beta_j$ ist. Weiterhin ist \begin{align*}
   \mathrm{Var}\left(\widehat{\beta}^{\mathrm{R}}_{\lambda,\,j}\right) =&\, 
   \mathrm{Var}\left(\widehat{\beta}_j\right) \cdot \left(\frac{\lambda}{1+\lambda^2}\right)\\
     =&\, \sigma^2\cdot \left(\frac{\lambda}{1+\lambda^2}\right),
-\end{align*}
-wobei $\sigma^2$ die Varianz des Regressionsfehlers $u$ ist. Wegen $\lambda<(1+\lambda)^2$ für $\lambda>0$ gilt $$\mathrm{Var}\left(\widehat{\beta}^{\mathrm{R}}_{\lambda,\,j}\right)<\mathrm{Var}\left(\widehat{\beta}_j\right).$$ Der Ridge-Schätzer hat also eine kleinere Varianz als der KQ-Schätzer. Diese Eigenschaften können auch für korrelierte Regressoren gezeigt werden.
+\end{align*} wobei $\sigma^2$ die Varianz des Regressionsfehlers $u$ ist. Wegen $\lambda<(1+\lambda)^2$ für $\lambda>0$ gilt $$\mathrm{Var}\left(\widehat{\beta}^{\mathrm{R}}_{\lambda,\,j}\right)<\mathrm{Var}\left(\widehat{\beta}_j\right).$$ Der Ridge-Schätzer hat also eine kleinere Varianz als der KQ-Schätzer. Diese Eigenschaften können auch für korrelierte Regressoren gezeigt werden.
 
 ### Ridge Regression mit `glmnet`
 
-Wir zeigen nun anhand simulierter Daten, wie der Ridge-Lösungspfad mit dem R-Paket `glmnet` berechnet werden kann. Wir erzeugen zunächst Daten gemäß der Vorschrift
-\begin{align}
+Wir zeigen nun anhand simulierter Daten, wie der Ridge-Lösungspfad mit dem R-Paket `glmnet` berechnet werden kann. Wir erzeugen zunächst Daten gemäß der Vorschrift \begin{align}
   \begin{split}
   Y_i =&\, \boldsymbol{X}_i' \boldsymbol{\beta} + u_i,\\
   \\
@@ -176,8 +163,9 @@ Wir zeigen nun anhand simulierter Daten, wie der Ridge-Lösungspfad mit dem R-Pa
   \\
   \boldsymbol{X}_i \sim&\, N(\boldsymbol{0}, \boldsymbol{\Sigma}), \quad u_i \overset{u.i.v.}{\sim} N(0, 1), \quad i = 1,\dots,25.
   \end{split} \label{eq:ridgedgp1}
-\end{align}
-Hierbei wird $\boldsymbol{\Sigma}$ so definiert, dass jeder Regressor $N(0,1)$-verteilt ist und eine Korrelation von $0.8$ mit allen anderen Regressoren aufweist. Mit der Vorschrift für die $\beta_j$ stellen wir sicher, dass es wenige Variablen gibt, die $Y$ stark beeinflussen, da der Absolutbetrag der Koeffizienten in $j$ abnimmt.^[Für bessere Interpretierbarkeit der Grafischen Auswertung, wählen wir positive und negative Koeffizienten mit gleichem Bertag.]
+\end{align} Hierbei wird $\boldsymbol{\Sigma}$ so definiert, dass jeder Regressor $N(0,1)$-verteilt ist und eine Korrelation von $0.8$ mit allen anderen Regressoren aufweist. Mit der Vorschrift für die $\beta_j$ stellen wir sicher, dass es wenige Variablen gibt, die $Y$ stark beeinflussen, da der Absolutbetrag der Koeffizienten in $j$ abnimmt.[^regreg-7]
+
+[^regreg-7]: Für bessere Interpretierbarkeit der Grafischen Auswertung, wählen wir positive und negative Koeffizienten mit gleichem Bertag.
 
 ```{r, warning=F}
 library(gendata)
@@ -200,7 +188,9 @@ X <- as.matrix(
 Y <- X %*% beta + rnorm(N)
 ```
 
-Wir schätzen nun ein Modell mit allen `r k` Regressoren mit `glmnet`. Beachte, dass für den Ridge-Strafterm `alpha = 0` gesetzt werden muss.^[`alpha` ist ein Mischparameter im Algorithmus für [elastic net](https://en.wikipedia.org/wiki/Elastic_net_regularization), siehe `?glmnet`.]
+Wir schätzen nun ein Modell mit allen `r k` Regressoren mit `glmnet`. Beachte, dass für den Ridge-Strafterm `alpha = 0` gesetzt werden muss.[^regreg-8]
+
+[^regreg-8]: `alpha` ist ein Mischparameter im Algorithmus für [elastic net](https://en.wikipedia.org/wiki/Elastic_net_regularization), siehe `?glmnet`.
 
 ```{r}
 library(glmnet)
@@ -243,7 +233,7 @@ as.matrix(ridge_fit$beta) %>%
   scale_x_log10("log_10(lambda)")
 ```
 
-@fig-ridgesolpath zeigt den nicht-linearen Verlauf der Shrinkage auf den geschätzten Modellkoeffizienten. Die Koeffizienten werden mit zunehmendem $\lambda$ von der KQ-Lösung ausgehend (linkes Ende der Skala) in Richtung 0 gezwungen.  
+@fig-ridgesolpath zeigt den nicht-linearen Verlauf der Shrinkage auf den geschätzten Modellkoeffizienten. Die Koeffizienten werden mit zunehmendem $\lambda$ von der KQ-Lösung ausgehend (linkes Ende der Skala) in Richtung 0 gezwungen.
 
 Über die Funktion `cv.glmnet()` kann ein optimales $\lambda$ mit Cross Validation (CV) ermittelt werden. Ähnlich wie bei `glmnet()` wird für die Validierung automatisch eine $\lambda$-Sequenz erzeugt. Wir nutzen `autoplot()` aus dem R-Paket `ggfortify` für die Visualisierung der Ergebnisse mit `ggplot2`.
 
@@ -265,7 +255,9 @@ ridge_cvfit %>%
   autoplot(label.n = 0)
 ```
 
-@fig-ridgecvplot zeigt `ridge_cvfit$lambda.min`, das optimale $\lambda$ mit dem geringsten CV Mean-Squarred-Error (linke gestrichelte Linie) und `ridge_cvfit$lambda.1se`, das größte $\lambda$, welches innerhalb einer Standardabweichung entfernt ist (rechte gestrichelte Linie).^[Die Wahl von `lambda.1se` ist eine Heuristik, welche die Schätzunsicherheit berücksichtigt und zu einem "sparsameren" Modell tendiert.] Wir berechnen die Schätzung für `lambda.min`.
+@fig-ridgecvplot zeigt `ridge_cvfit$lambda.min`, das optimale $\lambda$ mit dem geringsten CV Mean-Squarred-Error (linke gestrichelte Linie) und `ridge_cvfit$lambda.1se`, das größte $\lambda$, welches innerhalb einer Standardabweichung entfernt ist (rechte gestrichelte Linie).[^regreg-9] Wir berechnen die Schätzung für `lambda.min`.
+
+[^regreg-9]: Die Wahl von `lambda.1se` ist eine Heuristik, welche die Schätzunsicherheit berücksichtigt und zu einem "sparsameren" Modell tendiert.
 
 ```{r, warning=F}
 (
@@ -364,7 +356,9 @@ Die Ergebnisse zeigen, dass der Ridge-Schätzer trotz seiner Verzerrung einen de
 
 ### Beispiel: Vorhersage von Abschlussnoten in Mathe
 
-Zur Illustration von Ridge Regression nutzen wir den Datensatz `SP` aus @CortezSilva2008.^[Wir verwenden eine Auszug aus dem Orignaldatensatz, der nebst ausführlicher Variablenbeschreibung [hier](https://archive.ics.uci.edu/dataset/320/student+performance) verfügbar ist.] `SP` enhält Beobachtungen zu Leistungen von insgesamt 100 Schülerinnen und Schülern im Fach Mathematik in der Sekundarstufe an zwei portugiesischen Schulen. Neben der Abschlussnote in Mathe (`G3`, Skala von 0 bis 20) beinhaltet `SP` diverse demografische, soziale und schulbezogene Merkmale, die mithilfe von Schulberichten und Fragebögen erhoben wurden. Ziel ist es, ein Modell für die Prognose von `G3` anzupassen.
+Zur Illustration von Ridge Regression nutzen wir den Datensatz `SP` aus @CortezSilva2008.[^regreg-10] `SP` enhält Beobachtungen zu Leistungen von insgesamt 100 Schülerinnen und Schülern im Fach Mathematik in der Sekundarstufe an zwei portugiesischen Schulen. Neben der Abschlussnote in Mathe (`G3`, Skala von 0 bis 20) beinhaltet `SP` diverse demografische, soziale und schulbezogene Merkmale, die mithilfe von Schulberichten und Fragebögen erhoben wurden. Ziel ist es, ein Modell für die Prognose von `G3` anzupassen.
+
+[^regreg-10]: Wir verwenden eine Auszug aus dem Orignaldatensatz, der nebst ausführlicher Variablenbeschreibung [hier](https://archive.ics.uci.edu/dataset/320/student+performance) verfügbar ist.
 
 Wir lesen zunächst die Daten (im .csv-Format) ein.
 
@@ -495,79 +489,63 @@ df %>%
   theme(legend.position = "none")
 ```
 
-@fig-ridgAppPlot gibt Hinweise darauf, dass neben der Schulzugehörigkeit und Indikatoren für schulische Leistung (bspw. `failures`) sozio-ökonomische Prädiktoren wie `internet` (Internetzugang zuhause), `Pstatus` (Zusammenleben der Eltern) und `address`/`traveltime` (sozialer Status) relevante Variablen zu sein scheinen. 
+@fig-ridgAppPlot gibt Hinweise darauf, dass neben der Schulzugehörigkeit und Indikatoren für schulische Leistung (bspw. `failures`) sozio-ökonomische Prädiktoren wie `internet` (Internetzugang zuhause), `Pstatus` (Zusammenleben der Eltern) und `address`/`traveltime` (sozialer Status) relevante Variablen zu sein scheinen.
 
-Das optimale $\lambda_\mathrm{cv} \approx `r round(min(lambdas), 2)`$  (gestrichelte rote Linie in @fig-ridgAppPlot) führt zu deutlicher Shrinkage, was eine mögliche Erklärung für den besseren Testset-MSE von Ridge Regression ist: Die Koeffizienten von Variablen mit wenig Erklärungskraft werden durch die Regularisierung in Richtung 0 gezwungen und reduzieren so die Varianz der Vorhersage gegenüber der (idealerweise) unverzerrten KQ-Schätzung.
+Das optimale $\lambda_\mathrm{cv} \approx `r round(min(lambdas), 2)`$ (gestrichelte rote Linie in @fig-ridgAppPlot) führt zu deutlicher Shrinkage, was eine mögliche Erklärung für den besseren Testset-MSE von Ridge Regression ist: Die Koeffizienten von Variablen mit wenig Erklärungskraft werden durch die Regularisierung in Richtung 0 gezwungen und reduzieren so die Varianz der Vorhersage gegenüber der (idealerweise) unverzerrten KQ-Schätzung.
 
-::: {.callout-note}
+::: callout-note
 #### Key Facts zu Ridge Regression
 
-- Ridge-Regression regularisiert den KQ-Schätzer mit der $\ell_2$-Norm der Koeffizienten. Diese Form von Regularisierung ist eine Alternative für KQ in Anwendungen mit mehr Regressoren als Beobachtugen ($k\geq n$) und/oder wenn KQ aufgrund starker Kollinearität eine hohe Varianz aufweist.
+-   Ridge-Regression regularisiert den KQ-Schätzer mit der $\ell_2$-Norm der Koeffizienten. Diese Form von Regularisierung ist eine Alternative für KQ in Anwendungen mit mehr Regressoren als Beobachtugen ($k\geq n$) und/oder wenn KQ aufgrund starker Kollinearität eine hohe Varianz aufweist.
 
-- Der Ridge-Schätzer $\widehat{\boldsymbol{\beta}}^{\mathrm{R}}_\lambda$ ist *nicht* erwartungstreu. Die geschätzten Koeffizienten sind auch für $n\to\infty$ verzerrt.
+-   Der Ridge-Schätzer $\widehat{\boldsymbol{\beta}}^{\mathrm{R}}_\lambda$ ist *nicht* erwartungstreu. Die geschätzten Koeffizienten sind auch für $n\to\infty$ verzerrt.
 
-- Aufgrund der verzerrten Schätzung ist statistische Inferenz für Koeffizienten mit $\widehat{\boldsymbol{\beta}}^{\mathrm{R}}_\lambda$ problematisch. Anstatt für strukturelle Modelle oder die Schätzung kausaler Effekte wird Ridge Regression in der Praxis daher überwiegend für Prognosen verwendet.
+-   Aufgrund der verzerrten Schätzung ist statistische Inferenz für Koeffizienten mit $\widehat{\boldsymbol{\beta}}^{\mathrm{R}}_\lambda$ problematisch. Anstatt für strukturelle Modelle oder die Schätzung kausaler Effekte wird Ridge Regression in der Praxis daher überwiegend für Prognosen verwendet.
 
-- Die Wahl von $\lambda$ impliziert einen Tradeoff zwischen Verzerrung und Varianz: Große $\lambda$ schrumpfen die Koeffizientenschätzer Richtung 0 (mehr Verzerrung), führen aber zu einer kleineren Varianz der Schätzung. Entsprechend können Vorhersagen mit mehr Verzerrung aber weniger Varianz als mit KQ getroffen werden.
+-   Die Wahl von $\lambda$ impliziert einen Tradeoff zwischen Verzerrung und Varianz: Große $\lambda$ schrumpfen die Koeffizientenschätzer Richtung 0 (mehr Verzerrung), führen aber zu einer kleineren Varianz der Schätzung. Entsprechend können Vorhersagen mit mehr Verzerrung aber weniger Varianz als mit KQ getroffen werden.
 
-- Ridge Regression kann in R mit dem Paket `glmnet` berechnet werden.
-
+-   Ridge Regression kann in R mit dem Paket `glmnet` berechnet werden.
 :::
 
 ## Lasso Regression
 
-Least Absolute Shrinkage and Selection Operator (Lasso) ist ein von @Tibshirani1996 vorgeschlagener Schätzer, der die Verlustfunktion des KQ-Schätzers um einen Strafterm für die Summe der (absoluten) Größe der Koeffizienten $\boldsymbol\beta = (\beta_1, \dots,\beta_k)'$ erweitert. Die Verlustfunktion des Lasso-Schätzers von $\boldsymbol{\beta}$ lautet
-\begin{align}
+Least Absolute Shrinkage and Selection Operator (Lasso) ist ein von @Tibshirani1996 vorgeschlagener Schätzer, der die Verlustfunktion des KQ-Schätzers um einen Strafterm für die Summe der (absoluten) Größe der Koeffizienten $\boldsymbol\beta = (\beta_1, \dots,\beta_k)'$ erweitert. Die Verlustfunktion des Lasso-Schätzers von $\boldsymbol{\beta}$ lautet \begin{align}
 \mathrm{RSS}(\boldsymbol{\beta},p=1,\lambda) = \mathrm{RSS}(\boldsymbol{\beta}) + \lambda \lVert\boldsymbol{\beta}\rVert_1.\label{eq:lassoloss}
-\end{align}
-Für den Strafterm wird also die $\ell_1$-norm
-$$
+\end{align} Für den Strafterm wird also die $\ell_1$-norm $$
 \lVert\boldsymbol{\beta}\rVert_1 = \sum_{j=1}^k \lvert\beta_j \rvert
-$$
-verwendet. Der Lasso-Schätzer $\widehat{\boldsymbol{\beta}}^{\mathrm{L}}_\lambda$ für $\boldsymbol{\beta}$ minimiert \eqref{eq:lassoloss},
-\begin{align}
+$$ verwendet. Der Lasso-Schätzer $\widehat{\boldsymbol{\beta}}^{\mathrm{L}}_\lambda$ für $\boldsymbol{\beta}$ minimiert \eqref{eq:lassoloss}, \begin{align}
 \boldsymbol{\beta}^{\mathrm{L}}_\lambda = \arg\min_{\boldsymbol{\beta}} \ \mathrm{RSS}(\boldsymbol{\beta},p=1,\lambda).
-\end{align}
-Entsprechend erhalten wir in Abhängigkeit von $\lambda$ ein Kontinuum an Lösungen 
-\begin{align}
+\end{align} Entsprechend erhalten wir in Abhängigkeit von $\lambda$ ein Kontinuum an Lösungen \begin{align}
   \left\{\widehat{\boldsymbol{\beta}}^{\mathrm{L}}_\lambda\right\}_{\lambda=0}^{\lambda=\infty},\label{eq:LassoPath}
-\end{align}
-der sogenannte *Lasso-Pfad*. 
+\end{align} der sogenannte *Lasso-Pfad*.
 
-Das Optimierungsproblem \eqref{eq:lassoloss} hat die äquivalente Darstellung
-\begin{align}
+Das Optimierungsproblem \eqref{eq:lassoloss} hat die äquivalente Darstellung \begin{align}
   \begin{split}
     \widehat{\boldsymbol{\beta}}^{\mathrm{L}}_\lambda =&\, \arg\min_{\boldsymbol{\beta}} \mathrm{RSS}(\boldsymbol{\beta}) + \lambda\left(\lVert\boldsymbol{\beta}\rVert_1 - t\right)\\
     =&\, \arg\min_{\lVert\boldsymbol{\beta}\rVert_1\leq t} \mathrm{RSS}(\boldsymbol{\beta}), 
   \end{split}\label{eq:lassolagrange}
-\end{align}
-welche über den [Lagrange-Ansatz](https://de.wikipedia.org/wiki/Lagrange-Multiplikator#Beispiel_mit_Anwendungsbezug) unter der Nebenbedingung $\lVert\boldsymbol{\beta}\rVert_1 \leq t$ gelöst werden kann. 
+\end{align} welche über den [Lagrange-Ansatz](https://de.wikipedia.org/wiki/Lagrange-Multiplikator#Beispiel_mit_Anwendungsbezug) unter der Nebenbedingung $\lVert\boldsymbol{\beta}\rVert_1 \leq t$ gelöst werden kann.
 
-Ähnlich wie der KQ-Schätzer ist der Lasso-Schätzer $\widehat{\boldsymbol{\beta}}^{\mathrm{L}}_\lambda$ durch Bedingungen 1. Ordnung bestimmt. Diese Bedingungen lassen sich komfortabel in Matrix-Schreibweise darstellen als
-\begin{align}
+Ähnlich wie der KQ-Schätzer ist der Lasso-Schätzer $\widehat{\boldsymbol{\beta}}^{\mathrm{L}}_\lambda$ durch Bedingungen 1. Ordnung bestimmt. Diese Bedingungen lassen sich komfortabel in Matrix-Schreibweise darstellen als \begin{align}
   -2\boldsymbol{X}_j'(\boldsymbol{Y} - \boldsymbol{X}\boldsymbol{\beta}) + \lambda\cdot\mathrm{sgn}(\beta_j) = 0, \quad j = 1,\dots,k.\label{eq:LassoFOC}
-\end{align}
-Aus Gleichung \eqref{eq:LassoFOC} folgt, dass der Lasso-Schätzer aufgrund des Strafterms im Allgemeinen nicht algebraisch bestimmt werden kann.^[Zur Bestimmung des Schätzers werden Algorithmen der nicht-linearen Optimierung genutzt.] 
+\end{align} Aus Gleichung \eqref{eq:LassoFOC} folgt, dass der Lasso-Schätzer aufgrund des Strafterms im Allgemeinen nicht algebraisch bestimmt werden kann.[^regreg-11]
 
-In Abhängigkeit von $\lambda$ zwingt der Lasso-Schätzer die KQ-Schätzung von $\beta_j$ zu einem (absolut) kleineren Wert: Ähnlich wie bei Ridge Regression bewirkt der $\ell_1$-Strafterm eine mit $\lambda$ zunehmende Schrumpfung der geschätzen Koeffizienten in Richtung 0. Charakteristisch für die Lösung des Lasso-Schätzers ist, dass $\widehat{\boldsymbol{\beta}}^{\mathrm{L}}_j = 0$, wenn die Bedingung
-\begin{align}
+[^regreg-11]: Zur Bestimmung des Schätzers werden Algorithmen der nicht-linearen Optimierung genutzt.
+
+In Abhängigkeit von $\lambda$ zwingt der Lasso-Schätzer die KQ-Schätzung von $\beta_j$ zu einem (absolut) kleineren Wert: Ähnlich wie bei Ridge Regression bewirkt der $\ell_1$-Strafterm eine mit $\lambda$ zunehmende Schrumpfung der geschätzen Koeffizienten in Richtung 0. Charakteristisch für die Lösung des Lasso-Schätzers ist, dass $\widehat{\boldsymbol{\beta}}^{\mathrm{L}}_j = 0$, wenn die Bedingung \begin{align}
   \left\lvert\boldsymbol{X}_j'(\boldsymbol{Y} - \boldsymbol{X}\widehat{\boldsymbol{\beta}}^{\mathrm{L}}_\lambda)\right\rvert - \lambda/2 \leq 0 \label{eq:lassoselection}
-\end{align}
-erfüllt ist. In Abhängigkeit von $\lambda$ kann der Lasso-Schätzer folglich geschätzte Regressionskoeffizienten nicht nur in Richtung $0$, sondern diese auch *exakt* mit $0$ schätzen und damit *Variablenselektion* betreiben. Aufgrund der mit $\lambda$ zunehmenden Shrinkage bis die Bedingung \eqref{eq:lassoselection} erfüllt und der Koeffizient gleich $0$ gesetzt wird, bezeichnet man Lasso auch als einen *Soft Thresholding Operator*. Im nächsten Abschnitt betrachten wir die Eigenschaften von Lasso-Regularisierung unter vereinfachten Annahmen bzgl. der Regressoren.
-
+\end{align} erfüllt ist. In Abhängigkeit von $\lambda$ kann der Lasso-Schätzer folglich geschätzte Regressionskoeffizienten nicht nur in Richtung $0$, sondern diese auch *exakt* mit $0$ schätzen und damit *Variablenselektion* betreiben. Aufgrund der mit $\lambda$ zunehmenden Shrinkage bis die Bedingung \eqref{eq:lassoselection} erfüllt und der Koeffizient gleich $0$ gesetzt wird, bezeichnet man Lasso auch als einen *Soft Thresholding Operator*. Im nächsten Abschnitt betrachten wir die Eigenschaften von Lasso-Regularisierung unter vereinfachten Annahmen bzgl. der Regressoren.
 
 ### Lasso ist Soft Thresholding
 
-Wir betrachten nun eine mathematische Darstellung von Selektions- und Shrinkage-Eigenschaft des Lasso-Schätzers in einem vereinfachten Modell. Wenn die Regressoren $\boldsymbol{X}$ orthonormal zueinander sind, existiert eine analytische Lösung des Lasso-Schätzers,
-\begin{align}
+Wir betrachten nun eine mathematische Darstellung von Selektions- und Shrinkage-Eigenschaft des Lasso-Schätzers in einem vereinfachten Modell. Wenn die Regressoren $\boldsymbol{X}$ orthonormal zueinander sind, existiert eine analytische Lösung des Lasso-Schätzers, \begin{align}
   \widehat{\boldsymbol{\beta}}^{\mathrm{L}}_\lambda =
   \begin{cases}
     \widehat{\boldsymbol{\beta}}_j - \lambda/2 &, \ \ \widehat{\boldsymbol{\beta}}_j > \lambda/2\\
     0 &, \ \ \lvert\widehat{\boldsymbol{\beta}}_j\rvert\leq\lambda/2\\
     \widehat{\boldsymbol{\beta}}_j + \lambda/2 &, \ \ \widehat{\boldsymbol{\beta}}_j < \lambda/2
   \end{cases},\label{eq:lassoST}
-\end{align}
-wobei $\widehat{\boldsymbol{\beta}}_j$ der KQ-Schätzer von $\beta_j$ ist. Anhand von \eqref{eq:lassoST} können wir die Selektionseigenschaft sowie die Schrumpfung der KQ-Koeffizientenschätzung in Abhängigkeit der durch $\lambda$ regulierten $\ell_1$-Strafe erkennen. Für eine Visualisierung implementieren wir \eqref{eq:lassoST} als R-Funktion `lasso_st()` und zeichnen die resultierenden Koeffizientenschätzungen für die Parameterwerte $\lambda\in\{0, 0.2, 0.4\}$. 
+\end{align} wobei $\widehat{\boldsymbol{\beta}}_j$ der KQ-Schätzer von $\beta_j$ ist. Anhand von \eqref{eq:lassoST} können wir die Selektionseigenschaft sowie die Schrumpfung der KQ-Koeffizientenschätzung in Abhängigkeit der durch $\lambda$ regulierten $\ell_1$-Strafe erkennen. Für eine Visualisierung implementieren wir \eqref{eq:lassoST} als R-Funktion `lasso_st()` und zeichnen die resultierenden Koeffizientenschätzungen für die Parameterwerte $\lambda\in\{0, 0.2, 0.4\}$.
 
 Wir definieren zunächst die Funktion `lasso_st()`.
 
@@ -617,44 +595,44 @@ ggplot(dat) +
   ylab("Lasso-Schätzer von beta_1")
 ```
 
-@fig-lassoST zeigt, dass der $\ell_1$-Strafterm des Lasso-Schätzers zu einem linearen Verlauf der auf den KQ-Schätzer (gezeichnet für $\lambda = 0$, gestrichelte Linie) applizierten Shrinkage führt: Der Lasso-Schätzer ist eine abschnittsweise-lineare Funktion des KQ-Schätzers in $\lambda$: Je größer der Parameter $\lambda$, desto größer ist das Intervall von KQ-Schätzwerten $[-\lambda/2,\lambda/2]$, wo der Lasso-Schätzer zu Variablenselektion führt, d.h. hier den Koeffizienten $\beta_j$ als $0$ schätzt (rote bzw. blaue Linie). 
+@fig-lassoST zeigt, dass der $\ell_1$-Strafterm des Lasso-Schätzers zu einem linearen Verlauf der auf den KQ-Schätzer (gezeichnet für $\lambda = 0$, gestrichelte Linie) applizierten Shrinkage führt: Der Lasso-Schätzer ist eine abschnittsweise-lineare Funktion des KQ-Schätzers in $\lambda$: Je größer der Parameter $\lambda$, desto größer ist das Intervall von KQ-Schätzwerten $[-\lambda/2,\lambda/2]$, wo der Lasso-Schätzer zu Variablenselektion führt, d.h. hier den Koeffizienten $\beta_j$ als $0$ schätzt (rote bzw. blaue Linie).
 
 Anhand von @fig-lassoST kann abgeleitet werden, dass der Lasso-Schätzer nicht invariant gegenüber der Skalierung der Regressoren ist: Die Stärke der Regularisierung durch $\lambda$ ist hängt von der Magnitude des KQ-Schätzers ab. Daher müssen die Regressoren vor Berechnung der Schätzung standardsiert werden. Üblich ist hierbei eine Normierung auf einen Mittelwert von $0$ und eine Varianz von $1$.
 
 Die nachstehende interaktive Grafik illustriert das Lasso-Optimierungsproblem \eqref{eq:lassolagrange} sowie den resultierenden Schätzer der Koeffizienten $(\beta_1, \beta_2)$ in einem multiplen Regressionsmodell mit korrelierten Regressoren $X_1$ und $X_2$.
 
-- Die blaue Ellipse ist die Menge aller Schätzwerte $\left(\widehat\beta_{1},\, \widehat\beta_{2}\right)$ für den angegebenen Wert von $\mathrm{RSS}$. Im Zentrum der Ellipse liegt der KQ-Schätzer, welcher $\mathrm{RSS}$ minimiert.
+-   Die blaue Ellipse ist die Menge aller Schätzwerte $\left(\widehat\beta_{1},\, \widehat\beta_{2}\right)$ für den angegebenen Wert von $\mathrm{RSS}$. Im Zentrum der Ellipse liegt der KQ-Schätzer, welcher $\mathrm{RSS}$ minimiert.
 
-- Das graue Quadrat ist die Menge aller Koeffizienten-Paare $(\beta_1, \beta_2)$, welche die Restriktion $\lvert\beta_1\rvert+\lvert\beta_2\rvert\leq t$ erfüllen. Beachte, dass die Größe dieser Region nur durch den Parameter $t$ bestimmt wird.
+-   Das graue Quadrat ist die Menge aller Koeffizienten-Paare $(\beta_1, \beta_2)$, welche die Restriktion $\lvert\beta_1\rvert+\lvert\beta_2\rvert\leq t$ erfüllen. Beachte, dass die Größe dieser Region nur durch den Parameter $t$ bestimmt wird.
 
-- Der blaue Punkt ist der Lasso-Schätzer $(\widehat{\boldsymbol{\beta}}^L_{1,t},\, \widehat{\boldsymbol{\beta}}^L_{2,t})$. Dieser ergibt sich als Schnittpunkt zwischen der blauen $\mathrm{RSS}$-Ellipse und der Restriktionsregion und variiert mit $t$. Die gestrichelte rote Linie zeigt den Lasso-Lösungspfad.
+-   Der blaue Punkt ist der Lasso-Schätzer $(\widehat{\boldsymbol{\beta}}^L_{1,t},\, \widehat{\boldsymbol{\beta}}^L_{2,t})$. Dieser ergibt sich als Schnittpunkt zwischen der blauen $\mathrm{RSS}$-Ellipse und der Restriktionsregion und variiert mit $t$. Die gestrichelte rote Linie zeigt den Lasso-Lösungspfad.
 
-- Für kleine Werte, erhalten wir starke Shrinkage auf $\widehat\beta_{1,t}$ bis zum Wertebereich $t\leq50$, wo $\widehat{\boldsymbol{\beta}}^L_{1,t}=0$. Hier erfolgt Variablenselektion: Die Regularisierung führt zu einem geschätzten Modell, das lediglich $X_2$ als erklärende Variable enthält. In diesem Bereich von $t$ bewirkt die Shrinkage, dass $\widehat{\boldsymbol{\beta}}^L_{2,t}\to0$ für $t\to0$.
-
+-   Für kleine Werte, erhalten wir starke Shrinkage auf $\widehat\beta_{1,t}$ bis zum Wertebereich $t\leq50$, wo $\widehat{\boldsymbol{\beta}}^L_{1,t}=0$. Hier erfolgt Variablenselektion: Die Regularisierung führt zu einem geschätzten Modell, das lediglich $X_2$ als erklärende Variable enthält. In diesem Bereich von $t$ bewirkt die Shrinkage, dass $\widehat{\boldsymbol{\beta}}^L_{2,t}\to0$ für $t\to0$.
 
 ::: {.content-visible when-format="html"}
+<iframe width="100%" height="567" frameborder="0" scroll="false" src="https://observablehq.com/embed/2e11f2b535e23c25@16?cells=viewof+s%2Cchart115">
 
-<iframe width="100%" height="567" frameborder="0" scroll=false
-  src="https://observablehq.com/embed/2e11f2b535e23c25@16?cells=viewof+s%2Cchart115"></iframe>
-
+</iframe>
 :::
 
 ::: {.content-visible when-format="pdf"}
-----
+
+------------------------------------------------------------------------
 
 ***Diese Interaktive Komponente des Buchs ist nur in der Online-Version verfügbar.***
 
-----
+------------------------------------------------------------------------
 :::
 
 Beachte, dass der rote Lasso-Pfad (die Menge aller Lasso-Lösungen) äquivalent als Funktion von $\lambda$ im Optimierungsproblem \eqref{eq:lassoloss} dargestellt werden kann. Implementierungen mit statistischer Software berechnen die Lasso-Lösung häufig in Abhängigkeit von $\lambda$. Ein Algorithmus hierfür ist LARS.
 
 ### Berechnung der Lasso-Lösung mit dem LARS-Algorithmus
 
-Für die Berechnung des Lasso-Lösungspfads kann der [LARS-Algorithmus](https://en.wikipedia.org/wiki/Least-angle_regression) von @Efronetal2004 im Lasso-Modus genutzt werden.^[LARS steht für *Least Angle Regression*.] Der Lasso-Lösungspfad beinhaltet geschätzte Koeffizienten über ein Intervall für $\lambda$, welches sämtliche Modellkomplexitäten zwischen der (trivialen) Lösung mit maximaler Shrinkage auf allen Koeffizienten ($\lambda$ groß, alle gesch. Koeffizienten sind $0$) und der unregularisierten Lösung ($\lambda = 0$, KQ-Schätzung) abbildet. Der LARS-Algorithmus erzeugt den Lösungspfad sequentiell, sodass die Schätzung als Funktion von $\lambda$ veranschaulicht werden kann, ähnlich wie bei Ridge Regression. 
+Für die Berechnung des Lasso-Lösungspfads kann der [LARS-Algorithmus](https://en.wikipedia.org/wiki/Least-angle_regression) von @Efronetal2004 im Lasso-Modus genutzt werden.[^regreg-12] Der Lasso-Lösungspfad beinhaltet geschätzte Koeffizienten über ein Intervall für $\lambda$, welches sämtliche Modellkomplexitäten zwischen der (trivialen) Lösung mit maximaler Shrinkage auf allen Koeffizienten ($\lambda$ groß, alle gesch. Koeffizienten sind $0$) und der unregularisierten Lösung ($\lambda = 0$, KQ-Schätzung) abbildet. Der LARS-Algorithmus erzeugt den Lösungspfad sequentiell, sodass die Schätzung als Funktion von $\lambda$ veranschaulicht werden kann, ähnlich wie bei Ridge Regression.
 
-Wir zeigen nun anhand simulierter Daten, wie Lasso-Lösungen mit dem R-Paket `lars` berechnet werden können. Hierfür erzeugen wir Daten gemäß der Vorschrift
-\begin{align}
+[^regreg-12]: LARS steht für *Least Angle Regression*.
+
+Wir zeigen nun anhand simulierter Daten, wie Lasso-Lösungen mit dem R-Paket `lars` berechnet werden können. Hierfür erzeugen wir Daten gemäß der Vorschrift \begin{align}
   \begin{split}
   Y_i =&\, \boldsymbol{X}_i' \boldsymbol{\beta}_v + u_i\\
   \\
@@ -677,7 +655,9 @@ X <- matrix(rnorm(N * 9), ncol = 9)
 Y <- X %*% beta_v + rnorm(N)
 ```
 
-Entsprechend des DGP passen wir ein Modell ohne Konstante an. Damit `lars::lars()` den Lösungspfad des Lasso-Schätzers berechnet, muss `type = "lasso"` gewählt werden.^[`lars()` standardisiert die Regressoren standardmäßig (aufgrund des DGPs hier nicht nötig).]
+Entsprechend des DGP passen wir ein Modell ohne Konstante an. Damit `lars::lars()` den Lösungspfad des Lasso-Schätzers berechnet, muss `type = "lasso"` gewählt werden.[^regreg-13]
+
+[^regreg-13]: `lars()` standardisiert die Regressoren standardmäßig (aufgrund des DGPs hier nicht nötig).
 
 ```{r}
 # Lösungen des Lasso-Schätzers mit LARS berechnen
@@ -691,7 +671,9 @@ Entsprechend des DGP passen wir ein Modell ohne Konstante an. Damit `lars::lars(
 )
 ```
 
-Die Zusammenfassung zeigt, dass der LARS-Algorithmus als erstes die (relevante) Variable $X_9$ aktiviert.^[Aktivierung meint die Aufnahme einer Variable in der Modell gegeben eines hinreichend kleinen $\lambda$.] Mit abnehmender Regularisierung (kleinere $\lambda$) werden in den nächsten 3 Schritten die übrigen relevanten Variablen $X_2$, $X_8$ und $X_1$ aktiviert. Über die weiteren Schritte nähert der Algorithmus die Lösung an die *saturierte* Schätzung (das Modell mit allen neun Regressoren) an und aktiviert schrittweise die übrigen, irrelevanten Variablen. 
+Die Zusammenfassung zeigt, dass der LARS-Algorithmus als erstes die (relevante) Variable $X_9$ aktiviert.[^regreg-14] Mit abnehmender Regularisierung (kleinere $\lambda$) werden in den nächsten 3 Schritten die übrigen relevanten Variablen $X_2$, $X_8$ und $X_1$ aktiviert. Über die weiteren Schritte nähert der Algorithmus die Lösung an die *saturierte* Schätzung (das Modell mit allen neun Regressoren) an und aktiviert schrittweise die übrigen, irrelevanten Variablen.
+
+[^regreg-14]: Aktivierung meint die Aufnahme einer Variable in der Modell gegeben eines hinreichend kleinen $\lambda$.
 
 Wir visualisieren die geschätzen Koeffizienten an jedem Schritt des Lösungspfads als Funktion von $\lambda$. In der Praxis wird der Regularisierungsparameter häufig auf der natürlichen log-Skala dargestellt.
 
@@ -727,8 +709,9 @@ fit_lars$beta %>%
 
 Wie zuvor bei Ridge Regression muss in empirischen Anwendungen ein Wert für den Tuning-Parameter $\lambda$ gewählt werden. Hierbei besteht die Herausforderung darin, einen geeigneten Wert zu finden, der zu wünschenswerten Eigenschaften des resultierenden Modells führt. So ist für gute Vorhersagen wichtig, dass das Modell nicht zu sehr an die Daten angepasst ist (*Overfitting*), um eine gute Generalisierung auf neue Daten zu ermöglichen. Gleichzeitig muss das Modell flexibel genug sein, um wesentliche Eigenschaften des datenerzeugenden Prozesses hinreichend gut zu erfassen. In der Regel wird hierbei eine sparsame Modellierung angestrebt, die nur eine Teilmenge der Prädiktoren nutzt.
 
-In der Praxis werden verschiedene Verfahren verwendet, um den Wert für den Tuning-Parameter $\lambda$ zu bestimmen. Gängige Methoden sind *Cross Validation* (CV) und Informationskriterien. In Abhängigkeit der Methode und der Daten ergeben sich ober- oder unterparameterisierte Modelle. Aufgrund der Implementierung im R-Paket `lars` betrachten wir CV.^[Chetverikov,
-Liao, and Chernozhukov (2020) zeigen, dass CV zu konsistenter Modellselektion führen kann.] Wir zeigen nachfolgend anhand der simulierten Daten aus dem letzten Abschnitt, wie für die LARS-Schätzung ein optimales $\lambda$ mit leave-one-out CV (LOO-CV) bestimmt werden kann. Hierzu nutzen wir `lars::cv.lars()` unter Verwendung derselben Argumente wie zuvor im Aufruf von `lars()`.
+In der Praxis werden verschiedene Verfahren verwendet, um den Wert für den Tuning-Parameter $\lambda$ zu bestimmen. Gängige Methoden sind *Cross Validation* (CV) und Informationskriterien. In Abhängigkeit der Methode und der Daten ergeben sich ober- oder unterparameterisierte Modelle. Aufgrund der Implementierung im R-Paket `lars` betrachten wir CV.[^regreg-15] Wir zeigen nachfolgend anhand der simulierten Daten aus dem letzten Abschnitt, wie für die LARS-Schätzung ein optimales $\lambda$ mit leave-one-out CV (LOO-CV) bestimmt werden kann. Hierzu nutzen wir `lars::cv.lars()` unter Verwendung derselben Argumente wie zuvor im Aufruf von `lars()`.
+
+[^regreg-15]: Chetverikov, Liao, and Chernozhukov (2020) zeigen, dass CV zu konsistenter Modellselektion führen kann.
 
 ```{r}
 # LARS-Lösungen mit CV evaluieren
@@ -785,7 +768,9 @@ coef(
 )
 ```
 
-Das Ergebnis veranschaulicht die Selektionseigenschaft von Lasso: Gemäß DGP \eqref{eq:larsdgp} sind die Variablen $X_3$ bis $X_7$ *irrelevante* Prädiktoren für $Y$; ihre wahren Koeffizienten sind $0$. In der kreuzvalidierten Lasso-Schätzung erreicht die Regularisierung, dass die Koeffizienten der Variablen $X_4$ bis $X_7$ tatsächlich mit 0 geschätzt werden. Wir schätzen für das mit CV bestimmte $\lambda$ also ein leicht überspezifiziertes Modell mit den Regressoren $X_1$, $X_2$, $X_3$, $X_8$ und $X_9$. Beachte, dass die Lasso-Schätzung einen Kompromiss impliziert: Die Varianz der Schätzung ist geringer als die des KQ-Schätzers im Modell mit allen Variablen.^[Wegen $N=25$ verbleiben bei der KQ-Schätzung mit 9 Regressoren nur 16 Freiheitsgrade.] Aufgrund der Regularisierung sind die mit Lasso geschätzten Koeffizienten der relevanten Variablen jedoch in Richtung $0$ verzerrt.
+Das Ergebnis veranschaulicht die Selektionseigenschaft von Lasso: Gemäß DGP \eqref{eq:larsdgp} sind die Variablen $X_3$ bis $X_7$ *irrelevante* Prädiktoren für $Y$; ihre wahren Koeffizienten sind $0$. In der kreuzvalidierten Lasso-Schätzung erreicht die Regularisierung, dass die Koeffizienten der Variablen $X_4$ bis $X_7$ tatsächlich mit 0 geschätzt werden. Wir schätzen für das mit CV bestimmte $\lambda$ also ein leicht überspezifiziertes Modell mit den Regressoren $X_1$, $X_2$, $X_3$, $X_8$ und $X_9$. Beachte, dass die Lasso-Schätzung einen Kompromiss impliziert: Die Varianz der Schätzung ist geringer als die des KQ-Schätzers im Modell mit allen Variablen.[^regreg-16] Aufgrund der Regularisierung sind die mit Lasso geschätzten Koeffizienten der relevanten Variablen jedoch in Richtung $0$ verzerrt.
+
+[^regreg-16]: Wegen $N=25$ verbleiben bei der KQ-Schätzung mit 9 Regressoren nur 16 Freiheitsgrade.
 
 Einen positiven Effekt dieses Kompromisses beobachten wir anhand des mittleren Vorhersagefehlers für Daten, die *nicht* zur Berechnung des Schätzers verwendet wurden. Wir vergleichen den Vorhersagefehler nachfolgend anhand eines solchen simulierten Test-Datensatzes mit 25 neuen Beobachtungen. Den Vorhersagefehler bestimmen wir als MSE zwischen den vorhergesagten und den tatsächlichen Ausprägungen für $Y$.
 
@@ -830,33 +815,29 @@ mean((Y_predict_KQ - new_Y)^2)
 
 Offenbar führt die Lasso-Schätzung zu einem deutlich geringeren MSE der Vorhersage von `Y` für den Test-Datensatz als die KQ-Schätzung und damit zu einer höheren Vorhersagegüte. Das "sparsame" mit Lasso-Regression geschätzte Modell ist dem "großen" mit KQ geschätztem Modell in dieser Hinsicht also überlegen.
 
-::: {.callout-note}
+::: callout-note
 #### Key Facts zu Lasso-Regression
 
-- Lasso-Regression bestraft die Verlustfunktion des KQ-Schätzers mit der $\ell_1$-Norm der Koeffizienten. 
+-   Lasso-Regression bestraft die Verlustfunktion des KQ-Schätzers mit der $\ell_1$-Norm der Koeffizienten.
 
-- Neben Koeffizientenschätzung mit Shrinkage in Richtung $0$ kann der Lasso-Schätzer Variablenselektion durchführen: Regressionskoeffizienten können exakt mit $0$ geschätzt und so ein "sparsames", leichter zu interpretierendes Modell gewählt werden.
+-   Neben Koeffizientenschätzung mit Shrinkage in Richtung $0$ kann der Lasso-Schätzer Variablenselektion durchführen: Regressionskoeffizienten können exakt mit $0$ geschätzt und so ein "sparsames", leichter zu interpretierendes Modell gewählt werden.
 
-- Wie bei Ridge Regression impliziert die Wahl von $\lambda$ einen Bias-Variance-Tradeoff, der für Vorhersagen nützlich ist: Für größere $\lambda$ wird mehr Verzerrung induziert und möglicherweise relevante Variablen mit kleinen Koeffizienten aus dem Modell entfernt. Ein solches sparsames Modell kann eine höhere Prognosegüte haben als ein komplexes, unregularisiertes Modell.  
+-   Wie bei Ridge Regression impliziert die Wahl von $\lambda$ einen Bias-Variance-Tradeoff, der für Vorhersagen nützlich ist: Für größere $\lambda$ wird mehr Verzerrung induziert und möglicherweise relevante Variablen mit kleinen Koeffizienten aus dem Modell entfernt. Ein solches sparsames Modell kann eine höhere Prognosegüte haben als ein komplexes, unregularisiertes Modell.
 
-- Der Lasso-Schätzer $\widehat{\boldsymbol{\beta}}_\lambda^L$ ist *nicht* erwartungstreu.
+-   Der Lasso-Schätzer $\widehat{\boldsymbol{\beta}}_\lambda^L$ ist *nicht* erwartungstreu.
 
-- Lasso Regression kann bspw. mit dem LARS-Algorithmus (Paket `lars`) oder mit `glmnet` berechnet werden.
-
+-   Lasso Regression kann bspw. mit dem LARS-Algorithmus (Paket `lars`) oder mit `glmnet` berechnet werden.
 :::
 
 ## Vergleich von Lasso- und Ridge-Regression mit Simulation
 
-In diesem Kapitel illustrieren wir Vor- und Nachteile von Lasso- und Ridge-Regression in Prognose-Anwendungen anhand von Monte-Carlo-Simulationen. Wir betrachten hierbei datenerzeugende Prozesse, die sich hinsichtlich der Anzahl relevanter Variablen sowie der Korrelation dieser Variablen unterscheiden. 
+In diesem Kapitel illustrieren wir Vor- und Nachteile von Lasso- und Ridge-Regression in Prognose-Anwendungen anhand von Monte-Carlo-Simulationen. Wir betrachten hierbei datenerzeugende Prozesse, die sich hinsichtlich der Anzahl relevanter Variablen sowie der Korrelation dieser Variablen unterscheiden.
 
-Die grundlegende Vorschrift für die Simulationen ist
-\begin{align*}
+Die grundlegende Vorschrift für die Simulationen ist \begin{align*}
   Y_i = \sum_{j=1}^{k=40} \beta_j X_{i,j} + u_i, \quad u_i \overset{u.i.v.}{\sim} N(0,1), \quad i=1,\dots,100,
-\end{align*}
-wobei die Regressoren $X_j$ eine Varianz von $1$ haben und aus einer multivariaten Normalverteilung mit Korrelation $$\rho\in(0,0.5,0.8)$$ gezogen werden.
+\end{align*} wobei die Regressoren $X_j$ eine Varianz von $1$ haben und aus einer multivariaten Normalverteilung mit Korrelation $$\rho\in(0,0.5,0.8)$$ gezogen werden.
 
-Für die Koeffizienten $\boldsymbol{\beta}$ unterscheiden wir zwei Szenarien. In Szenario A ist $$\boldsymbol{\beta} = (1,\dots,1)',$$ d.h. alle Variablen sind relevant und haben denselben Einfluss auf $Y$. In Szenario B erzeugen wir $\boldsymbol{\beta}$ einmalig vorab so, dass $$\beta_j = \begin{cases}1,\quad \text{mit Wsk.  }p\\ 0,\quad \text{mit Wsk.  }1-p, \end{cases}$$
-d.h. nur eine Teilmenge der Variablen beeinflusst $Y$ jeweils mit demselben Effekt $\beta_j = 1$. Die übrigen Variablen sind irrelevant.
+Für die Koeffizienten $\boldsymbol{\beta}$ unterscheiden wir zwei Szenarien. In Szenario A ist $$\boldsymbol{\beta} = (1,\dots,1)',$$ d.h. alle Variablen sind relevant und haben denselben Einfluss auf $Y$. In Szenario B erzeugen wir $\boldsymbol{\beta}$ einmalig vorab so, dass $$\beta_j = \begin{cases}1,\quad \text{mit Wsk.  }p\\ 0,\quad \text{mit Wsk.  }1-p, \end{cases}$$ d.h. nur eine Teilmenge der Variablen beeinflusst $Y$ jeweils mit demselben Effekt $\beta_j = 1$. Die übrigen Variablen sind irrelevant.
 
 Wir schätzen und validieren die Modelle mit `glmnet()`.
 
@@ -987,9 +968,12 @@ walk(1:length(rho), \(j) {
 })
 ```
 
-Beachte, dass hier der Super-Assignment-Operator `<<-` genutzt wird, damit `walk` die Matrizen `ridge_mse` und `lasso_mse` in der globalen Umgebung überschreibt.^[Dies folgt aus der Definition von `walk`. `<-` bewirkt hier lediglich Assignment in der Funktionsumgebung.]
+Beachte, dass hier der Super-Assignment-Operator `<<-` genutzt wird, damit `walk` die Matrizen `ridge_mse` und `lasso_mse` in der globalen Umgebung überschreibt.[^regreg-17]
+
+[^regreg-17]: Dies folgt aus der Definition von `walk`. `<-` bewirkt hier lediglich Assignment in der Funktionsumgebung.
 
 Wir berechnen jeweils den mittleren MSEs, sammeln die Ergebnisse in einer `tibble()` und nutzen `gt()` für die tabellarische Darstellung.
+
 ```{r}
 #| tbl-cap: Durchschnittliche Testset-MSEs für Setting A
 #| label: tbl-lrsimA
@@ -1035,7 +1019,7 @@ beta <- beta * sample(
 head(beta, n = 10)
 ```
 
-Eine wiederholung der Simulation für die modifizierten Koeffizienten `beta` und liefert folgende tabellarische Auswertung. 
+Eine wiederholung der Simulation für die modifizierten Koeffizienten `beta` und liefert folgende tabellarische Auswertung.
 
 ```{r, echo = F, cache=TRUE}
 #| tbl-cap: Durchschnittliche Testset-MSEs für Szenario B
@@ -1104,11 +1088,9 @@ Die Ergebnisse in @tbl-lrsimB zeigen, dass Ridge-Regression in Szenario B bis au
 
 ### Visualisierung des Bias-Variance-Tradeoffs bei Prognosen
 
-Für ein besseres Verständnis, wie sich der Regularisierungsparameter $\lambda$ auf den Bias-Variance-Tradeoff bei Prognosen mit Ridge- und Lasso-Regression auswirkt, vergleichen wir für beide Methoden nachfolgend die Abhängigkeit des MSEs der Prognose $\widehat{Y}_0$ für den Wert $Y_0$ der abhängigen Variable eines Datenpunkts anhand seiner Regressoren $\boldsymbol{X}_0'$, wobei
-\begin{align}
+Für ein besseres Verständnis, wie sich der Regularisierungsparameter $\lambda$ auf den Bias-Variance-Tradeoff bei Prognosen mit Ridge- und Lasso-Regression auswirkt, vergleichen wir für beide Methoden nachfolgend die Abhängigkeit des MSEs der Prognose $\widehat{Y}_0$ für den Wert $Y_0$ der abhängigen Variable eines Datenpunkts anhand seiner Regressoren $\boldsymbol{X}_0'$, wobei \begin{align}
   \text{MSE}(\widehat{Y}_0) = \text{Bias}(\widehat{Y}_0)^2 + \text{Var}(\widehat{Y}_0) + \text{Var}(Y_0) \label{eq:pbvdecomp}
-\end{align}
-Beachte, dass $\text{Var}(Y_0)$ die durch den datenerzeugenden Prozess (und damit unvermeidbare) Varianz von $Y_0$ ist, wohingegen $\text{Bias}(\widehat{Y}_0)^2$ und $\text{Var}(\widehat{Y}_0)$ von dem verwendeten Schätzer für $\widehat{Y}_0$ abhängt.
+\end{align} Beachte, dass $\text{Var}(Y_0)$ die durch den datenerzeugenden Prozess (und damit unvermeidbare) Varianz von $Y_0$ ist, wohingegen $\text{Bias}(\widehat{Y}_0)^2$ und $\text{Var}(\widehat{Y}_0)$ von dem verwendeten Schätzer für $\widehat{Y}_0$ abhängt.
 
 Für die Simulation betrachten wir erneut Szenario A aus @sec-pdz mit $50$ Beobachtungen für ein Modell mit $40$ unkorrelierten Regressoren. Wir legen zunächst die Simulationsparameter fest und erzeugen den vorherzusagenden Datenpunkt (`X_0`, `Y_0`).
 
@@ -1144,7 +1126,9 @@ ridge_fits <- list()
 lasso_fits <- list()
 ```
 
-Weiterhin definieren wir separate $\lambda$-Sequenzen für Lasso- und Ridge-Schätzer.^[Die Sequenzen haben wir in Abhängigkeit des DGP so gewählt, dass die Abhängigkeit der Prognosegüte von $\lambda$ gut visualisiert werden kann.]
+Weiterhin definieren wir separate $\lambda$-Sequenzen für Lasso- und Ridge-Schätzer.[^regreg-18]
+
+[^regreg-18]: Die Sequenzen haben wir in Abhängigkeit des DGP so gewählt, dass die Abhängigkeit der Prognosegüte von $\lambda$ gut visualisiert werden kann.
 
 ```{r}
 # Lambda-Sequenzen festlegen
@@ -1185,7 +1169,7 @@ walk(1:n, \(i) {
 })
 ```
 
-Wir nutzen Funktionen aus `purrr` und `dplyr`, um über die in den Simulationsdurchläufen angepassten Modelle zu iterieren. Mit `predict()` erhalten wir Punktvorhersagen für `Y_0` für jedes $\lambda$ der zuvor definierten $\lambda$-Sequenzen. Beachte, dass `map()` jeweils eine Liste mit `r n` Punktvorhersagen für jedes der `r length(lambdas_r)` zurückgibt. Mit `list_rbind()` können wir die Ergebnisse komfortabel jeweils in einer `tibble` sammeln. 
+Wir nutzen Funktionen aus `purrr` und `dplyr`, um über die in den Simulationsdurchläufen angepassten Modelle zu iterieren. Mit `predict()` erhalten wir Punktvorhersagen für `Y_0` für jedes $\lambda$ der zuvor definierten $\lambda$-Sequenzen. Beachte, dass `map()` jeweils eine Liste mit `r n` Punktvorhersagen für jedes der `r length(lambdas_r)` zurückgibt. Mit `list_rbind()` können wir die Ergebnisse komfortabel jeweils in einer `tibble` sammeln.
 
 ```{r}
 # Prognosen für Ridge-Regression
@@ -1328,40 +1312,41 @@ sim_data_l %>%
 
 Anhand von @fig-MSEBVT lässt sich der Bias-Variance-Tradeoff bei der Vorhersage von $Y_0$ gut erkennen: Bereits für kleine $\lambda$ erzielen beide Methode eine deutliche Reduktion des MSE. Dies wir durch etwas zusätzlichen Bias, aber eine überproportionale Verringerung der Varianz erreicht. Der erkennbare funktionale Zusammenhang zeigt, dass der MSE eine konvexe Funktion von $\lambda$ ist. Damit existieren optimale $\lambda$ mit minimalem MSE (grüne Punkte), die wir mit Cross Validation schätzen können.
 
-
 ## Inferenz für Treatment-Effekt-Schätzung mit vielen Variablen
 
-In empirischen Studien des Effekts einer Behandlungsvariable $B$ auf eine Outcome-Variable $Y$ steht häufig eine Vielzahl potentieller Kontrollvariablen zur Verfügung. Häufig ist unklar, welche Variablen in das Modell aufgenommen werden sollten, um das Risiko einer verzerrten Schätzung durch ausgelassene Variablen zu vermindern und gleichzeitig eine Schätzung mit geringer Varianz zu gewährleisten. Ist der Beobachtungsumfang $N$ relativ zur Variablenanzahl $k$ groß, so kann die KQ-Schätzung einer langen Regression (ein Modell mit allen $k$ Kontrollvariablen) gute Ergebnisse liefern. In der Praxis liegt diese wünschenswerte Situation jedoch oft nicht vor und es ist $k\lesssim N$ oder sogar $k>N$. Dann ist eine KQ-Schätzung des Behandlungseffekts anhand aller $k$ Variablen mit hoher Varianz behaftet bzw. gar nicht möglich.^[Beachte, dass der KQ-Schätzer bei $k>N$ nicht lösbar ist.] Ein weiteres Szenario ist $k(N)>N$, d.h. die Anzahl der Regressoren kann mit dem Beobachtungsumfang wachsen.^[Dieses Szenario wird unter Bedingungen bzgl. der Wachstumsrate und der Größe der Koeffizienten betrachet, s. [@BelloniChernozhukov2013].] Lasso-Verfahren können dann hilfreich sein, um Determinanten von $Y$ *und* $B$ zu identifizieren und damit eine Menge an Kontrollvariablen zu selektieren, für die eine erwartungstreue und konsistente Schätzung des interessierenden Effekts wahrscheinlich ist.
+In empirischen Studien des Effekts einer Behandlungsvariable $B$ auf eine Outcome-Variable $Y$ steht häufig eine Vielzahl potentieller Kontrollvariablen zur Verfügung. Häufig ist unklar, welche Variablen in das Modell aufgenommen werden sollten, um das Risiko einer verzerrten Schätzung durch ausgelassene Variablen zu vermindern und gleichzeitig eine Schätzung mit geringer Varianz zu gewährleisten. Ist der Beobachtungsumfang $N$ relativ zur Variablenanzahl $k$ groß, so kann die KQ-Schätzung einer langen Regression (ein Modell mit allen $k$ Kontrollvariablen) gute Ergebnisse liefern. In der Praxis liegt diese wünschenswerte Situation jedoch oft nicht vor und es ist $k\lesssim N$ oder sogar $k>N$. Dann ist eine KQ-Schätzung des Behandlungseffekts anhand aller $k$ Variablen mit hoher Varianz behaftet bzw. gar nicht möglich.[^regreg-19] Ein weiteres Szenario ist $k(N)>N$, d.h. die Anzahl der Regressoren kann mit dem Beobachtungsumfang wachsen.[^regreg-20] Lasso-Verfahren können dann hilfreich sein, um Determinanten von $Y$ *und* $B$ zu identifizieren und damit eine Menge an Kontrollvariablen zu selektieren, für die eine erwartungstreue und konsistente Schätzung des interessierenden Effekts wahrscheinlich ist.
 
-Betrachte zunächst das Modell mit allen Kontrollvariablen $X_j$,
-\begin{align}
+[^regreg-19]: Beachte, dass der KQ-Schätzer bei $k>N$ nicht lösbar ist.
+
+[^regreg-20]: Dieses Szenario wird unter Bedingungen bzgl. der Wachstumsrate und der Größe der Koeffizienten betrachet, s. [@BelloniChernozhukov2013].
+
+Betrachte zunächst das Modell mit allen Kontrollvariablen $X_j$, \begin{align}
   Y_i = \beta_0 + \alpha_0 B_i + \sum_{j=1}^k \beta_{j} X_{i,j} + u_i, \label{eq:lassotmt}
-\end{align}
-wobei einige $\beta_{j}=0$ sind und wir annehmen, dass $B$ lediglich mit ein paar der $X_j$ korrelliert. Die Shrinkage der geschätzten Koeffizienten aus einer naiven Lasso-Regression von \eqref{eq:lassotmt} führt grundsätzlich zu einer verzerrten Schätzung des Behandlungseffekts $\alpha_0$ und damit zu ungültiger Inferenz.^[@Hahnetal2018 geben eine ausführliche Erläuterung dieser Problematik.] 
+\end{align} wobei einige $\beta_{j}=0$ sind und wir annehmen, dass $B$ lediglich mit ein paar der $X_j$ korrelliert. Die Shrinkage der geschätzten Koeffizienten aus einer naiven Lasso-Regression von \eqref{eq:lassotmt} führt grundsätzlich zu einer verzerrten Schätzung des Behandlungseffekts $\alpha_0$ und damit zu ungültiger Inferenz.[^regreg-21]
 
-Die Verzerrung von geschätzten Koeffizienten kann vermieden werden, indem Lasso lediglich zur Selektion von Kontrollvariablen verwendet wird. Dabei wird mit einer Lasso-Regression von $Y$ auf die $X_j$ eine Teilmenge von Regressoren $\mathcal{S}$ selektiert und der Treatment-Effekt anschließend mit der KQ-Schätzung von
-\begin{align}
+[^regreg-21]: @Hahnetal2018 geben eine ausführliche Erläuterung dieser Problematik.
+
+Die Verzerrung von geschätzten Koeffizienten kann vermieden werden, indem Lasso lediglich zur Selektion von Kontrollvariablen verwendet wird. Dabei wird mit einer Lasso-Regression von $Y$ auf die $X_j$ eine Teilmenge von Regressoren $\mathcal{S}$ selektiert und der Treatment-Effekt anschließend mit der KQ-Schätzung von \begin{align}
   Y_i = \beta_0 + \alpha_0 B_i + \sum_{j\in\mathcal{S}} \beta_{j} X_{i,j} + e_i,
-\end{align}
-basierend auf der Selektion $\mathcal{S}$ berechnet wird.^[Solche Verfahren werden *Post-Selection-Schätzer* gennant.] Ein solcher *Post-Lasso-Selection-Schätzer* [@BelloniChernozhukov2013] ist jedoch im Allgemeinen und insbesondere in hoch-dimensionalen Settings nicht konsistent für $\alpha_0$ und nicht asymptotisch normalverteilt, da weiterhin die Gefahr einer verzerrten Schätzung durch in $\mathcal{S}$ ausgelassene Variablen besteht, die mit $B$ korrelieren: Lasso selektiert Variablen $X_j$, die "gut" $Y$ erklären. Dabei kann nicht ausgeschlossen werden, das ein Modell gewählt wird, dass relevante Determinanten von $B$ auslässt. Selbst wenn wir ein mit Lasso gewähltes Modell mit KQ (d.h. ohne Shrinkage) schätzen, würde $\alpha_0$ verzerrt geschätzt!
+\end{align} basierend auf der Selektion $\mathcal{S}$ berechnet wird.[^regreg-22] Ein solcher *Post-Lasso-Selection-Schätzer* [@BelloniChernozhukov2013] ist jedoch im Allgemeinen und insbesondere in hoch-dimensionalen Settings nicht konsistent für $\alpha_0$ und nicht asymptotisch normalverteilt, da weiterhin die Gefahr einer verzerrten Schätzung durch in $\mathcal{S}$ ausgelassene Variablen besteht, die mit $B$ korrelieren: Lasso selektiert Variablen $X_j$, die "gut" $Y$ erklären. Dabei kann nicht ausgeschlossen werden, das ein Modell gewählt wird, dass relevante Determinanten von $B$ auslässt. Selbst wenn wir ein mit Lasso gewähltes Modell mit KQ (d.h. ohne Shrinkage) schätzen, würde $\alpha_0$ verzerrt geschätzt!
+
+[^regreg-22]: Solche Verfahren werden *Post-Selection-Schätzer* gennant.
 
 @Bellonietal2014 schlagen ein alternatives Verfahren vor, dass auf Selektion der Determinanten $X_j$ von $Y$ und $B$ basiert. Dieses Verfahren wird als *Post-Double Selection* bezeichnet und kann wiefolgt implementiert werden:
 
 **Post-Double-Selection-Schätzer**
 
-1. Bestimme die Determinanten $X_j$ von $Y$ mit Lasso-Regression und bezeichne die Menge der selektierten Variablen als $\mathcal{S}_Y$.
+1.  Bestimme die Determinanten $X_j$ von $Y$ mit Lasso-Regression und bezeichne die Menge der selektierten Variablen als $\mathcal{S}_Y$.
 
-2. Bestimme die Determinanten $X_j$ von $B$ mit Lasso-Regression und bezeichne die Menge der selektierten Variablen als $\mathcal{S}_B$.
+2.  Bestimme die Determinanten $X_j$ von $B$ mit Lasso-Regression und bezeichne die Menge der selektierten Variablen als $\mathcal{S}_B$.
 
-3. Bestimme die Schnittmenge $\mathcal{S}_{YB} = \mathcal{S}_Y \cap \mathcal{S}_B$. Schätze den Treatment-Effekt als $\widehat{\alpha}_0$ in der KQ-Regression
-\begin{align}
-  Y_i = \beta_0 + \alpha_0 B_i + \sum_{j\in\mathcal{S}_{YB}} \beta_{j} X_{i,j} + v_i.
-\end{align}
+3.  Bestimme die Schnittmenge $\mathcal{S}_{YB} = \mathcal{S}_Y \cap \mathcal{S}_B$. Schätze den Treatment-Effekt als $\widehat{\alpha}_0$ in der KQ-Regression \begin{align}
+      Y_i = \beta_0 + \alpha_0 B_i + \sum_{j\in\mathcal{S}_{YB}} \beta_{j} X_{i,j} + v_i.
+    \end{align}
 
 @Bellonietal2014 zeigen, dass $\widehat{\alpha}_0$ aus diesem Verfahren ein asymptotisch normalverteiler Schätzer für $\alpha_0$ ist und herkömmliche t-Tests und Konfidenzintervalle gültige Inferenz erlauben.
 
-Wir illustrieren die in diesem Abschnitt betrachteten Schätzer nun anhand simulierter Daten mit R. Die fiktive Problemstellung ist die Schätzung eines wahren Treatment-Effekts $\alpha_0 = 2$, wenn so viele potenzielle Kontrollvariablen vorliegen, dass der KQ-Schätzer gerade noch berechnet werden kann, aber aufgrund hoher Varianz unzuverlässig ist. Hierzu erzeugen wir $Y$ gemäß der Vorschrift
-\begin{align*}
+Wir illustrieren die in diesem Abschnitt betrachteten Schätzer nun anhand simulierter Daten mit R. Die fiktive Problemstellung ist die Schätzung eines wahren Treatment-Effekts $\alpha_0 = 2$, wenn so viele potenzielle Kontrollvariablen vorliegen, dass der KQ-Schätzer gerade noch berechnet werden kann, aber aufgrund hoher Varianz unzuverlässig ist. Hierzu erzeugen wir $Y$ gemäß der Vorschrift \begin{align*}
   Y_i =&\, \alpha_0 B_i + \sum_{j=1}^{k_Y} \beta_{j}^Y X_{i,j}^Y + \sum_{l=1}^{k_{YB}} \beta_{l}^{YB} X_{i,l}^{YB} + u_i,\\
   \\
   \beta_j^{YB} \overset{u.i.v}{\sim}&\,N(10,1), \quad \beta_j^{Y} \overset{u.i.v}{\sim}U(0,1), \quad u_i \overset{u.i.v}{\sim}N(0,1).\\
@@ -1369,13 +1354,11 @@ Wir illustrieren die in diesem Abschnitt betrachteten Schätzer nun anhand simul
   i=&\,1,\dots,550
 \end{align*}
 
-Die Behandlungsvariable $B_i$ entspricht der Vorschrift
-\begin{align*}
+Die Behandlungsvariable $B_i$ entspricht der Vorschrift \begin{align*}
   B_i =&\, \sum_{l=1}^{k_{YB}} \beta_{l}^{YB} X_{i,l}^{YB} + e_i,\\
   \\
   \beta_j^{YB} \overset{u.i.v}{\sim}&\,N(2,0.2), \quad e_i \overset{u.i.v}{\sim}N(0,1).
-\end{align*}
-Wir wählen $k_{YB} = k_{Y} = 25$. Zusätzlich zu $B$, den Determinanten von $Y$ *und* $B$ ($X^{YB}$) sowie den Variablen, die ausschließlich $Y$ beeinflussen ($X^{Y}$) gibt es $k_U = 499$ Variablen $X^U$, die weder $Y$ noch $B$ beeinflussen und damit irrelevant für die Schätzung des Behandlungseffekts sind. Wir haben also $N=550$ Beobachtungen und insgesamt $k = 1+k_{Y} + k_{YB} + k_{U} = 550$ potenzielle Kontrollvariablen von denen $k_{YB} = 25$ für eine unverzerrte Schätzung von $\alpha_0$ relevant sind.
+\end{align*} Wir wählen $k_{YB} = k_{Y} = 25$. Zusätzlich zu $B$, den Determinanten von $Y$ *und* $B$ ($X^{YB}$) sowie den Variablen, die ausschließlich $Y$ beeinflussen ($X^{Y}$) gibt es $k_U = 499$ Variablen $X^U$, die weder $Y$ noch $B$ beeinflussen und damit irrelevant für die Schätzung des Behandlungseffekts sind. Wir haben also $N=550$ Beobachtungen und insgesamt $k = 1+k_{Y} + k_{YB} + k_{U} = 550$ potenzielle Kontrollvariablen von denen $k_{YB} = 25$ für eine unverzerrte Schätzung von $\alpha_0$ relevant sind.
 
 Der nachstehende Code generiert die Daten gemäß der Vorschrift.
 
@@ -1430,7 +1413,7 @@ Wir schätzen daher zunächst die "lange" Regression mit allen $k$ verfügbaren 
 lm(Y ~ . - 1, data = X)$coefficients["B"]
 ```
 
-Die KQ-Schätzung von $\alpha_0$ anhand der langen Regression weicht deutlich vom wahren Wert $\alpha_0 = 2$ ab. 
+Die KQ-Schätzung von $\alpha_0$ anhand der langen Regression weicht deutlich vom wahren Wert $\alpha_0 = 2$ ab.
 
 Eine "kurze" KQ-Regression nur mit der Behandlungsvariable $B$ führt wegen Korrelation mit den ausgelassenen Determinanten in `XB` zu einer deutlich verzerrten Schätzung.
 
@@ -1439,7 +1422,9 @@ Eine "kurze" KQ-Regression nur mit der Behandlungsvariable $B$ führt wegen Korr
 lm(Y ~ B - 1)$coefficients["B"]
 ```
 
-Die Methoden von @BelloniChernozhukov2013 und @Bellonietal2014 sind im R-Paket `hdm` implementiert. Mit den Funktionen `hrm::rlasso()` und `hdm::rlassoEffect` kann Lasso-Regression sowie Post- und Double-Post-Selection durchgeführt werden.^[Diese Funktionen ermitteln ein optimales $\lambda$ mit dem in @Bellonietal2012 vorgeschlagenen Algorithmus.] 
+Die Methoden von @BelloniChernozhukov2013 und @Bellonietal2014 sind im R-Paket `hdm` implementiert. Mit den Funktionen `hrm::rlasso()` und `hdm::rlassoEffect` kann Lasso-Regression sowie Post- und Double-Post-Selection durchgeführt werden.[^regreg-23]
+
+[^regreg-23]: Diese Funktionen ermitteln ein optimales $\lambda$ mit dem in @Bellonietal2012 vorgeschlagenen Algorithmus.
 
 Wir berechnen zunächst den naiven Lasso-Schätzer in einem Modell mit allen Variablen.
 
@@ -1517,37 +1502,35 @@ summary(pds_lasso)
 
 Der Post-Double-Selection-Schätzer liefert unter den betrachteten Verfahren die beste Schätzung von $\alpha_0$ und erlaubt gülstige statistische Inferenz. Der geschätzte Effekt ist hoch-signifikant.
 
-::: {.callout-note}
-#### Key Facts zum Post-Double-Selection-Schätzer 
+::: callout-note
+#### Key Facts zum Post-Double-Selection-Schätzer
 
-- Durch die sorgfältige Auswahl von Variablen, die mit Behandlung- und Outcome-Variable zusammenhängen, ermöglicht die Double-Selection eine bessere Kontrolle über das Risiko ausgelassender Variablen in Beobachtungsstudien und ermöglicht gültige (asymptotisch normale) Inferenz.
+-   Durch die sorgfältige Auswahl von Variablen, die mit Behandlung- und Outcome-Variable zusammenhängen, ermöglicht die Double-Selection eine bessere Kontrolle über das Risiko ausgelassender Variablen in Beobachtungsstudien und ermöglicht gültige (asymptotisch normale) Inferenz.
 
-- Der Post-Double-Selection-Schätzer besteht aus drei Regressionen: 
+-   Der Post-Double-Selection-Schätzer besteht aus drei Regressionen:
 
-  1. Es werden Variablen mit Lasso selektiert, welche die *Behandlungs-Variable* erklären.
-  2. Es werden Variablen mit Lasso selektiert, welche die *Outcome-Variable* erklären.
-  3. Der Post-Double-Selection-Schätzer ist der KQ-Schätzer in einer Regression, die für die Schnittmenge der ausgewählten Variablen kontrolliert.
+    1.  Es werden Variablen mit Lasso selektiert, welche die *Behandlungs-Variable* erklären.
+    2.  Es werden Variablen mit Lasso selektiert, welche die *Outcome-Variable* erklären.
+    3.  Der Post-Double-Selection-Schätzer ist der KQ-Schätzer in einer Regression, die für die Schnittmenge der ausgewählten Variablen kontrolliert.
 
-- Dank der Selektion mit Lasso kann der Schätzer auch bei hoch-dimensionalen Daten ($k>n$) angewendet werden.
+-   Dank der Selektion mit Lasso kann der Schätzer auch bei hoch-dimensionalen Daten ($k>n$) angewendet werden.
 
-- Post-Double-Selection-Schätzer für Behandlungseffekte sind im R-Paket `hdm` implementiert.
+-   Post-Double-Selection-Schätzer für Behandlungseffekte sind im R-Paket `hdm` implementiert.
 :::
 
 ### Case Study: Makroökonomisches Wachstum
 
-Zur Illustration des Post-Double-Selection Schätzers betrachten wir eine empirische Anwendung bzgl. der Validierung von makroökonomischer Wachstumtheorie. Aus neo-klassischen Ansätzen wie dem [Solow-Swan-Modell](https://de.wikipedia.org/wiki/Solow-Modell) kann die Hypothese, dass Volkswirtschaften zu einem gemeinsamen Wachstumspfad hin konvergieren, abgeleitet werden. Diese Konvergenzhypothese impliziert die Existenz von Aufholeffekten: Ärmere Volkswirtschaften müssen im mittel schneller Wachsen als die Wirschaft wohlhabender Länder. Die grundlegende Spezifikation eines entsprechenden Regressionsmodells lautet
-\begin{align}
+Zur Illustration des Post-Double-Selection Schätzers betrachten wir eine empirische Anwendung bzgl. der Validierung von makroökonomischer Wachstumtheorie. Aus neo-klassischen Ansätzen wie dem [Solow-Swan-Modell](https://de.wikipedia.org/wiki/Solow-Modell) kann die Hypothese, dass Volkswirtschaften zu einem gemeinsamen Wachstumspfad hin konvergieren, abgeleitet werden. Diese Konvergenzhypothese impliziert die Existenz von Aufholeffekten: Ärmere Volkswirtschaften müssen im mittel schneller Wachsen als die Wirschaft wohlhabender Länder. Die grundlegende Spezifikation eines entsprechenden Regressionsmodells lautet \begin{align}
   \text{WR}_{i} = \alpha_0 \text{BIP0}_i + u_i, \label{eq:growthmodel1}
-\end{align}
-wobei $\text{WR}_{i}$ die Wachstumsrate des Pro-Kopf-BIP in Land $i$ über einen Zeitraum (typischerweise berechnet als Log-Differenz zwischen zwei Perioden) und $\text{BIP0}_i$ das (logarithmierte) Pro-Kopf-BIP zu beginn der Referenzperiode ist. Gemäß der Konvergenzhypothese muss $\alpha_0<0$ sein: Je wohlhabender eine Volkswirtschaft ist, desto geringer ist das Wirtschaftswachstum. 
+\end{align} wobei $\text{WR}_{i}$ die Wachstumsrate des Pro-Kopf-BIP in Land $i$ über einen Zeitraum (typischerweise berechnet als Log-Differenz zwischen zwei Perioden) und $\text{BIP0}_i$ das (logarithmierte) Pro-Kopf-BIP zu beginn der Referenzperiode ist. Gemäß der Konvergenzhypothese muss $\alpha_0<0$ sein: Je wohlhabender eine Volkswirtschaft ist, desto geringer ist das Wirtschaftswachstum.
 
-Um Verzerrung durch ausgelassene Kovariablen zu vermeiden, sollte das Modell \eqref{eq:growthmodel1} um länder-spezifische Regressoren $x_{i,j}$, die sowohl das Ausgagnsniveau $\text{BIP0}$ sowie die Wachtumsrate beinflussen, erweitert werden. Zu der großen Menge potentieller Kovariablen gehören makro- und sozio-ökonomische Maße wie bspw. die Investitionstätigkeit des Staates, Offenheit der Volkswirtschaft, das politische Umfeld, das Bildungsniveau, die Demographie usw. Eine bevorzugte Spezifikation ist daher
-\begin{align}
+Um Verzerrung durch ausgelassene Kovariablen zu vermeiden, sollte das Modell \eqref{eq:growthmodel1} um länder-spezifische Regressoren $x_{i,j}$, die sowohl das Ausgagnsniveau $\text{BIP0}$ sowie die Wachtumsrate beinflussen, erweitert werden. Zu der großen Menge potentieller Kovariablen gehören makro- und sozio-ökonomische Maße wie bspw. die Investitionstätigkeit des Staates, Offenheit der Volkswirtschaft, das politische Umfeld, das Bildungsniveau, die Demographie usw. Eine bevorzugte Spezifikation ist daher \begin{align}
   \text{WR}_{i} = \alpha_0 \text{BIP0}_i + \sum_{j=1}^k \beta_j x_{i,j} + u_i,\label{eq:growthmodel2}
-\end{align}
-wobei $\alpha_0$ als Behandlungseffekt interpretiert werden kann. Beachte, dass \eqref{eq:growthmodel2} eine Regression in der Form von \eqref{eq:lassotmt} ist. 
+\end{align} wobei $\alpha_0$ als Behandlungseffekt interpretiert werden kann. Beachte, dass \eqref{eq:growthmodel2} eine Regression in der Form von \eqref{eq:lassotmt} ist.
 
-Wir illustrieren die Schätzung von und Inferenz bzgl. $\alpha_0$ in \eqref{eq:growthmodel2} mit Post-Double-Selektion für einen 90 Länder umfassenden Auszug aus dem Datensatz von @BarroLee2013, der als Objekt `GrowthData` im R-Paket `hdm` verfügbar ist.^[Eine ausführliche Beschreibung der Variablen ist [hier](https://www2.nber.org/pub/barro.lee/readme.txt) einsehbar.] 
+Wir illustrieren die Schätzung von und Inferenz bzgl. $\alpha_0$ in \eqref{eq:growthmodel2} mit Post-Double-Selektion für einen 90 Länder umfassenden Auszug aus dem Datensatz von @BarroLee2013, der als Objekt `GrowthData` im R-Paket `hdm` verfügbar ist.[^regreg-24]
+
+[^regreg-24]: Eine ausführliche Beschreibung der Variablen ist [hier](https://www2.nber.org/pub/barro.lee/readme.txt) einsehbar.
 
 ```{r}
 # Datensatz in Arbeitsumgebung verfügbar machen
@@ -1672,10 +1655,9 @@ tibble(
   tabopts
 ```
 
-
 ```{r}
 # Gültige Inferenz mit dem Post-Double-Selection-Schätzer
 summary(Growth_DS)
 ```
 
-Das Ergebnis der Post-Double-Selection-Schätzung unterstützt die (bedingte) Konvergenzhypothese mit einer signifikanten negativen Schätzung $\widehat{\alpha}_0\approx`r round(Growth_DS$alpha, 3)`$. 
+Das Ergebnis der Post-Double-Selection-Schätzung unterstützt die (bedingte) Konvergenzhypothese mit einer signifikanten negativen Schätzung $\widehat{\alpha}_0\approx`r round(Growth_DS$alpha, 3)`$.

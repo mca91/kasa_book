@@ -20,8 +20,10 @@ book:
     - index.qmd
     - R_Einfuehrung.qmd
     - Matching.qmd
+    - DiD.qmd
     - RDD.qmd
     - RegReg.qmd
+    - SyntheticControl.qmd
     - Literatur.qmd
   repo-branch: main
   repo-actions: [edit, issue]
@@ -96,3 +98,4 @@ editor: visual
 
 filters: 
   - webr
+  

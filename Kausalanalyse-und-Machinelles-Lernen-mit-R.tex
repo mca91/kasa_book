@@ -119,28 +119,38 @@
 \makeatletter
 \def\fps@figure{htbp}
 \makeatother
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
 \newlength{\cslhangindent}
 \setlength{\cslhangindent}{1.5em}
 \newlength{\csllabelwidth}
 \setlength{\csllabelwidth}{3em}
-\newlength{\cslentryspacingunit} % times entry-spacing
-\setlength{\cslentryspacingunit}{\parskip}
-\newenvironment{CSLReferences}[2] % #1 hanging-ident, #2 entry spacing
- {% don't indent paragraphs
-  \setlength{\parindent}{0pt}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
   % turn on hanging indent if param 1 is 1
   \ifodd #1
-  \let\oldpar\par
-  \def\par{\hangindent=\cslhangindent\oldpar}
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
   \fi
   % set entry spacing
-  \setlength{\parskip}{#2\cslentryspacingunit}
- }%
- {}
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
 \usepackage{calc}
-\newcommand{\CSLBlock}[1]{#1\hfill\break}
-\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{#1}}
-\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{#1}\break}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
 \newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
 
 \usepackage{booktabs}
@@ -186,8 +196,6 @@
 \definecolor{quarto-callout-caution-color-frame}{HTML}{fd7e14}
 \makeatother
 \makeatletter
-\makeatother
-\makeatletter
 \@ifpackageloaded{bookmark}{}{\usepackage{bookmark}}
 \makeatother
 \makeatletter
@@ -226,22 +234,14 @@
 \newcommand*\listoflistings{\listof{codelisting}{Listingverzeichnis}}
 \makeatother
 \makeatletter
+\makeatother
+\makeatletter
 \@ifpackageloaded{caption}{}{\usepackage{caption}}
 \@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
 \makeatother
 \makeatletter
-\@ifpackageloaded{tcolorbox}{}{\usepackage[skins,breakable]{tcolorbox}}
-\makeatother
-\makeatletter
-\@ifundefined{shadecolor}{\definecolor{shadecolor}{rgb}{.97, .97, .97}}
-\makeatother
-\makeatletter
-\makeatother
-\makeatletter
 \@ifpackageloaded{sidenotes}{}{\usepackage{sidenotes}}
 \@ifpackageloaded{marginnote}{}{\usepackage{marginnote}}
-\makeatother
-\makeatletter
 \makeatother
 \ifLuaTeX
 \usepackage[bidi=basic]{babel}
@@ -255,7 +255,8 @@
 \ifLuaTeX
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
-\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\usepackage{bookmark}
+
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same} % disable monospaced font for URLs
 \hypersetup{
@@ -282,14 +283,13 @@
 
 \begin{document}
 \maketitle
+
 \RecustomVerbatimEnvironment{verbatim}{Verbatim}{
 showspaces = false,
 showtabs = false,
 breaksymbolleft={},
 breaklines
 }
-
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, enhanced, boxrule=0pt, borderline west={3pt}{0pt}{shadecolor}, interior hidden, breakable, frame hidden]}{\end{tcolorbox}}\fi
 
 \renewcommand*\contentsname{Inhaltsverzeichnis}
 {
@@ -300,14 +300,12 @@ breaklines
 \setstretch{1.2}
 \bookmarksetup{startatroot}
 
-\hypertarget{start}{%
-\chapter{Start}\label{start}}
+\chapter{Start}\label{start}
 
 \bookmarksetup{startatroot}
 
-\hypertarget{statistische-programmierung-mit-r}{%
 \chapter{Statistische Programmierung mit
-R}\label{statistische-programmierung-mit-r}}
+R}\label{statistische-programmierung-mit-r}
 
 Dieses Kapitel ist \emph{nicht} als umfassende Einführung in R gedacht,
 sondern behandelt Kernfunktionen aus der Paketsammlung
@@ -395,16 +393,18 @@ Chunk illustriert dies für die Variable \texttt{x}.
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{lange-weite-und-tidy-datenformate}{%
 \section{Lange, weite und ``tidy''
-Datenformate}\label{lange-weite-und-tidy-datenformate}}
+Datenformate}\label{lange-weite-und-tidy-datenformate}
 
 Wir betrachten den in Tabelle~\ref{tbl-Klausurergebnisse} dargestellten
 Datensatz \emph{Klausurergebnisse}.
 
-\hypertarget{tbl-Klausurergebnisse}{}
 \begin{longtable}{lrrr}
-\caption{\label{tbl-Klausurergebnisse}Datensatz \emph{Klausurergebnisse} }\tabularnewline
+
+\caption{\label{tbl-Klausurergebnisse}Datensatz
+\emph{Klausurergebnisse}}
+
+\tabularnewline
 
 \toprule
 Name & Mikro & Makro & Mathe \\ 
@@ -414,6 +414,7 @@ Lena & $1$ & $3$ & NA \\
 Ricarda & $2$ & $1.7$ & $1.3$ \\ 
 Simon & $2.3$ & $3.3$ & NA \\ 
 \bottomrule
+
 \end{longtable}
 
 Der Datensatz ist noch nicht in der R-Arbeitsumgebung verfügbar. Mit der
@@ -442,7 +443,7 @@ Tabelle~\ref{tbl-Klausurergebnisse} händisch als R-Objekt der Klasse
 Variable \emph{Modul}. Der Datensatz liegt also \emph{nicht} im s.g.
 \emph{Tidy-Format} vor.
 
-\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, bottomrule=.15mm, colbacktitle=quarto-callout-tip-color!10!white, bottomtitle=1mm, arc=.35mm, title=\textcolor{quarto-callout-tip-color}{\faLightbulb}\hspace{0.5em}{Tidy-Format}, opacitybacktitle=0.6, colback=white, left=2mm, breakable, leftrule=.75mm, opacityback=0, coltitle=black, titlerule=0mm, colframe=quarto-callout-tip-color-frame, toprule=.15mm, toptitle=1mm]
+\begin{tcolorbox}[enhanced jigsaw, breakable, toprule=.15mm, title=\textcolor{quarto-callout-tip-color}{\faLightbulb}\hspace{0.5em}{Tidy-Format}, titlerule=0mm, bottomrule=.15mm, leftrule=.75mm, colbacktitle=quarto-callout-tip-color!10!white, opacitybacktitle=0.6, coltitle=black, left=2mm, opacityback=0, bottomtitle=1mm, toptitle=1mm, arc=.35mm, rightrule=.15mm, colframe=quarto-callout-tip-color-frame, colback=white]
 
 Tidy-Format: Jede Spalte ist \textbf{\emph{eine}} Variable, jede Reihe
 ist \textbf{\emph{eine}} Beobachtung und jede Zelle enthält einen
@@ -548,8 +549,7 @@ betroffener Beobachtungen erhalten.
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{pinguine-und-pipes}{%
-\section{Pinguine und Pipes}\label{pinguine-und-pipes}}
+\section{Pinguine und Pipes}\label{pinguine-und-pipes}
 
 In diesem Abschnitt zeigen wir die Verwendung häufig verwendeter
 \texttt{dplyr}-Funktionen (s.g. \emph{Verben}) für die Transformation
@@ -587,8 +587,7 @@ gemacht. Wir nutzen \texttt{glimpse()}, um einen Überblick zu erhalten.
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{dplyrmutate}{%
-\subsection{\texorpdfstring{\texttt{dplyr::mutate()}}{dplyr::mutate()}}\label{dplyrmutate}}
+\subsection{\texorpdfstring{\texttt{dplyr::mutate()}}{dplyr::mutate()}}\label{dplyrmutate}
 
 Mit \texttt{mutate()} können bestehende Variablen überschrieben oder
 neue Variablen als Funktion bestehender Variablen definiert werden.
@@ -642,8 +641,7 @@ lediglich die transformierten Variablen beibehält.
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{dplyrselect}{%
-\subsection{\texorpdfstring{\texttt{dplyr::select()}}{dplyr::select()}}\label{dplyrselect}}
+\subsection{\texorpdfstring{\texttt{dplyr::select()}}{dplyr::select()}}\label{dplyrselect}
 
 Mit \texttt{select()} werden Variablen aus dem Datensatz ausgewählt.
 Dies geschieht entweder über den Variablennamen\ldots{}
@@ -697,8 +695,7 @@ Eigenschaften ihrer Ausprägungen selektieren.
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{dplyrfilter}{%
-\subsection{\texorpdfstring{\texttt{dplyr::filter()}}{dplyr::filter()}}\label{dplyrfilter}}
+\subsection{\texorpdfstring{\texttt{dplyr::filter()}}{dplyr::filter()}}\label{dplyrfilter}
 
 Das Verb \texttt{filter()} filtert den Datensatz in der Zeilendimension.
 So können Beobachtungen ausgewält werden, deren Merkmalsausprägungen
@@ -843,8 +840,7 @@ Zwischenergebnissen durchführen.
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{dplyrsummarise}{%
-\subsection{\texorpdfstring{\texttt{dplyr::summarise()}}{dplyr::summarise()}}\label{dplyrsummarise}}
+\subsection{\texorpdfstring{\texttt{dplyr::summarise()}}{dplyr::summarise()}}\label{dplyrsummarise}
 
 Das Verb \texttt{summarise()} fasst Variablen über Beobachtungen hinweg
 zusammen. Der nachstehende Code-Chunk erzeugt eine Tabelle mit
@@ -890,8 +886,7 @@ Funktionen zusammenzufassen. Beachte, dass
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{dplyrarrange}{%
-\subsection{\texorpdfstring{\texttt{dplyr::arrange()}}{dplyr::arrange()}}\label{dplyrarrange}}
+\subsection{\texorpdfstring{\texttt{dplyr::arrange()}}{dplyr::arrange()}}\label{dplyrarrange}
 
 Mit \texttt{arrange()} können Datensätze in Abhängigkeit der
 beobachteten Ausprägungen von Variablen sortiert werden.
@@ -931,9 +926,8 @@ gewünschten Reihenfolge erreicht.
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{operationen-mit-gruppierten-datensuxe4tzen}{%
 \subsection{Operationen mit gruppierten
-Datensätzen}\label{operationen-mit-gruppierten-datensuxe4tzen}}
+Datensätzen}\label{operationen-mit-gruppierten-datensuxe4tzen}
 
 Für manche Transformationen ist eine Gruppierung der Daten hilfreich.
 Wir illustrieren nachfolgend die unterschiedlichen Verhaltensweisen
@@ -1026,9 +1020,8 @@ zu.
 Bei gruppierten Daten berechnet \texttt{mutate()} das Stichprobenmittel
 \emph{pro Gruppe} und weist die Mittelwerte entsprechend zu.
 
-\hypertarget{eine-explorative-analyse-mit-ggplot2}{%
 \section{\texorpdfstring{Eine explorative Analyse mit
-\texttt{ggplot2}}{Eine explorative Analyse mit ggplot2}}\label{eine-explorative-analyse-mit-ggplot2}}
+\texttt{ggplot2}}{Eine explorative Analyse mit ggplot2}}\label{eine-explorative-analyse-mit-ggplot2}
 
 Der bereinigte Datensatz \texttt{penguins\_cleaned} eignet sich gut für
 eine graphische Auswertung mit dem R-Paket \texttt{ggplot2}, welches
@@ -1165,15 +1158,11 @@ die drei Arten über die Inseln verteilt sind.
 
 \bookmarksetup{startatroot}
 
-\hypertarget{matching}{%
-\chapter{Matching}\label{matching}}
+\chapter{Matching}\label{matching}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{\#| context: setup}
-\NormalTok{webr::install("dplyr")}
-\NormalTok{webr::install("tidyr")}
-
 \NormalTok{\# create dataset directory}
 \NormalTok{dir.create("datasets")}
 \NormalTok{\# Download the dataset}
@@ -1223,19 +1212,19 @@ Beobachtungen anhand invididueller Merkmale bei der Schätzung des
 Behandlungseffekts erfolgen. Andere etablierte Methoden schätzen den
 kausalen Effekt nach Selektion von vergleichbaren Teilmengen von
 Subjekten beider Gruppen aus der ursprünglichen Stichprobe, sogenanntes
-\emph{Matching}.
+\emph{selektierendes Matching}.
 
-Da \emph{Matching} ähnliche Beobachtungen basierend auf beobachtbaren
-Merkmalen vergleicht, kann die Wahrscheinlichkeit einer verzerrten
-Schätzung des kausalen Effekt durch falsche Modellspezifikationen
-geringer sein als für eine Schätzung des Effekts anhand multipler
-Regression. Weiterhin basieren Matching-Methoden nicht auf der Annahme
-eines linearen Zusammenhangs zwischen Kovariablen und der erklärenden
-Variable und können für die Schätzung unterschiedlicher Spezifikationen
-von Behandlungseffekten herangezogen werden.
+Da Matching Beobachtungen basierend auf beobachtbaren Merkmalen
+vergleicht, kann die Wahrscheinlichkeit einer verzerrten Schätzung des
+kausalen Effekt durch falsche Modellspezifikationen geringer sein als
+für eine Schätzung des Effekts anhand multipler Regression. Weiterhin
+basieren Matching-Methoden nicht auf der Annahme eines linearen
+Zusammenhangs zwischen Kovariablen und der erklärenden Variable und
+können für die Schätzung unterschiedlicher Spezifikationen von
+Behandlungseffekten herangezogen werden.
 
-Für die Gültigkeit eines Schätzers basierend auf \emph{Matching} sind
-zwei Annahmen erforderlich.
+Für die Gültigkeit eines Schätzers basierend auf Matching sind zwei
+Annahmen erforderlich.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1272,10 +1261,9 @@ gibt. Dann ist sichergestellt, dass für jedes Subjekt in einer Gruppe
 ein hinsichtlich seiner Charakteristika vergleichbares Subjekt in der
 anderen Gruppe geben kann, sodass ein Vergleich möglich ist.
 
-\hypertarget{sec-balance}{%
 \section{\texorpdfstring{\emph{Balance}: Vergleichbarkeit von
 Behandlungs- und
-Kontrollgruppe}{Balance: Vergleichbarkeit von Behandlungs- und Kontrollgruppe}}\label{sec-balance}}
+Kontrollgruppe}{Balance: Vergleichbarkeit von Behandlungs- und Kontrollgruppe}}\label{sec-balance}
 
 Der Lehrstuhl für Ökonometrie an der Universität Duisburg-Essen betreibt
 einen Ökonometrie-Blog und interessiert sich für den kausalen Effekt der
@@ -1305,9 +1293,11 @@ enthalten und sollen der Analyse des Effekts des darkmode
 Tabelle~\ref{tbl-darkmode} zeigt die Definitionen der Variablen in
 \emph{darkmode.csv}.
 
-\hypertarget{tbl-darkmode}{}
 \begin{longtable}{ll}
-\caption{\label{tbl-darkmode}Variablen im Datensatz \emph{darkmode} }\tabularnewline
+
+\caption{\label{tbl-darkmode}Variablen im Datensatz \emph{darkmode}}
+
+\tabularnewline
 
 \toprule
 Variable & Beschreibung \\ 
@@ -1318,6 +1308,7 @@ male & Indikator: Individuum männlich \\
 age & Alter (in Jahren) \\ 
 hours & Bisherige Verweildauer auf der Seite \\ 
 \bottomrule
+
 \end{longtable}
 
 Für die Analyse lesen wir zunächst den Datensatz \emph{darkmode.csv} mit
@@ -1414,24 +1405,18 @@ nicht-männliche Leser. Dann ist \texttt{male} eine Backdoor-Variable.
 Diese Situation ist unter der Annahme, dass nur diese Faktoren den DGP
 bestimmen, in Abbildung~\ref{fig-maleCDdarkmode} dargestellt.
 
-\begin{figure}
+\begin{figure}[t]
 
-{\centering 
+\centering{
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=4in,height=3in]{Matching_files/figure-latex/dot-figure-1.png}
-
-}
-
-\end{figure}
+\includegraphics[width=4in,height=3in]{Matching_files/figure-latex/dot-figure-1.png}
 
 }
 
 \caption{\label{fig-maleCDdarkmode}Backdoor durch `male' im
 Website-Design-Bespiel}
 
-\end{figure}
+\end{figure}%
 
 Der DGP in Abbildung~\ref{fig-maleCDdarkmode} führt zu einer verzerrten
 Schätzung des kausalen Effekts von \texttt{dark\_mode} auf
@@ -1468,8 +1453,7 @@ Die Zusammenfassung \texttt{anteile\_m} zeigt, dass der Anteil
 männlicher User in der Behandlungsgruppe deutlich höher ist als in der
 Kontrollgruppe.
 
-\hypertarget{matching-durch-gewichtung}{%
-\subsection{Matching durch Gewichtung}\label{matching-durch-gewichtung}}
+\subsection{Matching durch Gewichtung}\label{matching-durch-gewichtung}
 
 Matching eliminiert die Variation von \texttt{male} zwischen den
 Gruppen. Eine Möglichkeit hierfür ist die Gewichtung der Beobachtungen
@@ -1624,24 +1608,18 @@ Der erweiterte DGP ist in Abbildung Abbildung~\ref{fig-CDdarkmode}
 dargestellt, wobei der zusätzliche Backdoor-Pfad durch \texttt{age}
 ebenfalls mit roten Pfeilen gekennzeichnet sind.
 
-\begin{figure}
+\begin{figure}[t]
 
-{\centering 
+\centering{
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=4in,height=3in]{Matching_files/figure-latex/dot-figure-3.png}
-
-}
-
-\end{figure}
+\includegraphics[width=4in,height=3in]{Matching_files/figure-latex/dot-figure-3.png}
 
 }
 
 \caption{\label{fig-CDdarkmode}Erweiterter DGP im
 Website-Design-Beispiel}
 
-\end{figure}
+\end{figure}%
 
 Die Beurteilung der \emph{Balance} von Kontrollgruppe und
 Behandlungsgruppe kann durch eine grafische Gegenüberstellung der
@@ -1701,13 +1679,7 @@ und Kontrollgruppe.
 \end{Highlighting}
 \end{Shaded}
 
-\begin{figure}[t]
-
-{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-14-1.pdf}
-
-}
-
-\end{figure}
+\includegraphics{Matching_files/figure-pdf/unnamed-chunk-14-1.pdf}
 
 Die graphische Analyse zeigt deutliche Unterschiede in den Verteilungen
 von \texttt{age} zwischen Kontroll- und Behandlungsgruppe. Für einen
@@ -1763,8 +1735,7 @@ Die Balance Table weist also auf einen vernachlässigbaren Unterschied
 für \texttt{hours} hin und bestätigt den aus den Grafiken abgeleiteten
 Eindruck einer relevanten Differenzen für \texttt{age}.
 
-\hypertarget{entropy-balancing}{%
-\subsection{Entropy Balancing}\label{entropy-balancing}}
+\subsection{Entropy Balancing}\label{entropy-balancing}
 
 \emph{Entropy Balancing} (Hainmueller 2012) ist eine weitere Methode zur
 Gewährleistung der Vergleichbarkeit von Behandlungs- und Kontrollgruppe
@@ -1857,33 +1828,26 @@ Entropy Balancing ungültig sind. In Abschnitt
 Kapitel~\ref{sec-bootmatching} erläutern wir die Berechnung von
 Standardfehlern für Matching-Schätzer mit dem Bootstrap.
 
-\hypertarget{sec-PSM}{%
 \subsection{Mehrere Matching-Variablen und der Propensity
-Score}\label{sec-PSM}}
+Score}\label{sec-PSM}
 
 Bei mehreren Backdoor-Variablen kann eine Gewichtung anhand der
 Behandlungswahrscheinlichkeit (\emph{Treatment Propensity}) erfolgen.
 Die Idee hierbei ist, dass der DGP wie in
 Abbildung~\ref{fig-propCDdarkmode} dargestellt werden kann.
 
-\begin{figure}
+\begin{figure}[t]
 
-{\centering 
+\centering{
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=4in,height=3in]{Matching_files/figure-latex/dot-figure-2.png}
-
-}
-
-\end{figure}
+\includegraphics[width=4in,height=3in]{Matching_files/figure-latex/dot-figure-2.png}
 
 }
 
 \caption{\label{fig-propCDdarkmode}Propensity im
 Website-Design-Beispiel}
 
-\end{figure}
+\end{figure}%
 
 Hierbei beeinflussen die Backdoor-Variablen \emph{age} und \emph{male}
 die Behandlungsvariable \emph{dark\_mode} lediglich durch die
@@ -2022,13 +1986,7 @@ Behandlungs-Indikator mit Histogrammen visualisieren.
 \end{Highlighting}
 \end{Shaded}
 
-\begin{figure}[t]
-
-{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-21-1.pdf}
-
-}
-
-\end{figure}
+\includegraphics{Matching_files/figure-pdf/unnamed-chunk-21-1.pdf}
 
 Ein Vergleich der Histogramme zeigt, dass die Überlappung der
 \emph{Propensity Scores} in der linken Flanken der Verteilungen der
@@ -2068,13 +2026,7 @@ deren \emph{Propensity Scores} wenig bzw. keine Überlappung aufweisen.
 \end{Highlighting}
 \end{Shaded}
 
-\begin{figure}[t]
-
-{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-23-1.pdf}
-
-}
-
-\end{figure}
+\includegraphics{Matching_files/figure-pdf/unnamed-chunk-23-1.pdf}
 
 IPWs anhand der \emph{Propensity Scores} können schnell mit der
 Vorschrift \begin{align}
@@ -2178,25 +2130,28 @@ die geschätzen \emph{Propensity Scores} nicht berücksichtigt! Später im
 Kapitel erläutern wir die Berechnung gültiger Standardfehler für
 IPW-Schätzer basierend auf \emph{Propensity Scores} mit dem Bootstrap.
 
-\hypertarget{selektierende-matching-verfahren}{%
 \section{Selektierende
-Matching-Verfahren}\label{selektierende-matching-verfahren}}
+Matching-Verfahren}\label{selektierende-matching-verfahren}
 
 Das grundsätzliche Konzept von selektierendem Matching wird in der
 nachstehenden interaktiven Grafik veranschaulicht. Hier betrachten wir
 beobachtete Ausprägungen von zwei (unabhängig und identisch verteilten)
 Matching-Variablen für Subjekte in der Behandlungsgruppe (blau) sowie
-Kontrollgruppe (rot). Per Klick auf eine Beobachtung werden Matches aus
-der anderen Gruppe in cyan farblich kenntlich gemacht. Als Matches
-zählen sämtliche Beobachtungen der anderen Gruppe, deren
+Kontrollgruppe (rot). Als Matches qualifizieren sich sämtliche
+Beobachtungen der anderen Gruppe, deren
 \href{https://de.wikipedia.org/wiki/Euklidischer_Abstand}{Euklidische
 Distanz} zu dem ausgewählten Punkt das über den Slider eingestellte
 Maximum \emph{Caliper} nicht überschreitet.\footnote{Es handelt sich
   hierbei um einen Spezialfall von Matching anhand der
   Mahalanobis-Distanz.} Diese Region wird durch den gestrichelten Kreis
-gekennzeichnet. Die Grafik illustriert inbesondere, dass Beobachtungen
-mehrfach (s.g. Matching mit zurücklegen) oder gar nicht gematcht werden
-können.
+gekennzeichnet und kann über den zugehörigen Slider angepasst werden.
+Per Klick auf eine Beobachtung werden Matches aus der anderen Gruppe
+durch eine verbindende Linie und farbliches Hervorheben kenntlich
+gemacht. Mit dem Slider für k wird festgelegt, dass nur die nahesten k
+qualifizierten Beobachtungen als Matches behandelt werden. Die Grafik
+illustriert inbesondere, dass Beobachtungen in Abhängigkeit von k und
+Caliper falls gewünscht mehrfach (s.g. Matching mit Zurücklegen) oder
+gar nicht gematcht werden können.
 
 Für die nachfolgenden Code-Beispiele verwenden wir das R-Paket
 \texttt{MatchIt}. \texttt{MatchIt::matchit()} nutzt standardmäßig
@@ -2216,8 +2171,7 @@ anhand der Regressoren \texttt{age}, \texttt{hours}, und \texttt{male}
 in unserem Website-Beispiel für unterschiedliche Varianten durchgeführt
 werden kann.
 
-\hypertarget{exaktes-matching}{%
-\subsection{Exaktes Matching}\label{exaktes-matching}}
+\subsection{Exaktes Matching}\label{exaktes-matching}
 
 Exaktes Matching ordnet einem Subjekt aus der Behandlungsgruppe ein oder
 mehrere Subjekte aus der Kontrollgruppe zu, wenn die boebachteten
@@ -2264,8 +2218,7 @@ Aufgrund der kontinulierliche Verteilten Variable \texttt{hours} gibt es
 in unserem Website-Beispiel keine exakten Matches. Dieses Verfahren ist
 hier folglich ungeeignet.
 
-\hypertarget{coarsened-exact-matching}{%
-\subsection{Coarsened Exact Matching}\label{coarsened-exact-matching}}
+\subsection{Coarsened Exact Matching}\label{coarsened-exact-matching}
 
 Bei dieser Methode werden kontinuierliche Matching-Variablen grob (Engl.
 \emph{coarse}) klassiert, ähnlich wie bei einem Histogram. Diese
@@ -2332,9 +2285,8 @@ Unmatched      69      67
 Mit Coarsened Exact Matching erhalten wir einen Datensatz mit 82
 Beobachtungen und guter Balance.
 
-\hypertarget{matching-mit-der-mahalanobis-distanz}{%
 \subsection{Matching mit der
-Mahalanobis-Distanz}\label{matching-mit-der-mahalanobis-distanz}}
+Mahalanobis-Distanz}\label{matching-mit-der-mahalanobis-distanz}
 
 Die Euklidische Distanz misst den direkten Abstand zwischen zwei Punkten
 und ist nicht invariant gegenüber Transformationen, insbesondere bei
@@ -2353,11 +2305,12 @@ die Matching-Variablen \(X\) und \(Y\). Die Mahalanobis-Distanz zwischen
 \(P_1\) und \(P_2\) ist definiert als \begin{align*}
   d_M(P_1,\,P_2) = \sqrt{(P_1 - P_2)'\boldsymbol{S}^{-1} (P_1 - P_2)},
 \end{align*} wobei \(\boldsymbol{S}\) die Varianz-Kovarianz-Matrix von
-\(X\) und \(Y\) ist. Die Mahalanobis-Distanz \(d_M(\cdot,\cdot)\) ist
-also die Euklidische Distanz zwischen den standardisierten Datenpunkten.
+\(X\) und \(Y\) ist. Die Mahalanobis-Distanz \(d_M(P_1,\,P_2)\) ist also
+die Euklidische Distanz zwischen den standardisierten Datenpunkten.
 
-Für beobachtete Daten ersetzen wir die Komponenten der
-Varianz-Kovarianz-Matrix durch Stichprobenmaße. Dies ergibt die Formel
+In empirischen Anwendungen ersetzen wir die (unbekannten) Komponenten
+der Varianz-Kovarianz-Matrix durch Stichprobenvarianten. Dies ergibt die
+Formel
 
 \begin{align*}
   \widehat{d}_M(P_1,\,P_2) = \sqrt{
@@ -2367,7 +2320,7 @@ Varianz-Kovarianz-Matrix durch Stichprobenmaße. Dies ergibt die Formel
   \end{pmatrix}'
   \begin{pmatrix}
     \widehat{\text{Var}}(X^2) & \widehat{\text{Cov}}(X, Y) \\
-     \widehat{\text{Cov}}(X, Y) & \widehat{\text{Var}}(X^2) 
+     \widehat{\text{Cov}}(X, Y) & \widehat{\text{Var}}(Y^2) 
   \end{pmatrix}^{-1}
     \begin{pmatrix}
     X_1 - X_2\\
@@ -2388,6 +2341,12 @@ Mahalanobis-Distanz Varianzen und Kovarianzen der Daten berücksichtigt,
 sodass die gematchten Beobachtungen in einem elliptischen Bereich um die
 betrachtete behandelte Beobachtung liegen. Eine Euklidische Distanz
 hingegen (gestrichelte Linie) ignoriert die Skalierung der Daten.
+
+\marginnote{\begin{footnotesize}
+
+\includegraphics{img/EDM_qr.png}
+
+\end{footnotesize}}
 
 Für Eins-zu-Eins-Matching im Website-Beispiel anhand der
 Mahalanobis-Distanz mit \texttt{matchit()} setzen wir
@@ -2472,6 +2431,20 @@ in der Behandlungsgruppe qualifiziert sind.
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\NormalTok{\#| context: setup}
+\NormalTok{\# Logit{-}Modell mit \textquotesingle{}glm()\textquotesingle{} schätzen}
+\NormalTok{(}
+\NormalTok{  darkmode\_ps\_logit \textless{}{-} glm(}
+\NormalTok{    formula = dark\_mode \textasciitilde{} age + male + hours,}
+\NormalTok{    data = darkmode,}
+\NormalTok{    family = binomial}
+\NormalTok{  )}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \CommentTok{\# Mahalanobis{-}Matchig mit PS{-}Caliper}
 \NormalTok{res\_mahaC }\OtherTok{\textless{}{-}} \FunctionTok{matchit}\NormalTok{(}
   \AttributeTok{formula =}\NormalTok{ dark\_mode }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ hours, }
@@ -2529,8 +2502,7 @@ individueller Match in der Kontrollgruppe gefunden.\footnote{Die durch
   \texttt{.25\ *\ sd(fitted(darkmode\_ps\_logit)))}.} Weiterhin finden
 wir eine verbesserte Balance für den gematchten Datensatz.
 
-\hypertarget{propensity-score-matching}{%
-\subsection{Propensity Score Matching}\label{propensity-score-matching}}
+\subsection{Propensity Score Matching}\label{propensity-score-matching}
 
 Eine gängige Variante ist Matching ausschließlich anhand von Propensity
 Scores innerhalb eines Calipers.
@@ -2616,13 +2588,7 @@ und übergeben die mit \texttt{matchit()} generierten Objekte im Argument
 \end{Highlighting}
 \end{Shaded}
 
-\begin{figure}[t]
-
-{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-36-1.pdf}
-
-}
-
-\end{figure}
+\includegraphics{Matching_files/figure-pdf/unnamed-chunk-37-1.pdf}
 
 Die Grafik zeigt, dass Coarsened Exact Matching (CEM) unter allen
 betrachteten Verfahren die Stichprobe mit der besten Balance ergibt.
@@ -2682,13 +2648,7 @@ Verteilung der Matching-Variablen in \texttt{darkmode\_matched}.
 \end{Highlighting}
 \end{Shaded}
 
-\begin{figure}[t]
-
-{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-38-1.pdf}
-
-}
-
-\end{figure}
+\includegraphics{Matching_files/figure-pdf/unnamed-chunk-39-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2707,21 +2667,14 @@ Verteilung der Matching-Variablen in \texttt{darkmode\_matched}.
 \end{Highlighting}
 \end{Shaded}
 
-\begin{figure}[t]
-
-{\centering \includegraphics{Matching_files/figure-pdf/unnamed-chunk-38-2.pdf}
-
-}
-
-\end{figure}
+\includegraphics{Matching_files/figure-pdf/unnamed-chunk-39-2.pdf}
 
 Wir beobachten eine bessere Balance bei \texttt{age} und \texttt{hours}.
 Inbesondere ist \texttt{male} für Kontroll- und Behandlungsgruppe
 ausgeglichen.
 
-\hypertarget{schuxe4tzung-und-inferenz-fuxfcr-den-behandlungseffekt-nach-matching}{%
 \section{Schätzung und Inferenz für den Behandlungseffekt nach
-Matching}\label{schuxe4tzung-und-inferenz-fuxfcr-den-behandlungseffekt-nach-matching}}
+Matching}\label{sec-regadj}
 
 Wir schätzen nun den Behandlungseffekt von \texttt{dark\_mode} auf
 \texttt{read\_time} für die mit CEM und Propensity Score Matching
@@ -2872,9 +2825,8 @@ dient als Ersatz für den hypothetischen Zustand der Behandlungsgruppe,
 wenn keine Behandlung erfolgt wäre. Dies entspricht der Definition eines
 ATT --- ein average treatment effect \emph{on the treated}.
 
-\hypertarget{cluster-robuste-standardfehler}{%
 \subsection{Cluster-robuste
-Standardfehler}\label{cluster-robuste-standardfehler}}
+Standardfehler}\label{cluster-robuste-standardfehler}
 
 Für Matching-Verfahren sind die mit \texttt{summary()} berechneten
 Standardfehler (und damit auch Konfidenzintervalle, t-Statistiken und
@@ -2892,30 +2844,30 @@ können. Auch dieser Faktor wird in der von \texttt{summary()}
 verwendeten Formel für den Standardfehler des Effekt-Schätzers nicht
 berücksichtigt.
 
-Standardfehlerberechnung für Matching-Schätzer von Behandlungseffekten
-ist Gegenstand aktueller Forschung. P. C. Austin und Small (2014) und
-Abadie und Spiess (2022) belegen die Gültigkeit von cluster-robusten
-Standardfehlern mit Clustering auf Ebene der Beobachtungsgruppen
-(\texttt{subclass} im output von \texttt{match.data()}) bei Matching
-ohne Zurücklegen. Für Matching anhand von Propensity Scores (auch mit
-Zurücklegen) zeigen Imbens (2016), dass ignorieren der zusätzlichen
-Unsicherheit durch die Schätzung der Propensity Scores zu konservativer
-Inferenz für den ATE anhand eines cluster-robusten
-Standardfehlerschätzers führt, jedoch ungültige Inferenz für die
-Schätzung des ATT bedeuten kann. Ähnlich zu P. C. Austin und Small
-(2014) deuten die Ergebnisse der Simulationsstudie von Bodory u.~a.
-(2020) auf grundsätzlich bessere Eigenschaften der Schätzung hin, wenn
-die Standardfehler nicht für die Schätzung der Propensity Scores
-adjustiert werden.
+Die Standardfehlerberechnung für Matching-Schätzer von
+Behandlungseffekten ist ein Gegenstand aktueller methodischer Forschung.
+P. C. Austin und Small (2014) und A. Abadie und Spiess (2022) belegen
+die Gültigkeit von cluster-robusten Standardfehlern mit Clustering auf
+Ebene der Beobachtungsgruppen (\texttt{subclass} im output von
+\texttt{match.data()}) bei Matching ohne Zurücklegen. Für Matching
+anhand von Propensity Scores (auch mit Zurücklegen) zeigt Imbens (2016),
+dass ignorieren der zusätzlichen Unsicherheit durch die Schätzung der
+Propensity Scores zu konservativer Inferenz für den ATE anhand eines
+cluster-robusten Standardfehlerschätzers führt, jedoch ungültige
+Inferenz für die Schätzung des ATT bedeuten kann. Ähnlich zu P. C.
+Austin und Small (2014) deuten die Ergebnisse der Simulationsstudie von
+Bodory u.~a. (2020) jedoch auf grundsätzlich bessere Eigenschaften der
+Schätzung hin, wenn die Standardfehler \emph{nicht} für die Schätzung
+der Propensity Scores adjustiert werden.
 
 Weiterhin ist die Kontrolle für Kovariablen mit Erklärungskraft für die
-Outcome-Variable und für die Matching-Variablen (wie oben erfolgt) mit
-\emph{Regression Adjustment} für die Schätzung des Behandlungseffekts
-nach Matching eine etablierte Strategie, vgl. Hill und Reiter (2006) und
-Abadie und Spiess (2022). So können die Varianz der Schätzung und das
-Risiko einer Verzerrung der Standardfehler aufgrund verbleibender
-Imbalance von Behandlungs- und Kontrollgruppe nach Matching verringert
-werden.
+Outcome-Variable und für die Matching-Variablen mit \emph{Regression
+Adjustment} (vgl. Kapitel~\ref{sec-regadj}) für die Schätzung des
+Behandlungseffekts nach Matching eine etablierte Strategie, vgl. Hill
+und Reiter (2006) und A. Abadie und Spiess (2022). So können die Varianz
+der Schätzung und das Risiko einer Verzerrung der Standardfehler
+aufgrund verbleibender Imbalance von Behandlungs- und Kontrollgruppe
+nach Matching verringert werden.
 
 Zur Demonstration von (cluster)-robuster Inferenz und für eine
 tabellarische Zusammenfassung der Ergebnisse nutzen wir die Pakete
@@ -3036,9 +2988,8 @@ Num.Obs. & 300 & 164 & 208 \\
 + p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001\\
 \end{minipage}
 
-\hypertarget{sec-bootmatching}{%
 \section{Bootstrap-Schätzung kausaler Effekte bei
-Matching}\label{sec-bootmatching}}
+Matching}\label{sec-bootmatching}
 
 Ein Bootstrap-Verfahren generiert mit Resampling (wiederholtes Ziehen
 mit Zurücklegen) aus dem Original-Datensatz (viele) künstliche
@@ -3053,14 +3004,14 @@ Bootstrap-Schätzungen) und p-Werte berechnen.
 
 Der Bootstrap kann hilfreich sein, wenn unklar ist, wie Standardfehler
 für die Unsicherheit des Matching-Prozesses zu adjustieren sind, um
-gültige Inferenzsstatistiken zu erhalten. Abadie und Imbens (2008)
+gültige Inferenzsstatistiken zu erhalten. A. Abadie und Imbens (2008)
 zeigen analytisch, dass der Standard-Bootstrap die Stichprobenverteilung
 für Schätzer kausaler Effekte anhand von gematchten Datensätzen (d.h.
 bei Zuordnung/Selektion von Beobachtungen mit Matching) nicht korrekt
 abbilden kann. Grundsätzlich problematisch hierbei ist, wenn der
 Bootstrap eine verzerrte Schätzung produziert und/oder zu kleine
-Standardfehler liefert. Abadie und Imbens (2008) belegen die Tendenz des
-Bootstraps zu \emph{konservative} (d.h. zu große) Standardfehler zu
+Standardfehler liefert. A. Abadie und Imbens (2008) belegen die Tendenz
+des Bootstraps zu \emph{konservative} (d.h. zu große) Standardfehler zu
 produzieren. Simulationsnachweise (Bodory u.~a. 2020; Hill und Reiter
 2006; P. C. Austin und Small 2014; P. C. Austin und Stuart 2017) finden,
 dass Bootstrap-Standardfehler u.a. bei Propensity Score Matching mit
@@ -3074,7 +3025,8 @@ bezüglich eines kausalen Effekts nach Matching und demonstrieren die
 Schätzung anhand unseres Website-Beispiels für den ATT nach
 Propensity-Score-Matching.
 
-\textbf{Algorithmus: Bootstrap-Schätzer für Propensity-Score-Matching}
+\begin{tcolorbox}[enhanced jigsaw, breakable, toprule=.15mm, title={\textbf{Algorithmus: Bootstrap-Schätzer für Matching mit Regression
+Adjustment}}, titlerule=0mm, bottomrule=.15mm, leftrule=.75mm, colbacktitle=quarto-callout-tip-color!10!white, opacitybacktitle=0.6, coltitle=black, left=2mm, opacityback=0, bottomtitle=1mm, toptitle=1mm, arc=.35mm, rightrule=.15mm, colframe=quarto-callout-tip-color-frame, colback=white]
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -3096,6 +3048,8 @@ Propensity-Score-Matching.
   \(\text{SE}(\overline{\beta}^*) = \sqrt{\frac{1}{B-1}\sum_{b=1}^B(\widehat{\beta}_b^*-\overline{\beta}^*)^2}\).
   Berechne Inferenz-Statistiken mit den üblichen Formeln.
 \end{enumerate}
+
+\end{tcolorbox}
 
 Wir Implementieren nun einen Bootstrap-Schätzer des ATT im
 Website-Beispiel für Propensity-Score-Matching. Hierzu definieren wir
@@ -3182,6 +3136,12 @@ Den Bootstrap-Schätzer des ATT sowie den Bootstrap-Standardfehler
 berechnen wir mit \texttt{mean()} und \texttt{sd()} anhand der 999
 Bootstrap-Replikationen in \texttt{boot\_out\$t}.
 
+Beachte, dass der Bootstrap-Schätzer des Behandlungseffekts nicht
+unmittelbar von \texttt{boot()} ausgegeben wird. \texttt{original} ist
+die Schätzung anhand der gesamten Stichprobe (d.h. ohne Bootstrap) und
+\texttt{bias} ist die Differenz zwischen dieser Schätzung und dem
+Mittelwert der Bootstrap-Schätzungen.
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# Bootstrap{-}Schätzer für den Treatment{-}Effekt}
@@ -3195,9 +3155,21 @@ Bootstrap-Replikationen in \texttt{boot\_out\$t}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# = mean(t0) + bias = mean(Bootstrap\_samples)}
-\CommentTok{\# vgl. \textquotesingle{}t0 = boot\_fun(darkmode, i = 1:1e3)\textquotesingle{}}
+\CommentTok{\# bootstrap {-} original = bias}
+\FunctionTok{mean}\NormalTok{(boot\_out}\SpecialCharTok{$}\NormalTok{t) }\SpecialCharTok{{-}}\NormalTok{ boot\_out}\SpecialCharTok{$}\NormalTok{t0}
+\end{Highlighting}
+\end{Shaded}
 
+\begin{verbatim}
+  dark_mode 
+-0.08144129 
+\end{verbatim}
+
+Wir können prüfen, dass die Berechnung des Standardfehlers dem
+Stichprobenstandardabweichung der Bootstrap-Schätzungen entspricht.
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \CommentTok{\# Bootstrap{-}Standardfehler}
 \FunctionTok{sd}\NormalTok{(boot\_out}\SpecialCharTok{$}\NormalTok{t)}
 \end{Highlighting}
@@ -3246,7 +3218,7 @@ Die Bootstrap-Funktion \texttt{boot\_fun} kann leicht für eine Schätzung
 des Standardfehlers für den IPW-Schätzer des ATE aus
 Kapitel~\ref{sec-PSM} angepasst werden. Statt einer Matching-Prozedur
 berechnen wir hierzu für \(B\) Bootstrap-Stichproben den Schätzer
-\(\widehat{\tau}^\text{IPW}\).
+\(\widehat{\tau}^\text{IPW}\) mit Trimming der Propensity Scores.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3305,14 +3277,31 @@ berechnen wir hierzu für \(B\) Bootstrap-Stichproben den Schätzer
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# Bootstrap durchführen}
-\NormalTok{b\_IPW }\OtherTok{\textless{}{-}} \FunctionTok{boot}\NormalTok{(}
-  \AttributeTok{data =}\NormalTok{ darkmode,}
-  \AttributeTok{statistic =}\NormalTok{ IPW\_boot, }
-  \AttributeTok{R =} \DecValTok{999}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{1234}\NormalTok{)}
+\CommentTok{\# Bootstrap für IPW durchführen}
+\NormalTok{(}
+\NormalTok{  b\_IPW }\OtherTok{\textless{}{-}} \FunctionTok{boot}\NormalTok{(}
+    \AttributeTok{data =}\NormalTok{ darkmode,}
+    \AttributeTok{statistic =}\NormalTok{ IPW\_boot, }
+    \AttributeTok{R =} \DecValTok{999}
+\NormalTok{  )}
 \NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+
+ORDINARY NONPARAMETRIC BOOTSTRAP
+
+
+Call:
+boot(data = darkmode, statistic = IPW_boot, R = 999)
+
+
+Bootstrap Statistics :
+    original     bias    std. error
+t1* 1.962849 0.06297654   0.6599891
+\end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3322,7 +3311,7 @@ berechnen wir hierzu für \(B\) Bootstrap-Stichproben den Schätzer
 \end{Shaded}
 
 \begin{verbatim}
-[1] 2.026179
+[1] 2.025826
 \end{verbatim}
 
 \begin{Shaded}
@@ -3332,13 +3321,13 @@ berechnen wir hierzu für \(B\) Bootstrap-Stichproben den Schätzer
 \end{Shaded}
 
 \begin{verbatim}
-[1] 0.6823184
+[1] 0.6599891
 \end{verbatim}
 
-In diesem Fall ist der Bootstrap-Standardfehler von ca. 0.68 gut mit dem
+In diesem Fall ist der Bootstrap-Standardfehler von ca. 0.66 gut mit dem
 anhand von \texttt{summary(model\_ipw)} berechneten Standardfehler
-vergleichbar. Ein 95\%-Konfidenzintervall für den ATE erhalten wir mit
-\texttt{boot.ci()}.
+vergleichbar. Ein 95\%-Konfidenzintervall für den ATE erhalten wir wie
+zuvor mit \texttt{boot.ci()}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3356,13 +3345,12 @@ boot.ci(boot.out = b_IPW, type = "bca")
 
 Intervals : 
 Level       BCa          
-95%   ( 0.658,  3.225 )  
+95%   ( 0.563,  3.134 )  
 Calculations and Intervals on Original Scale
 \end{verbatim}
 
-\hypertarget{regression-matching-und-doubly-robust-schuxe4tzung}{%
 \section{Regression, Matching und
-Doubly-Robust-Schätzung}\label{regression-matching-und-doubly-robust-schuxe4tzung}}
+Doubly-Robust-Schätzung}\label{regression-matching-und-doubly-robust-schuxe4tzung}
 
 Als \emph{Doubly-Robust-Schätzer} bezeichnet man Methoden, die bei
 Fehlspezifikationen im Matching-Verfahrens \emph{oder} der funktionalen
@@ -3381,7 +3369,9 @@ Der von Wooldridge (2010) vorgeschlagene Doubly-Robust-Schätzer (IPWRA)
 für den ATE erreicht seine vorteilhaften Eigenschaften durch eine
 geschickte Kombination von IPW und Regression Adjustment.
 
-\textbf{Algorithmus: IPWRA-Schätzer des ATE (Wooldridge 2010)}
+\begin{tcolorbox}[enhanced jigsaw, breakable, toprule=.15mm, title={\textbf{Algorithmus: IPWRA-Schätzer des ATE}}, titlerule=0mm, bottomrule=.15mm, leftrule=.75mm, colbacktitle=quarto-callout-tip-color!10!white, opacitybacktitle=0.6, coltitle=black, left=2mm, opacityback=0, bottomtitle=1mm, toptitle=1mm, arc=.35mm, rightrule=.15mm, colframe=quarto-callout-tip-color-frame, colback=white]
+
+Vgl. Wooldridge (2010).
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -3390,49 +3380,54 @@ geschickte Kombination von IPW und Regression Adjustment.
   unter Verwendung der Matching-Variablen.
 \item
   Regression Adjustment:
-\end{enumerate}
 
-A. Schätze für die \emph{Behandlungsgruppe} eine mit den IPW gewichtete
-Regressionspezifikation der Outcome-Variable mit Kontrolle für die
-Matching-Variablen.
-
-B. Wiederhole Schritt A für die Kontrollgruppe.
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{2}
+  \begin{enumerate}
+  \def\labelenumii{(\alph{enumii})}
+  \item
+    Schätze lediglich für die \emph{Behandlungsgruppe} eine mit den IPW
+    gewichtete Regressionspezifikation der Outcome-Variable mit
+    Kontrolle für die Matching-Variablen.
+  \item
+    Wiederhole Schritt A für \emph{Kontrollgruppe}.
+  \end{enumerate}
 \item
   Berechne Vorhersagen der Outcome-Variable für die angepassten Modelle
-  aus 2.A und 2.B.
+  aus 2 (a) und 2 (b) anhand des \emph{gesamten} Datensatzes.
 \item
   Schätze den ATE als Mittelwert-Differenz der Vorhersagen aus Schritt
   3.
 \end{enumerate}
 
+\end{tcolorbox}
+
 Wir implementieren den Doubly-Robust-Schätzer des ATE von Wooldridge
-(2010) für das Website-Beispiel in der Funktion \texttt{IPWRA()}.
+(2010) für das Website-Beispiel in der Funktion \texttt{IPWRA()} under
+Adaption des Schemas von \texttt{IPW\_boot()}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# IPW estimation with regression adjustment}
 \NormalTok{IPWRA }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(}
-\NormalTok{    br, }
+\NormalTok{    data, }
     \AttributeTok{i =}\NormalTok{ i) \{}
-    \CommentTok{\# slice bootstrapped observations}
-\NormalTok{    br }\OtherTok{\textless{}{-}}\NormalTok{ br }\SpecialCharTok{\%\textgreater{}\%} 
+  
+    \CommentTok{\# Bootstrap{-}Stichprobe zuweisen}
+\NormalTok{    b\_data }\OtherTok{\textless{}{-}}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%} 
       \FunctionTok{slice}\NormalTok{(i)}
     
-    \CommentTok{\# estimate and predict propensity score}
-\NormalTok{    m }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(}
+    \CommentTok{\# Logistische Regression}
+\NormalTok{    glm\_fit }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(}
       \AttributeTok{formula =}\NormalTok{ dark\_mode }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ male,}
-      \AttributeTok{data =}\NormalTok{ br, }
+      \AttributeTok{data =}\NormalTok{ b\_data, }
       \AttributeTok{family =} \FunctionTok{binomial}\NormalTok{(}\AttributeTok{link =} \StringTok{\textquotesingle{}logit\textquotesingle{}}\NormalTok{)}
 \NormalTok{    )}
     
-\NormalTok{    br }\OtherTok{\textless{}{-}}\NormalTok{ br }\SpecialCharTok{\%\textgreater{}\%}
-        \FunctionTok{mutate}\NormalTok{(}\AttributeTok{ps =} \FunctionTok{predict}\NormalTok{(m, }\AttributeTok{type =} \StringTok{\textquotesingle{}response\textquotesingle{}}\NormalTok{))}
-
-\NormalTok{    br }\OtherTok{\textless{}{-}}\NormalTok{ br }\SpecialCharTok{\%\textgreater{}\%}
+    \CommentTok{\# Propensity Scores berechnen}
+\NormalTok{    b\_data }\OtherTok{\textless{}{-}}\NormalTok{ b\_data }\SpecialCharTok{\%\textgreater{}\%}
+        \FunctionTok{mutate}\NormalTok{(}\AttributeTok{ps =} \FunctionTok{predict}\NormalTok{(glm\_fit, }\AttributeTok{type =} \StringTok{\textquotesingle{}response\textquotesingle{}}\NormalTok{))}
+    
+    \CommentTok{\# Propensity Scores trimmen}
+\NormalTok{    b\_data }\OtherTok{\textless{}{-}}\NormalTok{ b\_data }\SpecialCharTok{\%\textgreater{}\%}
       \FunctionTok{filter}\NormalTok{(}
         \FunctionTok{between}\NormalTok{(}
           \AttributeTok{x =}\NormalTok{ ps,}
@@ -3441,61 +3436,112 @@ Wir implementieren den Doubly-Robust-Schätzer des ATE von Wooldridge
 \NormalTok{          )}
 \NormalTok{    )}
     
-    \CommentTok{\# compute IPWs}
-\NormalTok{    br }\OtherTok{\textless{}{-}}\NormalTok{ br }\SpecialCharTok{\%\textgreater{}\%}
+    \CommentTok{\# IPW berechnen}
+\NormalTok{    b\_data }\OtherTok{\textless{}{-}}\NormalTok{ b\_data }\SpecialCharTok{\%\textgreater{}\%}
       \FunctionTok{mutate}\NormalTok{(}
-        \AttributeTok{ipw =} \FunctionTok{case\_when}\NormalTok{(}
+        \AttributeTok{IPW =} \FunctionTok{case\_when}\NormalTok{(}
 \NormalTok{          dark\_mode }\SpecialCharTok{==} \DecValTok{1} \SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{/}\NormalTok{ ps,}
 \NormalTok{          dark\_mode }\SpecialCharTok{==} \DecValTok{0} \SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{/}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ ps))}
 \NormalTok{      )}
     
-    \CommentTok{\# Do regression adjustment for \_ATE\_ estimate}
-    \CommentTok{\# TE prediction for whole sample based on TG model}
-\NormalTok{    mtreat }\OtherTok{\textless{}{-}}\NormalTok{ br }\SpecialCharTok{\%\textgreater{}\%}
+    \CommentTok{\# Regression Adjustment:}
+    
+    \CommentTok{\# Schätzung des Behandlungseffekts für die ges. Stichprobe}
+    \CommentTok{\# mit Modell für Behandlungsgruppe}
+\NormalTok{    mtreat }\OtherTok{\textless{}{-}}\NormalTok{ b\_data }\SpecialCharTok{\%\textgreater{}\%}
       \FunctionTok{filter}\NormalTok{(dark\_mode }\SpecialCharTok{==} \DecValTok{1}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-      \FunctionTok{lm}\NormalTok{(read\_time }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ male, }\AttributeTok{data =}\NormalTok{ ., }\AttributeTok{weights =}\NormalTok{ .}\SpecialCharTok{$}\NormalTok{ipw) }\SpecialCharTok{\%\textgreater{}\%}
-      \FunctionTok{predict}\NormalTok{(}\AttributeTok{newdata =}\NormalTok{ br) }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{lm}\NormalTok{(read\_time }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ male, }\AttributeTok{data =}\NormalTok{ ., }\AttributeTok{weights =}\NormalTok{ .}\SpecialCharTok{$}\NormalTok{IPW) }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{predict}\NormalTok{(}\AttributeTok{newdata =}\NormalTok{ b\_data) }\SpecialCharTok{\%\textgreater{}\%}
       \FunctionTok{mean}\NormalTok{()}
 
-    \CommentTok{\# TE prediction for whole sample based on CG model}
-\NormalTok{    mcont }\OtherTok{\textless{}{-}}\NormalTok{ br }\SpecialCharTok{\%\textgreater{}\%}
+    \CommentTok{\# Schätzung des Behandlungseffekts für die ges. Stichprobe}
+    \CommentTok{\# mit Modell für Kontrollgruppe   }
+\NormalTok{    mcont }\OtherTok{\textless{}{-}}\NormalTok{ b\_data }\SpecialCharTok{\%\textgreater{}\%}
       \FunctionTok{filter}\NormalTok{(dark\_mode }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
       \FunctionTok{lm}\NormalTok{(read\_time }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ hours }\SpecialCharTok{+}\NormalTok{ male, }\AttributeTok{data =}\NormalTok{ ., }\AttributeTok{weights =}\NormalTok{ .}\SpecialCharTok{$}\NormalTok{ipw) }\SpecialCharTok{\%\textgreater{}\%}
-      \FunctionTok{predict}\NormalTok{(}\AttributeTok{newdata =}\NormalTok{ br) }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{predict}\NormalTok{(}\AttributeTok{newdata =}\NormalTok{ b\_data) }\SpecialCharTok{\%\textgreater{}\%}
       \FunctionTok{mean}\NormalTok{()}
-
-    \FunctionTok{return}\NormalTok{(mtreat }\SpecialCharTok{{-}}\NormalTok{ mcont) }\CommentTok{\# Regression adjusted \_ATE\_ estimate}
+    
+    \CommentTok{\# Regression adjusted ATE{-}Schätzer}
+    \FunctionTok{return}\NormalTok{(mtreat }\SpecialCharTok{{-}}\NormalTok{ mcont)}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
 
+Schätzung des ATE mit \texttt{IPWRA()}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{IPWRA}\NormalTok{(}\AttributeTok{data =}\NormalTok{ darkmode, }\AttributeTok{i =} \DecValTok{1}\SpecialCharTok{:}\FunctionTok{nrow}\NormalTok{(darkmode))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] 1.96847
+\end{verbatim}
+
+Wie bei \(\widehat{\tau}^\text{IPW}\) gibt es keine formale Darstellung
+des Standardfehlers für den IPWRA-Schätzer, sodass auch hier der
+Bootstrap genutzt werden sollte.
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{set.seed}\NormalTok{(}\DecValTok{1234}\NormalTok{)}
-\NormalTok{b }\OtherTok{\textless{}{-}} \FunctionTok{boot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ darkmode, IPWRA, }\AttributeTok{R =} \DecValTok{999}\NormalTok{)}
-\CommentTok{\# Bootstrap estimate and standard error}
-\FunctionTok{mean}\NormalTok{(b}\SpecialCharTok{$}\NormalTok{t)}
+
+\CommentTok{\# Bootrstrap für IPWRA durchführen}
+\NormalTok{(}
+\NormalTok{  b\_IPWRA }\OtherTok{\textless{}{-}} \FunctionTok{boot}\NormalTok{(}
+  \AttributeTok{data =}\NormalTok{ darkmode,}
+  \AttributeTok{statistic =}\NormalTok{ IPWRA,}
+  \AttributeTok{R =}\NormalTok{ B}
+\NormalTok{  )}
+\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-[1] 1.947387
+
+ORDINARY NONPARAMETRIC BOOTSTRAP
+
+
+Call:
+boot(data = darkmode, statistic = IPWRA, R = B)
+
+
+Bootstrap Statistics :
+    original       bias    std. error
+t1*  1.96847 -0.001270721   0.5960465
 \end{verbatim}
+
+Wir berechnen die interessierenden Statistiken analog zu der
+Vorgehensweise in Kapitel~\ref{sec-bootmatching}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{sd}\NormalTok{(b}\SpecialCharTok{$}\NormalTok{t)}
+\CommentTok{\# Bootstrap{-}IPWRA{-}Schätzer des ATE}
+\FunctionTok{mean}\NormalTok{(b\_IPWRA}\SpecialCharTok{$}\NormalTok{t)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-[1] 0.5959568
+[1] 1.967199
 \end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# 95\% Bootstrap{-}KI für den Treatment{-}Effekt}
-\FunctionTok{boot.ci}\NormalTok{(b, }\AttributeTok{type =} \StringTok{"bca"}\NormalTok{)}
+\CommentTok{\# Bootstrap{-}Standardfehler}
+\FunctionTok{sd}\NormalTok{(b\_IPWRA}\SpecialCharTok{$}\NormalTok{t)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] 0.5960465
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 95\%{-}Bootstrap{-}KI für den ATE}
+\FunctionTok{boot.ci}\NormalTok{(b\_IPWRA, }\AttributeTok{type =} \StringTok{"bca"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -3504,19 +3550,23 @@ BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
 Based on 999 bootstrap replicates
 
 CALL : 
-boot.ci(boot.out = b, type = "bca")
+boot.ci(boot.out = b_IPWRA, type = "bca")
 
 Intervals : 
 Level       BCa          
-95%   ( 0.737,  3.057 )  
+95%   ( 0.787,  3.098 )  
 Calculations and Intervals on Original Scale
 \end{verbatim}
 
+Die Bootstrap-Schätzung des ATE mit IPWRA ist mit den Ergebnissen für
+die Bootstrap-Variante von \(\widehat{\tau}^\text{IPW}\) vergleichbar,
+hat allerdings einen etwas kleineren Standardfehler und ist somit
+genauer.
+
 \bookmarksetup{startatroot}
 
-\hypertarget{regression-discontiniuty-designs}{%
 \chapter{Regression Discontiniuty
-Designs}\label{regression-discontiniuty-designs}}
+Designs}\label{regression-discontiniuty-designs}
 
 Regression Discontinuity Design (RDD) ist ein Ansatz für die Schätzung
 von Behandlungseffekten mit Regression, wenn durch einen experimentell
@@ -3531,23 +3581,17 @@ potentieller Backdoor-Variablen vergleichbar, sodass deren
 problematische Pfade geschlossen sind. Das kausale Diagram in
 Abbildung~\ref{fig-CDRDD} zeigt den grundsätzlichen Zusammenhang.
 
-\begin{figure}
+\begin{figure}[t]
 
-{\centering 
+\centering{
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=5in,height=3in]{RDD_files/figure-latex/dot-figure-1.png}
-
-}
-
-\end{figure}
+\includegraphics[width=5in,height=3in]{RDD_files/figure-latex/dot-figure-1.png}
 
 }
 
 \caption{\label{fig-CDRDD}Kausales Diagramm für Sharp RDD}
 
-\end{figure}
+\end{figure}%
 
 RDD isoliert Variation auf dem Pfad \emph{Oberhalb C → Behandlung B →
 Y}. Somit können Backdoor-Pfade über \(X\) oder weitere (möglichweise
@@ -3578,9 +3622,8 @@ gibt (für die wir nicht kontrollieren können). Die Wahl zwischen SRDD
 und FRDD hängt grundsätzlich vom datenerzeugenden Prozess und der
 Forschungsfrage ab.
 
-\hypertarget{sharp-regression-discontinuity-design}{%
 \section{Sharp Regression Discontinuity
-Design}\label{sharp-regression-discontinuity-design}}
+Design}\label{sharp-regression-discontinuity-design}
 
 \textbf{Modell und funktionale Form}
 
@@ -3692,13 +3735,15 @@ Triangular-Kernelfunktion (blau), siehe Abbildung~\ref{fig-linearkern}.
 
 \begin{figure}[t]
 
-{\centering \includegraphics{RDD_files/figure-pdf/fig-linearkern-1.pdf}
+\centering{
+
+\includegraphics{RDD_files/figure-pdf/fig-linearkern-1.pdf}
 
 }
 
 \caption{\label{fig-linearkern}Kernelfunktionen auf {[}-1, 1{]}}
 
-\end{figure}
+\end{figure}%
 
 In empirischen Studien wird als Basis-Spezifikation oft eine lokale
 lineare Regression anhand von \eqref{eq:linearSRDD} mit einer linearen
@@ -3750,7 +3795,7 @@ Diese Vorschrift ist schnell mit R umgesetzt:
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 \textbf{\emph{Diese interaktive Komponente des Buchs ist nur in der
-Online-Version verfügbar}}
+Online-Version verfügbar.}}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -3795,9 +3840,8 @@ oder anhand von \emph{Cross Validation} (bspw. G. W. Imbens und Lemieux
 2008) bestimmt. Die später in diesem Kapitel betrachteten R-Pakete
 halten diese Methoden bereit.
 
-\hypertarget{manipulation-am-schwellenwert}{%
 \section{Manipulation am
-Schwellenwert}\label{manipulation-am-schwellenwert}}
+Schwellenwert}\label{manipulation-am-schwellenwert}
 
 Eine wichtige Annahmen für die Gültigkeit einer RDD-Schätzung ist, dass
 keine Manipulation der Gruppenzugehörigkeit am Schwellenwert vorliegt.
@@ -3879,14 +3923,16 @@ Abbildung~\ref{fig-cjmtsim}.
 
 \begin{figure}[t]
 
-{\centering \includegraphics{RDD_files/figure-pdf/fig-cjmtsim-1.pdf}
+\centering{
+
+\includegraphics{RDD_files/figure-pdf/fig-cjmtsim-1.pdf}
 
 }
 
 \caption{\label{fig-cjmtsim}CJM-Test -- geschätzte Dichtefunktionen der
 Laufvariable auf beiden Seiten des Schwellenwerts c = 5}
 
-\end{figure}
+\end{figure}%
 
 Abbildung~\ref{fig-cjmtsim} zeigt die geschätzten Dichtefunktionen.
 Erwartungsgemäß finden wir eine große Überlappung der zugehörigen
@@ -3942,9 +3988,8 @@ Gemäß des p-Werts (\texttt{P\ \textgreater{}\ \textbar{}T\textbar{}})
 von 0.74 spricht der CJM-Test noch deutlicher gegen eine Diskontinuität
 als der McCrary-Test.
 
-\hypertarget{case-study-amtsinhaber-vorteil-lee2008}{%
 \subsection{Case Study: Amtsinhaber-Vorteil (Lee
-2008)}\label{case-study-amtsinhaber-vorteil-lee2008}}
+2008)}\label{case-study-amtsinhaber-vorteil-lee2008}
 
 Lee (2008) untersucht den Einfluss des Amtsinhaber-Vorteils auf die Wahl
 von Mitgliedern des US-Repräsentantenhaus. In den meisten Wahlkreisen
@@ -4029,13 +4074,15 @@ Seiten zu erhalten. Wir stellen zunächst diese klassierten Daten mit
 
 \begin{figure}[t]
 
-{\centering \includegraphics{RDD_files/figure-pdf/fig-LeeDataClass-1.pdf}
+\centering{
+
+\includegraphics{RDD_files/figure-pdf/fig-LeeDataClass-1.pdf}
 
 }
 
 \caption{\label{fig-LeeDataClass}Klassierte Daten aus Lee (2008)}
 
-\end{figure}
+\end{figure}%
 
 Die Grafik zeigt eindeutig einen Sprung von \(StimmenT\) bei
 \(StimmenTm1 = 0\). Weiterhin erkennen wir, dass der Zusammenhang nahe
@@ -4128,14 +4175,16 @@ Window Length / 2          <c     >=c    P>|T|
 
 \begin{figure}[t]
 
-{\centering \includegraphics{RDD_files/figure-pdf/fig-cjm-lee-1.pdf}
+\centering{
+
+\includegraphics{RDD_files/figure-pdf/fig-cjm-lee-1.pdf}
 
 }
 
 \caption{\label{fig-cjm-lee}CJM-Test -- geschätzte Dichtefunktionen der
 Laufvariable}
 
-\end{figure}
+\end{figure}%
 
 Abbildung~\ref{fig-cjm-lee} und der p-Wert von \(0.15\) sind Evidenz
 gegen eine Manipulation am Schwellenwert.
@@ -4282,10 +4331,14 @@ Für eine Gegenüberstellung der Ergebnisse verwenden wir
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{tbl-intmodsLee}{}
 \setlength{\LTpost}{0mm}
+
 \begin{longtable}{lcc}
-\caption{\label{tbl-intmodsLee}Vergleich von SRDD-Interaktionsmodellen für Lee (2008) }\tabularnewline
+
+\caption{\label{tbl-intmodsLee}Vergleich von SRDD-Interaktionsmodellen
+für Lee (2008)}
+
+\tabularnewline
 
 \toprule
   & Linear int. & Quadratisch int. \\ 
@@ -4308,7 +4361,9 @@ BTRUE × poly(StimmenTm1, degree = 2, raw = T)2 &  & -1.529+ \\
  &  & (0.834) \\ 
 Num.Obs. & 2956 & 2956 \\ 
 \bottomrule
+
 \end{longtable}
+
 \begin{minipage}{\linewidth}
 + p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001\\
 \end{minipage}
@@ -4377,27 +4432,20 @@ Online-Version verfügbar.}}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
-\hypertarget{fuzzy-regression-discontinuity-design}{%
 \section{Fuzzy Regression Discontinuity
-Design}\label{fuzzy-regression-discontinuity-design}}
+Design}\label{fuzzy-regression-discontinuity-design}
 
-\begin{figure}
+\begin{figure}[t]
 
-{\centering 
+\centering{
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=5in,height=3in]{RDD_files/figure-latex/dot-figure-2.png}
-
-}
-
-\end{figure}
+\includegraphics[width=5in,height=3in]{RDD_files/figure-latex/dot-figure-2.png}
 
 }
 
 \caption{\label{fig-CDFRDD}Kausales Diagram für FRDD}
 
-\end{figure}
+\end{figure}%
 
 Ein FRDD liegt vor, wenn die Zuweisung der Behandlung \(B\) durch die
 Laufvariable \(X\) (und möglicherweise weitere Variablen \(Z\))
@@ -4478,14 +4526,16 @@ mit einer Diskontinuität bei \(X_i = c\).
 
 \begin{figure}[t]
 
-{\centering \includegraphics{RDD_files/figure-pdf/fig-FRDDprobD-1.pdf}
+\centering{
+
+\includegraphics{RDD_files/figure-pdf/fig-FRDDprobD-1.pdf}
 
 }
 
 \caption{\label{fig-FRDDprobD}Bedingte Behandlungswahrscheinlichkeiten
 im FRDD}
 
-\end{figure}
+\end{figure}%
 
 Definition \eqref{eq-BFRDD} bedeutet, dass eine KQ-Schätzung von
 \(\beta_1\) anhand \eqref{eq-simpleFRDD} eine \emph{verzerrte} Schätzung
@@ -4536,9 +4586,8 @@ Wie im SRDD werden die IV-Ansätze für das FRDD \eqref{eq:FRDD_simpleIV}
 und \eqref{eq:FRDD_lintIV} in empirischen Studien unter Berücksichtigung
 einer Bandweite (i.d.R. dieselbe Bandweite für beide Stufen) angewendet.
 
-\hypertarget{case-study-protestantische-arbeitsethik}{%
 \section{Case Study: Protestantische
-Arbeitsethik}\label{case-study-protestantische-arbeitsethik}}
+Arbeitsethik}\label{case-study-protestantische-arbeitsethik}
 
 Die Studie \emph{Beyond Work Ethic: Religion, Individual, and Political
 Preferences} (Basten und Betz 2013) untersucht den Zusammenhang zwischen
@@ -4578,17 +4627,32 @@ gemäß Webers Theorie vorliegt, sich die Gemeinden nahe der Grenz aber
 hinsichtlich anderer Charakteristika (insb. der Bevölkerungsstruktur)
 nicht systematisch unterscheiden. Somit liegt ein quai
 
+{
+\makeatletter
+\def\LT@makecaption#1#2#3{%
+  \noalign{\smash{\hbox{\kern\textwidth\rlap{\kern\marginparsep
+  \parbox[t]{\marginparwidth}{%
+    \footnotesize{%
+      \vspace{(1.1\baselineskip)}
+    #1{#2: }\ignorespaces #3}}}}}}%
+    }
+\makeatother
+
 \begin{figure}[t]
 
 \sidecaption{\label{fig-vaudfb}Historische Verteilung von
 Religionszugehörigkeit in Schweizer Gemeinden im 16. Jahrhundert.
 Quelle: Basten und Betz (2013).}
 
-{\centering \includegraphics[width=4.16667in,height=\textheight]{img/WaadtFribourg.png}
+\centering{
+
+\includegraphics[width=4.16667in,height=\textheight]{img/WaadtFribourg.png}
 
 }
 
-\end{figure}
+\end{figure}%
+
+}
 
 Die Ergebnisse der Studie zeigen einen signifikanten Einfluss von
 Protestantismus auf politische Präferenzen, die über traditionelle
@@ -4598,8 +4662,7 @@ politische Ansichten vertreten. Eine mögliche Erklärung für diesen
 Effekt ist, dass religiöse Institutionen auch eine soziale und
 politische Agenda verfolgen, die von den Gläubigen internalisiert wird.
 
-\hypertarget{aufbereitung-der-daten}{%
-\subsection{Aufbereitung der Daten}\label{aufbereitung-der-daten}}
+\subsection{Aufbereitung der Daten}\label{aufbereitung-der-daten}
 
 In diesem Kapitel zeigen wir, wie die Kernergebnisse der Studie mit R
 reproduziert werden können. Hierfür werden folgende Pakete benötigt.
@@ -4653,12 +4716,11 @@ Die Definitionen der Variablen sind in Tabelle~\ref{tbl-BastenBetzRed}
 gegeben. Die Präferenzen \texttt{pfl}, \texttt{pfr} und \texttt{pfi}
 basieren auf Wahlergebnissen auf Gemeindeebene zu Volksentscheiden.
 
-\hypertarget{tbl-BastenBetzRed}{}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1806}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8194}}@{}}
-\caption{\label{tbl-BastenBetzRed}\texttt{BastenBetz} -- Variablen und
-Definitionen}\tabularnewline
+\caption{\texttt{BastenBetz} -- Variablen und
+Definitionen}\label{tbl-BastenBetzRed}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Variable
@@ -4715,8 +4777,7 @@ MSE-optimalen Schätzer, der in der Funktion
 [1] 5.078001
 \end{verbatim}
 
-\hypertarget{deskriptive-statistiken}{%
-\subsection{Deskriptive Statistiken}\label{deskriptive-statistiken}}
+\subsection{Deskriptive Statistiken}\label{deskriptive-statistiken}
 
 Zur Reproduktion von Tabelle 1 aus Basten und Betz (2013) erzeugen wir
 eine nach Kantonen gruppierte Zusammenfassung der Daten und berechnen
@@ -4783,9 +4844,12 @@ Die Tabelle erzeugen wir mit \texttt{gt::gt()}.
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{tbl-sumstat}{}
 \begin{longtable}{lrrrrrr}
-\caption{\label{tbl-sumstat}Datensatz \texttt{BastenBetz} -- Zusammenfassende Statistiken }\tabularnewline
+
+\caption{\label{tbl-sumstat}Datensatz \texttt{BastenBetz} --
+Zusammenfassende Statistiken}
+
+\tabularnewline
 
 \toprule
  & \multicolumn{3}{c}{Freiburg} & \multicolumn{3}{c}{Waadt} \\ 
@@ -4799,6 +4863,7 @@ pfl & $48.239$ & $4.774$ & $49$ & $39.508$ & $5.723$ & $84$ \\
 pfr & $43.049$ & $2.634$ & $49$ & $39.19$ & $5.025$ & $84$ \\ 
 pfi & $52.642$ & $2.94$ & $49$ & $47.086$ & $3.368$ & $84$ \\ 
 \bottomrule
+
 \end{longtable}
 
 Die Statistiken in Tabelle~\ref{tbl-sumstat} scheinen konsistent mit der
@@ -4808,9 +4873,8 @@ finden wir eine größere Einkommensungleichkeit und höhere aus
 Wahlergebnissen abgeleitete Präferenzen für Freizeit, Umverteilung sowie
 staatliche Interventionen.
 
-\hypertarget{modellspezifikation-und-first-stage-ergebnisse}{%
 \subsection{Modellspezifikation und
-First-Stage-Ergebnisse}\label{modellspezifikation-und-first-stage-ergebnisse}}
+First-Stage-Ergebnisse}\label{modellspezifikation-und-first-stage-ergebnisse}
 
 Die Kantone Waadt und Freiburg haben bis heute mehrheitlich
 protestantische bzw. katholische Gemeinden. Die Verteilung von
@@ -4905,13 +4969,15 @@ Wir sammeln die Ergebnisse in einem Plot-Gitter mit
 
 \begin{figure}[t]
 
-{\centering \includegraphics{RDD_files/figure-pdf/fig-BastenBetzFS-1.pdf}
+\sidecaption{\label{fig-BastenBetzFS}First-Stage-Regressionen}
+
+\centering{
+
+\includegraphics{RDD_files/figure-pdf/fig-BastenBetzFS-1.pdf}
 
 }
 
-\caption{\label{fig-BastenBetzFS}First-Stage-Regressionen}
-
-\end{figure}
+\end{figure}%
 
 Die Grafiken in Abbildung~\ref{fig-BastenBetzFS} zeigen deutliche
 Hinweise auf die Diskontinuität in \texttt{prot} nahe der Kantonsgrenze.
@@ -4980,21 +5046,13 @@ anhand der jeweiligen KQ-Regressionen beurteilen.\footnote{Wir nutzen
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{tbl-BastenBetzFS}{}
-{
-\makeatletter
-\def\LT@makecaption#1#2#3{%
-  \noalign{\smash{\hbox{\kern\textwidth\rlap{\kern\marginparsep
-  \parbox[t]{\marginparwidth}{%
-    \footnotesize{%
-      \vspace{(1.1\baselineskip)}
-    #1{#2: }\ignorespaces #3}}}}}}%
-    }
-\makeatother
-
 \setlength{\LTpost}{0mm}
+
 \begin{longtable}{lcccc}
-\caption{\label{tbl-BastenBetzFS}First-Stage Regressionen }\tabularnewline
+
+\caption{\label{tbl-BastenBetzFS}First-Stage-Regressionen}
+
+\tabularnewline
 
 \toprule
   & BW = OB & BW = 10 & BW=20 & Ges. Datensatz \\ 
@@ -5009,12 +5067,12 @@ vaud × bord & -0.006 & -0.001 & -0.009*** & -0.004*** \\
  & (0.012) & (0.005) & (0.003) & (0.001) \\ 
 Num.Obs. & 133 & 207 & 312 & 509 \\ 
 \bottomrule
+
 \end{longtable}
+
 \begin{minipage}{\linewidth}
 + p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001\\
 \end{minipage}
-
-}
 
 Für die geschätze Bandweite schätzen wir einen hochsignifikanten Sprung
 in \texttt{prot} von etwa 67\% an der Kantonsgrenze. Auch für größere
@@ -5022,8 +5080,7 @@ Bandweiten von 10km und 20km sowie für den gesamten Datensatz finden wir
 vergleichbare signifikante Effekte, was eine bei zunehmender Distanz zur
 Grenze persistente Diskrepanz der Religionszugehörigkeit bestätigt.
 
-\hypertarget{second-stage-ergebnisse}{%
-\subsection{Second-Stage-Ergebnisse}\label{second-stage-ergebnisse}}
+\subsection{Second-Stage-Ergebnisse}\label{second-stage-ergebnisse}
 
 Wir schätzen nun den LATE von Protestantismus für die Outcome-Variablen
 \texttt{gini}, \texttt{pfl}, \texttt{pfi} und \texttt{pfr}, vgl.
@@ -5156,21 +5213,14 @@ Inferenz betreiben zu können.\footnote{Die Autoren geben an, robuste SEs
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{tbl-BastenBetzSS}{}
-{
-\makeatletter
-\def\LT@makecaption#1#2#3{%
-  \noalign{\smash{\hbox{\kern\textwidth\rlap{\kern\marginparsep
-  \parbox[t]{\marginparwidth}{%
-    \footnotesize{%
-      \vspace{(1.1\baselineskip)}
-    #1{#2: }\ignorespaces #3}}}}}}%
-    }
-\makeatother
-
 \setlength{\LTpost}{0mm}
+
 \begin{longtable}{lcccc}
-\caption{\label{tbl-BastenBetzSS}Ergebnisse der Second-Stage-Regressionen }\tabularnewline
+
+\caption{\label{tbl-BastenBetzSS}Ergebnisse der
+Second-Stage-Regressionen}
+
+\tabularnewline
 
 \toprule
   & (1) Freizeit & (2) Umverteilung & (3) Intervention & (4) Ungleichheit \\ 
@@ -5185,12 +5235,12 @@ bord × vaud & -0.364 & -0.909 & 0.011 & 0.011 \\
  & (0.811) & (0.561) & (0.432) & (0.432) \\ 
 Num.Obs. & 133 & 133 & 133 & 133 \\ 
 \bottomrule
+
 \end{longtable}
+
 \begin{minipage}{\linewidth}
 + p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001\\
 \end{minipage}
-
-}
 
 Die Koeffizienten von \texttt{prot} in Tabelle~\ref{tbl-BastenBetzSS}
 sind die mit 2SLS ermittelten erwarteten Behandlungseffekte einer
@@ -5210,9 +5260,8 @@ Intervention seitens des Staats führt. Auch die ökonomische Ungleichheit
 ist signifikant geringer, als in einer durchschnittlichen vollständig
 katholischen Gemeinde.
 
-\hypertarget{addendum-frdd-schuxe4tzung-mit-rdrobust}{%
 \subsection{\texorpdfstring{Addendum: FRDD-Schätzung mit
-\texttt{rdrobust()}}{Addendum: FRDD-Schätzung mit rdrobust()}}\label{addendum-frdd-schuxe4tzung-mit-rdrobust}}
+\texttt{rdrobust()}}{Addendum: FRDD-Schätzung mit rdrobust()}}\label{addendum-frdd-schuxe4tzung-mit-rdrobust}
 
 Die Funktion \texttt{rdrobust::rdrobust()} erlaubt die Schätzung von
 SRDD und FRDD mit einer Vielzahl von Optionen, s. \texttt{?rdrobust}.
@@ -5332,8 +5381,7 @@ aber vergleichbare Schätzung für einen negativen Effekt.
 
 \bookmarksetup{startatroot}
 
-\hypertarget{regularisierte-regression}{%
-\chapter{Regularisierte Regression}\label{regularisierte-regression}}
+\chapter{Regularisierte Regression}\label{regularisierte-regression}
 
 In diesem Kapitel betrachten wir Varianten von Koeffizientenschätzern im
 linearen Modell \begin{align}
@@ -5407,8 +5455,7 @@ Schätzer, die sich durch die Wahl \(p=1\) (Lasso Regression) bzw.
 \(p=2\) (Ridge Regression) ergeben und illustrieren ihre Anwendung mit
 R.
 
-\hypertarget{ridge-regression}{%
-\section{Ridge Regression}\label{ridge-regression}}
+\section{Ridge Regression}\label{ridge-regression}
 
 Ridge Regression wurde von Hoerl und Kennard (1970) als Alternative zur
 KQ-Schätzung bei hoch-korrelierten Regressoren eingeführt. Die
@@ -5500,9 +5547,8 @@ Online-Version verfügbar.}}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
-\hypertarget{eigenschaften-des-schuxe4tzers}{%
 \subsection{Eigenschaften des
-Schätzers}\label{eigenschaften-des-schuxe4tzers}}
+Schätzers}\label{eigenschaften-des-schuxe4tzers}
 
 Der Ridge-Schätzer \(\widehat{\boldsymbol{\beta}}^{\mathrm{R}}_\lambda\)
 ist nicht invariant gegenüber der Skalierung der Regressoren. Für
@@ -5558,14 +5604,16 @@ Ridge-Schätzer im orthonormalen Fall als R-Funktion
 
 \begin{figure}[t]
 
-{\centering \includegraphics{RegReg_files/figure-pdf/fig-ridgeortho-1.pdf}
+\centering{
+
+\includegraphics{RegReg_files/figure-pdf/fig-ridgeortho-1.pdf}
 
 }
 
 \caption{\label{fig-ridgeortho}Shrinkage des OLS-Schätzers bei Ridge
 Regression}
 
-\end{figure}
+\end{figure}%
 
 Abbildung~\ref{fig-ridgeortho} zeigt, dass der Ridge-Schätzer eine
 lineare Transformation des KQ-Schätzers (gestrichelte Linie) ist.
@@ -5590,9 +5638,8 @@ Der Ridge-Schätzer hat also eine kleinere Varianz als der KQ-Schätzer.
 Diese Eigenschaften können auch für korrelierte Regressoren gezeigt
 werden.
 
-\hypertarget{ridge-regression-mit-glmnet}{%
 \subsection{\texorpdfstring{Ridge Regression mit
-\texttt{glmnet}}{Ridge Regression mit glmnet}}\label{ridge-regression-mit-glmnet}}
+\texttt{glmnet}}{Ridge Regression mit glmnet}}\label{ridge-regression-mit-glmnet}
 
 Wir zeigen nun anhand simulierter Daten, wie der Ridge-Lösungspfad mit
 dem R-Paket \texttt{glmnet} berechnet werden kann. Wir erzeugen zunächst
@@ -5691,13 +5738,15 @@ werden.
 
 \begin{figure}[t]
 
-{\centering \includegraphics{RegReg_files/figure-pdf/fig-ridgesolpath-1.pdf}
+\centering{
+
+\includegraphics{RegReg_files/figure-pdf/fig-ridgesolpath-1.pdf}
 
 }
 
 \caption{\label{fig-ridgesolpath}Lösungspfad für Ridge-Schätzung}
 
-\end{figure}
+\end{figure}%
 
 Abbildung~\ref{fig-ridgesolpath} zeigt den nicht-linearen Verlauf der
 Shrinkage auf den geschätzten Modellkoeffizienten. Die Koeffizienten
@@ -5731,13 +5780,15 @@ R-Paket \texttt{ggfortify} für die Visualisierung der Ergebnisse mit
 
 \begin{figure}[t]
 
-{\centering \includegraphics{RegReg_files/figure-pdf/fig-ridgecvplot-1.pdf}
+\centering{
+
+\includegraphics{RegReg_files/figure-pdf/fig-ridgecvplot-1.pdf}
 
 }
 
 \caption{\label{fig-ridgecvplot}Lösungspfad für Ridge-Schätzung}
 
-\end{figure}
+\end{figure}%
 
 Abbildung~\ref{fig-ridgecvplot} zeigt \texttt{ridge\_cvfit\$lambda.min},
 das optimale \(\lambda\) mit dem geringsten CV Mean-Squarred-Error
@@ -5813,13 +5864,15 @@ der Ridge-Schätzung.
 
 \begin{figure}[t]
 
-{\centering \includegraphics{RegReg_files/figure-pdf/fig-KoefRidgeVsKQ-1.pdf}
+\centering{
+
+\includegraphics{RegReg_files/figure-pdf/fig-KoefRidgeVsKQ-1.pdf}
 
 }
 
 \caption{\label{fig-KoefRidgeVsKQ}Koeffizientenvergleich: Ridge vs.~KQ}
 
-\end{figure}
+\end{figure}%
 
 Der Vergleich anhand von Abbildung~\ref{fig-KoefRidgeVsKQ} zeigt
 deutlich, dass Ridge Regression im Vergleich mit KQ zu absolut kleineren
@@ -5898,9 +5951,8 @@ erzielt als der KQ-Schätzer. Diese Eigenschaft der
 Koeffizientenschätzung kann die Prognosegüte von Ridge Regression
 gegenüber der KQ-Regression verbessern.
 
-\hypertarget{beispiel-vorhersage-von-abschlussnoten-in-mathe}{%
 \subsection{Beispiel: Vorhersage von Abschlussnoten in
-Mathe}\label{beispiel-vorhersage-von-abschlussnoten-in-mathe}}
+Mathe}\label{beispiel-vorhersage-von-abschlussnoten-in-mathe}
 
 Zur Illustration von Ridge Regression nutzen wir den Datensatz
 \texttt{SP} aus Cortez und Silva (2008).\footnote{Wir verwenden eine
@@ -6013,13 +6065,7 @@ daher mit \texttt{data.matrix()}.
 \end{Highlighting}
 \end{Shaded}
 
-\begin{figure}[t]
-
-{\centering \includegraphics{RegReg_files/figure-pdf/unnamed-chunk-16-1.pdf}
-
-}
-
-\end{figure}
+\includegraphics{RegReg_files/figure-pdf/unnamed-chunk-16-1.pdf}
 
 Wie für das Beispiel mit simulierten Daten erhalten wir mit
 \texttt{predict()} Vorhersagen für die erzielte Punktzahl. Beachte, dass
@@ -6128,13 +6174,15 @@ des mit CV ermittelten \(\lambda\) und fügen mit dem Paket
 
 \begin{figure}[t]
 
-{\centering \includegraphics{RegReg_files/figure-pdf/fig-ridgAppPlot-1.pdf}
+\centering{
+
+\includegraphics{RegReg_files/figure-pdf/fig-ridgAppPlot-1.pdf}
 
 }
 
 \caption{\label{fig-ridgAppPlot}Lösungspfad für Ridge-Schätzung}
 
-\end{figure}
+\end{figure}%
 
 Abbildung~\ref{fig-ridgAppPlot} gibt Hinweise darauf, dass neben der
 Schulzugehörigkeit und Indikatoren für schulische Leistung (bspw.
@@ -6151,7 +6199,7 @@ Erklärungskraft werden durch die Regularisierung in Richtung 0 gezwungen
 und reduzieren so die Varianz der Vorhersage gegenüber der
 (idealerweise) unverzerrten KQ-Schätzung.
 
-\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, bottomrule=.15mm, colbacktitle=quarto-callout-note-color!10!white, bottomtitle=1mm, arc=.35mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Ridge Regression}, opacitybacktitle=0.6, colback=white, left=2mm, breakable, leftrule=.75mm, opacityback=0, coltitle=black, titlerule=0mm, colframe=quarto-callout-note-color-frame, toprule=.15mm, toptitle=1mm]
+\begin{tcolorbox}[enhanced jigsaw, breakable, toprule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Ridge Regression}, titlerule=0mm, bottomrule=.15mm, leftrule=.75mm, colbacktitle=quarto-callout-note-color!10!white, opacitybacktitle=0.6, coltitle=black, left=2mm, opacityback=0, bottomtitle=1mm, toptitle=1mm, arc=.35mm, rightrule=.15mm, colframe=quarto-callout-note-color-frame, colback=white]
 
 \begin{itemize}
 \item
@@ -6185,8 +6233,7 @@ und reduzieren so die Varianz der Vorhersage gegenüber der
 
 \end{tcolorbox}
 
-\hypertarget{lasso-regression}{%
-\section{Lasso Regression}\label{lasso-regression}}
+\section{Lasso Regression}\label{lasso-regression}
 
 Least Absolute Shrinkage and Selection Operator (Lasso) ist ein von
 Tibshirani (1996) vorgeschlagener Schätzer, der die Verlustfunktion des
@@ -6245,9 +6292,8 @@ Lasso auch als einen \emph{Soft Thresholding Operator}. Im nächsten
 Abschnitt betrachten wir die Eigenschaften von Lasso-Regularisierung
 unter vereinfachten Annahmen bzgl. der Regressoren.
 
-\hypertarget{lasso-ist-soft-thresholding}{%
 \subsection{Lasso ist Soft
-Thresholding}\label{lasso-ist-soft-thresholding}}
+Thresholding}\label{lasso-ist-soft-thresholding}
 
 Wir betrachten nun eine mathematische Darstellung von Selektions- und
 Shrinkage-Eigenschaft des Lasso-Schätzers in einem vereinfachten Modell.
@@ -6321,14 +6367,16 @@ von KQ-Schätzwerten gegeben \(\lambda\).
 
 \begin{figure}[t]
 
-{\centering \includegraphics{RegReg_files/figure-pdf/fig-lassoST-1.pdf}
+\centering{
+
+\includegraphics{RegReg_files/figure-pdf/fig-lassoST-1.pdf}
 
 }
 
 \caption{\label{fig-lassoST}Shrinkage und Selektion von
 OLS-Koeffizienten mit Lasso}
 
-\end{figure}
+\end{figure}%
 
 Abbildung~\ref{fig-lassoST} zeigt, dass der \(\ell_1\)-Strafterm des
 Lasso-Schätzers zu einem linearen Verlauf der auf den KQ-Schätzer
@@ -6394,9 +6442,8 @@ Beachte, dass der rote Lasso-Pfad (die Menge aller Lasso-Lösungen)
 statistischer Software berechnen die Lasso-Lösung häufig in Abhängigkeit
 von \(\lambda\). Ein Algorithmus hierfür ist LARS.
 
-\hypertarget{berechnung-der-lasso-luxf6sung-mit-dem-lars-algorithmus}{%
 \subsection{Berechnung der Lasso-Lösung mit dem
-LARS-Algorithmus}\label{berechnung-der-lasso-luxf6sung-mit-dem-lars-algorithmus}}
+LARS-Algorithmus}\label{berechnung-der-lasso-luxf6sung-mit-dem-lars-algorithmus}
 
 Für die Berechnung des Lasso-Lösungspfads kann der
 \href{https://en.wikipedia.org/wiki/Least-angle_regression}{LARS-Algorithmus}
@@ -6512,13 +6559,15 @@ dargestellt.
 
 \begin{figure}[t]
 
-{\centering \includegraphics{RegReg_files/figure-pdf/fig-larssolpath-1.pdf}
+\centering{
+
+\includegraphics{RegReg_files/figure-pdf/fig-larssolpath-1.pdf}
 
 }
 
 \caption{\label{fig-larssolpath}LARS-Lösungspfad für Lasso-Schätzung}
 
-\end{figure}
+\end{figure}%
 
 Abbildung~\ref{fig-larssolpath} zeigt, dass die Shrinkage der
 geschätzten Koeffizienten nach der Aktivierung rasch abnimmt und sich
@@ -6528,10 +6577,9 @@ Modell mit den Variablen \(X_1\), \(X_2\), \(X_8\) und \(X_9\)
 selektiert werden kann. Je nach Ziel der Analyse kann es sinnvoll sein,
 ein \(\lambda\) in diesem Intervall zu schätzen.
 
-\hypertarget{wahl-des-regularisierungsparameters-lambda-fuxfcr-den-lasso-schuxe4tzer}{%
 \subsection{\texorpdfstring{Wahl des Regularisierungsparameters
 \(\lambda\) für den
-Lasso-Schätzer}{Wahl des Regularisierungsparameters \textbackslash lambda für den Lasso-Schätzer}}\label{wahl-des-regularisierungsparameters-lambda-fuxfcr-den-lasso-schuxe4tzer}}
+Lasso-Schätzer}{Wahl des Regularisierungsparameters \textbackslash lambda für den Lasso-Schätzer}}\label{wahl-des-regularisierungsparameters-lambda-fuxfcr-den-lasso-schuxe4tzer}
 
 Wie zuvor bei Ridge Regression muss in empirischen Anwendungen ein Wert
 für den Tuning-Parameter \(\lambda\) gewählt werden. Hierbei besteht die
@@ -6599,14 +6647,16 @@ implizit geschätzt. \texttt{cv.error} ist der mit CV geschätzte MSE.
 
 \begin{figure}[t]
 
-{\centering \includegraphics{RegReg_files/figure-pdf/fig-larscv-1.pdf}
+\centering{
+
+\includegraphics{RegReg_files/figure-pdf/fig-larscv-1.pdf}
 
 }
 
 \caption{\label{fig-larscv}CV-MSE und relative Position von \(\lambda\)
 auf dem Lassopfad}
 
-\end{figure}
+\end{figure}%
 
 In der Grafik erkennen wir ein Minimum des CV-MSEs bei etwa 0.73.
 
@@ -6724,7 +6774,7 @@ und damit zu einer höheren Vorhersagegüte. Das ``sparsame'' mit
 Lasso-Regression geschätzte Modell ist dem ``großen'' mit KQ geschätztem
 Modell in dieser Hinsicht also überlegen.
 
-\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, bottomrule=.15mm, colbacktitle=quarto-callout-note-color!10!white, bottomtitle=1mm, arc=.35mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Lasso-Regression}, opacitybacktitle=0.6, colback=white, left=2mm, breakable, leftrule=.75mm, opacityback=0, coltitle=black, titlerule=0mm, colframe=quarto-callout-note-color-frame, toprule=.15mm, toptitle=1mm]
+\begin{tcolorbox}[enhanced jigsaw, breakable, toprule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Lasso-Regression}, titlerule=0mm, bottomrule=.15mm, leftrule=.75mm, colbacktitle=quarto-callout-note-color!10!white, opacitybacktitle=0.6, coltitle=black, left=2mm, opacityback=0, bottomtitle=1mm, toptitle=1mm, arc=.35mm, rightrule=.15mm, colframe=quarto-callout-note-color-frame, colback=white]
 
 \begin{itemize}
 \item
@@ -6752,9 +6802,8 @@ Modell in dieser Hinsicht also überlegen.
 
 \end{tcolorbox}
 
-\hypertarget{vergleich-von-lasso--und-ridge-regression-mit-simulation}{%
 \section{Vergleich von Lasso- und Ridge-Regression mit
-Simulation}\label{vergleich-von-lasso--und-ridge-regression-mit-simulation}}
+Simulation}\label{vergleich-von-lasso--und-ridge-regression-mit-simulation}
 
 In diesem Kapitel illustrieren wir Vor- und Nachteile von Lasso- und
 Ridge-Regression in Prognose-Anwendungen anhand von
@@ -6778,8 +6827,7 @@ demselben Effekt \(\beta_j = 1\). Die übrigen Variablen sind irrelevant.
 
 Wir schätzen und validieren die Modelle mit \texttt{glmnet()}.
 
-\hypertarget{sec-pdz}{%
-\subsection{Prognosegüte in diversen Szenarien}\label{sec-pdz}}
+\subsection{Prognosegüte in diversen Szenarien}\label{sec-pdz}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -6963,9 +7011,11 @@ Darstellung.
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{tbl-lrsimA}{}
 \begin{longtable}{lrrr}
-\caption{\label{tbl-lrsimA}Durchschnittliche Testset-MSEs für Setting A }\tabularnewline
+
+\caption{\label{tbl-lrsimA}Durchschnittliche Testset-MSEs für Setting A}
+
+\tabularnewline
 
 \toprule
 Methode & Kor=0 & Kor=0.5 & Kor=0.8 \\ 
@@ -6973,6 +7023,7 @@ Methode & Kor=0 & Kor=0.5 & Kor=0.8 \\
 Lasso-Regression & $7.17$ & $10.398$ & $7.581$ \\ 
 Ridge-Regression & $4.841$ & $1.615$ & $1.517$ \\ 
 \bottomrule
+
 \end{longtable}
 
 Tabelle~\ref{tbl-lrsimA} zeigt, dass Ridge-Regression gegenüber
@@ -7012,9 +7063,12 @@ und die zugehörigen Variablen irrelevant für \(Y\) sind.
 Eine wiederholung der Simulation für die modifizierten Koeffizienten
 \texttt{beta} und liefert folgende tabellarische Auswertung.
 
-\hypertarget{tbl-lrsimB}{}
 \begin{longtable}{lrrr}
-\caption{\label{tbl-lrsimB}Durchschnittliche Testset-MSEs für Szenario B }\tabularnewline
+
+\caption{\label{tbl-lrsimB}Durchschnittliche Testset-MSEs für Szenario
+B}
+
+\tabularnewline
 
 \toprule
 Methode & Kor=0 & Kor=0.5 & Kor=0.8 \\ 
@@ -7022,6 +7076,7 @@ Methode & Kor=0 & Kor=0.5 & Kor=0.8 \\
 Lasso & $2.51$ & $2.143$ & $1.923$ \\ 
 Ridge & $3.331$ & $2.562$ & $2.014$ \\ 
 \bottomrule
+
 \end{longtable}
 
 Die Ergebnisse in Tabelle~\ref{tbl-lrsimB} zeigen, dass Ridge-Regression
@@ -7034,9 +7089,8 @@ und damit ein sparsameres Modell schätzt als Ridge. Entsprechend erzielt
 Lasso in diesem Szenario insbesondere für \(\rho = 0\) genauere
 Vorhersagen als Ridge Regression.
 
-\hypertarget{visualisierung-des-bias-variance-tradeoffs-bei-prognosen}{%
 \subsection{Visualisierung des Bias-Variance-Tradeoffs bei
-Prognosen}\label{visualisierung-des-bias-variance-tradeoffs-bei-prognosen}}
+Prognosen}\label{visualisierung-des-bias-variance-tradeoffs-bei-prognosen}
 
 Für ein besseres Verständnis, wie sich der Regularisierungsparameter
 \(\lambda\) auf den Bias-Variance-Tradeoff bei Prognosen mit Ridge- und
@@ -7305,42 +7359,36 @@ mit \texttt{ggplo2} genutzt.
 \end{Highlighting}
 \end{Shaded}
 
-\begin{figure}
+\begin{figure}[t]
 
-\begin{minipage}[t]{\linewidth}
+\begin{minipage}{\linewidth}
 
-{\centering 
-
-\raisebox{-\height}{
+\centering{
 
 \includegraphics{RegReg_files/figure-pdf/fig-MSEBVT-1.pdf}
 
 }
 
-}
-
 \subcaption{\label{fig-MSEBVT-1}Ridge Regression}
+
 \end{minipage}%
 \newline
-\begin{minipage}[t]{\linewidth}
+\begin{minipage}{\linewidth}
 
-{\centering 
-
-\raisebox{-\height}{
+\centering{
 
 \includegraphics{RegReg_files/figure-pdf/fig-MSEBVT-2.pdf}
 
 }
 
-}
-
 \subcaption{\label{fig-MSEBVT-2}Lasso Regression}
+
 \end{minipage}%
 
 \caption{\label{fig-MSEBVT}Simulierte MSE-Komponenten in Abhängigkeit
 von Lambda}
 
-\end{figure}
+\end{figure}%
 
 Anhand von Abbildung~\ref{fig-MSEBVT} lässt sich der
 Bias-Variance-Tradeoff bei der Vorhersage von \(Y_0\) gut erkennen:
@@ -7351,9 +7399,8 @@ funktionale Zusammenhang zeigt, dass der MSE eine konvexe Funktion von
 \(\lambda\) ist. Damit existieren optimale \(\lambda\) mit minimalem MSE
 (grüne Punkte), die wir mit Cross Validation schätzen können.
 
-\hypertarget{inferenz-fuxfcr-treatment-effekt-schuxe4tzung-mit-vielen-variablen}{%
 \section{Inferenz für Treatment-Effekt-Schätzung mit vielen
-Variablen}\label{inferenz-fuxfcr-treatment-effekt-schuxe4tzung-mit-vielen-variablen}}
+Variablen}\label{inferenz-fuxfcr-treatment-effekt-schuxe4tzung-mit-vielen-variablen}
 
 In empirischen Studien des Effekts einer Behandlungsvariable \(B\) auf
 eine Outcome-Variable \(Y\) steht häufig eine Vielzahl potentieller
@@ -7699,7 +7746,7 @@ Der Post-Double-Selection-Schätzer liefert unter den betrachteten
 Verfahren die beste Schätzung von \(\alpha_0\) und erlaubt gülstige
 statistische Inferenz. Der geschätzte Effekt ist hoch-signifikant.
 
-\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, bottomrule=.15mm, colbacktitle=quarto-callout-note-color!10!white, bottomtitle=1mm, arc=.35mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum Post-Double-Selection-Schätzer}, opacitybacktitle=0.6, colback=white, left=2mm, breakable, leftrule=.75mm, opacityback=0, coltitle=black, titlerule=0mm, colframe=quarto-callout-note-color-frame, toprule=.15mm, toptitle=1mm]
+\begin{tcolorbox}[enhanced jigsaw, breakable, toprule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum Post-Double-Selection-Schätzer}, titlerule=0mm, bottomrule=.15mm, leftrule=.75mm, colbacktitle=quarto-callout-note-color!10!white, opacitybacktitle=0.6, coltitle=black, left=2mm, opacityback=0, bottomtitle=1mm, toptitle=1mm, arc=.35mm, rightrule=.15mm, colframe=quarto-callout-note-color-frame, colback=white]
 
 \begin{itemize}
 \item
@@ -7735,9 +7782,8 @@ statistische Inferenz. Der geschätzte Effekt ist hoch-signifikant.
 
 \end{tcolorbox}
 
-\hypertarget{case-study-makrouxf6konomisches-wachstum}{%
 \subsection{Case Study: Makroökonomisches
-Wachstum}\label{case-study-makrouxf6konomisches-wachstum}}
+Wachstum}\label{case-study-makrouxf6konomisches-wachstum}
 
 Zur Illustration des Post-Double-Selection Schätzers betrachten wir eine
 empirische Anwendung bzgl. der Validierung von makroökonomischer
@@ -7818,13 +7864,15 @@ Regressionsgerade einzeichnen.
 
 \begin{figure}[t]
 
-{\centering \includegraphics{RegReg_files/figure-pdf/fig-bipsimple-1.pdf}
+\centering{
+
+\includegraphics{RegReg_files/figure-pdf/fig-bipsimple-1.pdf}
 
 }
 
 \caption{\label{fig-bipsimple}BIP-Wachstum: Einfache Regression}
 
-\end{figure}
+\end{figure}%
 
 Abbildung~\ref{fig-bipsimple} zeigt einen geringen positiven geschätzten
 Effekt \(\widehat{\alpha}_0\). Eine Auswertung mit \texttt{lm()} ergibt,
@@ -7943,10 +7991,12 @@ lediglich sieben Regressoren aus.
 Tabelle~\ref{tbl-growthpdssek} zeigt die Definitionen der ausgewählten
 Variablen.
 
-\hypertarget{tbl-growthpdssek}{}
 \begin{longtable}{ll}
-\caption{\label{tbl-growthpdssek}Mit PDS selektierte Variablen aus \texttt{GrowthData}. Referenzjahr
-1965. }\tabularnewline
+
+\caption{\label{tbl-growthpdssek}Mit PDS selektierte Variablen aus
+\texttt{GrowthData}. Referenzjahr 1965.}
+
+\tabularnewline
 
 \toprule
 Variable & Beschreibung \\ 
@@ -7959,6 +8009,7 @@ lifee065 & Lebenserwartung bei Geburt \\
 humanf65 & Durschn. Bildung im Alter 25 (Frauen) \\ 
 pop6565 & Anteil Bevölkerung ü. 65 Jahre \\ 
 \bottomrule
+
 \end{longtable}
 
 \begin{Shaded}
@@ -7982,173 +8033,1479 @@ Schätzung \(\widehat{\alpha}_0\approx-0.05\).
 
 \bookmarksetup{startatroot}
 
-\hypertarget{literatur}{%
-\chapter*{Literatur}\label{literatur}}
+\chapter{Synthetic Control}\label{synthetic-control}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\#| context: setup}
+
+\NormalTok{\# install wabassem nlopt from astamm\textquotesingle{}s repository}
+\NormalTok{install.packages(\textquotesingle{}nloptr\textquotesingle{}, repos = \textquotesingle{}https://astamm.r{-}universe.dev\textquotesingle{})}
+
+\NormalTok{\# create dataset directory}
+\NormalTok{dir.create("datasets")}
+\NormalTok{\# Download the dataset}
+\NormalTok{download.file(}
+\NormalTok{    "https://raw.githubusercontent.com/mca91/kausal\_data/main/brexit.csv",}
+\NormalTok{    \textquotesingle{}datasets/brexit.csv\textquotesingle{},}
+\NormalTok{)}
+
+\NormalTok{\# load the brexit data}
+\NormalTok{brexit \textless{}{-} read\_csv("datasets/brexit.csv") \%\textgreater{}\% as.data.frame}
+
+\NormalTok{\# load the Synth package}
+\NormalTok{library(Synth)}
+\NormalTok{options(pillar.sigfig = 2)}
+\end{Highlighting}
+\end{Shaded}
+
+Synthetic Control Methoden (SCM) wurden in A. D. Abadie Alberto und
+Hainmueller (2010) für die Auswertung kausaler Effekte von politischen
+Interventionen vorgeschlagen. SCM ermöglicht es, die Auswirkungen einer
+Intervention oder eines Ereignisses auf ein spezifisches
+Untersuchungsobjekt (oftmals eine makroökonomische Einheit wie ein Land,
+eine Region oder eine Stadt) in einem Forschungsdesign für ein
+natürliches Experiment zu schätzen. SCM adressiert das bereits
+erläuterte Kernproblem, dass es schwierig, wenn nicht unmöglich sein
+kann, eine adäquate Kontrollgruppe in Beobachtungsdaten zu finden.
+Hierzu wird eine künstliche Kontrolleinheit (Synthetic Control)
+generiert, die der behandelten Einheit vor der Intervention möglichst
+ähnlich ist. Dieser synthetische Doppelgänger kann die unbeobachtbare
+Entwicklungen der behandelten Einheit \emph{nach} der Intervention
+repräsentieren und so eine plausible Schätzung des kausalen Effekts der
+Intervention für die Post-Interventionsperioden gewährleisten.
+
+\section{Schätzung von Interventionseffekten mit SCM}\label{sec-siscm}
+
+Ähnlich wie bei manchen Matching-Methoden wird bei SCM die Ähnlichkeit
+der synthetischen Einheit mit der untersuchten Einheit durch eine
+gewichtete Kombination von Kontrolleinheiten basierend auf ihren
+Prä-Interventionsmerkmalen erreicht. Seien \(i = 1, 2, \ldots, N\) die
+Einheiten in der Stichprobe, wobei \(i = 1\) die behandelte Einheit und
+\(i = 2, \ldots, N\) potenziellen Kontrolleinheiten (auch \emph{Donor
+pool} genannt) sind. Die Daten liegen für die Perioden
+\(t = 1, 2, \ldots, T\) vor, mit \(T_0\) dem Zeitpunkt direkt vor der
+Intervention und \(T_1, \ldots, T\) den Perioden nach der Intervention.
+
+Für SCM bestimmen wir einen Vektor von Gewichten
+\(\mathbf{w}^* := (w_2^*, \ldots, w_k^*)^T\), der die Summe der
+quadrierten Differenzen zwischen den Ausprägungen von \(k\)
+Charakteristika der behandelten Einheit vor der Intervention,
+\(X_{1,\,m}^{\text{Pre}}\), \(m=1,\dots,k\), und der gewichteten Summe
+dieser Charakteristika für die Kontrolleinheiten,
+\(X_{i,\,m}^{\text{Pre}}\), minimiert:
+
+\begin{align}
+  \mathbf{w}^* := \arg\min_{\mathbf{w}} \sum_{m=1}^{k} v_m \left( X_{1,\,m}^{\text{Pre}} - \sum_{i=2}^{N} w_i X_{i,m}^{\text{Pre}} \right)^2,\label{eq:scopt}
+\end{align}
+
+unter der Nebenbedingung, dass \(\sum_{i=2}^{N} w_i = 1\) und
+\(w_i \geq 0\) für alle \(i\). Die \(v_m\) sind weitere Gewichte, welche
+die Relevanz der Variablen für die Vorhersage der Outcome-Variable der
+interessierenden Einheit, \(Y_{1,\,t}\), beinflussen. Diese Gewichte
+werden meist in einem weiteren Optimierungsverfahren (bspw. mit
+Cross-Validation) bestimmt (vgl. A. Abadie, Diamond, und Hainmueller
+2014). Als Verlustfunktion hierbei wird meist der mittlere quadratische
+Fehler bei der Vorhersage von \(Y_{1,\,t}\) (MSPE)\footnote{Engl. für
+  \emph{Mean squared prediction error}} vor der Behandlung anhand der
+synthetischen Einheit verwendet,
+
+\begin{align}
+  \sum_{t=1}^{T_0} \left( Y_{1,\,t} - \sum_{i=2}^N w_i(\mathbf{v}) Y_{i,\,t} \right)^2, \label{eq:scopt2}
+\end{align} mit \(\mathbf{v} := (v_1,\dots,v_k)'\).
+
+Durch die Lösung des Optimierungsproblems \eqref{eq:scopt} unter
+Berücksichtigung von \eqref{eq:scopt2} erhalten wir die geschätzten
+Gewichte \(\widehat{w}_i\), welche den Einfluss der Kontrolleinheit
+\(i=2,\dots,N\)-ten bei der Zusammensetzung der Kontrollgruppe
+festlegen. Anhand der \(\widehat{w}_i\) wird die Outcome-Variable der
+synthetischen Kontrolleinheit konstruiert, welche als Referenz für die
+Schätzung des kausalen Effekts der Intervention dient. Die
+Outcome-Variable der synthetischen Kontrollgruppe für die
+Nach-Interventionsperiode kann formal ausgedrückt werden als
+
+\begin{align}
+  Y_{1,\,t}^{\text{Synth}} = \sum_{i=2}^{N} \widehat{w}_i Y_{i,\,t},\quad t > T_0,\label{eq:dgkonst}
+\end{align}
+
+wobei \(Y_{1,t}^{\text{Synth}}\) der Wert der Outcome-Variable \(Y\) für
+die synthetische Kontrollgruppe zum Zeitpunkt \(t\) und \(Y_{i,t}\) der
+entsprechende Wert des Outcomes für die \(i\)-te Kontrolleinheit ist.
+Bei SCM schätzen wir den kausalen Effekt \(\tau_t\) der Intervention zum
+Zeitpunkt \(t\) als die Differenz der Post-Interventionswerte von \(Y\)
+zwischen der behandelten Einheit und dem synthetischen Doppelgänger,
+
+\[
+\widehat{\tau}_t = Y_{1,\,t} - Y_{1,\,t}^{\text{synth}},\quad t > T_0.
+\]
+
+Der mit SCM geschätzte Effekt ermittelt also für \(t > T_0\), wie sich
+die Intervention auf die behandelte Einheit ausgewirkt hat durch einen
+Vergleich mit der Situation, die eingetreten wäre, wenn die Einheit
+nicht behandelt worden wäre, repräsentiert durch die synthetische
+Kontrollgruppe.
+
+Der SCM-Schätzer von A. D. Abadie Alberto und Hainmueller (2010) ist im
+R-Paket \texttt{Synth} (\textbf{Hainmuelleretal2011?}) implementiert.
+Wir illustrieren die Methode nachfolgend mit einer empirischen Anwendung
+zu den Konsequenzen des Brexit auf die nachfolgende Entwicklung der
+britischen Volkswirtschaft.
+
+\section{Case Study: Ökonomische Kosten des
+Brexit}\label{case-study-uxf6konomische-kosten-des-brexit}
+
+Born u.~a. (2019) untersuchen die ökonomischen Kosten des Brexits mit
+einem kausalanalytischen Forschungsansatz. Der Kern der empirischen
+Analyse ist eine Kombination von quasi-experimenteller Identifikation
+und struktureller Zeitreihenanalyse. Hiermit können nicht nur die
+aggregierten Kosten des EU-Ausstiegs für Großbrittanien zu
+quantifiziert, sondern auch die Kanäle indentifiziert werden, durch die
+die erwartete wirtschaftliche Desintegration die britische Makroökonomie
+beeinflusst hat. Hierbei identifizieren Born u.~a. (2019) einen Anstieg
+der wirtschaftspolitischen Unsicherheit und eine Abwärtskorrektur der
+Wachstumserwartungen als Haupttreiber für den Rückgang der
+Wirtschaftsleistung.
+
+Der quasi-experimentelle Ansatz betrachtet das Brexit-Referendum als ein
+natürliches makroökonomisches Experiment und untersucht die Konsequenzn
+der wirtschaftlichen Desintegration für das Bruttoinlandsprodukt (BIP)
+im Nachfolgezeitraum mit SCM. Hierzu wird gemäß der in
+Kapitel~\ref{sec-siscm} erläuterten Vorgehensweise ein syntetischer
+Doppelgänger für die britische Wirtschaft aus einem Donor Pool von 23
+Volkswirtschaften konstruiert, und der Effekt des Referendums als
+Unterschied zwischen der tatsächlichen und synthetischen Trajektorien
+des BIP für Folgeperioden ermittelt. Die Analyse zeigt, dass das
+Brexit-Votum bis Ende 2018 zu einem BIP-Rückgang von etwa 1.7\% bis
+2.5\% geführt hat.
+
+Wie reproduzieren nun die wesentlichen Ergebnisse des SCM-Ansatzes der
+Studie mit R. Hierfür lesen zunächst den Datensatz \texttt{brexit.csv}
+(\href{https://raw.githubusercontent.com/mca91/kausal_data/main/brexit.csv}{hier
+verfügbar}) in R ein. Dieser enthält vierteljährliche Beobachtungen
+makroökonomischer Variablen für 24 Länder für den Zeitraum
+1995-Q1--2021-Q4.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(readr)}
+\FunctionTok{library}\NormalTok{(dplyr)}
+
+\CommentTok{\# Datensatz \textquotesingle{}brexit.csv\textquotesingle{} einlesen}
+\NormalTok{brexit }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"datasets/brexit.csv"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{as.data.frame}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{brexit} ist ein Datensatz mit einer Panel-Struktur. Die Zeit-
+und Entitätsvariablen sind \texttt{Year}/\texttt{quarter} und
+\texttt{Country}/\texttt{ID}. Beachte, dass die Variable \texttt{Time}
+zusätzlich das Jahr und das Quartal als numerische Variable angibt.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Überblick über \textquotesingle{}brexit\textquotesingle{}}
+\FunctionTok{glimpse}\NormalTok{(brexit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Rows: 2,496
+Columns: 21
+$ Time          <dbl> 1995.00, 1995.00, 1995.00, 1995.00, 1995.00, 1995.00, 19~
+$ Year          <dbl> 1995, 1995, 1995, 1995, 1995, 1995, 1995, 1995, 1995, 19~
+$ quarter       <chr> "Q1", "Q1", "Q1", "Q1", "Q1", "Q1", "Q1", "Q1", "Q1", "Q~
+$ Country       <chr> "Australia", "Austria", "Belgium", "Canada", "Finland", ~
+$ real_con_raw  <dbl> 4.660970e+11, 1.214713e+11, 1.608240e+11, 5.558142e+11, ~
+$ real_inv_raw  <dbl> 1.683258e+11, 5.537994e+10, 6.118800e+10, 1.894910e+11, ~
+$ real_exp_raw  <dbl> 1.246639e+11, 6.634091e+10, 1.501160e+11, 3.353030e+11, ~
+$ real_imp_raw  <dbl> 9.781032e+10, 7.439282e+10, 1.468880e+11, 2.572610e+11, ~
+$ real_gdp_raw  <dbl> 8.495864e+11, 2.165699e+11, 2.910360e+11, 1.084659e+12, ~
+$ real_gdp_2016 <dbl> 0.5080841, 0.6832146, 0.6877292, 0.6057397, 0.6370480, 0~
+$ tot_emp_raw   <dbl> 8077377.2, 3737003.3, 3920400.0, 13274100.0, 2050262.7, ~
+$ pop_quarterly <dbl> 13144039.8, 6043266.6, 7666495.5, 21714093.3, 3827395.7,~
+$ lab_prod      <dbl> 0.9988637, 0.9863141, 0.9942753, 0.9997992, 0.9885239, 1~
+$ ConGDP        <dbl> 0.5486164, 0.5608871, 0.5525914, 0.5124322, 0.5244422, 0~
+$ InvGDP        <dbl> 0.1981267, 0.2557140, 0.2102420, 0.1747010, 0.2085606, 0~
+$ ExpGDP        <dbl> 0.14673485, 0.30632565, 0.51579873, 0.30913218, 0.268451~
+$ ImpGDP        <dbl> 0.1151270, 0.3435049, 0.5047073, 0.2371815, 0.2485870, 0~
+$ LPG           <dbl> -0.0078972729, -0.0093478618, 0.0033636783, 0.0054461911~
+$ EmpSha        <dbl> 0.6145277, 0.6183747, 0.5113679, 0.6113127, 0.5356809, 0~
+$ gdp           <dbl> -49.19159, -31.67854, -31.22708, -39.42603, -36.29520, -~
+$ ID            <dbl> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 1~
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# \textquotesingle{}Time\textquotesingle{} zeigt Jahr + Quartal}
+\NormalTok{brexit }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(Country }\SpecialCharTok{==} \StringTok{"United Kingdom"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{select}\NormalTok{(Time) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{slice\_head}\NormalTok{(}\AttributeTok{n =} \DecValTok{5}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+     Time
+1 1995.00
+2 1995.25
+3 1995.50
+4 1995.75
+5 1996.00
+\end{verbatim}
+
+Für die Schätzung der Gewichte \(w_i\) für die Konstruktion des
+UK-Doppelgängers werden die in gelisteten Charakteristika der
+Volkswirtschaften verwendet.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2027}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7973}}@{}}
+\caption{\texttt{brexit} -- Variablen und
+Definitionen}\label{tbl-Born2019preds}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Definition
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Definition
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{gdp} & Veränderung des BIP relativ zu 2016 \\
+\texttt{ConGDP} & Anteil: Konsum/BIP (\%) \\
+\texttt{InvGDP} & Anteil: Investitionen/BIP (\%) \\
+\texttt{ExpGDP} & Anteil: Exporte/BIP (\%) \\
+\texttt{ImpGDP} & Anteil: Importe/BIP (\%) \\
+\texttt{EmpSha} & Anteil: Beschäftigte/Erwerbsbevölkerung (\%) \\
+\texttt{LPG} & Wachstum der Arbeitsproduktivität (\%) \\
+\end{longtable}
+
+Zur Berechnung von SCM mit dem R-Paket \texttt{Synth} müssen die Daten
+zunächst mit der Funktion \texttt{Synth::dataprep()} aufbereitet werden,
+s. \texttt{?Synth::dataprep()} für weitere Details. Neben dem Datensatz
+(\texttt{foo}) unter expliziter Nennung der Prädiktoren
+(\texttt{predictors}) und der Outcome-Variable (\texttt{dependent})
+übergeben wir Variablen für die Indentifikation von Einheiten
+(\texttt{ID}) und Zeitpunkten (\texttt{Time}), sowie Donor Pool
+(\texttt{controls.identifier}) und behandelter Einheit
+(\texttt{treatment.identifier}). Weiterhin werden die
+Vorbehandlungsperiode (\texttt{time.predictors.prior}) sowie der
+Zeitraum über den die Regressor-Gewichte \(v_m\) bestimmt werden sollen
+(\texttt{time.optimize.ssr}), festgelegt. Für letztere übergeben wir
+einen numerischen Vektor für sämtliche Zeitpunkte von 1995-Q1 bis zum
+Brexit-Referendum in 2016-Q2.
+
+Um einen ersten Überblick über die Entwicklung der BIP im Datensatz zu
+gewinnen, vergleichen wir die Zeitreihen für Donor-Pool-Länder (grau)
+und Großbritannien (blau) mit \texttt{ggplot}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(cowplot)}
+
+\NormalTok{brexit }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{group =} \FunctionTok{ifelse}\NormalTok{(}
+\NormalTok{      Country }\SpecialCharTok{==} \StringTok{"United Kingdom"}\NormalTok{, }
+      \AttributeTok{yes =} \StringTok{"UK"}\NormalTok{, }
+      \AttributeTok{no =}\StringTok{"else"}
+\NormalTok{    )}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  
+  \FunctionTok{ggplot}\NormalTok{(}
+    \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}
+      \AttributeTok{x =}\NormalTok{ Time, }
+      \AttributeTok{y =}\NormalTok{ gdp, }
+      \AttributeTok{color =}\NormalTok{ group, }
+      \AttributeTok{group =}\NormalTok{ Country, }
+      \AttributeTok{lwd =}\NormalTok{ group}
+\NormalTok{    )}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_manual}\NormalTok{(}
+    \AttributeTok{values =} \FunctionTok{c}\NormalTok{(}
+      \StringTok{"UK"} \OtherTok{=} \StringTok{"\#00BFC4"}\NormalTok{, }\StringTok{"else"} \OtherTok{=} \FunctionTok{alpha}\NormalTok{(}\StringTok{"gray"}\NormalTok{, .}\DecValTok{75}\NormalTok{)}
+\NormalTok{    )}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{scale\_linewidth\_manual}\NormalTok{(}
+    \AttributeTok{values =} \FunctionTok{c}\NormalTok{(}\StringTok{"UK"} \OtherTok{=} \DecValTok{1}\NormalTok{, }\StringTok{"else"} \OtherTok{=}\NormalTok{ .}\DecValTok{5}\NormalTok{)}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+}
+  \CommentTok{\# Brexit{-}Referendum}
+  \FunctionTok{geom\_vline}\NormalTok{(}
+    \AttributeTok{xintercept =} \FloatTok{2016.25}\NormalTok{, }
+    \AttributeTok{lty =} \StringTok{"dotted"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_cowplot}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{guides}\NormalTok{(}
+    \AttributeTok{lwd =} \StringTok{"none"}\NormalTok{, }
+    \AttributeTok{color =} \FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{position =} \StringTok{"inside"}\NormalTok{)}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position.inside =} \FunctionTok{c}\NormalTok{(.}\DecValTok{1}\NormalTok{, .}\DecValTok{9}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics{SyntheticControl_files/figure-pdf/fig-bipv-1.pdf}
+
+}
+
+\caption{\label{fig-bipv}BIP relativ zu 2016}
+
+\end{figure}%
+
+Abbildung~\ref{fig-bipv} zeigt, dass das BIP von Großbritannien zwar
+auch nach dem Brexit-Referendum (gepunktete Linie) gewachsen ist, jedoch
+vergleichsweise schwach. Eine Analyse mit SCM kann statistische Evidenz
+für den mutmaßlich negativen Effekt des Referendums auf das Wachstum in
+den Folgeperioden liefern.
+
+Wir laden nun das Paket \texttt{Synth} und bereiten die Daten für die
+Analyse vor.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# R{-}Paket \textquotesingle{}Synth\textquotesingle{} laden}
+\FunctionTok{library}\NormalTok{(Synth)}
+
+\CommentTok{\# Daten für die Optimierung vorbereiten}
+\NormalTok{dataprep\_out }\OtherTok{\textless{}{-}} \FunctionTok{dataprep}\NormalTok{(}
+  \AttributeTok{foo =}\NormalTok{ brexit, }
+  \AttributeTok{predictors =} \FunctionTok{c}\NormalTok{(}
+    \StringTok{"ConGDP"}\NormalTok{, }\StringTok{"InvGDP"}\NormalTok{, }
+    \StringTok{"ExpGDP"}\NormalTok{, }\StringTok{"ImpGDP"}\NormalTok{, }
+    \StringTok{"LPG"}\NormalTok{, }\StringTok{"EmpSha"}
+\NormalTok{  ), }
+  \AttributeTok{dependent =} \StringTok{"gdp"}\NormalTok{, }
+  \AttributeTok{unit.variable =} \StringTok{"ID"}\NormalTok{,}
+  \AttributeTok{time.variable =} \StringTok{"Time"}\NormalTok{, }
+  \AttributeTok{treatment.identifier =} \DecValTok{23}\NormalTok{, }
+  \AttributeTok{controls.identifier =}\NormalTok{ (brexit}\SpecialCharTok{$}\NormalTok{ID }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{unique}\NormalTok{())[}\SpecialCharTok{{-}}\DecValTok{23}\NormalTok{], }
+  \AttributeTok{time.predictors.prior =} \FunctionTok{seq}\NormalTok{(}\DecValTok{1995}\NormalTok{, }\FloatTok{2016.25}\NormalTok{, .}\DecValTok{25}\NormalTok{),}
+  \AttributeTok{time.optimize.ssr =} \FunctionTok{seq}\NormalTok{(}\DecValTok{1995}\NormalTok{, }\FloatTok{2016.25}\NormalTok{, .}\DecValTok{25}\NormalTok{),}
+  \AttributeTok{unit.names.variable =} \StringTok{"Country"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Anhand der vorbereiteten Daten \texttt{dataprep\_out} wird nun die
+Bestimmung der Gewichte mit \texttt{Synth::synth()} durchgeführt.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Gewichte per Optimierung bestimmen}
+\NormalTok{synth\_out }\OtherTok{\textless{}{-}} \FunctionTok{synth}\NormalTok{(dataprep\_out)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+
+X1, X0, Z1, Z0 all come directly from dataprep object.
+
+
+**************** 
+ searching for synthetic control unit  
+ 
+
+**************** 
+**************** 
+**************** 
+
+MSPE (LOSS V): 0.6083746 
+
+solution.v:
+ 0.1488472 0.08840361 0.1480946 0.153318 0.1815462 0.2797904 
+
+solution.w:
+ 1.42199e-05 4.00616e-05 8.47284e-05 0.00014488 4.45754e-05 4.84009e-05 0.001608051 4.77577e-05 0.06654494 2.07094e-05 0.1446237 1.188e-05 2.377e-06 0.04837474 1.33542e-05 0.0001405933 4.61625e-05 0.0001592545 1.49993e-05 4.14211e-05 3.78112e-05 0.0002273924 0.737708 
+\end{verbatim}
+
+\texttt{Synth::synth()} gibt Infos über den Optimierungsprozess und
+dessen Ergebnisse automatisch in der Konsole aus. Wir können diese mit
+\texttt{Synth::synth.tab()} leicht tabellarisch zusammenfassen und mit
+\texttt{gt::gt()} darstellen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Zusammenfassung der Ergebnisse}
+\NormalTok{(}
+\NormalTok{  tb }\OtherTok{\textless{}{-}} \FunctionTok{synth.tab}\NormalTok{(}
+    \AttributeTok{synth.res =}\NormalTok{ synth\_out, }
+    \AttributeTok{dataprep.res =}\NormalTok{ dataprep\_out}
+\NormalTok{  )  }
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+$tab.pred
+       Treated Synthetic Sample Mean
+ConGDP   0.655     0.635       0.534
+InvGDP   0.168     0.202       0.226
+ExpGDP   0.254     0.219       0.454
+ImpGDP   0.256     0.232       0.423
+LPG      0.003     0.003       0.003
+EmpSha   0.634     0.625       0.611
+
+$tab.v
+       v.weights
+ConGDP 0.149    
+InvGDP 0.088    
+ExpGDP 0.148    
+ImpGDP 0.153    
+LPG    0.182    
+EmpSha 0.28     
+
+$tab.w
+   w.weights      unit.names unit.numbers
+1      0.000       Australia            1
+2      0.000         Austria            2
+3      0.000         Belgium            3
+4      0.000          Canada            4
+5      0.000         Finland            5
+6      0.000          France            6
+7      0.002         Germany            7
+8      0.000         Hungary            8
+9      0.067         Iceland            9
+10     0.000         Ireland           10
+11     0.145           Italy           11
+12     0.000           Japan           12
+13     0.000           Korea           13
+14     0.048      Luxembourg           14
+15     0.000     Netherlands           15
+16     0.000     New Zealand           16
+17     0.000          Norway           17
+18     0.000        Portugal           18
+19     0.000 Slovak Republic           19
+20     0.000           Spain           20
+21     0.000          Sweden           21
+22     0.000     Switzerland           22
+24     0.738   United States           24
+
+$tab.loss
+       Loss W    Loss V
+[1,] 0.135733 0.6083746
+\end{verbatim}
+
+Für die tabellarische Darstellung mit \texttt{gt::gt()} berücksichtigen
+wir lediglich Volkswirtschaften mit Gewicht \textgreater{} .0001.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Darstellung mit gt()}
+\NormalTok{tb}\SpecialCharTok{$}\NormalTok{tab.w }\SpecialCharTok{\%\textgreater{}\%} 
+  \CommentTok{\# Berücksichtige nur Länder mit relevanten Gewichten}
+  \FunctionTok{filter}\NormalTok{(w.weights }\SpecialCharTok{\textgreater{}}\NormalTok{ .}\DecValTok{0001}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(w.weights)) }\SpecialCharTok{\%\textgreater{}\%} 
+\NormalTok{  gt}\SpecialCharTok{::}\FunctionTok{gt}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  tabopts}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}{rlr}
+
+\caption{\label{tbl-brexitcw}Gewichte für den synthetischen
+UK-Doppelgänger}
+
+\tabularnewline
+
+\toprule
+w.weights & unit.names & unit.numbers \\ 
+\midrule\addlinespace[2.5pt]
+$0.738$ & United States & $24$ \\ 
+$0.145$ & Italy & $11$ \\ 
+$0.067$ & Iceland & $9$ \\ 
+$0.048$ & Luxembourg & $14$ \\ 
+$0.002$ & Germany & $7$ \\ 
+\bottomrule
+
+\end{longtable}
+
+Der synthetische UK-Doppelgänger kann nun gemäß der Vorschrift
+\eqref{eq:dgkonst} konstruiert werden. Wir erzeugen hierzu ein
+\texttt{tibble}-Objekt mit den entsprechenden ID-Variablen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Doppelgänger konstruieren}
+\NormalTok{doppelganger }\OtherTok{\textless{}{-}} \FunctionTok{left\_join}\NormalTok{(}
+  \AttributeTok{x =}\NormalTok{ brexit, }
+  \AttributeTok{y =}\NormalTok{ tb}\SpecialCharTok{$}\NormalTok{tab.w, }
+  \AttributeTok{by =} \FunctionTok{c}\NormalTok{(}\StringTok{"Country"} \OtherTok{=} \StringTok{"unit.names"}\NormalTok{)}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{select}\NormalTok{(Time, Year, Country, gdp, w.weights) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(Time, Year) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{gdp =} \FunctionTok{sum}\NormalTok{(gdp }\SpecialCharTok{*}\NormalTok{ w.weights, }\AttributeTok{na.rm =}\NormalTok{ T)}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{type =} \StringTok{"Doppelgaenger"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ungroup}\NormalTok{()}
+
+\FunctionTok{glimpse}\NormalTok{(doppelganger)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Rows: 104
+Columns: 4
+$ Time <dbl> 1995.00, 1995.25, 1995.50, 1995.75, 1996.00, 1996.25, 1996.50, 19~
+$ Year <dbl> 1995, 1995, 1995, 1995, 1996, 1996, 1996, 1996, 1997, 1997, 1997,~
+$ gdp  <dbl> -36.87991, -36.70512, -36.32948, -35.72637, -35.34392, -34.57688,~
+$ type <chr> "Doppelgaenger", "Doppelgaenger", "Doppelgaenger", "Doppelgaenger~
+\end{verbatim}
+
+Für die nachfolgenden Schritte der Analyse führen wir das beobachtete
+GDP für Großbritannien mit dem syntethischen GDP des Doppelgängers
+zusammen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# tibble mit UK{-}GDP erstellen}
+\NormalTok{UK }\OtherTok{\textless{}{-}}\NormalTok{ brexit }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(Country }\SpecialCharTok{==} \StringTok{"United Kingdom"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{select}\NormalTok{(Time, Year, gdp) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{type =} \StringTok{"UK"}\NormalTok{)}
+
+\CommentTok{\# UK und Doppelgänger zusammenführen}
+\NormalTok{the\_gdps }\OtherTok{\textless{}{-}} \FunctionTok{bind\_rows}\NormalTok{(}
+\NormalTok{  doppelganger, UK}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Für einen Vergleich von UK- und Doppelgänger-BIP folgen wir Born u.~a.
+(2019) und berechnen die Differenz der BIP über den gesamten Zeitraum,
+die so genannte \emph{Doppelgänger-Gap}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# UK{-}Doppelgänger{-}Gap berechnen}
+\NormalTok{gdp\_gap }\OtherTok{\textless{}{-}}\NormalTok{ the\_gdps }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{pivot\_wider}\NormalTok{(}
+    \AttributeTok{values\_from =}\NormalTok{ gdp, }
+    \AttributeTok{names\_from =} \StringTok{"type"}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{gdp\_gap =}\NormalTok{ UK }\SpecialCharTok{{-}}\NormalTok{ Doppelgaenger)}
+\end{Highlighting}
+\end{Shaded}
+
+Als ein Maß für die Unsicherheit bei der Schätzung des GDPs für den
+Doppelgänger berechnen Born u.~a. (2019) die Standardabweichung der
+Doppelgänger-Gap für den Zeitraum \emph{vor} dem Brexit-Referendum.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Standardabweichung der Gap vor dem Brexit{-}Vote}
+\NormalTok{sd\_gap }\OtherTok{\textless{}{-}}\NormalTok{ gdp\_gap }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(Time }\SpecialCharTok{\textless{}} \FloatTok{2016.25}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{sd =} \FunctionTok{sd}\NormalTok{(gdp\_gap)}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{pull}\NormalTok{(sd)}
+\end{Highlighting}
+\end{Shaded}
+
+Wir nutzen nun \texttt{ggplot2::ggplot()}, um den syntetischen
+Doppelgänger und das BIP für Großbritannien über den gesamten Zeitraum
+darzustellen. Für die Darstellung von Unsicherheit bei der Konstruktion
+des Doppelgängers unterlegen wir die Doppelgänger-Zeitreihe mit einer
+Schattierung in der Breite der geschätzten Standardabweichung von 0.78
+für die Periode vor dem Referendum.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}
+\NormalTok{  p\_gdp }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{() }\SpecialCharTok{+}
+    \CommentTok{\# 1{-}SD{-}Band um das Doppelgänger{-}GDP}
+    \FunctionTok{geom\_ribbon}\NormalTok{(}
+      \AttributeTok{data =}\NormalTok{ the\_gdps }\SpecialCharTok{\%\textgreater{}\%} 
+        \FunctionTok{filter}\NormalTok{(type }\SpecialCharTok{==} \StringTok{"Doppelgaenger"}\NormalTok{), }
+      \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}
+        \AttributeTok{x =}\NormalTok{ Time, }
+        \AttributeTok{ymin =}\NormalTok{ gdp }\SpecialCharTok{{-}}\NormalTok{ sd\_gap, }
+        \AttributeTok{ymax =}\NormalTok{ gdp }\SpecialCharTok{+}\NormalTok{ sd\_gap}
+\NormalTok{      ), }
+      \AttributeTok{fill =} \FunctionTok{alpha}\NormalTok{(}\StringTok{"red"}\NormalTok{, }\AttributeTok{alpha =}\NormalTok{ .}\DecValTok{2}\NormalTok{), }
+      \AttributeTok{color =} \StringTok{"white"}
+\NormalTok{    ) }\SpecialCharTok{+}
+    \CommentTok{\# UK{-} und Doppelgänger{-}GDP}
+    \FunctionTok{geom\_line}\NormalTok{(}
+      \AttributeTok{data =}\NormalTok{ the\_gdps, }
+      \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}
+        \AttributeTok{x =}\NormalTok{ Time, }
+        \AttributeTok{y =}\NormalTok{ gdp, }
+        \AttributeTok{col =}\NormalTok{ type}
+\NormalTok{      ),}
+      \AttributeTok{lwd =} \DecValTok{1}
+\NormalTok{    ) }\SpecialCharTok{+}
+    \CommentTok{\# Brexit{-}Referendum}
+    \FunctionTok{geom\_vline}\NormalTok{(}
+      \AttributeTok{xintercept =} \FloatTok{2016.25}\NormalTok{, }
+      \AttributeTok{lty =} \StringTok{"dotted"}
+\NormalTok{    ) }\SpecialCharTok{+}
+    \FunctionTok{scale\_color\_discrete}\NormalTok{(}\AttributeTok{name =} \StringTok{""}\NormalTok{) }\SpecialCharTok{+}
+    \CommentTok{\# Legende hinzufügen}
+\NormalTok{    cowplot}\SpecialCharTok{::}\FunctionTok{theme\_cowplot}\NormalTok{() }\SpecialCharTok{+}
+    \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \FunctionTok{c}\NormalTok{(.}\DecValTok{025}\NormalTok{, .}\DecValTok{9}\NormalTok{))  }
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics{SyntheticControl_files/figure-pdf/fig-ukuksdg-1.pdf}
+
+}
+
+\caption{\label{fig-ukuksdg}UK-BIP und synthetischer Doppelgänger}
+
+\end{figure}%
+
+Abbildung~\ref{fig-ukuksdg} zeigt, dass der synthetische Doppelgänger
+über weite Teile der Vorperiode eine gute Anpassung an das beobachtete
+BIP von Großbritannien aufweist, insbesondere für den Zeitraum
+unmittelbar vor dem Brexit-Referendum. Nach dem Referendum zeigt sich
+bereits nach wenigen Quartalen eine deutliche Abweichung zwischen der
+geschätzten und der beobachteten Trajektorie. Eine Beschränkung der in
+\texttt{p\_gdp} verwendeten Datenpunkte auf einen Bereich nahe des
+Referendums bestärkt diese Schlussfolgerung.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Close{-}up im Bereich des Referendums}
+\NormalTok{p\_gdp }\SpecialCharTok{+}
+  \FunctionTok{scale\_x\_continuous}\NormalTok{(}
+    \AttributeTok{limits =} \FunctionTok{c}\NormalTok{(}\DecValTok{2015}\NormalTok{, }\DecValTok{2021}\NormalTok{), }
+    \AttributeTok{expand =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, .}\DecValTok{1}\NormalTok{)}
+\NormalTok{    ) }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{limits =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{4}\NormalTok{, }\DecValTok{12}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics{SyntheticControl_files/figure-pdf/fig-ukuksdgclose-1.pdf}
+
+}
+
+\caption{\label{fig-ukuksdgclose}UK-BIP und synthetischer Doppelgänger
+-- Close-Up}
+
+\end{figure}%
+
+In Abbildung~\ref{fig-ukuksdg} ist eine ab Mitte 2017 außerhalb des
+Standardabweichungsbereichs verlaufende Divergenz der Zeitreihen zu
+erkennen. Diese stellen wir nachfolgend anhand der Doppelgänger-Gap mit
+\texttt{ggplot2::ggplot()} dar.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# BIP{-}Doppelgänger{-}Gap}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ gdp\_gap) }\SpecialCharTok{+}
+  \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =} \DecValTok{0}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{(}
+    \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ Time, }\AttributeTok{y =}\NormalTok{ gdp\_gap),}
+    \AttributeTok{lwd =} \DecValTok{1}
+\NormalTok{  ) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_ribbon}\NormalTok{(}
+    \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}
+      \AttributeTok{x =}\NormalTok{ Time, }
+      \AttributeTok{ymin =}\NormalTok{ gdp\_gap }\SpecialCharTok{{-}}\NormalTok{ sd\_gap, }
+      \AttributeTok{ymax =}\NormalTok{ gdp\_gap }\SpecialCharTok{+}\NormalTok{ sd\_gap}
+\NormalTok{    ), }
+    \AttributeTok{fill =} \FunctionTok{alpha}\NormalTok{(}\StringTok{"darkgray"}\NormalTok{, }\AttributeTok{alpha =}\NormalTok{ .}\DecValTok{2}\NormalTok{), }
+    \AttributeTok{color =} \StringTok{"white"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \CommentTok{\# Referendum}
+  \FunctionTok{geom\_vline}\NormalTok{(}
+    \AttributeTok{xintercept =} \FloatTok{2016.25}\NormalTok{,}
+    \AttributeTok{lty =} \StringTok{"dotted"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{scale\_x\_continuous}\NormalTok{(}
+    \AttributeTok{expand =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, .}\DecValTok{1}\NormalTok{), }
+    \AttributeTok{limits =} \FunctionTok{c}\NormalTok{(}\DecValTok{2015}\NormalTok{, }\DecValTok{2021}\NormalTok{)}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{limits =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{6}\NormalTok{, }\FloatTok{1.5}\NormalTok{)) }\SpecialCharTok{+}
+\NormalTok{  cowplot}\SpecialCharTok{::}\FunctionTok{theme\_cowplot}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics{SyntheticControl_files/figure-pdf/fig-ukdggap-1.pdf}
+
+}
+
+\caption{\label{fig-ukdggap}UK-BIP und synthetischer Doppelgänger --
+Doppelgänger-Gap}
+
+\end{figure}%
+
+Die in Abbildung~\ref{fig-ukdggap} gezeigte Doppelgänger-Gap stimmt gut
+mit dem von Born u.~a. (2019) geschätzten verlorenen Wachstums des BIP
+relativ zu 2016 um bis zu 2.5\% bis Ende des Jahres 2018 überein.
+
+Als weiteres Maß für den Effekt des Referendums im Folgezeitraum können
+wir die mittlere Doppelgänger-Gap für sämtliche Beobachtungsperioden
+nach dem Brexit-Referendum schnell bestimmen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Mittlerer Unterschied nach dem Brexit{-}Referendum}
+\NormalTok{gdp\_gap }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(Time }\SpecialCharTok{\textgreater{}} \FloatTok{2016.25}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{pull}\NormalTok{(gdp\_gap) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{mean}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] -2.343273
+\end{verbatim}
+
+\subsection{Placebo-Tests: Grafische
+Inferenz}\label{placebo-tests-grafische-inferenz}
+
+Auch für SCM sind Placebo-Tests ein hilfreiches Instrument zur
+Überprüfung der Gültigkeit von Studienergebnissen. Eine gründliche
+Placebo-Analyse kann festzustellen, ob der beobachtete Effekt
+tatsächlich auf die Intervention zurückzuführen ist und nicht auf
+unberücksichtigte (möglicherweise unbeobachtbare) Faktoren.
+
+Ein Ansatz ist hierfür ist es, den synthetische-Doppelgänger für
+\emph{fiktive Interventionszeitpunkte} vor dem tatsächlichen
+Behandlungszeitpunkt zu konstruieren, und die entsprechenden
+Trajektorien mit dem ursprünglichen Doppelgänger zu vergleichen. So kann
+die Validität der ursprünglichen Doppelgänger-Trajektorie im Hinblick
+auf mögliche anderweitige Ereignisse vor der Intervention geprüft
+werden: Doppelgänger-Trajektorien für fiktive, frühere Interventionen
+sollten sich nicht systematisch von der andhand von Daten bis zur
+tatsächlichen Intervention berechneten Trajektorie unterscheiden.
+
+Wir definieren hierzu eine Funktion \texttt{placebo()}, die einen
+syntethischen Doppelgänger des BIP Großbritanniens mit Gewichten auf
+Basis eines vorgegebenen Interventionszeitpunktes (\texttt{treat})
+zurückgibt. Abgesehen vom früheren Interventionszeitpunkt (und der damit
+einhergehenden verkleinerten Stichprobe) erfolgt die Berechnung der
+Gewichte mit derselben Spezifikation wie zuvor.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Funktion für Placebo{-}Doppelgänger:}
+\CommentTok{\# Fiktive frühere Intervention}
+\NormalTok{placebo }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(treat) \{}
+  
+  \CommentTok{\# Datenvorbereitung für fiktives Datum \textquotesingle{}treat\textquotesingle{}}
+\NormalTok{  dataprep\_out }\OtherTok{\textless{}{-}} \FunctionTok{dataprep}\NormalTok{(}
+    \AttributeTok{foo =}\NormalTok{ brexit, }
+    \AttributeTok{predictors =} \FunctionTok{c}\NormalTok{(}
+      \StringTok{"ConGDP"}\NormalTok{, }\StringTok{"InvGDP"}\NormalTok{,}
+      \StringTok{"ExpGDP"}\NormalTok{, }\StringTok{"ImpGDP"}\NormalTok{,}
+      \StringTok{"LPG"}\NormalTok{, }\StringTok{"EmpSha"}
+\NormalTok{    ), }
+    \AttributeTok{dependent =} \StringTok{"gdp"}\NormalTok{, }
+    \AttributeTok{unit.variable =} \StringTok{"ID"}\NormalTok{,}
+    \AttributeTok{time.variable =} \StringTok{"Time"}\NormalTok{, }
+    \AttributeTok{treatment.identifier =} \DecValTok{23}\NormalTok{, }
+    \AttributeTok{controls.identifier =}\NormalTok{ (brexit}\SpecialCharTok{$}\NormalTok{ID }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{unique}\NormalTok{())[}\SpecialCharTok{{-}}\DecValTok{23}\NormalTok{], }
+    \AttributeTok{time.predictors.prior =} \FunctionTok{seq}\NormalTok{(}\DecValTok{1995}\NormalTok{, treat, .}\DecValTok{25}\NormalTok{),}
+    \AttributeTok{time.optimize.ssr =} \FunctionTok{seq}\NormalTok{(}\DecValTok{1995}\NormalTok{, treat, .}\DecValTok{25}\NormalTok{),}
+    \AttributeTok{unit.names.variable =} \StringTok{"Country"}
+\NormalTok{    )}
+  
+  \CommentTok{\# Doppelgänger bestimmen}
+\NormalTok{  synth\_out }\OtherTok{\textless{}{-}} \FunctionTok{quietly}\NormalTok{(synth)(dataprep\_out)}\SpecialCharTok{$}\NormalTok{result}
+  
+  \CommentTok{\# Ergebnisse auslesen}
+\NormalTok{  tb }\OtherTok{\textless{}{-}} \FunctionTok{synth.tab}\NormalTok{(}
+    \AttributeTok{synth.res =}\NormalTok{ synth\_out, }
+    \AttributeTok{dataprep.res =}\NormalTok{ dataprep\_out}
+\NormalTok{    )}
+  
+  \FunctionTok{return}\NormalTok{(}
+    
+    \CommentTok{\# Doppelgänger konstruieren }
+    \FunctionTok{left\_join}\NormalTok{(}
+      \AttributeTok{x =}\NormalTok{ brexit, }
+      \AttributeTok{y =}\NormalTok{ tb}\SpecialCharTok{$}\NormalTok{tab.w, }
+      \AttributeTok{by =} \FunctionTok{c}\NormalTok{(}\StringTok{"Country"} \OtherTok{=} \StringTok{"unit.names"}\NormalTok{)}
+\NormalTok{    ) }\SpecialCharTok{\%\textgreater{}\%} 
+      \FunctionTok{select}\NormalTok{(Time, Country, gdp, w.weights) }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{group\_by}\NormalTok{(Time) }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{summarise}\NormalTok{(}
+        \AttributeTok{gdp =} \FunctionTok{sum}\NormalTok{(gdp }\SpecialCharTok{*}\NormalTok{ w.weights, }\AttributeTok{na.rm =}\NormalTok{ T)}
+\NormalTok{      ) }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{type =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"Placebo"}\NormalTok{, treat))  }
+\NormalTok{    )}
+  
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Wie in Born u.~a. (2019) berechnen wir nun 12 Placebo-Doppelgänger des
+BIP von Großbritannien für fiktive Zeitpunkte eines Referendums über
+sämtliche Quartale im Zeitraum 2010-Q1 bis 2016-Q1. Dies ist komfortabel
+durch Iteration von \texttt{placebo()} über diese Zeitpunkte mit
+\texttt{purrr::map\_dfr()} umsetzbar.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Iteration über fiktive frühere Referenden}
+\NormalTok{placebos\_tbl }\OtherTok{\textless{}{-}} \FunctionTok{map\_dfr}\NormalTok{(}
+  \AttributeTok{.x =} \FunctionTok{seq}\NormalTok{(}\DecValTok{2010}\NormalTok{, }\DecValTok{2016}\NormalTok{, .}\DecValTok{25}\NormalTok{), }
+  \AttributeTok{.f =}\NormalTok{  \textbackslash{}(x) }\FunctionTok{placebo}\NormalTok{(x) }
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{placebos\_tbl} ist ein \texttt{tibble}-Objekt im tidy-Format.
+Wir können die Placebo-Doppelgänger sowie den ursprünglich berechneten
+Doppelgänger und das tatsächliche BIP also ähnlich wie in
+Abbildung~\ref{fig-ukuksdg} mit \texttt{ggplot2::ggplot()} darstellen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Vergleich mit Placebo{-}Doppelgänger}
+\NormalTok{(}
+\NormalTok{  p\_UKDG }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}
+    \AttributeTok{data =}\NormalTok{ placebos\_tbl,}
+    \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}
+      \AttributeTok{x =}\NormalTok{ Time, }
+      \AttributeTok{y =}\NormalTok{ gdp, }
+      \AttributeTok{group =}\NormalTok{ type}
+\NormalTok{    )}
+\NormalTok{  ) }\SpecialCharTok{+}
+    \CommentTok{\# Placebos (mit jitter)}
+    \FunctionTok{geom\_line}\NormalTok{(}
+      \AttributeTok{lwd =}\NormalTok{ .}\DecValTok{25}\NormalTok{, }
+      \AttributeTok{col =} \StringTok{"gray80"}\NormalTok{,}
+      \AttributeTok{position =} \FunctionTok{position\_jitter}\NormalTok{(}\AttributeTok{height =}\NormalTok{ .}\DecValTok{25}\NormalTok{)}
+\NormalTok{    ) }\SpecialCharTok{+}
+    \CommentTok{\# Ursprünglicher Doppelgänger}
+    \FunctionTok{geom\_line}\NormalTok{(}
+      \AttributeTok{data =}\NormalTok{ the\_gdps }\SpecialCharTok{\%\textgreater{}\%} 
+        \FunctionTok{filter}\NormalTok{(type }\SpecialCharTok{==} \StringTok{"Doppelgaenger"}\NormalTok{), }
+      \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{col =}\NormalTok{ type), }
+      \AttributeTok{lwd =} \DecValTok{1}
+\NormalTok{    ) }\SpecialCharTok{+}
+    \CommentTok{\# Beobachtetes BIP}
+    \FunctionTok{geom\_line}\NormalTok{(}
+      \AttributeTok{data =}\NormalTok{ the\_gdps }\SpecialCharTok{\%\textgreater{}\%} 
+        \FunctionTok{filter}\NormalTok{(type }\SpecialCharTok{==} \StringTok{"UK"}\NormalTok{), }
+      \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{col =}\NormalTok{ type), }
+      \AttributeTok{lwd =} \DecValTok{1}
+\NormalTok{    ) }\SpecialCharTok{+}
+    \CommentTok{\# Intikator für Referendum}
+    \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{2016.25}\NormalTok{, }\AttributeTok{lty =} \StringTok{"dotted"}\NormalTok{) }\SpecialCharTok{+}
+    \CommentTok{\# Formatierung}
+\NormalTok{    cowplot}\SpecialCharTok{::}\FunctionTok{theme\_cowplot}\NormalTok{() }\SpecialCharTok{+}
+    \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \FunctionTok{c}\NormalTok{(.}\DecValTok{05}\NormalTok{, .}\DecValTok{9}\NormalTok{))}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics{SyntheticControl_files/figure-pdf/fig-pdgukbip-1.pdf}
+
+}
+
+\caption{\label{fig-pdgukbip}Placebo-Doppelgänger}
+
+\end{figure}%
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Close{-}up bei Referendum}
+\NormalTok{p\_UKDG }\SpecialCharTok{+}
+      \FunctionTok{scale\_x\_continuous}\NormalTok{(}
+      \AttributeTok{limits =} \FunctionTok{c}\NormalTok{(}\DecValTok{2015}\NormalTok{, }\DecValTok{2021}\NormalTok{), }\AttributeTok{expand =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, .}\DecValTok{05}\NormalTok{)}
+\NormalTok{    ) }\SpecialCharTok{+}
+      \FunctionTok{scale\_y\_continuous}\NormalTok{(}
+      \AttributeTok{limits =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{3}\NormalTok{, }\DecValTok{13}\NormalTok{),  }\AttributeTok{expand =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{)}
+\NormalTok{    )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics{SyntheticControl_files/figure-pdf/fig-pdgukbipcu-1.pdf}
+
+}
+
+\caption{\label{fig-pdgukbipcu}Placebo-Doppelgänger -- Close-Up}
+
+\end{figure}%
+
+Beachte, dass \texttt{position\ =\ position\_jitter(height\ =\ .25)}
+eine zufällige, kleine Verschiebung (jitter) der Trajektorien der
+Placebo-Doppelgänger für eine bessere Unterscheidbarkeit bewirkt.
+Abbildung~\ref{fig-pdgukbip} und Abbildung~\ref{fig-pdgukbipcu} zeigen,
+dass sich die Placebo-Pfade für fiktive frühere Referenden (grau) nicht
+systematisch vom ursprünglich berechneten synthetischen Doppelgänger
+(rot) unterscheiden. Insbesondere finden wir keinen Rückgang der
+synthetischen BIP relativ zum beobachteten BIP für Großbritannien
+\emph{vor} dem Referendum. Deutliche Abweichungen vom tatsächlichen BIP
+ergeben sich erst jenseits der tatsächlichen Referendums. Diese
+Placebo-Analyse bekräftigt also die Validität der Konstruktion des
+``Benchmark-Doppelgängers'' für die Periode bis 2016-Q2 und die
+Schätzung des kausalen Effekts des Referendums anhand der entsprechenden
+Doppelgänger-Gap.
+
+Ein weiterer Placebo-Test in Born u.~a. (2019) ist ein Vergleich der
+Doppelgänger-Gap Großbritanniens mit Doppelgänger-Gaps für fiktive
+Referenden in 2016-Q2 in Ländern mit wesentlichem Einfluss bei der
+Konstruktion des synthetischen Doppelgängers für Großbritannien: Die
+Schätzung des kausalen Effekts des Referendums auf das BIP in
+Großbritannien ist glaubwürdig, wenn lediglich die Doppelgänger-Gap für
+Großbritannien durch das Referendum beeinflusst wird, \emph{nicht} aber
+die Doppelgänger-Gaps für Länder in der Kontrollgruppe.
+
+Für diese grafische Placebo-Analyse modifizieren wir die Funktion
+\texttt{placebo()} entsprechend. \texttt{placebo\_gap()} berechnet die
+Doppelgänger-Gap für das mit \texttt{treat} identifizierte Land. Das
+\texttt{if}-Statement zu Beginn stellt sicher, dass Großbritannien
+\emph{nicht} als Kontroll-Einheit für die Placebo-Gaps verwendet wird.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Funktion für Placebo{-}Gaps}
+\NormalTok{placebo\_gap }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(treat) \{}
+  
+  \CommentTok{\# Kontrollgruppe definieren}
+  \ControlFlowTok{if}\NormalTok{(treat }\SpecialCharTok{!=} \DecValTok{23}\NormalTok{) \{}
+\NormalTok{    controls }\OtherTok{\textless{}{-}}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{:}\DecValTok{24}\NormalTok{)[}\SpecialCharTok{{-}}\FunctionTok{c}\NormalTok{(}\DecValTok{23}\NormalTok{, treat)]}
+\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{ \{}
+\NormalTok{    controls }\OtherTok{\textless{}{-}}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{:}\DecValTok{24}\NormalTok{)[}\SpecialCharTok{{-}}\DecValTok{23}\NormalTok{]}
+\NormalTok{  \}}
+  
+  \CommentTok{\# Daten vorbereiten}
+\NormalTok{  dataprep\_out }\OtherTok{\textless{}{-}} \FunctionTok{dataprep}\NormalTok{(}
+    \AttributeTok{foo =}\NormalTok{ brexit, }
+    \AttributeTok{predictors =} \FunctionTok{c}\NormalTok{(}
+      \StringTok{"ConGDP"}\NormalTok{, }\StringTok{"InvGDP"}\NormalTok{,}
+      \StringTok{"ExpGDP"}\NormalTok{, }\StringTok{"ImpGDP"}\NormalTok{,}
+      \StringTok{"LPG"}\NormalTok{, }\StringTok{"EmpSha"}
+\NormalTok{    ), }
+    \AttributeTok{dependent =} \StringTok{"gdp"}\NormalTok{, }
+    \AttributeTok{unit.variable =} \StringTok{"ID"}\NormalTok{,}
+    \AttributeTok{time.variable =} \StringTok{"Time"}\NormalTok{, }
+    \AttributeTok{treatment.identifier =}\NormalTok{ treat, }
+    \AttributeTok{controls.identifier =}\NormalTok{ controls, }
+    \AttributeTok{time.predictors.prior =} \FunctionTok{seq}\NormalTok{(}\DecValTok{1995}\NormalTok{, }\FloatTok{2016.25}\NormalTok{, .}\DecValTok{25}\NormalTok{),}
+    \AttributeTok{time.optimize.ssr =} \FunctionTok{seq}\NormalTok{(}\DecValTok{1995}\NormalTok{, }\FloatTok{2016.25}\NormalTok{, .}\DecValTok{25}\NormalTok{),}
+    \AttributeTok{unit.names.variable =} \StringTok{"Country"}
+\NormalTok{  )}
+  
+  \CommentTok{\# Gewichte bestimmen}
+\NormalTok{  synth\_out }\OtherTok{\textless{}{-}} \FunctionTok{quietly}\NormalTok{(synth)(dataprep\_out)}\SpecialCharTok{$}\NormalTok{result}
+  
+  \CommentTok{\# Ergebnisse zusammenfassen}
+\NormalTok{  tb }\OtherTok{\textless{}{-}} \FunctionTok{synth.tab}\NormalTok{(}
+    \AttributeTok{synth.res =}\NormalTok{ synth\_out, }
+    \AttributeTok{dataprep.res =}\NormalTok{ dataprep\_out}
+\NormalTok{  )}
+  
+  \CommentTok{\# Doppelgänger bestimmen}
+\NormalTok{  doppel }\OtherTok{\textless{}{-}} \FunctionTok{left\_join}\NormalTok{(}
+    \AttributeTok{x =}\NormalTok{ brexit, }
+    \AttributeTok{y =}\NormalTok{ tb}\SpecialCharTok{$}\NormalTok{tab.w, }
+    \AttributeTok{by =} \FunctionTok{c}\NormalTok{(}\StringTok{"Country"} \OtherTok{=} \StringTok{"unit.names"}\NormalTok{)}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%} 
+    \FunctionTok{select}\NormalTok{(Time, gdp, Country, w.weights) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{group\_by}\NormalTok{(Time) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{summarise}\NormalTok{(}
+      \AttributeTok{gdp\_synth =} \FunctionTok{sum}\NormalTok{(gdp }\SpecialCharTok{*}\NormalTok{ w.weights, }\AttributeTok{na.rm =}\NormalTok{ T), }
+\NormalTok{    )}
+  
+  \CommentTok{\# Beobachtetes BIP auslesen}
+\NormalTok{  gdp }\OtherTok{\textless{}{-}}\NormalTok{ brexit }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(ID }\SpecialCharTok{==}\NormalTok{ treat) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(gdp)}
+  
+  \FunctionTok{return}\NormalTok{(}
+    
+    \CommentTok{\# Doppelgänger{-}Gap berechnen}
+\NormalTok{    doppel }\SpecialCharTok{\%\textgreater{}\%} 
+      \FunctionTok{mutate}\NormalTok{(}
+        \AttributeTok{ID =}\NormalTok{ treat,}
+        \AttributeTok{gdp =}\NormalTok{ gdp,}
+        \AttributeTok{gdp\_gap =}\NormalTok{ gdp }\SpecialCharTok{{-}}\NormalTok{ gdp\_synth}
+\NormalTok{      )}
+    
+\NormalTok{  )}
+  
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Für die Berechnung der Placebo-Gaps iterieren wir über die Indizes der
+in Tabelle~\ref{tbl-brexitcw} gelisteten Volkswirtschaften der
+Kontrollgruppe für Großbritannien.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Indizes für "Donor Countries" und UK}
+\NormalTok{donors\_and\_UK }\OtherTok{\textless{}{-}}\NormalTok{ brexit }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{select}\NormalTok{(ID, Country) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{distinct}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(}
+\NormalTok{    Country }\SpecialCharTok{\%in\%} 
+      \FunctionTok{c}\NormalTok{(}
+        \StringTok{"United States"}\NormalTok{, }\StringTok{"Italy"}\NormalTok{, }\StringTok{"Iceland"}\NormalTok{, }
+        \StringTok{"Luxembourg"}\NormalTok{, }\StringTok{"Germany"}\NormalTok{, }\StringTok{"United Kingdom"}
+\NormalTok{      )}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{pull}\NormalTok{(ID)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Placebo{-}Doppelgänger{-}Gaps berechnen}
+\NormalTok{placebo\_gaps\_tbl }\OtherTok{\textless{}{-}} \FunctionTok{map\_dfr}\NormalTok{(}
+  \AttributeTok{.x =}\NormalTok{ donors\_and\_UK, }
+  \AttributeTok{.f =}\NormalTok{  \textbackslash{}(x) }\FunctionTok{placebo\_gap}\NormalTok{(x) }
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Für die grafische Darstellung ergänzen wir die Variable \texttt{Country}
+zur Unterscheidung der Doppelgänger-Gaps für Großbritannien und die
+Kontroll-Länder.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ID{-}Variable für UK und Kontroll{-}Länder}
+\NormalTok{placebo\_gaps\_tbl }\OtherTok{\textless{}{-}}\NormalTok{ placebo\_gaps\_tbl }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{Country =} \FunctionTok{ifelse}\NormalTok{(ID }\SpecialCharTok{==} \DecValTok{23}\NormalTok{, }\StringTok{"UK"}\NormalTok{, }\StringTok{"else"}\NormalTok{)}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+Um die Vergleichbarkeit der Doppelgänger-Gaps zu gewährleisten,
+standardisieren Born u.~a. (2019) die Schätzungen der Gaps anhand der
+jeweiligen Mittelwerte für das Jahr 2015 und der Standardabweichungen im
+Zeitraum vor dem Brexit-Referendum. Wir berechnen diese Statistiken
+zunächst.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Mittelwerte für 2015}
+\NormalTok{means }\OtherTok{\textless{}{-}}\NormalTok{ placebo\_gaps\_tbl }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{group\_by}\NormalTok{(ID) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(}\FunctionTok{between}\NormalTok{(Time, }\DecValTok{2015}\NormalTok{, }\FloatTok{2015.75}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{mean2015 =} \FunctionTok{mean}\NormalTok{(gdp\_gap)}
+\NormalTok{  )}
+
+\CommentTok{\# Standardabweichungen vor Referendum}
+\NormalTok{sds }\OtherTok{\textless{}{-}}\NormalTok{ placebo\_gaps\_tbl }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{group\_by}\NormalTok{(ID) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(Time }\SpecialCharTok{\textless{}} \FloatTok{2016.25}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{thesd =} \FunctionTok{sd}\NormalTok{(gdp\_gap)}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+Mit \texttt{dplyr::left\_join()} führen wir diese Statistiken mit
+\texttt{placebo\_gaps\_tbl} zusammen und berechnen die standardisierten
+Doppelgänger-Gaps.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Join + Standardisierung}
+\NormalTok{placebo\_gaps\_std }\OtherTok{\textless{}{-}} 
+  \FunctionTok{left\_join}\NormalTok{(placebo\_gaps\_tbl, means) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{left\_join}\NormalTok{(sds) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{gdp\_gap\_std =}\NormalTok{ (gdp\_gap }\SpecialCharTok{{-}}\NormalTok{ mean2015)}\SpecialCharTok{/}\NormalTok{thesd)}
+\end{Highlighting}
+\end{Shaded}
+
+Analog zum Code für Abbildung~\ref{fig-ukdggap} plotten wir die
+Placebo-Gap-Zeitreihen mit \texttt{ggplot2::ggplot()}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Placebo{-}Gaps mit UK{-}Gap vergleichen}
+\FunctionTok{ggplot}\NormalTok{(}
+  \AttributeTok{data =}\NormalTok{ placebo\_gaps\_std,}
+  \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}
+    \AttributeTok{x =}\NormalTok{ Time, }
+    \AttributeTok{y =}\NormalTok{ gdp\_gap\_std,}
+    \AttributeTok{group =}\NormalTok{ ID,}
+    \AttributeTok{lwd =}\NormalTok{ Country,}
+    \AttributeTok{color =}\NormalTok{ Country}
+\NormalTok{  )}
+\NormalTok{) }\SpecialCharTok{+}
+  \CommentTok{\# Hilfslinie bei Differenz = 0}
+  \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =} \DecValTok{0}\NormalTok{) }\SpecialCharTok{+}
+  \CommentTok{\# Gaps}
+  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+}
+  \CommentTok{\# Referendum}
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{2016.25}\NormalTok{, }\AttributeTok{lty =} \StringTok{"dotted"}\NormalTok{) }\SpecialCharTok{+}
+  \CommentTok{\# Formatierung}
+  \FunctionTok{scale\_color\_manual}\NormalTok{(}
+    \AttributeTok{values =} \FunctionTok{c}\NormalTok{(}\StringTok{"UK"} \OtherTok{=} \StringTok{"steelblue"}\NormalTok{, }\StringTok{"else"} \OtherTok{=} \FunctionTok{alpha}\NormalTok{(}\StringTok{"darkgray"}\NormalTok{, .}\DecValTok{5}\NormalTok{))}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{scale\_linewidth\_manual}\NormalTok{(}
+    \AttributeTok{values =} \FunctionTok{c}\NormalTok{(}\StringTok{"UK"} \OtherTok{=} \DecValTok{1}\NormalTok{, }\StringTok{"else"} \OtherTok{=}\NormalTok{ .}\DecValTok{5}\NormalTok{)}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{scale\_x\_continuous}\NormalTok{(}
+    \AttributeTok{limits =} \FunctionTok{c}\NormalTok{(}\DecValTok{2015}\NormalTok{, }\DecValTok{2021}\NormalTok{), }\AttributeTok{expand =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, .}\DecValTok{05}\NormalTok{)}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_cowplot}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \FunctionTok{c}\NormalTok{(.}\DecValTok{05}\NormalTok{, .}\DecValTok{9}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics{SyntheticControl_files/figure-pdf/fig-pdgukg-1.pdf}
+
+}
+
+\caption{\label{fig-pdgukg}Placebo- und UK-Doppelgänger-Gaps}
+
+\end{figure}%
+
+Abbildung~\ref{fig-pdgukg} zeigt die standardisierten
+Placebo-Doppelgänger-Gaps für ein fiktives Referendum zum Zeitpunkt
+2016-Q2 in den 5 Kontroll-Volkswirtschaften, die für Konstruktion des
+BIP-Doppelgängers von Großbrittannien relevant sind (grau). Der
+Vergleich mit der standardisierten Doppelgänger-Gap für Großbritannien
+(blau). Der Verlauf der Placebo-Gaps zeigt an, dass keine Abweichungen
+mit negativem Trend von der Referenzlinie bei 0 (kein Unterschied
+zwischen beobachtetem und syntetischem BIP) nach dem Referendum
+vorliegen. Damit liefert die Grafik keine Hinweise auf einen Effekt
+fiktiver Interventionen in den Kontroll-Ländern. Für Großbritannien
+jedoch ist, ähnlich wie in Abbildung~\ref{fig-ukdggap}, ein negativer
+Trend nach dem Referendum deutlich erkennbar.
+
+\subsection{Statistische Inferenz}\label{statistische-inferenz}
+
+Die bisherigen Placebo-Tests liefern lediglich grafische Evidenz für die
+Signifikanz des negativen Effekts des Brexit-Referendums auf die
+Britische Volkswirtschaft. Methoden für statistische Inferenz für SCM
+sind Gegenstand aktueller Forschung. Born u.~a. (2019) verwenden den
+End-Of-Sample Instability Test (\(S\)) von Andrews (2003). Dieses
+Verfahren kann für einen Test auf einen Strukturbruch gegen Ende einer
+Zeitreihe verwendet werden. In der vorliegende Studie wird der Test
+angewendet, um zu überprüfen, ob die Verteilung der Doppelgänger-Gap
+Großbritanniens für die letzen \(m\) Perioden jenseits des Referendums
+signifikant verschieden ist von Verteilung vorheriger Perioden.
+
+Wir zeigen nachfolgend, wie diese Analyse in R mit der Funktion
+\texttt{CPAT::Andrews.test()} aus dem Paket \texttt{CPAT} durchgeführt
+werden kann. Wir testen zunächst auf eine signifikante Diskrepanz der
+Doppelgänger-Gap in Form eines Sturkturbruchs ab 2017 und fassen die
+Ergebnisse tabellarisch mit \texttt{broom::tidy()} und \texttt{gt::gt()}
+zusammen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(CPAT)}
+
+\CommentTok{\# Andrews\textquotesingle{} (2003) Test für 2017 durchführen}
+\FunctionTok{Andrews.test}\NormalTok{(}
+  \AttributeTok{x =}\NormalTok{ gdp\_gap}\SpecialCharTok{$}\NormalTok{gdp\_gap, }
+  \AttributeTok{M =} \FunctionTok{which}\NormalTok{(gdp\_gap}\SpecialCharTok{$}\NormalTok{Time }\SpecialCharTok{==} \DecValTok{2017}\NormalTok{)}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+\NormalTok{  broom}\SpecialCharTok{::}\FunctionTok{tidy}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} 
+\NormalTok{  gt}\SpecialCharTok{::}\FunctionTok{gt}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  tabopts}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}{rrl}
+
+\caption{\label{tbl-growthpdssek}Andrews' (1993) End-of-Sample
+Instability Test}
+
+\tabularnewline
+
+\toprule
+statistic & p.value & method \\ 
+\midrule\addlinespace[2.5pt]
+$14.196$ & $0.693$ & Andrews' Test for Structural Change \\ 
+\bottomrule
+
+\end{longtable}
+
+Gem. des großen \(p\)-Werts kann die Nullhypothese (keine strukturelle
+Veränderung ab 2017) nicht abgelehnt werden. Wir führen den Test nun für
+sämtliche Zeitpunkte ab 2017 durch und plotten die \(p\)-Werte nebst
+gepunkteten roten Hilfslinien für die gängigen Signifikanzniveaus (10\%,
+5\%, 1\%).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Andrews\textquotesingle{} (1993) test für }
+\CommentTok{\# Post{-}Referendumsperioden}
+\NormalTok{pvals\_andrews }\OtherTok{\textless{}{-}} \FunctionTok{map}\NormalTok{(}\FunctionTok{seq}\NormalTok{(}\DecValTok{2017}\NormalTok{, }\FloatTok{2020.5}\NormalTok{, .}\DecValTok{25}\NormalTok{), \textbackslash{}(time) \{}
+  \FunctionTok{tibble}\NormalTok{(}
+    \AttributeTok{Time =}\NormalTok{ time,}
+    \AttributeTok{gap =}\NormalTok{ gdp\_gap }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(Time }\SpecialCharTok{==}\NormalTok{ time) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{pull}\NormalTok{(gdp\_gap),}
+    \AttributeTok{pvalue =}\NormalTok{ CPAT}\SpecialCharTok{::}\FunctionTok{Andrews.test}\NormalTok{(}
+      \AttributeTok{x =}\NormalTok{ gdp\_gap}\SpecialCharTok{$}\NormalTok{gdp\_gap, }
+      \AttributeTok{M =} \FunctionTok{which}\NormalTok{(gdp\_gap}\SpecialCharTok{$}\NormalTok{Time }\SpecialCharTok{==}\NormalTok{ time)}
+\NormalTok{    )}\SpecialCharTok{$}\NormalTok{p.value}
+\NormalTok{  )}
+\NormalTok{\}) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{bind\_rows}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# p{-}Werte für Post{-}Interventionsperioden}
+\NormalTok{pvals\_andrews }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ Time, }\AttributeTok{y =}\NormalTok{ pvalue)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_hline}\NormalTok{(}
+    \AttributeTok{yintercept =} \FunctionTok{c}\NormalTok{(.}\DecValTok{1}\NormalTok{,.}\DecValTok{05}\NormalTok{, .}\DecValTok{01}\NormalTok{), }
+    \AttributeTok{lty =} \StringTok{"dotted"}\NormalTok{, }
+    \AttributeTok{col =} \StringTok{"red"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{scale\_x\_continuous}\NormalTok{(}\AttributeTok{expand =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{)) }\SpecialCharTok{+}
+\NormalTok{  cowplot}\SpecialCharTok{::}\FunctionTok{theme\_cowplot}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics{SyntheticControl_files/figure-pdf/fig-andrewspvals-1.pdf}
+
+}
+
+\caption{\label{fig-andrewspvals}P-Werte für Andrews' (2003) Test}
+
+\end{figure}%
+
+Der Verlauf der \(p\)-Werte zeigt deutlich, dass es für Zeitpunkte
+jenseits von 2018-Q3 Evidenz für eine strukturelle Veränderung der
+Doppelgänger-Gap für Großbrittannien gibt. Diese Ergebnisse untermauern
+die Signifikanz der in Born u.~a. (2019) mit SCM gefundenen negativen
+Effekte des Brexit-Votums auf die Britische Volkswirtschaft weiter.
+
+\bookmarksetup{startatroot}
+
+\chapter*{Literatur}\label{literatur}
 \addcontentsline{toc}{chapter}{Literatur}
 
 \markboth{Literatur}{Literatur}
 
-\hypertarget{refs}{}
+\phantomsection\label{refs}
 \begin{CSLReferences}{1}{0}
-\leavevmode\vadjust pre{\hypertarget{ref-AbadieImbens2008}{}}%
+\bibitem[\citeproctext]{ref-Abadieetal2014}
+Abadie, Alberto, Alexis Diamond, und Jens Hainmueller. 2014.
+{„Comparative Politics and the Synthetic Control Method: COMPARATIVE
+POLITICS AND THE SYNTHETIC CONTROL METHOD``}. \emph{American Journal of
+Political Science} 59 (2): 495--510.
+\url{https://doi.org/10.1111/ajps.12116}.
+
+\bibitem[\citeproctext]{ref-AbadieImbens2008}
 Abadie, Alberto, und Guido W. Imbens. 2008. {„On the Failure of the
 Bootstrap for Matching Estimators.``} \emph{Econometrica. Journal of the
 Econometric Society} 76 (6): 1537--57.
 \url{https://doi.org/10.3982/ECTA6474}.
 
-\leavevmode\vadjust pre{\hypertarget{ref-AbadieSpiess2022}{}}%
+\bibitem[\citeproctext]{ref-AbadieSpiess2022}
 Abadie, Alberto, und Jann Spiess. 2022. {„Robust Post-Matching
 Inference.``} \emph{Journal of the American Statistical Association} 117
 (538): 983--95. \url{https://doi.org/10.1080/01621459.2020.1840383}.
 
-\leavevmode\vadjust pre{\hypertarget{ref-Austin2011}{}}%
+\bibitem[\citeproctext]{ref-Abadieetal2010}
+Abadie, Alexis Diamond, Alberto, und Jens Hainmueller. 2010. {„Synthetic
+Control Methods for Comparative Case Stud- ies: Estimating the Effect of
+California's Tobacco Control Program.``} \emph{Journal of the American
+Statistical Association} 105 (490): 493--505.
+\url{https://doi.org/10.1198/jasa.2009.ap08746}.
+
+\bibitem[\citeproctext]{ref-Andrews2003}
+Andrews, D. W. K. 2003. {„End-of-Sample Instability Tests``}.
+\emph{Econometrica} 71 (6): 1661--94.
+\url{https://doi.org/10.1111/1468-0262.00466}.
+
+\bibitem[\citeproctext]{ref-Austin2011}
 Austin, P. 2011. {„An Introduction to Propensity Score Methods for
 Reducing the Effects of Confounding in Observational Studies``}.
 \emph{Multivariate Behavioral Research} 46 (3): 399--424.
 \url{https://doi.org/10.1080/00273171.2011.568786}.
 
-\leavevmode\vadjust pre{\hypertarget{ref-AustinSmall2014}{}}%
+\bibitem[\citeproctext]{ref-AustinSmall2014}
 Austin, Peter C., und Dylan S. Small. 2014. {„The use of bootstrapping
 when using propensity-score matching without replacement: A simulation
 study.``} \emph{Statistics in Medicine} 33 (24): 4306--19.
 \url{https://doi.org/10.1002/sim.6276}.
 
-\leavevmode\vadjust pre{\hypertarget{ref-AustinStuart2017}{}}%
+\bibitem[\citeproctext]{ref-AustinStuart2017}
 Austin, Peter C., und Elizabeth A. Stuart. 2017. {„Estimating the Effect
 of Treatment on Binary Outcomes Using Full Matching on the Propensity
 Score.``} \emph{Statistical Methods in Medical Research} 26 (6):
 2505--25. \url{https://doi.org/10.1177/0962280215601134}.
 
-\leavevmode\vadjust pre{\hypertarget{ref-BarroLee2013}{}}%
+\bibitem[\citeproctext]{ref-BarroLee2013}
 Barro, Robert J., und Jong Wha Lee. 2013. {„A new data set of
 educational attainment in the world, 1950--2010``}. \emph{Journal of
 Development Economics} 104: 184--98.
 https://doi.org/\url{https://doi.org/10.1016/j.jdeveco.2012.10.001}.
 
-\leavevmode\vadjust pre{\hypertarget{ref-BastenBetz2013}{}}%
+\bibitem[\citeproctext]{ref-BastenBetz2013}
 Basten, Christoph, und Frank Betz. 2013. {„Beyond work ethic: Religion,
 individual, and political preferences``}. \emph{American Economic
 Journal: Economic Policy} 5 (3): 67--91.
 
-\leavevmode\vadjust pre{\hypertarget{ref-Bellonietal2012}{}}%
+\bibitem[\citeproctext]{ref-Bellonietal2012}
 Belloni, Alexandre, Daniel Chen, Victor Chernozhukov, und Christian
 Hansen. 2012. {„Sparse models and methods for optimal instruments with
 an application to eminent domain``}. \emph{Econometrica} 80 (6):
 2369--429.
 
-\leavevmode\vadjust pre{\hypertarget{ref-BelloniChernozhukov2013}{}}%
+\bibitem[\citeproctext]{ref-BelloniChernozhukov2013}
 Belloni, Alexandre, und Victor Chernozhukov. 2013. {„Least squares after
 model selection in high-dimensional sparse models``}. \emph{Bernoulli},
 521--47.
 
-\leavevmode\vadjust pre{\hypertarget{ref-Bellonietal2014}{}}%
+\bibitem[\citeproctext]{ref-Bellonietal2014}
 Belloni, Alexandre, Victor Chernozhukov, und Christian Hansen. 2014.
 {„High-dimensional methods and inference on structural and treatment
 effects``}. \emph{Journal of Economic Perspectives} 28 (2): 29--50.
 
-\leavevmode\vadjust pre{\hypertarget{ref-Bodoryetal2020}{}}%
+\bibitem[\citeproctext]{ref-Bodoryetal2020}
 Bodory, Hugo, Lorenzo Camponovo, Martin Huber, und Michael Lechner.
 2020. {„The Finite Sample Performance of Inference Methods for
 Propensity Score Matching and Weighting Estimators.``} \emph{Journal of
 Business \& Economic Statistics}.
 \url{https://doi.org/10.2139/ssrn.2731969}.
 
-\leavevmode\vadjust pre{\hypertarget{ref-CJM2020}{}}%
+\bibitem[\citeproctext]{ref-Bornetal2019}
+Born, Benjamin, Gernot J Müller, Moritz Schularick, und Petr Sedláček.
+2019. {„The Costs of Economic Nationalism: Evidence from the Brexit
+Experiment*``}. \emph{The Economic Journal} 129 (623): 2722--44.
+\url{https://doi.org/10.1093/ej/uez020}.
+
+\bibitem[\citeproctext]{ref-CJM2020}
 Cattaneo, Matias D, Michael Jansson, und Xinwei Ma. 2020. {„Simple local
 polynomial density estimators``}. \emph{Journal of the American
 Statistical Association} 115 (531): 1449--55.
 
-\leavevmode\vadjust pre{\hypertarget{ref-CortezSilva2008}{}}%
+\bibitem[\citeproctext]{ref-CortezSilva2008}
 Cortez, Paulo, und Alice Maria Gonçalves Silva. 2008. {„Using data
 mining to predict secondary school student performance``}.
 
-\leavevmode\vadjust pre{\hypertarget{ref-Efronetal2004}{}}%
+\bibitem[\citeproctext]{ref-Efronetal2004}
 Efron, Bradley, Trevor Hastie, Iain Johnstone, und Robert Tibshirani.
 2004. {„Least angle regression``}.
 
-\leavevmode\vadjust pre{\hypertarget{ref-GelmanImbens2019}{}}%
+\bibitem[\citeproctext]{ref-GelmanImbens2019}
 Gelman, Andrew, und Guido Imbens. 2019. {„Why high-order polynomials
 should not be used in regression discontinuity designs``}. \emph{Journal
 of Business \& Economic Statistics} 37 (3): 447--56.
 
-\leavevmode\vadjust pre{\hypertarget{ref-Hahnetal2018}{}}%
+\bibitem[\citeproctext]{ref-Hahnetal2018}
 Hahn, P Richard, Carlos M Carvalho, David Puelz, und Jingyu He. 2018.
 {„Regularization and confounding in linear regression for treatment
 effect estimation``}.
 
-\leavevmode\vadjust pre{\hypertarget{ref-Hainmueller2012}{}}%
+\bibitem[\citeproctext]{ref-Hainmueller2012}
 Hainmueller, Jens. 2012. {„Entropy Balancing for Causal Effects: A
 Multivariate Reweighting Method to Produce Balanced Samples in
 Observational Studies``}. \emph{Political Analysis} 20 (1): 25--46.
 \url{https://doi.org/10.1093/pan/mpr025}.
 
-\leavevmode\vadjust pre{\hypertarget{ref-Hajek1971}{}}%
+\bibitem[\citeproctext]{ref-Hajek1971}
 Hájek, J. 1971. {„Comment on {‚An essay on the logical foundations of
 survey sampling`} by Basu, D``}. \emph{Foundations of Statistical
 Inference} 236.
 
-\leavevmode\vadjust pre{\hypertarget{ref-HillReiter2006}{}}%
+\bibitem[\citeproctext]{ref-HillReiter2006}
 Hill, Jennifer, und Jerome P. Reiter. 2006. {„Interval estimation for
 treatment effects using propensity score matching. Statistics in
 Medicine``}. \emph{Statistics in Medicine} 25 (13): 2230--56.
 \url{https://doi.org/10.1002/sim.2277}.
 
-\leavevmode\vadjust pre{\hypertarget{ref-Hiranoetal2003}{}}%
+\bibitem[\citeproctext]{ref-Hiranoetal2003}
 Hirano, Keisuke, Guido Imbens, und Geert Ridder. 2003. {„Efficient
 Estimation of Average Treatment Effects Using the Estimated Propensity
 Score.``} \emph{Econometrica} 71 (4): 1161--89.
 \url{https://doi.org/10.1111/1468-0262.00442}.
 
-\leavevmode\vadjust pre{\hypertarget{ref-HoerlKennard1970}{}}%
+\bibitem[\citeproctext]{ref-HoerlKennard1970}
 Hoerl, Arthur E, und Robert W Kennard. 1970. {„{Ridge regression: Biased
 estimation for nonorthogonal problems}``}. \emph{Technometrics} 12 (1):
 55--67.
 
-\leavevmode\vadjust pre{\hypertarget{ref-AbadieImbens2016}{}}%
+\bibitem[\citeproctext]{ref-AbadieImbens2016}
 Imbens. 2016. {„Matching on the Estimated Propensity Score.``}
 \emph{Econometrica} 84 (2): 781--807.
 \url{https://doi.org/10.3982/ecta11293}.
 
-\leavevmode\vadjust pre{\hypertarget{ref-ImbensLemieux2008}{}}%
+\bibitem[\citeproctext]{ref-ImbensLemieux2008}
 Imbens, G. W., und Thomas Lemieux. 2008. {„Regression discontinuity
 designs: A guide to practice``}. \emph{Journal of econometrics} 142 (2):
 615--35.
 
-\leavevmode\vadjust pre{\hypertarget{ref-ImbensKalyanaraman2012}{}}%
+\bibitem[\citeproctext]{ref-ImbensKalyanaraman2012}
 Imbens, Guido, und Karthik Kalyanaraman. 2012. {„Optimal bandwidth
 choice for the regression discontinuity estimator``}. \emph{The Review
 of economic studies} 79 (3): 933--59.
 
-\leavevmode\vadjust pre{\hypertarget{ref-Lee2008}{}}%
+\bibitem[\citeproctext]{ref-Lee2008}
 Lee, David S. 2008. {„Randomized experiments from non-random selection
 in US House elections``}. \emph{Journal of Econometrics} 142 (2):
 675--97.
 
-\leavevmode\vadjust pre{\hypertarget{ref-Love2004}{}}%
+\bibitem[\citeproctext]{ref-Love2004}
 Love, Thomas. 2004. {„Graphical display of covariate balance``}.
 Presentation.
 
-\leavevmode\vadjust pre{\hypertarget{ref-McCrary2008}{}}%
+\bibitem[\citeproctext]{ref-McCrary2008}
 McCrary, Justin. 2008. {„Manipulation of the running variable in the
 regression discontinuity design: A density test``}. \emph{Journal of
 Econometrics} 142 (2): 698--714.
 
-\leavevmode\vadjust pre{\hypertarget{ref-RosenbaumRubin1983}{}}%
+\bibitem[\citeproctext]{ref-RosenbaumRubin1983}
 Rosenbaum, Paul R., und Donald R. Rubin. 1983. {„The central role of the
 propensity score in observational studies for causal effects``}.
 \emph{Biometrika} 70 (1): 170--84.
 \url{https://doi.org/10.1017/cbo9780511810725.016}.
 
-\leavevmode\vadjust pre{\hypertarget{ref-Tibshirani1996}{}}%
+\bibitem[\citeproctext]{ref-Tibshirani1996}
 Tibshirani, Robert. 1996. {„Regression shrinkage and selection via the
 lasso``}. \emph{Journal of the Royal Statistical Society Series B:
 Statistical Methodology} 58 (1): 267--88.
 
-\leavevmode\vadjust pre{\hypertarget{ref-Weber2004}{}}%
+\bibitem[\citeproctext]{ref-Weber2004}
 Weber, Max. 2004. \emph{Die protestantische Ethik und der Geist des
 Kapitalismus}. Bd. 1614. CH Beck.
 
-\leavevmode\vadjust pre{\hypertarget{ref-Wooldrige2010}{}}%
+\bibitem[\citeproctext]{ref-Wooldrige2010}
 Wooldridge, Jeffrey. 2010. \emph{Econometric Analysis of Cross Section
 and Panel Data}. Second edition. Cambridge, Massachusetts: MIT.
 
