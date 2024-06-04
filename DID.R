@@ -8,7 +8,7 @@ library(modelsummary)  # For side-by-side regression tables
 
 setwd("~/Downloads/MP_Kausalanalyse")
 
-crime <-  read_stata("CrimebyBlock.dta")
+
 polizeipraesenz <- read_stata("MonthlyPanel_paper.dta")
 
 # Load terror data
@@ -44,6 +44,8 @@ dat <- polizeipraesenz %>%
   filter(mes != 73) %>%
   ungroup()
 
+write_csv(dat, "~/git_projects/kausal_data/polizeipraesenz.csv")
+write_rds(dat, "~/git_projects/kausalanalyse_book/datasets/polizeipraesenz.RDS")
 
 # Table 2
 dat_listcol <- dat %>% 
