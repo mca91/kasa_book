@@ -443,7 +443,7 @@ Tabelle~\ref{tbl-Klausurergebnisse} händisch als R-Objekt der Klasse
 Variable \emph{Modul}. Der Datensatz liegt also \emph{nicht} im s.g.
 \emph{Tidy-Format} vor.
 
-\begin{tcolorbox}[enhanced jigsaw, breakable, toprule=.15mm, title=\textcolor{quarto-callout-tip-color}{\faLightbulb}\hspace{0.5em}{Tidy-Format}, titlerule=0mm, bottomrule=.15mm, leftrule=.75mm, colbacktitle=quarto-callout-tip-color!10!white, opacitybacktitle=0.6, coltitle=black, left=2mm, opacityback=0, bottomtitle=1mm, toptitle=1mm, arc=.35mm, rightrule=.15mm, colframe=quarto-callout-tip-color-frame, colback=white]
+\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, breakable, toptitle=1mm, colframe=quarto-callout-tip-color-frame, opacitybacktitle=0.6, rightrule=.15mm, title=\textcolor{quarto-callout-tip-color}{\faLightbulb}\hspace{0.5em}{Tidy-Format}, opacityback=0, colbacktitle=quarto-callout-tip-color!10!white, toprule=.15mm, bottomrule=.15mm, bottomtitle=1mm, coltitle=black, arc=.35mm, colback=white, titlerule=0mm]
 
 Tidy-Format: Jede Spalte ist \textbf{\emph{eine}} Variable, jede Reihe
 ist \textbf{\emph{eine}} Beobachtung und jede Zelle enthält einen
@@ -1809,18 +1809,18 @@ lm(formula = read_time ~ dark_mode, data = darkmode, weights = W1$weights)
 
 Weighted Residuals:
      Min       1Q   Median       3Q      Max 
--16.6662  -2.3552   0.8786   2.9583  27.1840 
+-16.6652  -2.3552   0.8786   2.9585  27.1808 
 
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  17.7598     0.4093  43.394   <2e-16 ***
-dark_mode     0.9704     0.5807   1.671   0.0958 .  
+(Intercept)  17.7601     0.4093  43.395   <2e-16 ***
+dark_mode     0.9701     0.5807   1.671   0.0959 .  
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 Residual standard error: 5.029 on 298 degrees of freedom
-Multiple R-squared:  0.009283,  Adjusted R-squared:  0.005958 
-F-statistic: 2.792 on 1 and 298 DF,  p-value: 0.09578
+Multiple R-squared:  0.009278,  Adjusted R-squared:  0.005953 
+F-statistic: 2.791 on 1 and 298 DF,  p-value: 0.09586
 \end{verbatim}
 
 Beachte, dass die von \texttt{summary()} berechneten Standardfehler bei
@@ -2896,10 +2896,10 @@ und der Gewichte aus dem Matching-Verfahren berechnet werden.
 
 \begin{verbatim}
 
-      Term Contrast Estimate Std. Error    z Pr(>|z|)   S 2.5 % 97.5 %
- dark_mode    1 - 0     1.39      0.537 2.58  0.00988 6.7 0.333   2.44
+      Term          Contrast Estimate Std. Error    z Pr(>|z|)   S 2.5 % 97.5 %
+ dark_mode mean(1) - mean(0)     1.39      0.537 2.58  0.00988 6.7 0.333   2.44
 
-Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high 
+Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high, predicted_lo, predicted_hi, predicted 
 Type:  response 
 \end{verbatim}
 
@@ -2921,10 +2921,10 @@ Type:  response
 
 \begin{verbatim}
 
-      Term Contrast Estimate Std. Error    z Pr(>|z|)   S 2.5 % 97.5 %
- dark_mode    1 - 0     1.65      0.549 3.01  0.00262 8.6 0.576   2.73
+      Term          Contrast Estimate Std. Error    z Pr(>|z|)   S 2.5 % 97.5 %
+ dark_mode mean(1) - mean(0)     1.65      0.549 3.01  0.00262 8.6 0.576   2.73
 
-Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high 
+Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high, predicted_lo, predicted_hi, predicted 
 Type:  response 
 \end{verbatim}
 
@@ -2945,10 +2945,10 @@ Type:  response
 
 \begin{verbatim}
 
-      Term Contrast Estimate Std. Error    z Pr(>|z|)   S 2.5 % 97.5 %
- dark_mode    1 - 0     1.63      0.565 2.89  0.00381 8.0 0.527   2.74
+      Term          Contrast Estimate Std. Error    z Pr(>|z|)   S 2.5 % 97.5 %
+ dark_mode mean(1) - mean(0)     1.63      0.565 2.89  0.00381 8.0 0.527   2.74
 
-Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high 
+Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high, predicted_lo, predicted_hi, predicted 
 Type:  response 
 \end{verbatim}
 
@@ -3025,8 +3025,8 @@ bezüglich eines kausalen Effekts nach Matching und demonstrieren die
 Schätzung anhand unseres Website-Beispiels für den ATT nach
 Propensity-Score-Matching.
 
-\begin{tcolorbox}[enhanced jigsaw, breakable, toprule=.15mm, title={\textbf{Algorithmus: Bootstrap-Schätzer für Matching mit Regression
-Adjustment}}, titlerule=0mm, bottomrule=.15mm, leftrule=.75mm, colbacktitle=quarto-callout-tip-color!10!white, opacitybacktitle=0.6, coltitle=black, left=2mm, opacityback=0, bottomtitle=1mm, toptitle=1mm, arc=.35mm, rightrule=.15mm, colframe=quarto-callout-tip-color-frame, colback=white]
+\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, breakable, toptitle=1mm, colframe=quarto-callout-tip-color-frame, opacitybacktitle=0.6, rightrule=.15mm, title={\textbf{Algorithmus: Bootstrap-Schätzer für Matching mit Regression
+Adjustment}}, opacityback=0, colbacktitle=quarto-callout-tip-color!10!white, toprule=.15mm, bottomrule=.15mm, bottomtitle=1mm, coltitle=black, arc=.35mm, colback=white, titlerule=0mm]
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -3369,7 +3369,7 @@ Der von Wooldridge (2010) vorgeschlagene Doubly-Robust-Schätzer (IPWRA)
 für den ATE erreicht seine vorteilhaften Eigenschaften durch eine
 geschickte Kombination von IPW und Regression Adjustment.
 
-\begin{tcolorbox}[enhanced jigsaw, breakable, toprule=.15mm, title={\textbf{Algorithmus: IPWRA-Schätzer des ATE}}, titlerule=0mm, bottomrule=.15mm, leftrule=.75mm, colbacktitle=quarto-callout-tip-color!10!white, opacitybacktitle=0.6, coltitle=black, left=2mm, opacityback=0, bottomtitle=1mm, toptitle=1mm, arc=.35mm, rightrule=.15mm, colframe=quarto-callout-tip-color-frame, colback=white]
+\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, breakable, toptitle=1mm, colframe=quarto-callout-tip-color-frame, opacitybacktitle=0.6, rightrule=.15mm, title={\textbf{Algorithmus: IPWRA-Schätzer des ATE}}, opacityback=0, colbacktitle=quarto-callout-tip-color!10!white, toprule=.15mm, bottomrule=.15mm, bottomtitle=1mm, coltitle=black, arc=.35mm, colback=white, titlerule=0mm]
 
 Vgl. Wooldridge (2010).
 
@@ -3562,6 +3562,1503 @@ Die Bootstrap-Schätzung des ATE mit IPWRA ist mit den Ergebnissen für
 die Bootstrap-Variante von \(\widehat{\tau}^\text{IPW}\) vergleichbar,
 hat allerdings einen etwas kleineren Standardfehler und ist somit
 genauer.
+
+\bookmarksetup{startatroot}
+
+\chapter{Difference-in-Differences}\label{difference-in-differences}
+
+Der Difference-in-Differences (DID) Ansatz erlaubt die Schätzung
+kausaler Effekte in quasi-experimentellen Forschungsdesigns, in denen
+Boebachtungen für Kontroll- und Behandlungsgruppe zu mindestens zwei
+Zeitpunkten vorliegen und die Behandlung zwischen diesen Zeitpunkten
+stattfindet: Wir beobachten sowohl die Kontroll- als auch die
+Behandlungsgruppe vor und nachdem die Behandlung erfolgt ist. Die
+Motivation für die Anwendung des DID-Ansatzes liegt in der Fähigkeit,
+typische Risiken einer Verzerrungen zu umgehen, die bei einfachen
+Vorher-Nachher-Vergleichen oder reinen Querschnittsvergleichen auftreten
+können. Die Kernidee ist eine Schätzung des ATT durch einen Vergleich
+durchschnittlicher Differenzen der Outcome-Variable beider Gruppen
+zwischen den Perdioden vor und nach der Intervention.
+Abbildung~\ref{fig-CDDID} zeigt ein kausales Diagramm für ein
+Forschungsdesign, in dem DID den ATT identifizieren kann.
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics[width=5in,height=3in]{DiD_files/figure-latex/dot-figure-1.png}
+
+}
+
+\caption{\label{fig-CDDID}Kausales Diagramm für DID}
+
+\end{figure}%
+
+Abbildung~\ref{fig-CDDID} illustriert Confounding bei der Bestimmung des
+Behandlungseffekts durch Backdoors in der Zeit \(t\) und der
+Gruppenzugehörigkeit:
+
+\begin{itemize}
+\item
+  \textbf{Zeit}: Der Behandlungszustand der behandelten Gruppe ändert
+  sich durch die Intervention zwischen der Vor- und der
+  Nachbehandlungsperiode. Die Outcome-Variable \(Y\) ändert sich für
+  beide Gruppen über die Zeit hinweg.
+\item
+  \textbf{Gruppenzugehörigkeit}: Die Gruppenzugehörigkeit legt fest, ob
+  eine Behandlung erfolgt. Systematische Unterschiede zwischen
+  Behandlungs- und Kontrollgruppe wirken sich auf die Outcome-Variable
+  \(Y\) aus.
+\end{itemize}
+
+In einem DID-Ansatz ermöglicht die Beobachtung von Kontroll- und
+Behandlungsgruppen vor und nach einer Intervention das herausrechnen
+systematischer Unterschiede zwischen Behandlungs- und Kontrollgruppe und
+von Zeiteffekten, sodass die Backdoors durch Gruppenzugehörigkeit und
+Zeit geschlossen. Die Schätzung eines durchschnittlichen
+Behandlungseffekts erfolgt hierbei unter der Annahme, dass die
+Outcome-Variable beider Gruppen \emph{ohne die Intervention} einen
+hinreichend ähnlichen Verlauf aufweisen würde.
+
+\section{Einordnung im Potential Outcomes
+Framework}\label{einordnung-im-potential-outcomes-framework}
+
+Im Potential Outcomes Framework nehmen wir an, dass jede Einheit \(i\)
+in Abhänigkeit ihres Behandlungsstatus zwei potentielle Ergebnisse hat.
+Wir unterscheiden zwischen Beobachtungen in Behandlungs- und
+Kontrollgruppe:
+
+\begin{itemize}
+\tightlist
+\item
+  \(Y_{i,B}(1)\): \(Y\) für Einheit \(i\) in der Behandlungsgruppe, wenn
+  diese behandelt wird.
+\item
+  \(Y_{i,B}(0)\): \(Y\) für Einheit \(i\) in der Behandlungsgruppe, wenn
+  diese \emph{nicht} behandelt wird.
+\item
+  \(Y_{i,K}(1)\): \(Y\) für Einheit \(i\) in der Kontrollgruppe, wenn
+  diese behandelt wird.
+\item
+  \(Y_{i,K}(0)\): \(Y\) für Einheit \(i\) in der Kontrollgruppe, wenn
+  diese \emph{nicht} behandelt wird.
+\end{itemize}
+
+In einem DID-Forschungsdesign hängen tatsächliche und potentielle
+Outcomes von der Zeit \(t\) ab: Die Behandlungsgruppe wird zwischen den
+Zeitpunkten \(t = 0\) und \(t = 1\) behandelt, während die
+Kontrollgruppe unbehandelt bleibt. Für die Identifizierung des
+Behandlungseffekts wird unterstellt, dass \(Y\) sich zwischen \(t=0\)
+und \(t=1\) in der Behandlungsgruppe \emph{ohne eine Behandlung} (im
+Erwartungswert) mit demselben Trend entwickelt hätte, mit dem sich die
+Kontrollgruppe tatsächlich entwickelt hat (parallele Trends). Die
+Gültigkeit paralleler Trends ist entscheidend für die Validität der
+DID-Methode, da so sicherstellt ist, dass die beobachteten Unterschiede
+in den Ergebnissen auf die Behandlung zurückzuführen sind und nicht auf
+andere zeitgleich auftretende Faktoren. Der Behandlungseffekt kann dann
+als eine \emph{Differenz von Differenzen} geschrieben werden:
+
+\begin{align}
+  \begin{split}
+    \beta_\textup{DID} =& \, \bigg({\color{red}\textup{E}\big[Y_B(1)\vert t=1\big] - \textup{E}\big[Y_B(0)\vert t=0\big]} \bigg)\\
+  -&\, \bigg({\color{blue}\textup{E}\big[Y_K(0)\vert t=1\big] -  \textup{E}\big[Y_K(0)\vert t=0\big]} \bigg)
+  \end{split}\label{eq:DID-ATT1}
+\end{align}
+
+Der Effekt \(\beta_\textup{DID}\) ist ein ATT, der über das Schließen
+der Backdoor in der Zeit (rote und blaue Differenzen der Erwartungswerte
+zwischen \(t=0\) und \(t=1\)) sowie der Backdoor in der
+Gruppenzugehörigkeit (Differenz der Erwartungswert-Differenzen)
+identifiziert wird.
+
+Eine Null-Ergänzung von \eqref{eq:DID-ATT1} mit
+\({\color{blue}\textup{E}\big[Y_K(0)\vert t=1\big] -  \textup{E}\big[Y_K(0)\vert t=1\big]}\)
+zeigt die Wichtigkeit der Gültigkeit paralleler Trends:
+
+\begin{align*}
+    \beta_\textup{DID} =& \, \bigg({\color{red}\textup{E}\big[Y_B(1)\vert t=1\big] - \textup{E}\big[Y_B(0)\vert t=0\big]} \bigg)
+  - \bigg({\color{blue}\textup{E}\big[Y_K(0)\vert t=1\big] -  \textup{E}\big[Y_K(0)\vert t=0\big]} \bigg)\\ + &\,
+{\color{blue}\textup{E}\big[Y_K(0)\vert t=1\big] -  \textup{E}\big[Y_K(0)\vert t=1\big]}\\
+    \\
+    =&\, \underbrace{{\color{red}\textup{E}\big[Y_B(1)\vert t=1\big]} - {\color{blue}\textup{E}\big[Y_B(1)\vert t=1\big]}}_{=\textup{ATT}}\\
+    +&\, \underbrace{\bigg({\color{red}\textup{E}\big[Y_B(0)\vert t=1\big] - \textup{E}\big[Y_B(0)\vert t=0\big]} \bigg) - \bigg({\color{blue}\textup{E}\big[Y_K(0)\vert t=1\big] -  \textup{E}\big[Y_K(0)\vert t=0\big]} \bigg)}_{ = \textup{Verzerrung durch nicht-parallele Trends}}
+\end{align*}
+
+Diese Zerlegung zeigt, dass der ATT nur bei parallelen Trends
+identifziert werden kann, d.h. wir benötigen
+
+\begin{align*}
+{\color{red}\textup{E}\big[Y_B(0)\vert t=1\big] - \textup{E}\big[Y_B(0)\vert t=0\big]} = {\color{blue}\textup{E}\big[Y_K(0)\vert t=1\big] -  \textup{E}\big[Y_K(0)\vert t=0\big]}.
+\end{align*}
+
+Beachte, dass \({\color{red}\textup{E}\big[Y_B(0)\vert t=1\big]}\) der
+Erwartungswert des potentiellen Outcomes einer unbehandelten
+Behandlungsgruppe in \(t=1\) ist. Somit kann die Verzerrung durch
+nicht-parallele Trends nicht empirisch überprüft werden und muss
+ausschließlich durch das Forschungsdesign gewährleistet sein. In
+Anwendungen kann die Plausibilität der Annahme graphisch anhand
+geschätzter Trends in der Outcome-Variable oder durch Placebo-Tests
+untersucht werden.
+
+\textbf{Annahmen für DID}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Parallele Trends}: Die Trends in der Outcome Variable \(Y\) in
+  Behandlungs- und Kontrollgruppe würden bis einschließlich \(t=1\)
+  parallel verlaufen, wenn es keine Behandlung gäbe. Diese Annahme ist
+  Voraussetzung dafür, dass Veränderungen im Outcome \(Y\) für die
+  Behandlungsgruppe, die sich von \(Y\) für die Kontrollgruppe
+  unterscheidet, auschließlich dem Effekt der Behandlung zugeschrieben
+  werden kann.
+\item
+  \textbf{Keine Interferenz zwischen Gruppen (SUTVA)}: Die Behandlung
+  einer Gruppe sollte keinen Einfluss auf die andere Gruppe haben.
+\item
+  \textbf{Konsistete Behandlungseffekte}: Der Effekt der Intervention
+  ist konstant über Individuen und Zeit hinweg.
+\end{enumerate}
+
+\section{Schätzung des ATT mit DID}\label{schuxe4tzung-des-att-mit-did}
+
+Für die Schätzung von \(\beta_\text{DID}\) ersetzen wir die
+Erwartungswerte in \eqref{eq:DID-ATT1} durch ihre Stichprobenmomente:
+
+\begin{align}
+  \widehat{\beta}_\textup{DID} = \bigg({\color{red}\overline{Y_B(1)\vert t=1} - \overline{Y_B(0)\vert t=0}} \bigg) -  \bigg({\color{blue}\overline{Y_K(0)\vert t=1} - \overline{Y_K(0)\vert t=0}}\bigg) \label{eq:DIDMOMENTS}
+\end{align}
+
+Die nachfolgende interaktive Grafik illustriert die Schätzung des ATT
+mit DID für simulierte Daten.
+
+\textbf{Interaktive Elemente der Visualisierung}
+
+\begin{itemize}
+\item
+  Die Beobachtungen der Individuen zu 6 verschiedenen Zeitpunkten werden
+  als Punkte dargestellt. Die Datenpunkte könn mit \emph{Zeige Daten}
+  ein- und ausgeblendet werden.
+\item
+  Die geschätzten Trends beider Gruppen für den gesamten
+  Beobachtungszeitraum und die Gruppenzugehörigkeit können mit
+  \emph{Zeige Trends} ein- und ausgeblendet werden. Die Auswahl
+  \emph{Parallele Trends} stellt sicher, dass beide Gruppen (mit
+  Ausnahme des Behandlungseffekts in der Behandlungsgruppe) dem selben
+  zeitlichen Trend folgen. Bei nicht-parallelen Trends folgt die
+  Behandlungsgruppe einem positiven Trend mit größerer positiver
+  Steigung als in der Kontrollgruppe.
+\item
+  Die Behandlung erfolgt zwischen der mit dem Slider \emph{Zeitpunkt}
+  ausgewählten und der darauf folgenden Periode. Der tatsächliche
+  Behandlungseffekt kann über den Slider \emph{Effekt} festgelegt
+  werden.
+\end{itemize}
+
+\textbf{Anatomie der Schätzung des ATT bei \emph{parallelen} Trends}
+
+\begin{itemize}
+\item
+  Wir illustrieren die Schätzen des ATT mit Formel
+  \eqref{eq:DIDMOMENTS}. Kreise zeigen Mittelwerte für Kontroll- und
+  Behandlungsgruppe \emph{vor} der Intervention. Dreiecke zeigen
+  Mittelwerte \emph{nach} der Intervention.
+\item
+  Die gestrichelte rote Linie zeigt den (kontrafaktischen) Verlauf der
+  Behandlungsgruppe \emph{ohne} Behandlung. Hierbei wird unterstellt,
+  dass sich die Behandlungsgruppe mit demselben Trend \emph{wie die
+  Kontrollgruppe entwickelt hätte} (blaue Linie).
+\item
+  Der geschätzte Behandlungseffekt wird als orangene vertikale Linie
+  dargestellt. Dies ist die Differenz zwischen dem tatsächlichen
+  post-Behandlungs-Mittelwert und dem kontrafaktischen Mittelwert der
+  Behandlungsgruppe.
+\end{itemize}
+
+\textbf{Anatomie der Schätzung des ATT bei \emph{nicht-parallelen}
+Trends}
+
+\begin{itemize}
+\item
+  Für nicht-parallele Trends zeigt die Grafik den unterstellten
+  kontrafaktischen Trend der Behandlungsgruppe als gestrichelte blaue
+  linie. Der'' ``tatsächliche'' kontrafaktische Verlauf der
+  Behandlungsgruppe wird als gestrichelte rote Linie dargestellt.
+\item
+  Aufgrund des steileren (positiven) Trends in der Behandlungsgruppe
+  ergibt sich eine \emph{positive} Verzerrung von
+  \(\color{orange}\widehat{\beta}_\text{DID}\). Diese Verzerrung wird
+  durch die gestrichelte vertikale schwarze Linie kenntlich gemacht.
+
+  \begin{itemize}
+  \item
+    Für \emph{positive} Behandlungseffekte wird der ATT
+    \emph{überschätzt}: die Verzerrung entspricht der Überlagerung der
+    gestrichelten schwarzen linie mit der orangenen Linie des
+    geschätzten Effekts.
+  \item
+    Für \emph{negative} Behandlungseffekte wird der ATT unterschätzt:
+    die Verzerrung entspricht der gestrichelten schwarzen linie oberhalb
+    der orangenen Linie des geschätzten Effekts.
+  \end{itemize}
+\end{itemize}
+
+Die Implementierung von DID-Schätzern erfolgt meist anhand linearer
+Regression. Das Modell für zwei Zeitperioden ist
+
+\begin{align}
+  Y_{i,\,t} = \alpha + \beta_1 B_i + \beta_2 Z_t + \beta_3 (B_i \times Z_t) + \epsilon_{i,\,t}, \quad t\in\{0,1\}, \label{eq:DIDREG}
+\end{align}
+
+wobei \(\beta_3\) der interessierende Behandlungseffekt ist. Der
+Regressor \(B_i \times Z_t\) ergibt sich als die Interaktion zwischen
+der Behandlungsgruppenzugehörigkeit \(B_i\) und einem Indikator für den
+Zeitpunkt \emph{nach} der Intervention, \(Z_i = \mathbb{I}_{\{t=1\}}\).
+Es ist \(\widehat\beta_3 = \widehat{\beta}_\text{DID}\), d.h. der
+KQ-Schätzer von \(\beta_3\) ist der DID-Schätzer des ATT und numerisch
+äquivalent zu \eqref{eq:DIDMOMENTS}.
+
+Die Berechnung von \(\widehat\beta_\text{DID}\) anhand von Modell
+\eqref{eq:DIDREG} ist praktisch, da wir so Inferenzstatistiken mit
+etablierten R-Funktionen wie gewohnt berechnen können.
+
+\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, breakable, toptitle=1mm, colframe=quarto-callout-note-color-frame, opacitybacktitle=0.6, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum einfachen DID-Schätzer}, opacityback=0, colbacktitle=quarto-callout-note-color!10!white, toprule=.15mm, bottomrule=.15mm, bottomtitle=1mm, coltitle=black, arc=.35mm, colback=white, titlerule=0mm]
+
+\begin{itemize}
+\item
+  DID benötigt Beobachtungen einer Behandlungs- und einer Kontrollgruppe
+  zu mindestens zwei verschiedenen Zeitpunkten.
+\item
+  Im DID-Forschungsdesign kann der ATT durch einen Vergleich von
+  Differenzen in den Ergebnissen vor und nach einer Behandlung zwischen
+  Behandlungs- und Kontrollgruppen identifiziert werden.
+\item
+  DID ist empfindlich gegenüber Verletzungen der Annahme, dass die
+  zeitlichen Trends in den Ergebnissen für beide Gruppen vor der
+  Intervention parallel verlaufen.
+\item
+  Der DID-Schätzer kann in einem Regressionsmodell mit
+  Interaktionstermen zwischen Zeit- und Gruppenvariablen implementiert
+  werden.
+\end{itemize}
+
+\end{tcolorbox}
+
+\section{Mehrere Perioden -- Two-way Fixed
+Effects}\label{mehrere-perioden-two-way-fixed-effects}
+
+\section{Beispiel: Effekt von Steuererleichterungen auf
+Erwerbsbeteilligung}\label{beispiel-effekt-von-steuererleichterungen-auf-erwerbsbeteilligung}
+
+Der Earned Income Tax Credit (EITC) ist ein Steuerguthaben für
+US-Amerkanische Familien die unterhalb einer gesetztlich festgelegten
+Einkoemmnsgrenze liegen. Der genaue Betrag des EITC hängt gestaffelt vom
+Einkommen ab und, ähnlich zum Kindergeld in Deutschland, steigt mit der
+Anzahl der zu versorgenden Kinder. Ein wichtiger Unterschied zum
+Kindergeld ist, dass der EITC nicht beantragt werden muss:
+Qualifizierten Familien wird der Betrag automatisch durch die Behörden
+im Steuerausgleich gutgeschrieben. Somit kann Selbstselektion in die
+Behandlungsgruppe ausgeschlossen werden, da sich die Behandlung
+ausschließlich durch die im Rahmen der EITC-Ausweitung geänderten
+Anspruchsgrundlagen ergibt.
+
+Eissa und Liebman (1996) betrachten Veränderungen in der
+EITC-Gesetzgebung als Intervention, deren Auswirkungen mit
+sozio-ökonimischen Paneldaten in einem DID-Ansatz untersucht werden
+können. Die Studie analysiert die Auswirkungen der ersten Ausweitung des
+EITC im Jahr 1986 auf die Beschäftigung und Löhne von Frauen. Diese
+Erweiterung erhöhte die gewährten Steuererleichterungen und die zur
+Qualifikation für das Programm zu unterschreitende Einkommensgrenze.
+
+Ein zentraler Befund der Studie ist, dass die EITC-Ausweitung von 1986
+einen statistisch signifikanten Anstieg der Arbeitsbeteiligung
+alleinerziehender Frauen von geschätzten 3\% bewirkt hat. Weiterhin gab
+es signifikante positive Effekte auf die geleisteten Arbeitsstunden und
+Nachweise für Einkommensverbesserungen in dieser Gruppe. Diese
+Ergebnisse sind starke Evidenz, dass Maßnahmen wie der EITC effektiv
+dazu beitragen können, die Erwerbssituation in der Zielgruppe zu
+steigern und somit die wirtsschafts- und sozialpolitische Ziele
+derartiger Programme realisierbar sind.
+
+Im Jahr 1993 wurde das Programm erneut ausgweitet: Vor 1993 gab es
+lediglich eine Einkommensstufe für Familien mit Kindern. 1993 wurde eine
+zusätzliche Stufe für Familien mit zwei oder mehr Kindern eigeführt, die
+damit einen höheren maximalen Kreditbetrag erhalten konnten als Familien
+mit nur einem Kind. Dies führte zu einer größeren steuerlichen
+Entlastung armutsbedrohter Familien.
+
+Adireksombat (2010) untersucht die Effekte der zweiten EITC-Ausweitung
+ebenfalls mit einem DID Ansatz und findet Evidenz für einen Anstieg der
+Arbeitbeteiligung von etwa 5\% in der Zielgruppe alleinerziehender
+Frauen mit mindestens 2 Kindern.
+
+Zur Illustration der empirischen Anwendung von DID mit R untersuchen wir
+Effekte der EITC-Ausweitung von 1993 nachfolgend anhand eines ähnlichen
+Datensatzes aus dem
+\href{https://www.census.gov/programs-surveys/cps.html}{CPS} wie in der
+Studie von Adireksombat (2010). Diese Daten umfassen jährliche
+sozio-ökonomische Merkmale für US-amerikanische Frauen im Zeitraum von
+1991 bis 1996 und sind in der Datei \texttt{eitc\_data.csv} verfügbar.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# EITC{-}Datensatz einlesen}
+\NormalTok{eitc\_data }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"datasets/eitc\_data.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Eine Übersicht des Datensatzes \texttt{eitc\_data} ist in
+Tabelle~\ref{tbl-EITCdata} dargestellt.
+
+\begin{longtable}{ll}
+
+\caption{\label{tbl-EITCdata}Soziökomonische Variablen zu US-Familien
+aus dem CPS}
+
+\tabularnewline
+
+\toprule
+Variable & Beschreibung \\ 
+\midrule\addlinespace[2.5pt]
+state & ID-Code Bundesstaat \\ 
+year & Steuerjahr \\ 
+urate & Arbeitslosenquote im Bundesstaat (\%) \\ 
+children & Anz. Kinder der Frau \\ 
+nonwhite & Dummy für nicht-weiße Frauen \\ 
+finc & Haushaltseinkommen im Steuerjahr (US-\$) \\ 
+earn & Einkommen der Frau im Steuerjahr (US-\$) \\ 
+age & Alter \\ 
+ed & Ausbildungsniveau der Frau (Jahre) \\ 
+work & Dummy für Berufstätigkeit \\ 
+unearn & = Haushaltseinkommen - Einkommen der Frau (Tsd. US-\$)  \\ 
+\bottomrule
+
+\end{longtable}
+
+Wir erweitern das \texttt{tibble}-Objekt zunächst eine kategorische
+Variable (\texttt{nchildren}) für die Anzahl der Kinder (keines, eins,
+mehr als 2) und Dummy-Variablen für Familien mit Kindern
+(\texttt{any\_children}) sowie Beobachtungen \emph{nach} 1993
+(\texttt{after\_1993}).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Indkator{-}Variablen für Familie mit Kindern}
+\CommentTok{\# und Post{-}Interventionsprediode hinzufügen }
+\NormalTok{eitc\_data }\OtherTok{\textless{}{-}}\NormalTok{ eitc\_data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{one\_child =} \FunctionTok{if\_else}\NormalTok{(children }\SpecialCharTok{==} \DecValTok{1}\NormalTok{, }\ConstantTok{TRUE}\NormalTok{, }\ConstantTok{FALSE}\NormalTok{),}
+    \AttributeTok{twomore\_kids =} \FunctionTok{if\_else}\NormalTok{(children }\SpecialCharTok{\textgreater{}=} \DecValTok{2}\NormalTok{, }\ConstantTok{TRUE}\NormalTok{, }\ConstantTok{FALSE}\NormalTok{),}
+    \AttributeTok{any\_kids =} \FunctionTok{if\_else}\NormalTok{(children }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{, }\ConstantTok{TRUE}\NormalTok{, }\ConstantTok{FALSE}\NormalTok{),}
+    \AttributeTok{after\_1993 =} \FunctionTok{if\_else}\NormalTok{(year }\SpecialCharTok{\textgreater{}} \DecValTok{1993}\NormalTok{, }\ConstantTok{TRUE}\NormalTok{, }\ConstantTok{FALSE}\NormalTok{)}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Modifikationen kontrollieren}
+\FunctionTok{glimpse}\NormalTok{(eitc\_data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Rows: 13,746
+Columns: 15
+$ state        <dbl> 11, 12, 13, 14, 15, 16, 21, 22, 23, 31, 32, 33, 34, 35, 4~
+$ year         <dbl> 1991, 1991, 1991, 1991, 1991, 1991, 1991, 1991, 1991, 199~
+$ urate        <dbl> 7.6, 7.2, 6.4, 9.1, 8.6, 6.8, 7.3, 6.7, 7.0, 6.4, 6.0, 7.~
+$ children     <dbl> 0, 1, 2, 0, 3, 1, 0, 0, 1, 2, 0, 2, 0, 0, 0, 1, 1, 0, 0, ~
+$ nonwhite     <dbl> 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, ~
+$ finc         <dbl> 18714.394, 4838.568, 8178.194, 9369.570, 14706.608, 21605~
+$ earn         <dbl> 18714.3943, 471.3656, 0.0000, 0.0000, 14706.6079, 18854.6~
+$ age          <dbl> 26, 22, 33, 43, 23, 53, 52, 51, 20, 32, 51, 29, 54, 28, 2~
+$ ed           <dbl> 10, 9, 11, 11, 7, 7, 11, 11, 11, 11, 9, 10, 9, 11, 11, 7,~
+$ work         <dbl> 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, ~
+$ unearn       <dbl> 0.0000000, 4.3672026, 8.1781938, 9.3695705, 0.0000000, 2.~
+$ one_child    <lgl> FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, TRU~
+$ twomore_kids <lgl> FALSE, FALSE, TRUE, FALSE, TRUE, FALSE, FALSE, FALSE, FAL~
+$ any_kids     <lgl> FALSE, TRUE, TRUE, FALSE, TRUE, TRUE, FALSE, FALSE, TRUE,~
+$ after_1993   <lgl> FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, F~
+\end{verbatim}
+
+Die Plausibilität der Annahme paralleler Trends können wir graphisch
+anhand einer Gegenüberstellung der \emph{Beschäftigungsquote}
+(\texttt{avg.work\ =\ mean(work)}) für Frauen mit und ohne Kindern
+(\texttt{any\_kids}) über die Zeit (\texttt{year}) einschätzen. Wir
+gruppieren hierzu den Datensatz entsprechend und fassen die
+Outcome-Variable (\texttt{work}) gruppenweise zusammen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Trends berechnen}
+\NormalTok{eitc\_summarised }\OtherTok{\textless{}{-}}\NormalTok{ eitc\_data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(year, any\_kids) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{avg.work =} \FunctionTok{mean}\NormalTok{(work)}
+\NormalTok{  )}
+
+\CommentTok{\# Graphischer Vergleich der Trends}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ eitc\_summarised) }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{(}
+    \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}
+      \AttributeTok{x =}\NormalTok{ year, }
+      \AttributeTok{y =}\NormalTok{ avg.work, }
+      \AttributeTok{col =}\NormalTok{ any\_kids}
+\NormalTok{    )}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \CommentTok{\# Indikator für EITC{-}Erweiterung 1993}
+  \FunctionTok{geom\_vline}\NormalTok{(}
+    \AttributeTok{xintercept =} \DecValTok{1993}\NormalTok{, }
+    \AttributeTok{lty =} \StringTok{"dashed"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{scale\_x\_continuous}\NormalTok{(}\StringTok{"Jahr"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\StringTok{"Beschäftigungsquote"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{title =} \StringTok{"Kinder?"}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{theme\_cowplot}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics{DiD_files/figure-pdf/fig-EITCtrends-1.pdf}
+
+}
+
+\caption{\label{fig-EITCtrends}Trends in der Erwerbsbeteiligung
+US-amerikanischer Frauen}
+
+\end{figure}%
+
+Abbildung~\ref{fig-EITCtrends} zeigt, dass die Beschäftigungsquote für
+kinderlose Frauen deutlich oberhalb der Quote für Mütter verläuft. Die
+Trends vor der EITC-Ausweitung im Jahr 1993 sind sehr ähnlich, sodass
+eine parallele Entwicklung plausibel scheint.
+
+\subsection{Schätzungen des ATT mit linearen
+Modellen}\label{schuxe4tzungen-des-att-mit-linearen-modellen}
+
+Wir berechnen Zunächst den Behandlungseffekt der für Frauen mit Kindern
+relativ zu kinderlosen Frauen gemäß \eqref{eq:DIDMOMENTS}, wobei wir
+jeweils sämtliche Perioden vor und nach der Behandlung einbeziehen. Dies
+führt zu den Ergebnissen in Tabelle~\ref{tbl-EITCSM}, wobei
+\begin{align}
+  \widehat\beta_\text{DID} = (B - A) - (D - C)
+\end{align} der geschätzte Behandlungseffekt ist.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2022}}
+  >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3371}}
+  >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3258}}
+  >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1348}}@{}}
+\caption{\texttt{eitc\_data}: Stichprobenmittelwerte für
+\texttt{work}}\label{tbl-EITCSM}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+v. EITC-Ausweitung
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+n.~EITC-Ausweitung
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Differenz
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+v. EITC-Ausweitung
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+n.~EITC-Ausweitung
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Differenz
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{k. Kinder} & \(A = 0.575\) & \(B = 0.573\) & \(0.045\) \\
+\textbf{Kinder} & \(C = 0.446\) & \(D = 0.491\) & \(-0.002\) \\
+\(\widehat{\beta}_\text{DID}\) & & & \(0.047\) \\
+\end{longtable}
+
+Die nachfolgenden Code-Chunks zeigen die Schritte zur Berechnung von
+\(\widehat{\beta}_\text{DID}\) mit R.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# A, B, C, D berechnen}
+\NormalTok{(}
+\NormalTok{  ABCD }\OtherTok{\textless{}{-}}\NormalTok{ eitc\_data }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{group\_by}\NormalTok{(after\_1993, any\_kids) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{summarise}\NormalTok{(}\AttributeTok{avg.work =} \FunctionTok{mean}\NormalTok{(work))}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+# A tibble: 4 x 3
+# Groups:   after_1993 [2]
+  after_1993 any_kids avg.work
+  <lgl>      <lgl>       <dbl>
+1 FALSE      FALSE        0.58
+2 FALSE      TRUE         0.45
+3 TRUE       FALSE        0.57
+4 TRUE       TRUE         0.49
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Differenzen bilden}
+\NormalTok{DminusC }\OtherTok{\textless{}{-}}\NormalTok{ ABCD }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{filter}\NormalTok{(any\_kids }\SpecialCharTok{==} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{pull}\NormalTok{(avg.work) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{diff}\NormalTok{()}
+
+\NormalTok{BminusA }\OtherTok{\textless{}{-}}\NormalTok{ ABCD }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{filter}\NormalTok{(any\_kids }\SpecialCharTok{==} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{pull}\NormalTok{(avg.work) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{diff}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# DID{-}Schätzung: Differenz der Stichprobenmittel{-}Differenzen}
+\NormalTok{beta\_DID\_means }\OtherTok{\textless{}{-}}\NormalTok{ BminusA }\SpecialCharTok{{-}}\NormalTok{ DminusC}
+\NormalTok{beta\_DID\_means}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] 0.04687313
+\end{verbatim}
+
+Durch Iteration von \texttt{summarise()} können wir diese Rechenschritte
+effizienter ausführen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Effizienter:}
+\NormalTok{eitc\_data  }\SpecialCharTok{\%\textgreater{}\%} 
+    \FunctionTok{group\_by}\NormalTok{(after\_1993, any\_kids) }\SpecialCharTok{\%\textgreater{}\%} 
+    \FunctionTok{summarise}\NormalTok{(}\AttributeTok{avg.work =} \FunctionTok{mean}\NormalTok{(work)) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{summarise}\NormalTok{(}\AttributeTok{diff\_time =} \FunctionTok{diff}\NormalTok{(avg.work)) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{summarise}\NormalTok{(}\AttributeTok{beta\_DID\_means =} \FunctionTok{diff}\NormalTok{(diff\_time)) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{pull}\NormalTok{(beta\_DID\_means)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] 0.04687313
+\end{verbatim}
+
+Wir erhalten eine positive Schätzung des Behandlungseffekts. Die
+Interpretation ist, dass die Ausweitung des EITC im Jahr 1993 zu einem
+Anstieg der Erwerbsbeteiligung in der Gruppe der Frauen mit Kindern von
+durchschittlich \(4.69\%\) in den Folgeperioden geführt hat.
+
+Für die Berechnung von Inferenzstatistiken bezüglich
+\(\beta_\text{DID}\) schätzen wir ein lineares Interaktionsmodell gemäß
+\eqref{eq:DIDREG}, d.h.
+
+\begin{align*}
+  \text{work}_{i,t} = \beta_0 + \beta_1 \text{any\_kids}_{i,t} + \beta_2 \text{any\_kids}_{i,t} + \beta_3 (\text{any\_kids}_{i,t} \times \text{after\_1993}_t) + \epsilon_{i,t}.
+\end{align*}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Equivalente Schätzung u. Inferenz }
+\CommentTok{\# mit linearem Interaktionsmodell}
+\NormalTok{DiD\_reg }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ work }\SpecialCharTok{\textasciitilde{}}\NormalTok{ any\_kids }\SpecialCharTok{*}\NormalTok{ after\_1993, }
+  \AttributeTok{data =}\NormalTok{ eitc\_data}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Der geschätzte Koeffizient des Interkationsterms stimmt mit der händisch
+berechneten Schätzung überein.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{tidy}\NormalTok{(DiD\_reg) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(term }\SpecialCharTok{==} \StringTok{"any\_kidsTRUE:after\_1993TRUE"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{pull}\NormalTok{(estimate)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] 0.04687313
+\end{verbatim}
+
+Mit \texttt{coeftest()} berechnen wir heteroskedastie-robuste
+Inferenzstatistiken.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Robuste Inferenzstatistiken}
+\FunctionTok{coeftest}\NormalTok{(}
+  \AttributeTok{x =}\NormalTok{ DiD\_reg, }
+  \AttributeTok{vcov. =}\NormalTok{ vcovHC, }
+  \AttributeTok{type =} \StringTok{"HC1"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+
+t test of coefficients:
+
+                              Estimate Std. Error  t value  Pr(>|t|)    
+(Intercept)                  0.5754597  0.0088024  65.3756 < 2.2e-16 ***
+any_kidsTRUE                -0.1294979  0.0116480 -11.1176 < 2.2e-16 ***
+after_1993TRUE              -0.0020735  0.0128732  -0.1611  0.872040    
+any_kidsTRUE:after_1993TRUE  0.0468731  0.0171435   2.7342  0.006262 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+Der Koeffizient des Interaktionsterms ist zum 1\%-Niveau signifikant.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Mit Kontrollvariablen}
+\NormalTok{DiD\_reg\_control }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ work }\SpecialCharTok{\textasciitilde{}}\NormalTok{ any\_kids }\SpecialCharTok{*}\NormalTok{ after\_1993 }
+  \SpecialCharTok{+}\NormalTok{ unearn }\SpecialCharTok{+}\NormalTok{ nonwhite }\SpecialCharTok{+}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ ed}
+  \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(ed}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{I}\NormalTok{(age}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{), }
+  \AttributeTok{data =}\NormalTok{ eitc\_data}
+\NormalTok{)}
+
+\FunctionTok{tidy}\NormalTok{(}
+  \FunctionTok{coeftest}\NormalTok{(DiD\_reg\_control, }\AttributeTok{vcov. =}\NormalTok{ vcovHC, }\AttributeTok{type =} \StringTok{"HC1"}\NormalTok{)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+# A tibble: 10 x 5
+   term                        estimate std.error statistic p.value
+   <chr>                          <dbl>     <dbl>     <dbl>   <dbl>
+ 1 (Intercept)                  0.14     0.060         2.3  2.4e- 2
+ 2 any_kidsTRUE                -0.12     0.012       -11.   1.1e-25
+ 3 after_1993TRUE              -0.0085   0.012        -0.68 5.0e- 1
+ 4 unearn                      -0.018    0.0011      -16.   2.7e-58
+ 5 nonwhite                    -0.074    0.0086       -8.6  9.6e-18
+ 6 age                          0.026    0.0033        7.8  5.5e-15
+ 7 ed                          -0.0040   0.0060       -0.67 5.0e- 1
+ 8 I(ed^2)                      0.0014   0.00043       3.3  1.1e- 3
+ 9 I(age^2)                    -0.00031  0.000045     -6.9  4.4e-12
+10 any_kidsTRUE:after_1993TRUE  0.058    0.016         3.5  4.0e- 4
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(fixest)}
+\NormalTok{(}
+\NormalTok{  DID\_twoway }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+    \AttributeTok{fml =}\NormalTok{ work }\SpecialCharTok{\textasciitilde{}}\NormalTok{ any\_kids }\SpecialCharTok{+} \FunctionTok{I}\NormalTok{(any\_kids }\SpecialCharTok{*}\NormalTok{ after\_1993) }
+    \SpecialCharTok{|}\NormalTok{ year }\SpecialCharTok{+}\NormalTok{ state,}
+    \AttributeTok{data =}\NormalTok{ eitc\_data)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: work
+Observations: 13,746
+Fixed-effects: year: 6,  state: 51
+Standard-errors: Clustered (year) 
+                          Estimate Std. Error   t value   Pr(>|t|)    
+any_kidsTRUE             -0.123906   0.006147 -20.15794 5.5551e-06 ***
+I(any_kids * after_1993)  0.045786   0.021354   2.14412 8.4874e-02 .  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.489063     Adj. R2: 0.038633
+                 Within R2: 0.011101
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}
+\NormalTok{  DID\_twoway\_controls }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+    \AttributeTok{fml =}\NormalTok{ work }\SpecialCharTok{\textasciitilde{}}\NormalTok{ any\_kids }\SpecialCharTok{+} \FunctionTok{I}\NormalTok{(any\_kids }\SpecialCharTok{*}\NormalTok{ after\_1993) }
+        
+        \SpecialCharTok{+}\NormalTok{ unearn }\SpecialCharTok{+}\NormalTok{ nonwhite }\SpecialCharTok{+}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ ed }
+        \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(ed}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{I}\NormalTok{(age}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}
+        
+        \SpecialCharTok{|}\NormalTok{ year }\SpecialCharTok{+}\NormalTok{ state, }
+    \AttributeTok{data =}\NormalTok{ eitc\_data}
+\NormalTok{    )}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: work
+Observations: 13,746
+Fixed-effects: year: 6,  state: 51
+Standard-errors: Clustered (year) 
+                          Estimate Std. Error    t value   Pr(>|t|)    
+any_kidsTRUE             -0.119221   0.007465 -15.970879 1.7522e-05 ***
+I(any_kids * after_1993)  0.055755   0.015986   3.487750 1.7513e-02 *  
+unearn                   -0.017695   0.000914 -19.356766 6.7889e-06 ***
+nonwhite                 -0.080399   0.010181  -7.896960 5.2377e-04 ***
+age                       0.026323   0.002236  11.770696 7.7854e-05 ***
+ed                       -0.004160   0.009175  -0.453349 6.6929e-01    
+I(ed^2)                   0.001536   0.000616   2.495188 5.4812e-02 .  
+I(age^2)                 -0.000316   0.000030 -10.510533 1.3457e-04 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.46896     Adj. R2: 0.115657
+                Within R2: 0.090729
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}
+\NormalTok{  DID\_twoway\_controls }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+\AttributeTok{fml =}\NormalTok{ work }\SpecialCharTok{\textasciitilde{}}\NormalTok{ one\_child }\SpecialCharTok{+} \FunctionTok{I}\NormalTok{(one\_child }\SpecialCharTok{*}\NormalTok{ after\_1993) }
+  \SpecialCharTok{+}\NormalTok{ twomore\_kids }\SpecialCharTok{+} \FunctionTok{I}\NormalTok{(twomore\_kids }\SpecialCharTok{*}\NormalTok{ after\_1993) }
+  
+  \SpecialCharTok{+}\NormalTok{ unearn }\SpecialCharTok{+}\NormalTok{ nonwhite }\SpecialCharTok{+}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ ed }
+  \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(ed}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{I}\NormalTok{(age}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{), }
+  \AttributeTok{data =}\NormalTok{ eitc\_data}
+\NormalTok{    )}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: work
+Observations: 13,746
+Standard-errors: IID 
+                              Estimate Std. Error    t value   Pr(>|t|)    
+(Intercept)                   0.085926   0.059835   1.436043 1.5101e-01    
+one_childTRUE                -0.062262   0.013422  -4.638896 3.5351e-06 ***
+I(one_child * after_1993)     0.035398   0.017232   2.054260 3.9969e-02 *  
+twomore_kidsTRUE             -0.162910   0.011912 -13.675968  < 2.2e-16 ***
+I(twomore_kids * after_1993)  0.058202   0.013815   4.212901 2.5372e-05 ***
+unearn                       -0.018070   0.000576 -31.346915  < 2.2e-16 ***
+nonwhite                     -0.067168   0.008486  -7.915542 2.6495e-15 ***
+age                           0.028378   0.003267   8.685581  < 2.2e-16 ***
+ed                           -0.003625   0.005966  -0.607655 5.4343e-01    
+I(ed^2)                       0.001399   0.000435   3.215818 1.3037e-03 ** 
+I(age^2)                     -0.000352   0.000045  -7.842981 4.7230e-15 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.47421   Adj. R2: 0.099234
+\end{verbatim}
+
+\subsection{Probit-Spezifikationen}\label{probit-spezifikationen}
+
+\begin{align}
+  \begin{split}
+    \Phi^{-1}\bigg[P(\text{work}_{i,s,t} = 1)\bigg] =&\,\beta_0 + \beta_1 \cdot \text{any\_kids}_{i,t}\\ +&\, \beta_2 \cdot (\text{any\_kids}_{i,t} \times \text{after\_1993}_{i,t})\\
+  +&\, \beta_t\text{Jahr}_{t} + \beta_s \text{Staat}_s
+  \end{split}
+\end{align}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(alpaca)}
+
+\NormalTok{EITC\_DID\_probit }\OtherTok{\textless{}{-}} \FunctionTok{feglm}\NormalTok{(}
+    \AttributeTok{formula =}\NormalTok{ work }\SpecialCharTok{\textasciitilde{}}\NormalTok{ any\_kids }\SpecialCharTok{+} \FunctionTok{I}\NormalTok{(any\_kids }\SpecialCharTok{*}\NormalTok{ after\_1993) }
+    \SpecialCharTok{|}\NormalTok{ year }\SpecialCharTok{+}\NormalTok{ state, }
+    \AttributeTok{family =} \FunctionTok{binomial}\NormalTok{(}\StringTok{"probit"}\NormalTok{),}
+    \AttributeTok{data =}\NormalTok{ eitc\_data}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(}
+ \FunctionTok{getAPEs}\NormalTok{(EITC\_DID\_probit) }
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Estimates:
+                         Estimate Std. error z value Pr(> |z|)    
+any_kidsTRUE             -0.12383    0.01147 -10.800   < 2e-16 ***
+I(any_kids * after_1993)  0.04554    0.01676   2.717   0.00658 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{align}
+  \begin{split}
+    \Phi^{-1}\bigg[P(\text{work}_{i,s,t} = 1)\bigg] =& \,\beta_0 + \beta_1 \cdot \text{any\_kids}_{i,t}\\ +&\, \beta_2 \cdot (\text{any\_kids}_{i,t} \times \text{after\_1993}_t)\\
+  +&\, \gamma_{year} + \delta_{\text{state}}
+  \end{split}
+\end{align}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{EITC\_DID\_probit }\OtherTok{\textless{}{-}} \FunctionTok{feglm}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ work }\SpecialCharTok{\textasciitilde{}}\NormalTok{ one\_child }\SpecialCharTok{+} \FunctionTok{I}\NormalTok{(one\_child }\SpecialCharTok{*}\NormalTok{ after\_1993) }
+  \SpecialCharTok{+}\NormalTok{ twomore\_kids }\SpecialCharTok{+} \FunctionTok{I}\NormalTok{(twomore\_kids }\SpecialCharTok{*}\NormalTok{ after\_1993) }
+  \SpecialCharTok{|}\NormalTok{ year }\SpecialCharTok{+}\NormalTok{ state, }
+  \AttributeTok{family =} \FunctionTok{binomial}\NormalTok{(}\StringTok{"probit"}\NormalTok{),}
+  \AttributeTok{data =}\NormalTok{ eitc\_data}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(}
+  \FunctionTok{getAPEs}\NormalTok{(EITC\_DID\_probit)  }
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Estimates:
+                             Estimate Std. error z value Pr(> |z|)    
+one_childTRUE                -0.04895    0.01468  -3.334  0.000857 ***
+I(one_child * after_1993)     0.03073    0.02173   1.414  0.157228    
+twomore_kidsTRUE             -0.17190    0.01275 -13.480   < 2e-16 ***
+I(twomore_kids * after_1993)  0.05434    0.01868   2.910  0.003619 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{EITC\_DID\_probit }\OtherTok{\textless{}{-}} \FunctionTok{feglm}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ work }\SpecialCharTok{\textasciitilde{}}\NormalTok{ one\_child }\SpecialCharTok{+} \FunctionTok{I}\NormalTok{(one\_child }\SpecialCharTok{*}\NormalTok{ after\_1993) }
+  \SpecialCharTok{+}\NormalTok{ twomore\_kids }\SpecialCharTok{+} \FunctionTok{I}\NormalTok{(twomore\_kids }\SpecialCharTok{*}\NormalTok{ after\_1993) }
+  
+  \SpecialCharTok{+}\NormalTok{ unearn }\SpecialCharTok{+}\NormalTok{ nonwhite }\SpecialCharTok{+}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ ed }
+  \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(ed}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{I}\NormalTok{(age}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}
+  
+  \SpecialCharTok{|}\NormalTok{ year }\SpecialCharTok{+}\NormalTok{ state, }
+  \AttributeTok{family =} \FunctionTok{binomial}\NormalTok{(}\StringTok{"probit"}\NormalTok{),}
+  \AttributeTok{data =}\NormalTok{ eitc\_data}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(}
+  \FunctionTok{getAPEs}\NormalTok{(EITC\_DID\_probit)  }
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Estimates:
+                               Estimate Std. error z value Pr(> |z|)    
+one_childTRUE                -6.473e-02  1.420e-02  -4.557  5.18e-06 ***
+I(one_child * after_1993)     4.319e-02  2.069e-02   2.087  0.036861 *  
+twomore_kidsTRUE             -1.591e-01  1.415e-02 -11.245   < 2e-16 ***
+I(twomore_kids * after_1993)  6.546e-02  1.782e-02   3.674  0.000239 ***
+unearn                       -1.930e-02  2.188e-03  -8.821   < 2e-16 ***
+nonwhite                     -7.444e-02  9.935e-03  -7.493  6.73e-14 ***
+age                           2.844e-02  3.255e-03   8.739   < 2e-16 ***
+ed                           -3.282e-03  6.060e-03  -0.541  0.588185    
+I(ed^2)                       1.513e-03  4.352e-04   3.476  0.000508 ***
+I(age^2)                     -3.482e-04  4.462e-05  -7.804  6.00e-15 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\section{Terrorism}\label{terrorism}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Datensatz erinlesen}
+\NormalTok{polizeipraesenz }\OtherTok{\textless{}{-}} \FunctionTok{readRDS}\NormalTok{(}\StringTok{"datasets/polizeipraesenz.RDS"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Trends}
+\NormalTok{polizeipraesenz\_Trends }\OtherTok{\textless{}{-}}\NormalTok{ polizeipraesenz }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{mutate}\NormalTok{(}\AttributeTok{institut =} \FunctionTok{as.factor}\NormalTok{(institut)) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{group\_by}\NormalTok{(monat, institut) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{summarise}\NormalTok{(}
+      \StringTok{\textasciigrave{}}\AttributeTok{Durchschn. Diebstähle}\StringTok{\textasciigrave{}} \OtherTok{=} \FunctionTok{mean}\NormalTok{(totrob)}
+\NormalTok{    )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{polizeipraesenz\_Trends }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ggplot}\NormalTok{(}
+    \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}
+      \AttributeTok{x =}\NormalTok{ monat, }
+      \AttributeTok{y =} \StringTok{\textasciigrave{}}\AttributeTok{Durchschn. Diebstähle}\StringTok{\textasciigrave{}}\NormalTok{, }
+      \AttributeTok{color =}\NormalTok{ institut, }
+      \AttributeTok{group =}\NormalTok{ institut}
+\NormalTok{    )}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \StringTok{"Juli (18 {-} 31)"}\NormalTok{, }\AttributeTok{lty =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme\_cowplot}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}
+    \AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}
+      \AttributeTok{angle =} \DecValTok{45}\NormalTok{, }
+      \AttributeTok{hjust =} \DecValTok{1}
+\NormalTok{    )}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{DiD_files/figure-pdf/unnamed-chunk-24-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Table 2}
+\NormalTok{dat\_listcol }\OtherTok{\textless{}{-}}\NormalTok{ polizeipraesenz }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{group\_by}\NormalTok{(observ, monat) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{totrob =} \FunctionTok{sum}\NormalTok{(totrob)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{transmute}\NormalTok{(}
+    \AttributeTok{d2more =} \FunctionTok{list}\NormalTok{(totrob[distanz }\SpecialCharTok{\textgreater{}} \DecValTok{2}\NormalTok{]),}
+    \AttributeTok{d2 =} \FunctionTok{list}\NormalTok{(totrob[distanz }\SpecialCharTok{==} \DecValTok{2}\NormalTok{]),}
+    \AttributeTok{d1 =} \FunctionTok{list}\NormalTok{(totrob[distanz }\SpecialCharTok{==} \DecValTok{1}\NormalTok{]),}
+    \AttributeTok{same =} \FunctionTok{list}\NormalTok{(totrob[institut }\SpecialCharTok{==} \DecValTok{1}\NormalTok{])}
+\NormalTok{  ) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# means and SDs}
+\NormalTok{dat\_listcol }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(monat) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}
+    \FunctionTok{across}\NormalTok{(}
+\NormalTok{      d2more}\SpecialCharTok{:}\NormalTok{same,}
+      \AttributeTok{.fns =} \FunctionTok{list}\NormalTok{(}
+        \AttributeTok{mean =} \SpecialCharTok{\textasciitilde{}} \FunctionTok{mean}\NormalTok{(}\FunctionTok{unlist}\NormalTok{(.)), }
+        \AttributeTok{sd =} \SpecialCharTok{\textasciitilde{}} \FunctionTok{sd}\NormalTok{(}\FunctionTok{unlist}\NormalTok{(.))}
+\NormalTok{        )}
+\NormalTok{    ),}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+# A tibble: 10 x 9
+   monat     d2more_mean d2more_sd d2_mean d2_sd d1_mean d1_sd same_mean same_sd
+   <ord>           <dbl>     <dbl>   <dbl> <dbl>   <dbl> <dbl>     <dbl>   <dbl>
+ 1 April           0.10       0.25   0.12   0.30   0.12   0.29     0.12    0.36 
+ 2 Mai             0.11       0.24   0.097  0.26   0.078  0.18     0.088   0.21 
+ 3 Juni            0.079      0.20   0.070  0.19   0.078  0.22     0.13    0.29 
+ 4 Juli (1 ~       0.039      0.15   0.031  0.14   0.059  0.21     0.020   0.069
+ 5 Juli (18~       0.039      0.15   0.069  0.24   0.073  0.22     0.027   0.079
+ 6 August          0.12       0.29   0.13   0.30   0.067  0.22     0.047   0.18 
+ 7 September       0.10       0.26   0.098  0.25   0.090  0.28     0.014   0.057
+ 8 Oktober         0.12       0.27   0.088  0.24   0.098  0.26     0.061   0.22 
+ 9 November        0.096      0.24   0.10   0.22   0.11   0.29     0.027   0.079
+10 Dezember        0.10       0.27   0.11   0.23   0.12   0.28     0.027   0.079
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{the\_diffs }\OtherTok{\textless{}{-}}\NormalTok{ dat\_listcol }\SpecialCharTok{\%\textgreater{}\%}
+  
+  \FunctionTok{group\_by}\NormalTok{(monat) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{diff1 =} \FunctionTok{list}\NormalTok{( }\FunctionTok{t.test}\NormalTok{(}\AttributeTok{x =} \FunctionTok{unlist}\NormalTok{(same), }\AttributeTok{y =} \FunctionTok{unlist}\NormalTok{(d2more)) ),}
+    \AttributeTok{diff2 =} \FunctionTok{list}\NormalTok{( }\FunctionTok{t.test}\NormalTok{(}\AttributeTok{x =} \FunctionTok{unlist}\NormalTok{(d1), }\AttributeTok{y =} \FunctionTok{unlist}\NormalTok{(same)) ),}
+    \AttributeTok{diff3 =} \FunctionTok{list}\NormalTok{( }\FunctionTok{t.test}\NormalTok{(}\AttributeTok{x =} \FunctionTok{unlist}\NormalTok{(d2), }\AttributeTok{y =} \FunctionTok{unlist}\NormalTok{(d2more)) ), }
+    \AttributeTok{.groups =} \StringTok{"keep"}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  
+  \FunctionTok{transmute}\NormalTok{(}
+    \FunctionTok{across}\NormalTok{(}
+\NormalTok{      diff1}\SpecialCharTok{:}\NormalTok{diff3, }
+      \AttributeTok{.fns =} \FunctionTok{list}\NormalTok{(}
+        \AttributeTok{m =} \SpecialCharTok{\textasciitilde{}} \FunctionTok{map\_dbl}\NormalTok{(., \textbackslash{}(x) }\FunctionTok{diff}\NormalTok{(x}\SpecialCharTok{$}\NormalTok{estimate)), }
+        \AttributeTok{sd =} \SpecialCharTok{\textasciitilde{}} \FunctionTok{map\_dbl}\NormalTok{(., \textbackslash{}(x) x}\SpecialCharTok{$}\NormalTok{stderr)}
+\NormalTok{      )}
+\NormalTok{    )}
+\NormalTok{  )}
+
+\NormalTok{form }\OtherTok{\textless{}{-}}\NormalTok{ the\_diffs }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{transmute}\NormalTok{(}
+    \FunctionTok{across}\NormalTok{(}
+      \FunctionTok{contains}\NormalTok{(}\StringTok{"\_m"}\NormalTok{), }\SpecialCharTok{\textasciitilde{}} 
+        \FunctionTok{sprintf}\NormalTok{(}\StringTok{"\%.4f (\%.4f)"}\NormalTok{, ., }\FunctionTok{get}\NormalTok{(}\FunctionTok{sub}\NormalTok{(}\StringTok{".m$"}\NormalTok{, }\StringTok{"\_sd"}\NormalTok{, }\FunctionTok{cur\_column}\NormalTok{()))), }
+      \AttributeTok{.names =} \StringTok{"\{.col\}\_formatted"}
+\NormalTok{    )}
+\NormalTok{  )}
+
+\NormalTok{form }\SpecialCharTok{\%\textgreater{}\%} 
+\NormalTok{  gt}\SpecialCharTok{::}\FunctionTok{gt}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{tabopts}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable*}{rrr}
+\toprule
+diff1\_m\_formatted & diff2\_m\_formatted & diff3\_m\_formatted \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{3}{l}{April} \\ 
+\midrule\addlinespace[2.5pt]
+-0.0221 (0.0606) & 0.0005 (0.0636) & -0.0232 (0.0230) \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{3}{l}{Mai} \\ 
+\midrule\addlinespace[2.5pt]
+0.0206 (0.0356) & 0.0102 (0.0368) & 0.0111 (0.0205) \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{3}{l}{Juni} \\ 
+\midrule\addlinespace[2.5pt]
+-0.0498 (0.0480) & 0.0507 (0.0500) & 0.0088 (0.0155) \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{3}{l}{Juli (1 - 17)} \\ 
+\midrule\addlinespace[2.5pt]
+0.0190 (0.0133) & -0.0387 (0.0201) & 0.0083 (0.0116) \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{3}{l}{Juli (18 - 31)} \\ 
+\midrule\addlinespace[2.5pt]
+0.0122 (0.0146) & -0.0460 (0.0215) & -0.0293 (0.0173) \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{3}{l}{August} \\ 
+\midrule\addlinespace[2.5pt]
+0.0711 (0.0318) & -0.0195 (0.0336) & -0.0088 (0.0244) \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{3}{l}{September} \\ 
+\midrule\addlinespace[2.5pt]
+0.0883 (0.0153) & -0.0765 (0.0237) & 0.0033 (0.0205) \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{3}{l}{Oktober} \\ 
+\midrule\addlinespace[2.5pt]
+0.0603 (0.0376) & -0.0370 (0.0410) & 0.0326 (0.0201) \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{3}{l}{November} \\ 
+\midrule\addlinespace[2.5pt]
+0.0692 (0.0172) & -0.0832 (0.0262) & -0.0055 (0.0184) \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{3}{l}{Dezember} \\ 
+\midrule\addlinespace[2.5pt]
+0.0747 (0.0181) & -0.0894 (0.0255) & -0.0044 (0.0196) \\ 
+\bottomrule
+\end{longtable*}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Table 3}
+\FunctionTok{library}\NormalTok{(fixest)}
+\FunctionTok{library}\NormalTok{(modelsummary)}
+
+\NormalTok{dat\_DID }\OtherTok{\textless{}{-}}\NormalTok{ polizeipraesenz }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{treated =}\NormalTok{ institut }\SpecialCharTok{==} \DecValTok{1}\NormalTok{,}
+    \AttributeTok{group =}\NormalTok{ monat }\SpecialCharTok{\textgreater{}} \StringTok{"Juli (1 {-} 17)"}\NormalTok{,}
+    \AttributeTok{oneblock =}\NormalTok{ distanz }\SpecialCharTok{==} \DecValTok{1}\NormalTok{,}
+    \AttributeTok{twoblocks =}\NormalTok{ distanz }\SpecialCharTok{==} \DecValTok{2}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(monat }\SpecialCharTok{!=} \StringTok{"Juli (18 {-} 31)"}\NormalTok{)}
+
+\CommentTok{\# (A)}
+\FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ totrob }\SpecialCharTok{\textasciitilde{}} 
+    \FunctionTok{I}\NormalTok{(treated }\SpecialCharTok{*}\NormalTok{ group) }
+    \SpecialCharTok{|}\NormalTok{ observ }\SpecialCharTok{+}\NormalTok{ monat, }
+  \AttributeTok{data =}\NormalTok{ dat\_DID, }
+  \AttributeTok{vcov =} \StringTok{"HC1"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: totrob
+Observations: 7,884
+Fixed-effects: observ: 876,  monat: 9
+Standard-errors: Heteroskedasticity-robust 
+                   Estimate Std. Error  t value   Pr(>|t|)    
+I(treated * group) -0.07753   0.022436 -3.45556 0.00055241 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.216676     Adj. R2: 0.097072
+                 Within R2: 0.001277
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# (B)}
+\FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ totrob }\SpecialCharTok{\textasciitilde{}} 
+    \FunctionTok{I}\NormalTok{(treated }\SpecialCharTok{*}\NormalTok{ group) }\SpecialCharTok{+} 
+    \FunctionTok{I}\NormalTok{(oneblock }\SpecialCharTok{*}\NormalTok{ group) }
+    \SpecialCharTok{|}\NormalTok{ observ }\SpecialCharTok{+}\NormalTok{ monat, }
+  \AttributeTok{data =}\NormalTok{ dat\_DID, }
+  \AttributeTok{vcov =} \StringTok{"HC1"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: totrob
+Observations: 7,884
+Fixed-effects: observ: 876,  monat: 9
+Standard-errors: Heteroskedasticity-robust 
+                     Estimate Std. Error  t value   Pr(>|t|)    
+I(treated * group)  -0.080074   0.022569 -3.54802 0.00039068 ***
+I(oneblock * group) -0.013260   0.013864 -0.95642 0.33889333    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.216661     Adj. R2: 0.097067
+                 Within R2: 0.001414
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# (C)}
+\FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ totrob }\SpecialCharTok{\textasciitilde{}} 
+    \FunctionTok{I}\NormalTok{(treated }\SpecialCharTok{*}\NormalTok{ group) }\SpecialCharTok{+} 
+    \FunctionTok{I}\NormalTok{(oneblock }\SpecialCharTok{*}\NormalTok{ group) }\SpecialCharTok{+} 
+    \FunctionTok{I}\NormalTok{(twoblocks }\SpecialCharTok{*}\NormalTok{ group) }
+    \SpecialCharTok{|}\NormalTok{ observ }\SpecialCharTok{+}\NormalTok{ monat, }
+  \AttributeTok{data =}\NormalTok{ dat\_DID, }
+  \AttributeTok{vcov =} \StringTok{"HC1"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: totrob
+Observations: 7,884
+Fixed-effects: observ: 876,  monat: 9
+Standard-errors: Heteroskedasticity-robust 
+                      Estimate Std. Error   t value   Pr(>|t|)    
+I(treated * group)   -0.080802   0.022945 -3.521573 0.00043173 ***
+I(oneblock * group)  -0.013988   0.014467 -0.966900 0.33362749    
+I(twoblocks * group) -0.002185   0.012316 -0.177393 0.85920503    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.21666     Adj. R2: 0.096942
+                Within R2: 0.001419
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# (D)}
+\FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ totrob }\SpecialCharTok{\textasciitilde{}} 
+    \FunctionTok{I}\NormalTok{(treated }\SpecialCharTok{*}\NormalTok{ group) }\SpecialCharTok{+} 
+    \FunctionTok{I}\NormalTok{(oneblock }\SpecialCharTok{*}\NormalTok{ group) }\SpecialCharTok{+} 
+    \FunctionTok{I}\NormalTok{(twoblocks }\SpecialCharTok{*}\NormalTok{ group) }
+    \SpecialCharTok{|}\NormalTok{ monat,}
+  \AttributeTok{data =}\NormalTok{ dat\_DID }\SpecialCharTok{\%\textgreater{}\%} 
+    \FunctionTok{filter}\NormalTok{(monat }\SpecialCharTok{\textgreater{}=} \StringTok{"August"}\NormalTok{),}
+  \AttributeTok{vcov =} \StringTok{"HC1"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: totrob
+Observations: 4,380
+Fixed-effects: monat: 5
+Standard-errors: Heteroskedasticity-robust 
+                      Estimate Std. Error   t value   Pr(>|t|)    
+I(treated * group)   -0.072719   0.011389 -6.385222 1.8897e-10 ***
+I(oneblock * group)  -0.011581   0.010901 -1.062320 2.8815e-01    
+I(twoblocks * group) -0.003429   0.009250 -0.370725 7.1086e-01    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.256214     Adj. R2: 0.002028
+                 Within R2: 0.00325 
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# (E)}
+\CommentTok{\# (doesnt match for some reason)}
+\FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ totrob }\SpecialCharTok{\textasciitilde{}} 
+    \FunctionTok{I}\NormalTok{(treated }\SpecialCharTok{*}\NormalTok{ group) }\SpecialCharTok{+} 
+    \FunctionTok{I}\NormalTok{(oneblock }\SpecialCharTok{*}\NormalTok{ group) }\SpecialCharTok{+} 
+    \FunctionTok{I}\NormalTok{(twoblocks }\SpecialCharTok{*}\NormalTok{ group), }
+  \AttributeTok{data =}\NormalTok{ dat\_DID }\SpecialCharTok{\%\textgreater{}\%} 
+    \FunctionTok{filter}\NormalTok{(distanz }\SpecialCharTok{\textless{}=} \DecValTok{2}\NormalTok{), }
+  \AttributeTok{vcov =} \StringTok{"HC1"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: totrob
+Observations: 3,816
+Standard-errors: Heteroskedasticity-robust 
+                      Estimate Std. Error  t value   Pr(>|t|)    
+(Intercept)           0.082400   0.005641 14.60826  < 2.2e-16 ***
+I(treated * group)   -0.047265   0.011453 -4.12694 3.7549e-05 ***
+I(oneblock * group)   0.013874   0.010934  1.26890 2.0456e-01    
+I(twoblocks * group)  0.022025   0.009297  2.36894 1.7889e-02 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.240809   Adj. R2: 0.003361
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\#\# Table 4 \#\#\#\#}
+
+\CommentTok{\# (A)}
+\NormalTok{dat\_DID }\OtherTok{\textless{}{-}}\NormalTok{ polizeipraesenz }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{treated =}\NormalTok{ institut }\SpecialCharTok{==} \DecValTok{1}\NormalTok{,}
+    \AttributeTok{group =}\NormalTok{ dplyr}\SpecialCharTok{::}\FunctionTok{between}\NormalTok{(mes, }\DecValTok{5}\NormalTok{, }\DecValTok{7}\NormalTok{),}
+    \AttributeTok{oneblock =}\NormalTok{ distanz }\SpecialCharTok{==} \DecValTok{1}\NormalTok{,}
+    \AttributeTok{twoblocks =}\NormalTok{ distanz }\SpecialCharTok{==} \DecValTok{2}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(mes }\SpecialCharTok{\textless{}=} \DecValTok{7}\NormalTok{)}
+
+\NormalTok{mod4\_A }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ totrob }\SpecialCharTok{\textasciitilde{}} 
+    \FunctionTok{I}\NormalTok{(treated }\SpecialCharTok{*}\NormalTok{ group) }
+  \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(oneblock }\SpecialCharTok{*}\NormalTok{ group) }
+  \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(twoblocks }\SpecialCharTok{*}\NormalTok{ group) }
+  \SpecialCharTok{|}\NormalTok{ observ }\SpecialCharTok{+}\NormalTok{ monat, }
+  \AttributeTok{data =}\NormalTok{ dat\_DID, }
+  \AttributeTok{vcov =} \StringTok{"HC1"}
+\NormalTok{)}
+
+\CommentTok{\# (B)}
+\NormalTok{dat\_DID }\OtherTok{\textless{}{-}}\NormalTok{ dat\_DID }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{group =}\NormalTok{ dplyr}\SpecialCharTok{::}\FunctionTok{between}\NormalTok{(mes, }\DecValTok{6}\NormalTok{, }\DecValTok{7}\NormalTok{)}
+\NormalTok{  ) }
+
+\NormalTok{mod4\_B }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ totrob }\SpecialCharTok{\textasciitilde{}} 
+    \FunctionTok{I}\NormalTok{(treated }\SpecialCharTok{*}\NormalTok{ group) }
+  \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(oneblock }\SpecialCharTok{*}\NormalTok{ group) }
+  \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(twoblocks }\SpecialCharTok{*}\NormalTok{ group) }
+  \SpecialCharTok{|}\NormalTok{ observ }\SpecialCharTok{+}\NormalTok{ monat, }
+  \AttributeTok{data =}\NormalTok{ dat\_DID, }
+  \AttributeTok{vcov =} \StringTok{"HC1"}
+\NormalTok{)}
+
+\CommentTok{\# (C)}
+\NormalTok{dat\_DID }\OtherTok{\textless{}{-}}\NormalTok{ dat\_DID }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{group =}\NormalTok{ mes }\SpecialCharTok{==} \DecValTok{7}\NormalTok{,}
+\NormalTok{  )}
+
+\NormalTok{mod4\_C }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ totrob }\SpecialCharTok{\textasciitilde{}} 
+    \FunctionTok{I}\NormalTok{(treated }\SpecialCharTok{*}\NormalTok{ group) }
+  \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(oneblock }\SpecialCharTok{*}\NormalTok{ group) }
+  \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(twoblocks }\SpecialCharTok{*}\NormalTok{ group) }
+  \SpecialCharTok{|}\NormalTok{ observ }\SpecialCharTok{+}\NormalTok{ monat, }
+  \AttributeTok{data =}\NormalTok{ dat\_DID, }
+  \AttributeTok{vcov =} \StringTok{"HC1"}
+\NormalTok{)}
+
+
+\CommentTok{\# Tabellarische Zusamenfassung}
+\FunctionTok{modelsummary}\NormalTok{(}
+  \AttributeTok{models =} \FunctionTok{list}\NormalTok{(}
+    \AttributeTok{A =}\NormalTok{ mod4\_A,}
+    \AttributeTok{B =}\NormalTok{ mod4\_B,}
+    \AttributeTok{C =}\NormalTok{ mod4\_C}
+\NormalTok{  ), }
+  \AttributeTok{stars =}\NormalTok{ T,}
+  \AttributeTok{gof\_omit =} \StringTok{"\^{}(?!(R2|Num.Obs.)$).*"}\NormalTok{, }
+  \AttributeTok{output =} \StringTok{"gt"}
+\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\setlength{\LTpost}{0mm}
+\begin{longtable*}{lccc}
+\toprule
+  & A & B & C \\ 
+\midrule\addlinespace[2.5pt]
+I(treated * group) & -0.019 & 0.015 & -0.036 \\ 
+ & (0.053) & (0.040) & (0.039) \\ 
+I(oneblock * group) & -0.026 & 0.014 & 0.023 \\ 
+ & (0.025) & (0.020) & (0.022) \\ 
+I(twoblocks * group) & -0.033 & -0.015 & -0.009 \\ 
+ & (0.023) & (0.017) & (0.017) \\ 
+Num.Obs. & 3504 & 3504 & 3504 \\ 
+R2 & 0.321 & 0.320 & 0.320 \\ 
+\bottomrule
+\end{longtable*}
+\begin{minipage}{\linewidth}
++ p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001\\
+\end{minipage}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\#\# Table 5 \#\#\#\#}
+
+\NormalTok{dat\_DID\_T5 }\OtherTok{\textless{}{-}}\NormalTok{ dat\_DID }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{mbc =} \FunctionTok{paste0}\NormalTok{(barrio, }\StringTok{"\_"}\NormalTok{, monat)}
+\NormalTok{  )}
+
+\CommentTok{\# (A)}
+\CommentTok{\# fixest}
+\FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ totrob }\SpecialCharTok{\textasciitilde{}} 
+    \FunctionTok{I}\NormalTok{(treated }\SpecialCharTok{*}\NormalTok{ group) }
+  \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(oneblock }\SpecialCharTok{*}\NormalTok{ group) }
+  \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(twoblocks }\SpecialCharTok{*}\NormalTok{ group) }
+  \SpecialCharTok{|}\NormalTok{ observ }\SpecialCharTok{+}\NormalTok{ monat,}
+  \AttributeTok{data =}\NormalTok{ dat\_DID\_T5,}
+  \AttributeTok{vcov =} \StringTok{"HC1"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: totrob
+Observations: 3,504
+Fixed-effects: observ: 876,  monat: 4
+Standard-errors: Heteroskedasticity-robust 
+                      Estimate Std. Error   t value Pr(>|t|) 
+I(treated * group)   -0.036111   0.038577 -0.936061  0.34933 
+I(oneblock * group)   0.023105   0.022446  1.029374  0.30340 
+I(twoblocks * group) -0.009403   0.016931 -0.555356  0.57870 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.182841     Adj. R2: 0.09205 
+                 Within R2: 9.857e-4
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# (B)}
+\CommentTok{\# fixest}
+\FunctionTok{feols}\NormalTok{(}\AttributeTok{fml =}\NormalTok{ totrob }\SpecialCharTok{\textasciitilde{}} 
+    \FunctionTok{I}\NormalTok{(treated }\SpecialCharTok{*}\NormalTok{ group) }
+  \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(oneblock }\SpecialCharTok{*}\NormalTok{ group) }
+  \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(twoblocks }\SpecialCharTok{*}\NormalTok{ group) }
+  \SpecialCharTok{|}\NormalTok{ observ }\SpecialCharTok{+}\NormalTok{ monat,}
+  \AttributeTok{data =}\NormalTok{ dat\_DID\_T5, }
+  \AttributeTok{vcov =} \FunctionTok{vcov\_cluster}\NormalTok{(}\StringTok{"observ"}\NormalTok{)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: totrob
+Observations: 3,504
+Fixed-effects: observ: 876,  monat: 4
+Standard-errors: Clustered (observ) 
+                      Estimate Std. Error   t value Pr(>|t|) 
+I(treated * group)   -0.036111   0.034137 -1.057834  0.29042 
+I(oneblock * group)   0.023105   0.022271  1.037473  0.29980 
+I(twoblocks * group) -0.009403   0.015136 -0.621229  0.53461 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.182841     Adj. R2: 0.09205 
+                 Within R2: 9.857e-4
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# (C)}
+\FunctionTok{feols}\NormalTok{(}\AttributeTok{fml =}\NormalTok{ totrob }\SpecialCharTok{\textasciitilde{}} 
+        \FunctionTok{I}\NormalTok{(treated }\SpecialCharTok{*}\NormalTok{ group) }
+      \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(oneblock }\SpecialCharTok{*}\NormalTok{ group) }
+      \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(twoblocks }\SpecialCharTok{*}\NormalTok{ group) }
+      \SpecialCharTok{|}\NormalTok{ observ }\SpecialCharTok{+}\NormalTok{ monat,}
+      \AttributeTok{data =}\NormalTok{ dat\_DID\_T5, }
+      \AttributeTok{vcov =} \FunctionTok{vcov\_cluster}\NormalTok{(}\StringTok{"mbc"}\NormalTok{)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: totrob
+Observations: 3,504
+Fixed-effects: observ: 876,  monat: 4
+Standard-errors: Clustered (mbc) 
+                      Estimate Std. Error   t value Pr(>|t|) 
+I(treated * group)   -0.036111   0.033684 -1.072033  0.30666 
+I(oneblock * group)   0.023105   0.020159  1.146161  0.27605 
+I(twoblocks * group) -0.009403   0.021185 -0.443827  0.66577 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.182841     Adj. R2: 0.09205 
+                 Within R2: 9.857e-4
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# (E)}
+\FunctionTok{feols}\NormalTok{(}\AttributeTok{fml =}\NormalTok{ totrob }\SpecialCharTok{\textasciitilde{}} 
+        \FunctionTok{I}\NormalTok{(treated }\SpecialCharTok{*}\NormalTok{ group) }
+      \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(oneblock }\SpecialCharTok{*}\NormalTok{ group) }
+      \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(twoblocks }\SpecialCharTok{*}\NormalTok{ group) }
+      \SpecialCharTok{|}\NormalTok{ observ }\SpecialCharTok{+}\NormalTok{ mbc,}
+      \AttributeTok{data =}\NormalTok{ dat\_DID\_T5,}
+      \AttributeTok{vcov =} \StringTok{"HC1"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: totrob
+Observations: 3,504
+Fixed-effects: observ: 876,  mbc: 12
+Standard-errors: Heteroskedasticity-robust 
+                      Estimate Std. Error   t value Pr(>|t|) 
+I(treated * group)   -0.065210   0.040774 -1.599302  0.10987 
+I(oneblock * group)  -0.002133   0.024446 -0.087253  0.93048 
+I(twoblocks * group) -0.024507   0.017537 -1.397417  0.16241 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.182412     Adj. R2: 0.093536
+                 Within R2: 0.001302
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# (F)}
+\FunctionTok{feols}\NormalTok{(}\AttributeTok{fml =}\NormalTok{ totrob }\SpecialCharTok{\textasciitilde{}} 
+        \FunctionTok{I}\NormalTok{(treated }\SpecialCharTok{*}\NormalTok{ group) }
+      \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(oneblock }\SpecialCharTok{*}\NormalTok{ group) }
+      \SpecialCharTok{+} \FunctionTok{I}\NormalTok{(twoblocks }\SpecialCharTok{*}\NormalTok{ group) }
+      \SpecialCharTok{|}\NormalTok{ observ }\SpecialCharTok{+}\NormalTok{ monat,}
+      \AttributeTok{data =}\NormalTok{ dat\_DID\_T5 }\SpecialCharTok{\%\textgreater{}\%} 
+        \FunctionTok{group\_by}\NormalTok{(observ) }\SpecialCharTok{\%\textgreater{}\%} 
+        \FunctionTok{filter}\NormalTok{(}
+          \FunctionTok{sum}\NormalTok{(totrob) }\SpecialCharTok{\textgreater{}} \DecValTok{0}
+\NormalTok{        ),}
+      \AttributeTok{vcov =} \StringTok{"HC1"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: totrob
+Observations: 1,780
+Fixed-effects: observ: 445,  monat: 4
+Standard-errors: Heteroskedasticity-robust 
+                      Estimate Std. Error   t value Pr(>|t|) 
+I(treated * group)   -0.075229   0.070545 -1.066396  0.28644 
+I(oneblock * group)   0.034420   0.046086  0.746869  0.45527 
+I(twoblocks * group) -0.034034   0.033083 -1.028742  0.30379 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.253716     Adj. R2: -0.025257
+                 Within R2:  0.002012
+\end{verbatim}
+
+\section{Zusammenfassung}\label{zusammenfassung}
+
+Der DID-Schätzer liefert uns eine Schätzung des ATT, indem er die
+Veränderung der Ergebnisse in der Behandlungsgruppe vor und nach der
+Intervention mit der entsprechenden Veränderung in der Kontrollgruppe
+vergleicht. Die Annahme paralleler Trends ist entscheidend: Nur wenn
+diese Annahme gilt, können wir sicher sein, dass die Differenz in den
+Differenzen tatsächlich den kausalen Effekt der Behandlung widerspiegelt
+und nicht durch andere zeitgleiche Faktoren beeinflusst wird.
+
+Zusammenfassend bietet der DID-Ansatz im Potential Outcomes Framework
+eine robuste Methode zur Schätzung kausaler Effekte, insbesondere wenn
+randomisierte Experimente nicht durchführbar sind. Durch den Vergleich
+von Zeitverläufen in Behandlungs- und Kontrollgruppen unter der Annahme
+paralleler Trends können wir verlässliche Schätzungen des ATT gewinnen.
 
 \bookmarksetup{startatroot}
 
@@ -4875,6 +6372,19 @@ staatliche Interventionen.
 
 \subsection{Modellspezifikation und
 First-Stage-Ergebnisse}\label{modellspezifikation-und-first-stage-ergebnisse}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{rddensity}\NormalTok{(BastenBetz}\SpecialCharTok{$}\NormalTok{bord, }\AttributeTok{c =} \DecValTok{0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Call:
+rddensity.
+Sample size: 509. Cutoff: 0.
+Model: unrestricted. Kernel: triangular. VCE: jackknife
+\end{verbatim}
 
 Die Kantone Waadt und Freiburg haben bis heute mehrheitlich
 protestantische bzw. katholische Gemeinden. Die Verteilung von
@@ -6199,7 +7709,7 @@ Erklärungskraft werden durch die Regularisierung in Richtung 0 gezwungen
 und reduzieren so die Varianz der Vorhersage gegenüber der
 (idealerweise) unverzerrten KQ-Schätzung.
 
-\begin{tcolorbox}[enhanced jigsaw, breakable, toprule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Ridge Regression}, titlerule=0mm, bottomrule=.15mm, leftrule=.75mm, colbacktitle=quarto-callout-note-color!10!white, opacitybacktitle=0.6, coltitle=black, left=2mm, opacityback=0, bottomtitle=1mm, toptitle=1mm, arc=.35mm, rightrule=.15mm, colframe=quarto-callout-note-color-frame, colback=white]
+\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, breakable, toptitle=1mm, colframe=quarto-callout-note-color-frame, opacitybacktitle=0.6, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Ridge Regression}, opacityback=0, colbacktitle=quarto-callout-note-color!10!white, toprule=.15mm, bottomrule=.15mm, bottomtitle=1mm, coltitle=black, arc=.35mm, colback=white, titlerule=0mm]
 
 \begin{itemize}
 \item
@@ -6774,7 +8284,7 @@ und damit zu einer höheren Vorhersagegüte. Das ``sparsame'' mit
 Lasso-Regression geschätzte Modell ist dem ``großen'' mit KQ geschätztem
 Modell in dieser Hinsicht also überlegen.
 
-\begin{tcolorbox}[enhanced jigsaw, breakable, toprule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Lasso-Regression}, titlerule=0mm, bottomrule=.15mm, leftrule=.75mm, colbacktitle=quarto-callout-note-color!10!white, opacitybacktitle=0.6, coltitle=black, left=2mm, opacityback=0, bottomtitle=1mm, toptitle=1mm, arc=.35mm, rightrule=.15mm, colframe=quarto-callout-note-color-frame, colback=white]
+\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, breakable, toptitle=1mm, colframe=quarto-callout-note-color-frame, opacitybacktitle=0.6, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Lasso-Regression}, opacityback=0, colbacktitle=quarto-callout-note-color!10!white, toprule=.15mm, bottomrule=.15mm, bottomtitle=1mm, coltitle=black, arc=.35mm, colback=white, titlerule=0mm]
 
 \begin{itemize}
 \item
@@ -7746,7 +9256,7 @@ Der Post-Double-Selection-Schätzer liefert unter den betrachteten
 Verfahren die beste Schätzung von \(\alpha_0\) und erlaubt gülstige
 statistische Inferenz. Der geschätzte Effekt ist hoch-signifikant.
 
-\begin{tcolorbox}[enhanced jigsaw, breakable, toprule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum Post-Double-Selection-Schätzer}, titlerule=0mm, bottomrule=.15mm, leftrule=.75mm, colbacktitle=quarto-callout-note-color!10!white, opacitybacktitle=0.6, coltitle=black, left=2mm, opacityback=0, bottomtitle=1mm, toptitle=1mm, arc=.35mm, rightrule=.15mm, colframe=quarto-callout-note-color-frame, colback=white]
+\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, breakable, toptitle=1mm, colframe=quarto-callout-note-color-frame, opacitybacktitle=0.6, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum Post-Double-Selection-Schätzer}, opacityback=0, colbacktitle=quarto-callout-note-color!10!white, toprule=.15mm, bottomrule=.15mm, bottomtitle=1mm, coltitle=black, arc=.35mm, colback=white, titlerule=0mm]
 
 \begin{itemize}
 \item
@@ -9347,6 +10857,12 @@ California's Tobacco Control Program.``} \emph{Journal of the American
 Statistical Association} 105 (490): 493--505.
 \url{https://doi.org/10.1198/jasa.2009.ap08746}.
 
+\bibitem[\citeproctext]{ref-Adireksombat2010}
+Adireksombat, Kampon. 2010. {„The Effects of the 1993 Earned Income Tax
+Credit Expansion on the Labor Supply of Unmarried Women``}. \emph{Public
+Finance Review} 38 (1): 11--40.
+https://doi.org/\url{https://doi.org/10.1177/1091142109358626}.
+
 \bibitem[\citeproctext]{ref-Andrews2003}
 Andrews, D. W. K. 2003. {„End-of-Sample Instability Tests``}.
 \emph{Econometrica} 71 (6): 1661--94.
@@ -9422,6 +10938,11 @@ mining to predict secondary school student performance``}.
 \bibitem[\citeproctext]{ref-Efronetal2004}
 Efron, Bradley, Trevor Hastie, Iain Johnstone, und Robert Tibshirani.
 2004. {„Least angle regression``}.
+
+\bibitem[\citeproctext]{ref-EissaLiebman1996}
+Eissa, N., und J. B. Liebman. 1996. {„Labor Supply Response to the
+Earned Income Tax Credit``}. \emph{The Quarterly Journal of Economics}
+111 (2): 605--37. \url{https://doi.org/10.2307/2946689}.
 
 \bibitem[\citeproctext]{ref-GelmanImbens2019}
 Gelman, Andrew, und Guido Imbens. 2019. {„Why high-order polynomials

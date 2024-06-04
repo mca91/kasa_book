@@ -1199,6 +1199,18 @@ Die Statistiken in @tbl-sumstat scheinen konsistent mit der (historischen) Verte
 
 ### Modellspezifikation und First-Stage-Ergebnisse
 
+```{r}
+CJM_BB <- rddensity(BastenBetz$bord, c = 0, kernel = "epanechnikov")
+summary(CJM_BB)
+# CJM-Plot
+plot <- rdplotdensity(
+  rdd = CJM_BB,
+  X = BastenBetz$bord, 
+  type = "both", plotN = 20, 
+)
+```
+
+
 Die Kantone Waadt und Freiburg haben bis heute mehrheitlich protestantische bzw. katholische Gemeinden. Die Verteilung von Protestantismus ist also, u.a. aufgrund von Bevölkerungsbewegungen, nicht mehr deterministisch. An der Kantonsgrenze besteht jedoch eine deutliche Diskontinuität im Anteil protestantischer Einwohner, die auf die historische Verteilung der Religionszugehörigkeit zurückzuführen ist. Damit kann ein  FRDD implementiert werden, bei dem die Distanz zur Grenze (`bord`) die zentrierte Laufvariable ist und die Zugehörigkeit zum Kanton Waadt (`vaud`) ein Instrument für die Behandlungsvariable (`prot`) ist. 
 
 Wir nutzen die Funktion `rdrobust::rdplot` um diesen Zusammenhang für verschiedene Bandweiten anhand des linearen Interaktionsmodells
@@ -1282,6 +1294,7 @@ plot_grid(
 ```
 
 Die Grafiken in @fig-BastenBetzFS zeigen deutliche Hinweise auf die Diskontinuität in `prot` nahe der Kantonsgrenze. Die Größe des geschätzten Sprungs scheint nur wenig sensitiv gegenüber der gewählten Bandweite zu sein. Die Signifikanz des Effekts können wir anhand der jeweiligen KQ-Regressionen beurteilen.^[Wir nutzen `update()` um die Regression mit weniger Code für verschiedene Bandweiten zu schätzen.] 
+
 
 ```{r}
 # Reproduktion der First-Stage-Regressionen

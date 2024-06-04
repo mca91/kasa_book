@@ -1,4 +1,4 @@
-# {{< fa stairs >}}  Regularisierte Regression
+#  Regularisierte Regression
 
 ```{r, echo=F, message=FALSE}
 library(gt)
@@ -19,12 +19,14 @@ tabopts <- function(x) {
 
 In diesem Kapitel betrachten wir Varianten von Koeffizientenschätzern im linearen Modell \begin{align}
  Y_i = \beta_1 X_{1,i} + \dots + \beta_k X_{k,i} + u_i, \quad i = 1,\dots,n,\label{eq:slm}
-\end{align} deren Motivation die Schätzung von $\boldsymbol{\beta} := (\beta_1, \dots,\beta_k)'$ in Anwendungen ist, in denen der KQ-Schätzer \begin{align}
+\end{align} deren Motivation die Schätzung von $\boldsymbol{\beta} := (\beta_1, \dots,\beta_k)'$ in Anwendungen ist, in denen der KQ-Schätzer 
+\begin{align}
   \begin{split}
   \widehat{\boldsymbol{\beta}} =&\, \arg\min_{\boldsymbol{\beta}}\mathrm{RSS}(\boldsymbol{\beta})\\ 
   =&\,  \arg\min_{\boldsymbol{\beta}}  \sum_{i=1}^n\left(Y_i-\beta_1 X_{1,i} + \dots + \beta_k X_{k,i}\right)^2
   \end{split}\label{eq:KQLoss}
-\end{align} keine stabile Schätzung zulässt oder nicht eindeutig definiert ist, und damit gar nicht erst berechnet werden kann. Solche Szenarien ergeben sich in der empirischen Forschung, wenn die Regressoren stark korreliert sind und/oder das Modell viele Regressoren enthält ($k\lesssim n$), oder das Regressionsproblem hoch-dimensional ist ($k>n$).
+\end{align} 
+keine stabile Schätzung zulässt oder nicht eindeutig definiert ist, und damit gar nicht erst berechnet werden kann. Solche Szenarien ergeben sich in der empirischen Forschung, wenn die Regressoren stark korreliert sind und/oder das Modell viele Regressoren enthält ($k\lesssim n$), oder das Regressionsproblem hoch-dimensional ist ($k>n$).
 
 Regularisierte Regressionsschätzer begegnen dieser Problematik mit einer Modifikation der Verlustfunktion $\mathrm{RSS}$ in \eqref{eq:KQLoss}, \begin{align}
   \mathrm{RSS}(\boldsymbol{\beta}, p, \lambda) := \mathrm{RSS}(\boldsymbol{\beta}) + \lambda\lVert\boldsymbol{\beta}\rVert_p.

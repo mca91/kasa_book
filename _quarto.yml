@@ -19,10 +19,12 @@ book:
   chapters:
     - index.qmd
     - R_Einfuehrung.qmd
+    - Reg.qmd
     - Matching.qmd
     - DiD.qmd
     - RDD.qmd
     - RegReg.qmd
+    - Machine Learning.qmd
     - SyntheticControl.qmd
     - Literatur.qmd
   repo-branch: main

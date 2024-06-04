@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.4.553">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Kausalanalyse und Machinelles Lernen mit R - 3&nbsp; Matching</title>
+<title>Kausalanalyse und Machinelles Lernen mit R - 4&nbsp; Matching</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -81,7 +81,7 @@ div.csl-indent {
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
 <link href="./DiD.html" rel="next">
-<link href="./R_Einfuehrung.html" rel="prev">
+<link href="./Reg.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -300,7 +300,7 @@ globalThis.qwebrCustomizedWebROptions = {
 };
 
 // Store cell data
-globalThis.qwebrCellDetails = [{"code":"# create dataset directory\ndir.create(\"datasets\")\n# Download the dataset\ndownload.file(\n    \"https://raw.githubusercontent.com/mca91/kausal_data/main/darkmode.csv\",\n    'datasets/darkmode.csv',\n)","id":1,"options":{"out-height":"","message":"true","fig-cap":"","label":"unnamed-chunk-1","warning":"true","autorun":"true","comment":"","context":"setup","classes":"","dpi":72,"out-width":"700px","output":"true","fig-height":5,"fig-width":7,"results":"markup"}},{"code":"library(dplyr)\n# make darkmode available using read.csv for now\n# because there's some issue with readr::read_csv\n# I can't fix right now\ndarkmode <- read.csv(\n    file = \"datasets/darkmode.csv\", \n    colClasses = c(\"numeric\", \"logical\", \"numeric\", \"numeric\", \"numeric\") \n)\n\noptions(pillar.bold = TRUE, pillar.subtle = FALSE)","id":2,"options":{"out-height":"","message":"true","fig-cap":"","label":"unnamed-chunk-2","warning":"true","autorun":"true","comment":"","context":"setup","classes":"","dpi":72,"out-width":"700px","output":"true","fig-height":5,"fig-width":7,"results":"markup"}},{"code":"# Logit-Modell mit 'glm()' schätzen\n(\n  darkmode_ps_logit <- glm(\n    formula = dark_mode ~ age + male + hours,\n    data = darkmode,\n    family = binomial\n  )\n)","id":3,"options":{"out-height":"","message":"true","fig-cap":"","label":"unnamed-chunk-3","warning":"true","autorun":"true","comment":"","context":"setup","classes":"","dpi":72,"out-width":"700px","output":"true","fig-height":5,"fig-width":7,"results":"markup"}},{"code":".25 * sd(\n  fitted(darkmode_ps_logit)\n  )","id":4,"options":{"out-height":"","message":"true","fig-cap":"","label":"unnamed-chunk-4","warning":"true","autorun":"false","comment":"","context":"interactive","classes":"","dpi":72,"out-width":"700px","output":"true","fig-height":5,"fig-width":7,"results":"markup"}}];
+globalThis.qwebrCellDetails = [{"code":"# create dataset directory\ndir.create(\"datasets\")\n# Download the dataset\ndownload.file(\n    \"https://raw.githubusercontent.com/mca91/kausal_data/main/darkmode.csv\",\n    'datasets/darkmode.csv',\n)","options":{"out-width":"700px","context":"setup","results":"markup","comment":"","autorun":"true","label":"unnamed-chunk-1","fig-width":7,"classes":"","fig-height":5,"message":"true","fig-cap":"","dpi":72,"output":"true","warning":"true","out-height":""},"id":1},{"code":"library(dplyr)\n# make darkmode available using read.csv for now\n# because there's some issue with readr::read_csv\n# I can't fix right now\ndarkmode <- read.csv(\n    file = \"datasets/darkmode.csv\", \n    colClasses = c(\"numeric\", \"logical\", \"numeric\", \"numeric\", \"numeric\") \n)\n\noptions(pillar.bold = TRUE, pillar.subtle = FALSE)","options":{"out-width":"700px","context":"setup","results":"markup","comment":"","autorun":"true","label":"unnamed-chunk-2","fig-width":7,"classes":"","fig-height":5,"message":"true","fig-cap":"","dpi":72,"output":"true","warning":"true","out-height":""},"id":2},{"code":"# Logit-Modell mit 'glm()' schätzen\n(\n  darkmode_ps_logit <- glm(\n    formula = dark_mode ~ age + male + hours,\n    data = darkmode,\n    family = binomial\n  )\n)","options":{"out-width":"700px","context":"setup","results":"markup","comment":"","autorun":"true","label":"unnamed-chunk-3","fig-width":7,"classes":"","fig-height":5,"message":"true","fig-cap":"","dpi":72,"output":"true","warning":"true","out-height":""},"id":3},{"code":".25 * sd(\n  fitted(darkmode_ps_logit)\n  )","options":{"out-width":"700px","context":"interactive","results":"markup","comment":"","autorun":"false","label":"unnamed-chunk-4","fig-width":7,"classes":"","fig-height":5,"message":"true","fig-cap":"","dpi":72,"output":"true","warning":"true","out-height":""},"id":4}];
 
 </script><script type="module">
 // Declare startupMessageQWebR globally
@@ -1045,7 +1045,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./Matching.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Matching</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./Matching.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Matching</span></a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -1087,32 +1087,38 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./Reg.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./Matching.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Matching</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Matching</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./DiD.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./RDD.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./RegReg.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Regularisierte Regression</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Regularisierte Regression</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./SyntheticControl.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Synthetic Control</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Synthetic Control</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -1127,30 +1133,30 @@ window.Quarto = {
    
   <ul>
 <li>
-<a href="#sec-balance" id="toc-sec-balance" class="nav-link active" data-scroll-target="#sec-balance"><span class="header-section-number">3.1</span> <em>Balance</em>: Vergleichbarkeit von Behandlungs- und Kontrollgruppe</a>
+<a href="#sec-balance" id="toc-sec-balance" class="nav-link active" data-scroll-target="#sec-balance"><span class="header-section-number">4.1</span> <em>Balance</em>: Vergleichbarkeit von Behandlungs- und Kontrollgruppe</a>
   <ul class="collapse">
-<li><a href="#matching-durch-gewichtung" id="toc-matching-durch-gewichtung" class="nav-link" data-scroll-target="#matching-durch-gewichtung"><span class="header-section-number">3.1.1</span> Matching durch Gewichtung</a></li>
-  <li><a href="#entropy-balancing" id="toc-entropy-balancing" class="nav-link" data-scroll-target="#entropy-balancing"><span class="header-section-number">3.1.2</span> Entropy Balancing</a></li>
-  <li><a href="#sec-PSM" id="toc-sec-PSM" class="nav-link" data-scroll-target="#sec-PSM"><span class="header-section-number">3.1.3</span> Mehrere Matching-Variablen und der Propensity Score</a></li>
+<li><a href="#matching-durch-gewichtung" id="toc-matching-durch-gewichtung" class="nav-link" data-scroll-target="#matching-durch-gewichtung"><span class="header-section-number">4.1.1</span> Matching durch Gewichtung</a></li>
+  <li><a href="#entropy-balancing" id="toc-entropy-balancing" class="nav-link" data-scroll-target="#entropy-balancing"><span class="header-section-number">4.1.2</span> Entropy Balancing</a></li>
+  <li><a href="#sec-PSM" id="toc-sec-PSM" class="nav-link" data-scroll-target="#sec-PSM"><span class="header-section-number">4.1.3</span> Mehrere Matching-Variablen und der Propensity Score</a></li>
   </ul>
 </li>
   <li>
-<a href="#selektierende-matching-verfahren" id="toc-selektierende-matching-verfahren" class="nav-link" data-scroll-target="#selektierende-matching-verfahren"><span class="header-section-number">3.2</span> Selektierende Matching-Verfahren</a>
+<a href="#selektierende-matching-verfahren" id="toc-selektierende-matching-verfahren" class="nav-link" data-scroll-target="#selektierende-matching-verfahren"><span class="header-section-number">4.2</span> Selektierende Matching-Verfahren</a>
   <ul class="collapse">
-<li><a href="#exaktes-matching" id="toc-exaktes-matching" class="nav-link" data-scroll-target="#exaktes-matching"><span class="header-section-number">3.2.1</span> Exaktes Matching</a></li>
-  <li><a href="#coarsened-exact-matching" id="toc-coarsened-exact-matching" class="nav-link" data-scroll-target="#coarsened-exact-matching"><span class="header-section-number">3.2.2</span> Coarsened Exact Matching</a></li>
-  <li><a href="#matching-mit-der-mahalanobis-distanz" id="toc-matching-mit-der-mahalanobis-distanz" class="nav-link" data-scroll-target="#matching-mit-der-mahalanobis-distanz"><span class="header-section-number">3.2.3</span> Matching mit der Mahalanobis-Distanz</a></li>
-  <li><a href="#propensity-score-matching" id="toc-propensity-score-matching" class="nav-link" data-scroll-target="#propensity-score-matching"><span class="header-section-number">3.2.4</span> Propensity Score Matching</a></li>
+<li><a href="#exaktes-matching" id="toc-exaktes-matching" class="nav-link" data-scroll-target="#exaktes-matching"><span class="header-section-number">4.2.1</span> Exaktes Matching</a></li>
+  <li><a href="#coarsened-exact-matching" id="toc-coarsened-exact-matching" class="nav-link" data-scroll-target="#coarsened-exact-matching"><span class="header-section-number">4.2.2</span> Coarsened Exact Matching</a></li>
+  <li><a href="#matching-mit-der-mahalanobis-distanz" id="toc-matching-mit-der-mahalanobis-distanz" class="nav-link" data-scroll-target="#matching-mit-der-mahalanobis-distanz"><span class="header-section-number">4.2.3</span> Matching mit der Mahalanobis-Distanz</a></li>
+  <li><a href="#propensity-score-matching" id="toc-propensity-score-matching" class="nav-link" data-scroll-target="#propensity-score-matching"><span class="header-section-number">4.2.4</span> Propensity Score Matching</a></li>
   </ul>
 </li>
   <li>
-<a href="#sec-regadj" id="toc-sec-regadj" class="nav-link" data-scroll-target="#sec-regadj"><span class="header-section-number">3.3</span> Schätzung und Inferenz für den Behandlungseffekt nach Matching</a>
+<a href="#sec-regadj" id="toc-sec-regadj" class="nav-link" data-scroll-target="#sec-regadj"><span class="header-section-number">4.3</span> Schätzung und Inferenz für den Behandlungseffekt nach Matching</a>
   <ul class="collapse">
-<li><a href="#cluster-robuste-standardfehler" id="toc-cluster-robuste-standardfehler" class="nav-link" data-scroll-target="#cluster-robuste-standardfehler"><span class="header-section-number">3.3.1</span> Cluster-robuste Standardfehler</a></li>
+<li><a href="#cluster-robuste-standardfehler" id="toc-cluster-robuste-standardfehler" class="nav-link" data-scroll-target="#cluster-robuste-standardfehler"><span class="header-section-number">4.3.1</span> Cluster-robuste Standardfehler</a></li>
   </ul>
 </li>
-  <li><a href="#sec-bootmatching" id="toc-sec-bootmatching" class="nav-link" data-scroll-target="#sec-bootmatching"><span class="header-section-number">3.4</span> Bootstrap-Schätzung kausaler Effekte bei Matching</a></li>
-  <li><a href="#regression-matching-und-doubly-robust-sch%C3%A4tzung" id="toc-regression-matching-und-doubly-robust-schätzung" class="nav-link" data-scroll-target="#regression-matching-und-doubly-robust-sch%C3%A4tzung"><span class="header-section-number">3.5</span> Regression, Matching und Doubly-Robust-Schätzung</a></li>
+  <li><a href="#sec-bootmatching" id="toc-sec-bootmatching" class="nav-link" data-scroll-target="#sec-bootmatching"><span class="header-section-number">4.4</span> Bootstrap-Schätzung kausaler Effekte bei Matching</a></li>
+  <li><a href="#regression-matching-und-doubly-robust-sch%C3%A4tzung" id="toc-regression-matching-und-doubly-robust-schätzung" class="nav-link" data-scroll-target="#regression-matching-und-doubly-robust-sch%C3%A4tzung"><span class="header-section-number">4.5</span> Regression, Matching und Doubly-Robust-Schätzung</a></li>
   </ul></nav>
 </nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
@@ -1329,7 +1335,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 }
 </script><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
 <div class="quarto-title-block"><div><h1 class="title">
-<span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Matching</span>
+<span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Matching</span>
 </h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
 </div>
 
@@ -1408,12 +1414,12 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </ol>
 <p>Annahme 1 stellt sicher, dass die Zuweisung zur Behandlungsgruppe nach Kontrolle für die Kovariablen <span class="math inline">\(X\)</span> als zufällig betracht werden kann. Somit ist es möglich den kausalen Effekt der Behandlung zu identifizieren, indem wir hinsichtlich der Kovariablen <span class="math inline">\(X\)</span> ähnliche Subjekte (vgl. Annahme 2) aus Kontroll- und Behandlungsgruppe vergleichen.</p>
 <p>Annahme 2 setzt vorraus, dass es eine ausreichende Überlappung in den Verteilungen der Kovariablen zwischen Behandlungs- und Kontrollgruppe gibt. Dann ist sichergestellt, dass für jedes Subjekt in einer Gruppe ein hinsichtlich seiner Charakteristika vergleichbares Subjekt in der anderen Gruppe geben kann, sodass ein Vergleich möglich ist.</p>
-<section id="sec-balance" class="level2 page-columns page-full" data-number="3.1"><h2 data-number="3.1" class="anchored" data-anchor-id="sec-balance">
-<span class="header-section-number">3.1</span> <em>Balance</em>: Vergleichbarkeit von Behandlungs- und Kontrollgruppe</h2>
+<section id="sec-balance" class="level2 page-columns page-full" data-number="4.1"><h2 data-number="4.1" class="anchored" data-anchor-id="sec-balance">
+<span class="header-section-number">4.1</span> <em>Balance</em>: Vergleichbarkeit von Behandlungs- und Kontrollgruppe</h2>
 <p>Der Lehrstuhl für Ökonometrie an der Universität Duisburg-Essen betreibt einen Ökonometrie-Blog und interessiert sich für den kausalen Effekt der Einführung eines <a href="https://en.wikipedia.org/wiki/Wikipedia:Dark_mode">darkmode</a> auf die Verweildauer der User auf der Webseite. Die Webseite ist zwar nicht-kommerziell, hat sich allerdings insb. für die Aquise internationaler Studierender für den Studiengang MSc. Econometrics als wichtiges Marketing-Instrument erwiesen. Ein anprechendes Design wird daher als hoch-relevant erachtet.</p>
 <p>Idealerweise sollte der Effekt des Design-Relaunches auf die Nutzungsintensität in einem kontrollierten randomisierten Experiment untersucht werden. Hierbei würden wir Nutzern zufällig das neue oder das alte Design zuweisen und den Effekt als Differnz des durchschnittlichen Verweildauer für die Gruppen bestimmen. Eine solche Studie ist jedoch aus technischen und finanziellen Gründen nicht realisierbar, sodass die Auswirkungen des darkmode mit vorliegenden nicht-experimenellen Nutzungsstatistiken für die Webseite geschätzt werden sollen.</p>
 <p>Die Nutzungsstatistiken sind im Datensatz <a href="https://raw.githubusercontent.com/mca91/kasa_data/main/darkmode.csv"><em>darkmode.csv</em></a> enthalten und sollen der Analyse des Effekts des darkmode (<code>dark_mode</code>) auf die Verweildauer der Leser auf der Webseite (<code>read_time</code>) dienen.</p>
-<p><a href="#tbl-darkmode" class="quarto-xref">Tabelle&nbsp;<span>3.1</span></a> zeigt die Definitionen der Variablen in <em>darkmode.csv</em>.</p>
+<p><a href="#tbl-darkmode" class="quarto-xref">Tabelle&nbsp;<span>4.1</span></a> zeigt die Definitionen der Variablen in <em>darkmode.csv</em>.</p>
 <div class="cell page-columns page-full">
 <div id="tbl-darkmode" class="cell quarto-float anchored page-columns page-full">
 <figure class="quarto-float quarto-float-tbl figure page-columns page-full"><div aria-describedby="tbl-darkmode-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -1892,7 +1898,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-darkmode-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;3.1: Variablen im Datensatz <em>darkmode</em>
+Tabelle&nbsp;4.1: Variablen im Datensatz <em>darkmode</em>
 </figcaption></figure>
 </div>
 </div>
@@ -1949,7 +1955,7 @@ $ hours     &lt;dbl&gt; 65.6, 125.4, 642.6, 129.1, 190.2, 185.3, 333.5, 279.3, 1
 </div>
 </div>
 <p>Die Schätzung ergibt einen negativen Behandlungseffekt, mit der Interpreation, dass das neue Design zu einer Reduktion der Lesezeit um etwa 0.44 Minuten pro Woche führt. Dieses Ergebnis ist allerdings zweifelhaft, weil eine Isolierung des Behandlungseffekts aufgrund von Backdoor-Pfaden im DGP vermutlich nicht gewähleistet ist. Ein Indikator hierfür sind systematische Unterschiede hinsichtlich von (möglicherweise unbeobachtbaren) Charakteristika von Kontrollgruppe und Behandlungsgruppe.</p>
-<p>Da die User sich beim Aufrufen der Seite aktiv für oder gegen den das neue Design entscheiden müssen (und somit selektieren, ob Sie in der Behandlungs- oder Kontrollgruppe landen), liegt wahrscheinlich <em>Confounding</em> vor: Unsere Hypothese ist zunächst, dass männliche User eine durchschnittlich längere Lesezeit aufweisen <em>und</em> mit größerer Wahrscheinlichkeit auf das neue Design wechseln als nicht-männliche Leser. Dann ist <code>male</code> eine Backdoor-Variable. Diese Situation ist unter der Annahme, dass nur diese Faktoren den DGP bestimmen, in <a href="#fig-maleCDdarkmode" class="quarto-xref">Abbildung&nbsp;<span>3.1</span></a> dargestellt.</p>
+<p>Da die User sich beim Aufrufen der Seite aktiv für oder gegen den das neue Design entscheiden müssen (und somit selektieren, ob Sie in der Behandlungs- oder Kontrollgruppe landen), liegt wahrscheinlich <em>Confounding</em> vor: Unsere Hypothese ist zunächst, dass männliche User eine durchschnittlich längere Lesezeit aufweisen <em>und</em> mit größerer Wahrscheinlichkeit auf das neue Design wechseln als nicht-männliche Leser. Dann ist <code>male</code> eine Backdoor-Variable. Diese Situation ist unter der Annahme, dass nur diese Faktoren den DGP bestimmen, in <a href="#fig-maleCDdarkmode" class="quarto-xref">Abbildung&nbsp;<span>4.1</span></a> dargestellt.</p>
 <div class="cell page-columns page-full" data-fig-width="4" data-fig-height="3" data-layout-align="center">
 <div class="cell-output-display page-columns page-full">
 <div id="fig-maleCDdarkmode" class="quarto-figure quarto-figure-center quarto-float anchored page-columns page-full">
@@ -1965,12 +1971,12 @@ $ hours     &lt;dbl&gt; 65.6, 125.4, 642.6, 129.1, 190.2, 185.3, 333.5, 279.3, 1
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-maleCDdarkmode-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;3.1: Backdoor durch ‘male’ im Website-Design-Bespiel
+Abbildung&nbsp;4.1: Backdoor durch ‘male’ im Website-Design-Bespiel
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p>Der DGP in <a href="#fig-maleCDdarkmode" class="quarto-xref">Abbildung&nbsp;<span>3.1</span></a> führt zu einer verzerrten Schätzung des kausalen Effekts von <code>dark_mode</code> auf <code>read_time</code> mit <span class="math inline">\(\eqref{eq:naivATEdarkmode}\)</span>, wenn das Verhältnis von männlichen und nicht-männlichen Usern in Bahandlungs- und Kontrollgruppe nicht ausgeglichen ist. Wir überprüfen dies mit R.</p>
+<p>Der DGP in <a href="#fig-maleCDdarkmode" class="quarto-xref">Abbildung&nbsp;<span>4.1</span></a> führt zu einer verzerrten Schätzung des kausalen Effekts von <code>dark_mode</code> auf <code>read_time</code> mit <span class="math inline">\(\eqref{eq:naivATEdarkmode}\)</span>, wenn das Verhältnis von männlichen und nicht-männlichen Usern in Bahandlungs- und Kontrollgruppe nicht ausgeglichen ist. Wir überprüfen dies mit R.</p>
 <div class="cell">
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Anteile männlicher und nicht-männlicher User</span></span>
 <span><span class="op">(</span></span>
@@ -1993,8 +1999,8 @@ Abbildung&nbsp;3.1: Backdoor durch ‘male’ im Website-Design-Bespiel
 </div>
 </div>
 <p>Die Zusammenfassung <code>anteile_m</code> zeigt, dass der Anteil männlicher User in der Behandlungsgruppe deutlich höher ist als in der Kontrollgruppe.</p>
-<section id="matching-durch-gewichtung" class="level3 page-columns page-full" data-number="3.1.1"><h3 data-number="3.1.1" class="anchored" data-anchor-id="matching-durch-gewichtung">
-<span class="header-section-number">3.1.1</span> Matching durch Gewichtung</h3>
+<section id="matching-durch-gewichtung" class="level3 page-columns page-full" data-number="4.1.1"><h3 data-number="4.1.1" class="anchored" data-anchor-id="matching-durch-gewichtung">
+<span class="header-section-number">4.1.1</span> Matching durch Gewichtung</h3>
 <p>Matching eliminiert die Variation von <code>male</code> zwischen den Gruppen. Eine Möglichkeit hierfür ist die Gewichtung der Beobachtungen in der Kontrollgruppe entsprechend der Anteile von Männern und Nicht-Männern in der Behandlungsgruppe, sodass die Vergleichbarkeit mit der Behandlungsgruppe hinsichtlich des Geschlechts gewährleistet ist. Dies wird in der Literatur als <em>Balance</em> bezeichnet. Der Behandlungseffekt wird dann analog zu <span class="math inline">\(\eqref{eq:naivATEdarkmode}\)</span> geschätzt.</p>
 <p>Die Gewichte für Beobachtungen in der Kontrollgruppe <span class="math inline">\(w_i\)</span> werden berechnet als <span class="math display">\[\begin{align}
   w_i =
@@ -2090,7 +2096,7 @@ F-statistic: 0.03343 on 1 and 298 DF,  p-value: 0.855</code></pre>
 </div>
 <p>Der geschätzte Koeffizient von <code>dark_mode</code> entspricht <span class="math inline">\(\widehat{\tau}^w\)</span>.</p>
 <p>Da <code>male</code> eine binäre Variable ist, reduziert sich eine Beurteilung der Vergleichbarkeit der Verteilungen von <code>male</code> in Behandlungs- und Kontrollgruppe auf einen simplen Vergleich des Männeranteils beider Gruppen. In der Praxis gibt es meist eine Vielzahl potentieller Backdoor-Variablen, die zudem kontinuierlich verteilt sind. Es scheint plausibel, dass das Alter der Nutzer sowohl die Akzeptanz des Design-Updates als auch die Lesezeit beeinflusst. Die bisherige Verweildauer ist mindestens eine plausible Determinante der Lesezeit.</p>
-<p>Der erweiterte DGP ist in Abbildung <a href="#fig-CDdarkmode" class="quarto-xref">Abbildung&nbsp;<span>3.2</span></a> dargestellt, wobei der zusätzliche Backdoor-Pfad durch <code>age</code> ebenfalls mit roten Pfeilen gekennzeichnet sind.</p>
+<p>Der erweiterte DGP ist in Abbildung <a href="#fig-CDdarkmode" class="quarto-xref">Abbildung&nbsp;<span>4.2</span></a> dargestellt, wobei der zusätzliche Backdoor-Pfad durch <code>age</code> ebenfalls mit roten Pfeilen gekennzeichnet sind.</p>
 <div class="cell page-columns page-full" data-fig-width="4" data-fig-height="3" data-layout-align="center">
 <div class="cell-output-display page-columns page-full">
 <div id="fig-CDdarkmode" class="quarto-figure quarto-figure-center quarto-float anchored page-columns page-full">
@@ -2111,7 +2117,7 @@ F-statistic: 0.03343 on 1 and 298 DF,  p-value: 0.855</code></pre>
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-CDdarkmode-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;3.2: Erweiterter DGP im Website-Design-Beispiel
+Abbildung&nbsp;4.2: Erweiterter DGP im Website-Design-Beispiel
 </figcaption></figure>
 </div>
 </div>
@@ -2193,8 +2199,8 @@ All     151     149</code></pre>
   SMD_j := \left(\overline{X}_{j,B} - \overline{X}_{j,K}\right) \bigg/ \sqrt{\frac{1}{2}\left(\widehat{\text{Var}}(X_{j,B}) + \widehat{\text{Var}}(X_{j,K})\right)},
 \end{align*}\]</span> mit Stichprobenmitteln <span class="math inline">\(\overline{X}_{j,B}\)</span> und <span class="math inline">\(\overline{X}_{j,K}\)</span> und Stichprobenvarianzen <span class="math inline">\(\widehat{\text{Var}}(X_{j,B})\)</span> und <span class="math inline">\(\widehat{\text{Var}}(X_{j,K})\)</span> für eine kontinuierliche Kovariable <span class="math inline">\(j\)</span>.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> Obwohl es keinen einheitlichen Schwellenwert für die standardisierte Differenz gibt, der ein erhebliches Ungleichgewicht anzeigt, gilt für kontinuierliche Variablen eine standardisierte (absolute) Differenz von weniger als <span class="math inline">\(0.1\)</span> als Hinweis auf einen vernachlässigbaren Unterschied zwischen den Gruppen.</p>
 <div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;Siehe <span class="citation" data-cites="Austin2011">P. Austin (<a href="Literatur.html#ref-Austin2011" role="doc-biblioref">2011</a>)</span> für einen Überblick zu Balance-Statistiken.</p></div></div><p>Die Balance Table weist also auf einen vernachlässigbaren Unterschied für <code>hours</code> hin und bestätigt den aus den Grafiken abgeleiteten Eindruck einer relevanten Differenzen für <code>age</code>.</p>
-</section><section id="entropy-balancing" class="level3" data-number="3.1.2"><h3 data-number="3.1.2" class="anchored" data-anchor-id="entropy-balancing">
-<span class="header-section-number">3.1.2</span> Entropy Balancing</h3>
+</section><section id="entropy-balancing" class="level3" data-number="4.1.2"><h3 data-number="4.1.2" class="anchored" data-anchor-id="entropy-balancing">
+<span class="header-section-number">4.1.2</span> Entropy Balancing</h3>
 <p><em>Entropy Balancing</em> <span class="citation" data-cites="Hainmueller2012">(<a href="Literatur.html#ref-Hainmueller2012" role="doc-biblioref">Hainmueller 2012</a>)</span> ist eine weitere Methode zur Gewährleistung der Vergleichbarkeit von Behandlungs- und Kontrollgruppe anhand von Gewichten. Das Verfahren nutzt Konzepte aus der <a href="https://de.wikipedia.org/wiki/Informationstheorie">Informationstheorie</a> um die Gewichte für Subjekte in der Kontrollgruppe so anzupassen, dass die Verteilung der Matchingvariablen in der Kontrollgruppe die Verteilung in der Behandlungsgruppe möglichst gut approximiert. Dies geschieht unter der Restriktion, dass bestimmte empirische Momente (meist Mittelwerte und Varianzen) der Matchingvariablen exakt übereinstimmen. Mathematisch werden die Gewichte für Kontrollgruppenbeobachtungen durch Minimierung der <a href="https://de.wikipedia.org/wiki/Kullback-Leibler-Divergenz">Kullback-Leibler-Divergenz</a> zwischen den Verteilungen gefunden, wobei die Divergenz ein Maß für den Unterschied von Wahrscheinlichkeitsverteilungen ist.</p>
 <p>Entropy Balancing ist im R-Paket <code>WeightIt</code> implementiert. Wir zeigen, wie die benötigten Gewichte für eine Schätzungen des ATT im Website-Beispiel mit <code>WeightIt::wightit()</code> bestimmt werden können. Über das Argument <code>moments</code> legen wir fest, dass die Gewichte unter der Restriktion übereinstimmender Mittelwerte aller Matching-Variablen zwischen Behandlungs- und Kontrollgruppe erfolgen soll.</p>
 <div class="cell">
@@ -2250,10 +2256,10 @@ Multiple R-squared:  0.009283,  Adjusted R-squared:  0.005958
 F-statistic: 2.792 on 1 and 298 DF,  p-value: 0.09578</code></pre>
 </div>
 </div>
-<p>Beachte, dass die von <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> berechneten Standardfehler bei Entropy Balancing ungültig sind. In Abschnitt <a href="#sec-bootmatching" class="quarto-xref"><span>Kapitel 3.4</span></a> erläutern wir die Berechnung von Standardfehlern für Matching-Schätzer mit dem Bootstrap.</p>
-</section><section id="sec-PSM" class="level3 page-columns page-full" data-number="3.1.3"><h3 data-number="3.1.3" class="anchored" data-anchor-id="sec-PSM">
-<span class="header-section-number">3.1.3</span> Mehrere Matching-Variablen und der Propensity Score</h3>
-<p>Bei mehreren Backdoor-Variablen kann eine Gewichtung anhand der Behandlungswahrscheinlichkeit (<em>Treatment Propensity</em>) erfolgen. Die Idee hierbei ist, dass der DGP wie in <a href="#fig-propCDdarkmode" class="quarto-xref">Abbildung&nbsp;<span>3.3</span></a> dargestellt werden kann.</p>
+<p>Beachte, dass die von <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> berechneten Standardfehler bei Entropy Balancing ungültig sind. In Abschnitt <a href="#sec-bootmatching" class="quarto-xref"><span>Kapitel 4.4</span></a> erläutern wir die Berechnung von Standardfehlern für Matching-Schätzer mit dem Bootstrap.</p>
+</section><section id="sec-PSM" class="level3 page-columns page-full" data-number="4.1.3"><h3 data-number="4.1.3" class="anchored" data-anchor-id="sec-PSM">
+<span class="header-section-number">4.1.3</span> Mehrere Matching-Variablen und der Propensity Score</h3>
+<p>Bei mehreren Backdoor-Variablen kann eine Gewichtung anhand der Behandlungswahrscheinlichkeit (<em>Treatment Propensity</em>) erfolgen. Die Idee hierbei ist, dass der DGP wie in <a href="#fig-propCDdarkmode" class="quarto-xref">Abbildung&nbsp;<span>4.3</span></a> dargestellt werden kann.</p>
 <div class="cell page-columns page-full" data-fig-width="4" data-fig-height="3" data-layout-align="center">
 <div class="cell-output-display page-columns page-full">
 <div id="fig-propCDdarkmode" class="quarto-figure quarto-figure-center quarto-float anchored page-columns page-full">
@@ -2276,7 +2282,7 @@ F-statistic: 2.792 on 1 and 298 DF,  p-value: 0.09578</code></pre>
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-propCDdarkmode-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;3.3: Propensity im Website-Design-Beispiel
+Abbildung&nbsp;4.3: Propensity im Website-Design-Beispiel
 </figcaption></figure>
 </div>
 </div>
@@ -2477,15 +2483,15 @@ F-statistic: 7.478 on 1 and 192 DF,  p-value: 0.006829</code></pre>
 </div>
 </div>
 <p>Unsere Schätzung des ATE ist der geschätzte Koeffizient von <code>dark_mode</code>. Die ausgegebenen Standardfehler und Inferenzstatistiken sind jedoch <em>ungültig</em> aufgrund der Gewichtung mit IPWs, den inversen <em>geschätzten</em> Wahrscheinlichkeiten für eine Behandlung. Der Grund hierfür ist, dass die Berechnung der Standardfehler in <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> die zusätzliche Unsicherheit durch die geschätzen <em>Propensity Scores</em> nicht berücksichtigt! Später im Kapitel erläutern wir die Berechnung gültiger Standardfehler für IPW-Schätzer basierend auf <em>Propensity Scores</em> mit dem Bootstrap.</p>
-</section></section><section id="selektierende-matching-verfahren" class="level2 page-columns page-full" data-number="3.2"><h2 data-number="3.2" class="anchored" data-anchor-id="selektierende-matching-verfahren">
-<span class="header-section-number">3.2</span> Selektierende Matching-Verfahren</h2>
+</section></section><section id="selektierende-matching-verfahren" class="level2 page-columns page-full" data-number="4.2"><h2 data-number="4.2" class="anchored" data-anchor-id="selektierende-matching-verfahren">
+<span class="header-section-number">4.2</span> Selektierende Matching-Verfahren</h2>
 <p>Das grundsätzliche Konzept von selektierendem Matching wird in der nachstehenden interaktiven Grafik veranschaulicht. Hier betrachten wir beobachtete Ausprägungen von zwei (unabhängig und identisch verteilten) Matching-Variablen für Subjekte in der Behandlungsgruppe (blau) sowie Kontrollgruppe (rot). Als Matches qualifizieren sich sämtliche Beobachtungen der anderen Gruppe, deren <a href="https://de.wikipedia.org/wiki/Euklidischer_Abstand">Euklidische Distanz</a> zu dem ausgewählten Punkt das über den Slider eingestellte Maximum <em>Caliper</em> nicht überschreitet.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> Diese Region wird durch den gestrichelten Kreis gekennzeichnet und kann über den zugehörigen Slider angepasst werden. Per Klick auf eine Beobachtung werden Matches aus der anderen Gruppe durch eine verbindende Linie und farbliches Hervorheben kenntlich gemacht. Mit dem Slider für k wird festgelegt, dass nur die nahesten k qualifizierten Beobachtungen als Matches behandelt werden. Die Grafik illustriert inbesondere, dass Beobachtungen in Abhängigkeit von k und Caliper falls gewünscht mehrfach (s.g. Matching mit Zurücklegen) oder gar nicht gematcht werden können.</p>
 <div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;Es handelt sich hierbei um einen Spezialfall von Matching anhand der Mahalanobis-Distanz.</p></div></div><iframe width="100%" height="678" frameborder="0" src="https://observablehq.com/embed/62067a02a72c9f90@464?cells=theplot%2Cviewof+k%2Cviewof+caliper%2Cstyles">
 </iframe>
 <p>Für die nachfolgenden Code-Beispiele verwenden wir das R-Paket <code>MatchIt</code>. <code><a href="https://kosukeimai.github.io/MatchIt/reference/matchit.html">MatchIt::matchit()</a></code> nutzt standardmäßig Eins-zu-Eins-Matching (ohne Zurücklegen) von Beobachtungen der Treatment-Gruppe mit Beobachtungen der Kontrollgruppe.<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a> Die für das Matching zu verwendenden Variablen werden über das Argument <code>formula</code> als Funktion des Behandlungsindikators definiert. <code><a href="https://kosukeimai.github.io/MatchIt/reference/matchit.html">matchit()</a></code> bereitet das Objekt für eine Schätzung des ATT mit einer geeigneten Funktionen, s. <code><a href="https://kosukeimai.github.io/MatchIt/reference/matchit.html">?matchit</a></code> und hier insb. die Erläuterungen der Argumente <code>replace = F</code>, <code>ratio = 1</code> und <code>estimand = "ATT"</code> für Details. Mit <code>cobalt::balt.tab()</code> erhalten wir eine <em>balance table</em> für den gematchten Datensatz.</p>
 <div class="no-row-height column-margin column-container"><div id="fn5"><p><sup>5</sup>&nbsp;Dieses Schema zielt auf eine Schätzung des ATT ab.</p></div></div><p>Wir zeigen als nächstes, wie <code><a href="https://kosukeimai.github.io/MatchIt/reference/matchit.html">MatchIt::matchit()</a></code> für Matching anhand der Regressoren <code>age</code>, <code>hours</code>, und <code>male</code> in unserem Website-Beispiel für unterschiedliche Varianten durchgeführt werden kann.</p>
-<section id="exaktes-matching" class="level3" data-number="3.2.1"><h3 data-number="3.2.1" class="anchored" data-anchor-id="exaktes-matching">
-<span class="header-section-number">3.2.1</span> Exaktes Matching</h3>
+<section id="exaktes-matching" class="level3" data-number="4.2.1"><h3 data-number="4.2.1" class="anchored" data-anchor-id="exaktes-matching">
+<span class="header-section-number">4.2.1</span> Exaktes Matching</h3>
 <p>Exaktes Matching ordnet einem Subjekt aus der Behandlungsgruppe ein oder mehrere Subjekte aus der Kontrollgruppe zu, wenn die boebachteten Ausprägung der Matching-Variablen <em>exakt</em> übereinstimmen. Hierbei muss die ‘Distanz’ zwischen den Ausprägung der Matching-Variablen folglich <span class="math inline">\(0\)</span> sein. Dieses Verfahren findet meist bei ausschließlich diskret verteilten Merkmalen Anwendung. Bei kontinuierlich verteilten Merkmalen (vgl. die obige interaktive Grafik) sind exakte Matches zwar theoretisch unmöglich, ergeben sich jedoch in der Praxis aus der Datenerfassung, bspw. durch Rundungsfehler. In <code><a href="https://kosukeimai.github.io/MatchIt/reference/matchit.html">matchit()</a></code> erhalten wir exaktes Ein-zu-eins-Matching mit <code>method = "exact"</code>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://kosukeimai.github.io/MatchIt/">MatchIt</a></span><span class="op">)</span></span>
@@ -2507,8 +2513,8 @@ F-statistic: 7.478 on 1 and 192 DF,  p-value: 0.006829</code></pre>
 </div>
 </div>
 <p>Aufgrund der kontinulierliche Verteilten Variable <code>hours</code> gibt es in unserem Website-Beispiel keine exakten Matches. Dieses Verfahren ist hier folglich ungeeignet.</p>
-</section><section id="coarsened-exact-matching" class="level3 page-columns page-full" data-number="3.2.2"><h3 data-number="3.2.2" class="anchored" data-anchor-id="coarsened-exact-matching">
-<span class="header-section-number">3.2.2</span> Coarsened Exact Matching</h3>
+</section><section id="coarsened-exact-matching" class="level3 page-columns page-full" data-number="4.2.2"><h3 data-number="4.2.2" class="anchored" data-anchor-id="coarsened-exact-matching">
+<span class="header-section-number">4.2.2</span> Coarsened Exact Matching</h3>
 <p>Bei dieser Methode werden kontinuierliche Matching-Variablen grob (Engl. <em>coarse</em>) klassiert, ähnlich wie bei einem Histogram. Diese Diskretisierung ermöglicht es exakte Übereinstimmungen zwischen Behandlungs- und Kontrollgruppenbeobachtungen hinsichtlich ihrer klassierten Ausprägungen zu finden. Sowohl Behandlungs- als auch Kontrollbeobachtungen die mindestents einen exakten Match haben, werden Teil des gematchten Datensatzes. In <code><a href="https://kosukeimai.github.io/MatchIt/reference/matchit.html">matchit()</a></code> wird Coarsened Exact Matching mit <code>method = "cem"</code> durchgeführt. Über das Argument <code>cutpoints</code> geben wir an, dass <code>hours</code> in 6 Klassen und <code>age</code> in 4 Klassen eingeteilt werden soll.<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a> Mit <code>k1k = TRUE</code> erfolgt Eins-zu-eins-Matching: Bei mehreren exakten Matches wird die Beobachtung mit der geringsten Mahalanobis-Distanz (für die unklassierten Matching-Variablen) gewählt.</p>
 <div class="no-row-height column-margin column-container"><div id="fn6"><p><sup>6</sup>&nbsp;Diese Werte wurden ad-hoc gewählt da sie zu einem guten Ergebnis führen.</p></div></div><div class="cell">
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Coarsened Exact Matching</span></span>
@@ -2550,8 +2556,8 @@ Unmatched      69      67</code></pre>
 </div>
 </div>
 <p>Mit Coarsened Exact Matching erhalten wir einen Datensatz mit 82 Beobachtungen und guter Balance.</p>
-</section><section id="matching-mit-der-mahalanobis-distanz" class="level3 page-columns page-full" data-number="3.2.3"><h3 data-number="3.2.3" class="anchored" data-anchor-id="matching-mit-der-mahalanobis-distanz">
-<span class="header-section-number">3.2.3</span> Matching mit der Mahalanobis-Distanz</h3>
+</section><section id="matching-mit-der-mahalanobis-distanz" class="level3 page-columns page-full" data-number="4.2.3"><h3 data-number="4.2.3" class="anchored" data-anchor-id="matching-mit-der-mahalanobis-distanz">
+<span class="header-section-number">4.2.3</span> Matching mit der Mahalanobis-Distanz</h3>
 <p>Die Euklidische Distanz misst den direkten Abstand zwischen zwei Punkten und ist nicht invariant gegenüber Transformationen, insbesondere bei unterschiedlichen Skalierungen und bei Korrelation der Matching-Variablen. Die Mahalanobis-Distanz hingegen ist ein standardisiertes Distanzmaß, das unter Berücksichtigung der Varianz-Kovarianz-Struktur der Daten angibt, wie viele Standardabweichungen zwei Datenpunkte voneinander entfernt sind. Die Mahalanobis-Distanz ist invariant gegenüber linearen Transformationen (Skalierung, Translation und Rotation) der Daten und bietet ein genaueres Maß für die Unähnlichkeit zweier Beobachtungen hinsichtlich ihrer Ausprägungen der Matching-Variablen.</p>
 <p>Betrachte die Datenpunkte <span class="math inline">\(P_1=(X_1,Y_1)'\)</span> und <span class="math inline">\(P_2=(X_2,Y_2)'\)</span> für die Matching-Variablen <span class="math inline">\(X\)</span> und <span class="math inline">\(Y\)</span>. Die Mahalanobis-Distanz zwischen <span class="math inline">\(P_1\)</span> und <span class="math inline">\(P_2\)</span> ist definiert als <span class="math display">\[\begin{align*}
   d_M(P_1,\,P_2) = \sqrt{(P_1 - P_2)'\boldsymbol{S}^{-1} (P_1 - P_2)},
@@ -2673,8 +2679,8 @@ Unmatched      47      45</code></pre>
 <p>Die Balance-Table zeigt einen deutlichen Effekt der Beschränkung qualifizierter Beobachtungen durch <code>caliper = .25</code>: Aufgrund der oberen Grenze für die Propensity-Score-Differenz von <span class="math inline">\(0.058\)</span> wird für lediglich <span class="math inline">\(104\)</span> Beobachtungen aus der Behandlungsgruppe ein individueller Match in der Kontrollgruppe gefunden.<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a> Weiterhin finden wir eine verbesserte Balance für den gematchten Datensatz.</p>
 <div class="no-row-height column-margin column-container"><div id="fn7"><p><sup>7</sup>&nbsp;Die durch <code>caliper</code> implizierte Obergrenze ergibt sich als <code>.25 * sd(fitted(darkmode_ps_logit)))</code>.</p></div></div><div id="qwebr-insertion-location-4"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</section><section id="propensity-score-matching" class="level3" data-number="3.2.4"><h3 data-number="3.2.4" class="anchored" data-anchor-id="propensity-score-matching">
-<span class="header-section-number">3.2.4</span> Propensity Score Matching</h3>
+</section><section id="propensity-score-matching" class="level3" data-number="4.2.4"><h3 data-number="4.2.4" class="anchored" data-anchor-id="propensity-score-matching">
+<span class="header-section-number">4.2.4</span> Propensity Score Matching</h3>
 <p>Eine gängige Variante ist Matching ausschließlich anhand von Propensity Scores innerhalb eines Calipers.</p>
 <div class="cell">
 <div class="sourceCode" id="cb53"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># 1:1 Matching mit PS und Caliper</span></span>
@@ -2759,7 +2765,7 @@ Unmatched      47      45</code></pre>
 </div>
 </div>
 <p><code>darkmode_matched</code> enthält Gewichte (<code>weights</code>) für die jeweilige Gruppe zu denen gemachte Beobachtungen gehören (<code>subclass</code>). Dies ist relevant, falls Beobachtungen mehrfach gematcht werden. Wegen Eins-zu-eins-Matching <em>ohne</em> Zurücklegen gibt es in unserem Beispiel 82 Beobachtungspaare und sämtliche Gewichte sind 1. Die Berücksichtigung der Gewicht in den nachfolgenden Aufrufen von Schätzfunktionen (bspw.<code><a href="https://rdrr.io/r/stats/lm.html">lm()</a></code>) ist daher nicht nötig und erfolgt lediglich zur Illustration der grundsätzlichen Vorgehensweise.</p>
-<p>Eine Wiederholung der grafischen Analyse in <a href="#sec-balance" class="quarto-xref"><span>Kapitel 3.1</span></a> zeigt eine deutlich verbesserte Vergleichbarkeit hinsichtlich der Verteilung der Matching-Variablen in <code>darkmode_matched</code>.</p>
+<p>Eine Wiederholung der grafischen Analyse in <a href="#sec-balance" class="quarto-xref"><span>Kapitel 4.1</span></a> zeigt eine deutlich verbesserte Vergleichbarkeit hinsichtlich der Verteilung der Matching-Variablen in <code>darkmode_matched</code>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb60"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">darkmode_matched_CEM</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">dark_mode</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
@@ -2802,8 +2808,8 @@ Unmatched      47      45</code></pre>
 </div>
 </div>
 <p>Wir beobachten eine bessere Balance bei <code>age</code> und <code>hours</code>. Inbesondere ist <code>male</code> für Kontroll- und Behandlungsgruppe ausgeglichen.</p>
-</section></section><section id="sec-regadj" class="level2" data-number="3.3"><h2 data-number="3.3" class="anchored" data-anchor-id="sec-regadj">
-<span class="header-section-number">3.3</span> Schätzung und Inferenz für den Behandlungseffekt nach Matching</h2>
+</section></section><section id="sec-regadj" class="level2" data-number="4.3"><h2 data-number="4.3" class="anchored" data-anchor-id="sec-regadj">
+<span class="header-section-number">4.3</span> Schätzung und Inferenz für den Behandlungseffekt nach Matching</h2>
 <p>Wir schätzen nun den Behandlungseffekt von <code>dark_mode</code> auf <code>read_time</code> für die mit CEM und Propensity Score Matching ermittelten Datensätzen und vergleichen die Ergebniss anschließend mit einer Regressionsschätzung ohne Matching.</p>
 <p>Wir kombinieren die Matching-Verfahren mit linearer Regression, d.h. wir Schätzen den Behandlungseffekt anhand es gematchten Datensatzes als Mittelwertdifferenz nach zusätzlicher Kontrolle für die Matching-Variablen. Diese Kombination von Matching mit Regression wird in der Literatur als <em>Regression Adjustment</em> bezeichnet und ist insbesondere hilfreich, wenn Backdoors mit Matching geschlossen werden sollen, der kausale Effekt jedoch nur unter Verwendung einer nicht-trivialen Regressionsfunktion ermittelt werden kann. Zum Beispiel kann bei einer kontinuierlichen Behandlungsvariable und einem nicht-linearen Zusammenhang mit <span class="math inline">\(Y\)</span> der kausale Effekt nicht durch einen bloßen Mittelwertvergleich erfasst werden, sondern erfordert eine adäquate Modellierung dieses Zusammenhangs in der Regressionsfunktion. Die zusätzliche Kontrolle für Matching-Variablen kann die Varianz der Schätzung verringern und das Risiko einer verzerrten Schätzung abmildern, falls nach Matching noch Unterschiede in der Balance von Behandlungs- und Kontrollgruppe vorliegen.</p>
 <div class="cell">
@@ -2910,11 +2916,11 @@ F-statistic: 38.57 on 4 and 295 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 </div>
 <p>Beachte, dass für die gematchten Datensätze jeweils ein durchschnittlicher Behandlungseffekt für die Beobachtungen <em>mit</em> erfolgter Behandlung ermittelt wird: In sämtlichen oben gezeigten Matchibg-Verfahren werden mit <code>estimand = "ATT"</code> vergleichbarere Kontrollbeobachtungen für die behandelten Beobachtungen ermittelt. Wir schätzen den Effekt der Behandlung, indem wir die Ergebnisse von behandelten Personen mit denen von gematchten Personen vergleichen, die keine Behandlung erhalten haben. Diese Vergleichsgruppe dient als Ersatz für den hypothetischen Zustand der Behandlungsgruppe, wenn keine Behandlung erfolgt wäre. Dies entspricht der Definition eines ATT — ein average treatment effect <em>on the treated</em>.</p>
-<section id="cluster-robuste-standardfehler" class="level3" data-number="3.3.1"><h3 data-number="3.3.1" class="anchored" data-anchor-id="cluster-robuste-standardfehler">
-<span class="header-section-number">3.3.1</span> Cluster-robuste Standardfehler</h3>
+<section id="cluster-robuste-standardfehler" class="level3" data-number="4.3.1"><h3 data-number="4.3.1" class="anchored" data-anchor-id="cluster-robuste-standardfehler">
+<span class="header-section-number">4.3.1</span> Cluster-robuste Standardfehler</h3>
 <p>Für Matching-Verfahren sind die mit <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> berechneten Standardfehler (und damit auch Konfidenzintervalle, t-Statistiken und p-Werte) für den Behandlungseffekt <em>grundsätzlich ungültig</em>. Je nach Matching-Verfahren liegen unterschiedliche Quellen von Schätzunsicherheit vor, die bei der Berechnung von Standardfehlern zusätzlich zu der “üblichen” Stichproben-Variabilität berücksichtig werden müssen. Gründe hierfür sind der Matching-Prozess ansich oder weitere Unsicherheit durch die Schätzung zusätzlicher Parameter, etwa bei der Berechnung von Propensity Scores mit logistischer Regression. Eine weiterere Ursache zusätzlicher Variation durch den Matching-Prozess, die wir bisher nicht näher betrachtet haben ensteht durch Zurücklegen, d.h. wenn Beobachtungen mehrfach gematcht werden können. Auch dieser Faktor wird in der von <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> verwendeten Formel für den Standardfehler des Effekt-Schätzers nicht berücksichtigt.</p>
 <p>Die Standardfehlerberechnung für Matching-Schätzer von Behandlungseffekten ist ein Gegenstand aktueller methodischer Forschung. <span class="citation" data-cites="AustinSmall2014">P. C. Austin und Small (<a href="Literatur.html#ref-AustinSmall2014" role="doc-biblioref">2014</a>)</span> und <span class="citation" data-cites="AbadieSpiess2022">Abadie und Spiess (<a href="Literatur.html#ref-AbadieSpiess2022" role="doc-biblioref">2022</a>)</span> belegen die Gültigkeit von cluster-robusten Standardfehlern mit Clustering auf Ebene der Beobachtungsgruppen (<code>subclass</code> im output von <code><a href="https://kosukeimai.github.io/MatchIt/reference/match.data.html">match.data()</a></code>) bei Matching ohne Zurücklegen. Für Matching anhand von Propensity Scores (auch mit Zurücklegen) zeigt <span class="citation" data-cites="AbadieImbens2016">Imbens (<a href="Literatur.html#ref-AbadieImbens2016" role="doc-biblioref">2016</a>)</span>, dass ignorieren der zusätzlichen Unsicherheit durch die Schätzung der Propensity Scores zu konservativer Inferenz für den ATE anhand eines cluster-robusten Standardfehlerschätzers führt, jedoch ungültige Inferenz für die Schätzung des ATT bedeuten kann. Ähnlich zu <span class="citation" data-cites="AustinSmall2014">P. C. Austin und Small (<a href="Literatur.html#ref-AustinSmall2014" role="doc-biblioref">2014</a>)</span> deuten die Ergebnisse der Simulationsstudie von <span class="citation" data-cites="Bodoryetal2020">Bodory u.&nbsp;a. (<a href="Literatur.html#ref-Bodoryetal2020" role="doc-biblioref">2020</a>)</span> jedoch auf grundsätzlich bessere Eigenschaften der Schätzung hin, wenn die Standardfehler <em>nicht</em> für die Schätzung der Propensity Scores adjustiert werden.</p>
-<p>Weiterhin ist die Kontrolle für Kovariablen mit Erklärungskraft für die Outcome-Variable und für die Matching-Variablen mit <em>Regression Adjustment</em> (vgl. <a href="#sec-regadj" class="quarto-xref"><span>Kapitel 3.3</span></a>) für die Schätzung des Behandlungseffekts nach Matching eine etablierte Strategie, vgl. <span class="citation" data-cites="HillReiter2006">Hill und Reiter (<a href="Literatur.html#ref-HillReiter2006" role="doc-biblioref">2006</a>)</span> und <span class="citation" data-cites="AbadieSpiess2022">Abadie und Spiess (<a href="Literatur.html#ref-AbadieSpiess2022" role="doc-biblioref">2022</a>)</span>. So können die Varianz der Schätzung und das Risiko einer Verzerrung der Standardfehler aufgrund verbleibender Imbalance von Behandlungs- und Kontrollgruppe nach Matching verringert werden.</p>
+<p>Weiterhin ist die Kontrolle für Kovariablen mit Erklärungskraft für die Outcome-Variable und für die Matching-Variablen mit <em>Regression Adjustment</em> (vgl. <a href="#sec-regadj" class="quarto-xref"><span>Kapitel 4.3</span></a>) für die Schätzung des Behandlungseffekts nach Matching eine etablierte Strategie, vgl. <span class="citation" data-cites="HillReiter2006">Hill und Reiter (<a href="Literatur.html#ref-HillReiter2006" role="doc-biblioref">2006</a>)</span> und <span class="citation" data-cites="AbadieSpiess2022">Abadie und Spiess (<a href="Literatur.html#ref-AbadieSpiess2022" role="doc-biblioref">2022</a>)</span>. So können die Varianz der Schätzung und das Risiko einer Verzerrung der Standardfehler aufgrund verbleibender Imbalance von Behandlungs- und Kontrollgruppe nach Matching verringert werden.</p>
 <p>Zur Demonstration von (cluster)-robuster Inferenz und für eine tabellarische Zusammenfassung der Ergebnisse nutzen wir die Pakete <code>marginaleffects</code> und <code>modelsummary</code>. Mit <code><a href="https://marginaleffects.com/man/comparisons.html">marginaleffects::avg_comparisons()</a></code> können p-Werte und Kofindenzintervalle unter Berücksichtigung von robuster Standardfehlern und der Gewichte aus dem Matching-Verfahren berechnet werden.</p>
 <div class="cell">
 <div class="sourceCode" id="cb68"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://marginaleffects.com/">marginaleffects</a></span><span class="op">)</span></span>
@@ -3473,8 +3479,8 @@ Type:  response </code></pre>
 </div>
 </div>
 </div>
-</section></section><section id="sec-bootmatching" class="level2 page-columns page-full" data-number="3.4"><h2 data-number="3.4" class="anchored" data-anchor-id="sec-bootmatching">
-<span class="header-section-number">3.4</span> Bootstrap-Schätzung kausaler Effekte bei Matching</h2>
+</section></section><section id="sec-bootmatching" class="level2 page-columns page-full" data-number="4.4"><h2 data-number="4.4" class="anchored" data-anchor-id="sec-bootmatching">
+<span class="header-section-number">4.4</span> Bootstrap-Schätzung kausaler Effekte bei Matching</h2>
 <p>Ein Bootstrap-Verfahren generiert mit Resampling (wiederholtes Ziehen mit Zurücklegen) aus dem Original-Datensatz (viele) künstliche Datensätze, für die der Schätzer (d.h. das gesamte Verfahren inkl. Matching!) jeweils berechnet wird. Die Verteilung der so gewonnenen Bootstrap-Schätzwerte approximiert die wahre, unbekannte Stichprobenverteilung des Schätzers des Behandlungseffekts. Mit dieser simulierten Verteilung können wir Inferenz betreiben: Wir können einen Bootstrap-Punktschätzer des Behandlungseffekts (Stichprobenmittel der Bootstrap-Schätzungen) sowie Standardfehler (Standardabweichung der der Bootstrap-Schätzungen) und p-Werte berechnen.</p>
 <p>Der Bootstrap kann hilfreich sein, wenn unklar ist, wie Standardfehler für die Unsicherheit des Matching-Prozesses zu adjustieren sind, um gültige Inferenzsstatistiken zu erhalten. <span class="citation" data-cites="AbadieImbens2008">Abadie und Imbens (<a href="Literatur.html#ref-AbadieImbens2008" role="doc-biblioref">2008</a>)</span> zeigen analytisch, dass der Standard-Bootstrap die Stichprobenverteilung für Schätzer kausaler Effekte anhand von gematchten Datensätzen (d.h. bei Zuordnung/Selektion von Beobachtungen mit Matching) nicht korrekt abbilden kann. Grundsätzlich problematisch hierbei ist, wenn der Bootstrap eine verzerrte Schätzung produziert und/oder zu kleine Standardfehler liefert. <span class="citation" data-cites="AbadieImbens2008">Abadie und Imbens (<a href="Literatur.html#ref-AbadieImbens2008" role="doc-biblioref">2008</a>)</span> belegen die Tendenz des Bootstraps zu <em>konservative</em> (d.h. zu große) Standardfehler zu produzieren. Simulationsnachweise <span class="citation" data-cites="Bodoryetal2020 HillReiter2006 AustinSmall2014 AustinStuart2017">(<a href="Literatur.html#ref-Bodoryetal2020" role="doc-biblioref">Bodory u.&nbsp;a. 2020</a>; <a href="Literatur.html#ref-HillReiter2006" role="doc-biblioref">Hill und Reiter 2006</a>; <a href="Literatur.html#ref-AustinSmall2014" role="doc-biblioref">P. C. Austin und Small 2014</a>; <a href="Literatur.html#ref-AustinStuart2017" role="doc-biblioref">P. C. Austin und Stuart 2017</a>)</span> finden, dass Bootstrap-Standardfehler u.a. bei Propensity Score Matching mit Zurücklegen leicht konservativ sind somit das gewünschte nominale Signifikanzniveau eines Bootstrap-Hypothesentests nicht überschritten wird, weshalb der Standard-Bootstrap trotz seiner Schwächen in der empirischen Forschung oft angewendet wird.</p>
 <p>Wir betrachen als nächstes einen Bootstrap-Algorithmus für Inferenz bezüglich eines kausalen Effekts nach Matching und demonstrieren die Schätzung anhand unseres Website-Beispiels für den ATT nach Propensity-Score-Matching.</p>
@@ -3608,7 +3614,7 @@ Calculations and Intervals on Original Scale</code></pre>
 </div>
 <p>Beachte, dass der Bootstrap-Standardfehler sowie das Bootstrap-Konfidenzintervall nahe der mit <code>avg_comarisons</code> berechneten Werte für <code>sum_PSC</code> sind.</p>
 <p><strong>Bootstrap-Standardfehler für IPW-Schätzer des ATE berechnen</strong></p>
-<p>Die Bootstrap-Funktion <code>boot_fun</code> kann leicht für eine Schätzung des Standardfehlers für den IPW-Schätzer des ATE aus <a href="#sec-PSM" class="quarto-xref"><span>Kapitel 3.1.3</span></a> angepasst werden. Statt einer Matching-Prozedur berechnen wir hierzu für <span class="math inline">\(B\)</span> Bootstrap-Stichproben den Schätzer <span class="math inline">\(\widehat{\tau}^\text{IPW}\)</span> mit Trimming der Propensity Scores.</p>
+<p>Die Bootstrap-Funktion <code>boot_fun</code> kann leicht für eine Schätzung des Standardfehlers für den IPW-Schätzer des ATE aus <a href="#sec-PSM" class="quarto-xref"><span>Kapitel 4.1.3</span></a> angepasst werden. Statt einer Matching-Prozedur berechnen wir hierzu für <span class="math inline">\(B\)</span> Bootstrap-Stichproben den Schätzer <span class="math inline">\(\widehat{\tau}^\text{IPW}\)</span> mit Trimming der Propensity Scores.</p>
 <div class="cell">
 <div class="sourceCode" id="cb86"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># IPW estimation with regression adjustment</span></span>
 <span><span class="va">IPW_boot</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
@@ -3713,8 +3719,8 @@ Level       BCa
 Calculations and Intervals on Original Scale</code></pre>
 </div>
 </div>
-</section><section id="regression-matching-und-doubly-robust-schätzung" class="level2 page-columns page-full" data-number="3.5"><h2 data-number="3.5" class="anchored" data-anchor-id="regression-matching-und-doubly-robust-schätzung">
-<span class="header-section-number">3.5</span> Regression, Matching und Doubly-Robust-Schätzung</h2>
+</section><section id="regression-matching-und-doubly-robust-schätzung" class="level2 page-columns page-full" data-number="4.5"><h2 data-number="4.5" class="anchored" data-anchor-id="regression-matching-und-doubly-robust-schätzung">
+<span class="header-section-number">4.5</span> Regression, Matching und Doubly-Robust-Schätzung</h2>
 <p>Als <em>Doubly-Robust-Schätzer</em> bezeichnet man Methoden, die bei Fehlspezifikationen im Matching-Verfahrens <em>oder</em> der funktionalen Form der Regressionsfunktion für die Outcome-Variable eine zuverlässige Schätzungen des kausalen Effekts ermöglichen.<a href="#fn9" class="footnote-ref" id="fnref9" role="doc-noteref"><sup>9</sup></a> Unter der Vorraussetzung, dass die verwendeten Matching-Variablen sämliche Backdoors schließen, ist so mit Doubly-Robust-Schätzung eine konsistente Schätzung des Behandlungseffekts unter abgeschwächten Annahmen gewähtleistet. Dies macht Doubly-Robust-Schätzer besonders nützlich in Forschungskontexten, in denen präzise Modellspezifikationen herausfordernd sind.</p>
 <div class="no-row-height column-margin column-container"><div id="fn9"><p><sup>9</sup>&nbsp;Bspw. kann eine falsche funktionale Form bei logistischer Regression eine verzerrte Schätzung von Propensity Scores und damit eine unzureichende Balance bedeuten.</p></div></div><p>Der von <span class="citation" data-cites="Wooldrige2010">Wooldridge (<a href="Literatur.html#ref-Wooldrige2010" role="doc-biblioref">2010</a>)</span> vorgeschlagene Doubly-Robust-Schätzer (IPWRA) für den ATE erreicht seine vorteilhaften Eigenschaften durch eine geschickte Kombination von IPW und Regression Adjustment.</p>
 <div class="callout callout-style-default callout-tip no-icon callout-titled" title="**Algorithmus: IPWRA-Schätzer des ATE**">
@@ -3837,7 +3843,7 @@ Bootstrap Statistics :
 t1*  1.96847 -0.001270721   0.5960465</code></pre>
 </div>
 </div>
-<p>Wir berechnen die interessierenden Statistiken analog zu der Vorgehensweise in <a href="#sec-bootmatching" class="quarto-xref"><span>Kapitel 3.4</span></a>.</p>
+<p>Wir berechnen die interessierenden Statistiken analog zu der Vorgehensweise in <a href="#sec-bootmatching" class="quarto-xref"><span>Kapitel 4.4</span></a>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb100"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Bootstrap-IPWRA-Schätzer des ATE</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">b_IPWRA</span><span class="op">$</span><span class="va">t</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -4375,13 +4381,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><nav class="page-navigation"><div class="nav-page nav-page-previous">
-      <a href="./R_Einfuehrung.html" class="pagination-link" aria-label="Statistische Programmierung mit R">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Statistische Programmierung mit R</span></span>
+      <a href="./Reg.html" class="pagination-link" aria-label="Regression">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Regression</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./DiD.html" class="pagination-link" aria-label="Difference-in-Differences">
-        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Quellcode</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">

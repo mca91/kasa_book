@@ -61,16 +61,40 @@ webr:
 ```{r, echo=F,message=F,warning=F}
 # Formatierung von gt-Tabellen
 library(gt)
+library(gtExtras)
+
+custom_theme <- function(x, ...) {
+    x %>% gt::opt_row_striping(row_striping = FALSE)
+}
+options("modelsummary_theme_gt" = custom_theme)
+
 tabopts <- function(x) {
-    fmt_number(x, decimals = 3, drop_trailing_zeros = T) %>%
-    tab_options(table_body.hlines.color = "white",
-              column_labels.border.bottom.color = "black", 
-             column_labels.border.top.color = "black",
-             table_body.border.bottom.color = "black", 
-             table.border.bottom.color = "black",
-             column_labels.font.weight = "bold", 
-             table.font.color = "black", 
-             table.font.size = 16)
+    fmt_number(x, decimals = 3, drop_trailing_zeros = T)
+
+    #gt_highlight_rows(fill = "white", rows = T, font_weight = NULL) #%>%
+
+    # tab_options(
+    #   table_body.hlines.color = "white",
+    #   column_labels.border.bottom.color = "black", 
+    #   column_labels.border.top.color = "black",
+    #   table_body.border.bottom.color = "black", 
+    #   table.border.bottom.color = "black",
+    #   column_labels.font.weight = "bold", 
+    #   table.font.color = "black", 
+    #   table.background.color = "white", 
+    #   summary_row.background.color = "white", 
+    #   grand_summary_row.background.color = "white", 
+    #   stub.background.color = "white",
+    #   row_group.background.color = "white",
+    #   table.font.size = 16
+    #   ) %>%
+    #  tab_style(
+    #    style = cell_fill(color = "white"),
+    #    locations = list(
+    #     cells_body(), 
+    #     cells_row_groups() 
+    #    )
+    #  )
 }
 
 library(tidyverse)
@@ -82,7 +106,9 @@ download.file(
 brexit <- read_csv("datasets/brexit.csv") %>% as.data.frame
 
 # load the Synth package
-library(Synth)
+library(cowplot)
+library(broom)
+library(AER)
 options(pillar.sigfig = 2)
 ```
 
@@ -106,10 +132,10 @@ digraph "Causal Diagramm RDD" {
   "Gruppenzugehörigkeit" [pos="2,-1.5!"]
   "Zeit t" [pos="2,1.5!"]
   "Behandlung B" -> "Outcome Y" [color="green"]
-  "Zeit t" -> "Outcome Y" [color="purple"]
-  "Zeit t" -> "Behandlung B" [color="purple"]
-  "Gruppenzugehörigkeit" -> "Outcome Y" [color="purple"]
-  "Gruppenzugehörigkeit" -> "Behandlung B" [color="purple"]
+  "Zeit t" -> "Outcome Y" [color="red"]
+  "Zeit t" -> "Behandlung B" [color="red"]
+  "Gruppenzugehörigkeit" -> "Outcome Y" [color="red"]
+  "Gruppenzugehörigkeit" -> "Behandlung B" [color="red"]
 }
 ```
 
@@ -119,7 +145,7 @@ digraph "Causal Diagramm RDD" {
  
  - **Gruppenzugehörigkeit**: Die Gruppenzugehörigkeit legt fest, ob eine Behandlung erfolgt. Systematische Unterschiede zwischen Behandlungs- und Kontrollgruppe wirken sich auf die Outcome-Variable $Y$ aus.
 
-In einem DID-Ansatz ermöglicht die Beobachtung von Kontroll- und Behandlungsgruppen vor und nach einer Intervention das herausrechnen systematischer Unterschiede zwischen Behandlungs- und Kontrollgruppe und von Zeiteffekten, sodass die Backdoors durch Gruppenzugehörigkeit und Zeit geschlossen. Die Schätzung eines durchschnittlichen Behandlungseffekts erfolgt hierbei unter der Annahme, dass die Outcome-Variable beider Gruppen *ohne die Intervention* einen hinreichend ähnlichen Verlauf aufweisen würde.
+In einem DID-Ansatz ermöglicht die Beobachtung von Kontroll- und Behandlungsgruppen jeweils *bevor und nach* einer Intervention das Herausrechnen von systematischen Unterschieden zwischen Behandlungs- und Kontrollgruppe und von Zeiteffekten, sodass die Backdoors durch Gruppenzugehörigkeit und Zeit geschlossen. Die Schätzung eines durchschnittlichen Behandlungseffekts erfolgt hierbei unter der Annahme, dass die Outcome-Variable beider Gruppen *ohne die Intervention* einen hinreichend ähnlichen Verlauf aufweisen würde und damit die Kontrollgruppe ein plausibles Counterfactual für die Behandlungsgruppe darstellt.
 
 ## Einordnung im Potential Outcomes Framework
 
@@ -164,19 +190,64 @@ Beachte, dass ${\color{red}\textup{E}\big[Y_B(0)\vert t=1\big]}$ der Erwartungsw
 
 1. **Parallele Trends**: Die Trends in der Outcome Variable $Y$ in Behandlungs- und Kontrollgruppe würden bis einschließlich $t=1$ parallel verlaufen, wenn es keine Behandlung gäbe. Diese Annahme ist Voraussetzung dafür, dass Veränderungen im Outcome $Y$ für die Behandlungsgruppe, die sich von $Y$ für die Kontrollgruppe unterscheidet, auschließlich dem Effekt der Behandlung zugeschrieben werden kann.
 
-2. **Keine Interferenz zwischen Gruppen (SUTVA)**: Die Behandlung einer Gruppe sollte keinen Einfluss auf die andere Gruppe haben.
+2. **Keine Interferenz und konsistente Behandlung (SUTVA)**: 
 
-3. **Konsistete Behandlungseffekte**: Der Effekt der Intervention ist konstant über Individuen und Zeit hinweg.
+    - *Keine Interferenz*: Die Behandlung eines Individums hat keinen Einfluss auf das potentielle Outcome anderer Individuen, unabhängig von der Gruppenzugehörigkeit.
+  
+    - *Konsistete Behandlung*: Es gibt keine Variation in der Intensität oder Art der Behandlung innerhalb der Behandlungsgruppe.
 
 ## Schätzung des ATT mit DID
 
-Für die Schätzung von $\beta_\text{DID}$ ersetzen wir die Erwartungswerte in \eqref{eq:DID-ATT1} durch ihre Stichprobenmomente:
+Für die Schätzung von $\beta_\text{DID}$ ersetzen wir die Erwartungswerte in \eqref{eq:DID-ATT1} durch ihre Stichprobenmomente. Dies liefert den Schätzer
 
 \begin{align}
-  \widehat{\beta}_\textup{DID} = \bigg({\color{red}\overline{Y_B(1)\vert t=1} - \overline{Y_B(0)\vert t=0}} \bigg) -  \bigg({\color{blue}\overline{Y_K(0)\vert t=1} - \overline{Y_K(0)\vert t=0}}\bigg) \label{eq:DIDMOMENTS}
+  \widehat{\beta}_\textup{DID} = \bigg({\color{red}\overline{Y_B(1)\vert t=1} - \overline{Y_B(0)\vert t=0}} \bigg) -  \bigg({\color{blue}\overline{Y_K(0)\vert t=1} - \overline{Y_K(0)\vert t=0}}\bigg). \label{eq:DIDMOMENTS}
 \end{align}
 
-Die nachfolgende interaktive Grafik illustriert die Schätzung des ATT mit DID für simulierte Daten. 
+Die Implementierung von DID-Schätzern erfolgt meist anhand linearer Regression. Das Modell für zwei Zeitperioden ist
+
+\begin{align}
+  Y_{i,\,t} = \alpha + \beta_1 B_i + \beta_2 Z_t + \beta_3 (B_i \times Z_t) + \epsilon_{i,\,t}, \quad t\in\{0,1\}, \label{eq:DIDREG}
+\end{align}
+
+wobei $\beta_3$ der interessierende Behandlungseffekt ist. Der Regressor $B_i \times Z_t$ ist die Interaktion zwischen der Behandlungsgruppenzugehörigkeit $B_i$ und einem Indikator für den Zeitpunkt *nach* der Intervention, $Z_i = \mathbb{I}_{\{t=1\}}$. Beachte, dass wir in Modell \eqref{eq:DIDREG} für Zeiteffekte und Gruppenzugehörig kontrollieren und damit die sich durch das Forschungsdesign ergebenden Backdoors (vgl. @fig-CDDID) schließen.
+
+Es ist $\widehat\beta_3 = \widehat{\beta}_\text{DID}$, d.h. der KQ-Schätzer von $\beta_3$ ist der DID-Schätzer des ATT und numerisch äquivalent zu \eqref{eq:DIDMOMENTS}. Die Berechnung von $\widehat\beta_\text{DID}$ anhand von Modell \eqref{eq:DIDREG} ist praktisch, da wir so Inferenzstatistiken mit etablierten R-Funktionen wie `summary()` und `lmtest::coeftest()` wie gewohnt berechnen können. 
+
+In empirischen Anwendungen stehen oft Datensätze mit mehreren Gruppen und mehr als zwei Beobachtungsperioden zur Verfügung. Beachte, dass das Modell \eqref{eq:DIDREG} ein Spezialfall des allgemeinen Forschungsdesigns mit $t=1,\dots,T$ für $T\geq2$ Beobachtungsperioden und mehr als zwei Gruppen (mehrere Kontroll- und Behandlungsgruppen) ist. Eine dann häufig genutzte Modellspezifikation für die Schätzung des ATT mit DID ist eine Panel-Regression mit *Two-way Fixed Effects*,
+
+\begin{align}
+  Y_{i,\,t} =  \theta_i + \eta_t + \beta_\text{DID}^\text{TWFE} D_{i,\, t} + \epsilon_{i,\,t}, \quad t = 1,\dots,T, \label{eq:TWFEDIDREG}
+\end{align}
+
+wobei $\theta_i$ und $\eta_t$ Dummy-Variablen für Gruppen und Zeitperioden sind und $D_{i,\, t}$ der Behandlungsindikator ist. Dieses lineare Paneldaten-Modell kann komfortabel mit dem R-Paket `fixest` (s. `fixtest::feols()`) implementiert werden. Bei mehreren Gruppen sollten cluster-robuste Standardfehler auf Gruppen-Ebene verwendet werden.
+
+In Modell \eqref{eq:TWFEDIDREG} indentifiziert $\beta_\text{DID}^\text{TWFE}$ den ATE, sofern die Annahmen 1 (parallele Trends) und 2 (SUTVA) gelten. Damit die Annahme paralleler Trends gewährleistet ist, dürfen keine heterogenen Behandlungseffekte vorliegen, d.h. die Behandlungseffekte 
+
+- variieren nicht zwischen verschiedenen Gruppen
+- sind unabhängig vom Zeitpunkt der Behandlung (relevant bei unterschiedlichen Behandlungszeitpunkten)
+- entwickeln sich nicht dynamisch über die Zeit^[Siehe bspw. @GoodmanBacon2021 für eine detaillierte Diskussion dieser Problematik.]
+
+Der Umgang mit heterogenen Behandlungseffekten ist Gegenstand der aktuellen ökonometrischen Forschung zu DID-Schätzern. @CallawaySantAnna2021  schlagen eine nicht-parametrische Schätzung von gruppenspezifischen ATE zu veschiedenen Zeitpunkten vor, die zu einem globalen ATT zusammengefasst werden können.^[Die Methoden von @CallawaySantAnna2021 sind im R-Paket `did` implementiert.]
+
+::: callout-note
+#### Key Facts zum einfachen DID-Schätzer
+
+- Im DID-Forschungsdesign kann der ATT durch einen Vergleich von *Differenzen* in den Ergebnissen vor und nach einer Behandlung zwischen Behandlungs- und Kontrollgruppen identifiziert werden. 
+
+- DID benötigt Beobachtungen einer Behandlungs- und einer Kontrollgruppe zu *mindestens* zwei verschiedenen Zeitpunkten, wobei der Behandlung zwischen diesen Zeitpunkten erfolgt.  
+
+- DID ist empfindlich gegenüber Verletzungen der Annahme, dass die zeitlichen Trends in der Outcome-Variable für die Behandlungs- und die Kontrollgruppen vor der Intervention parallel verlaufen.
+
+- DID-Schätzer können in linearen Interaktionsmodellen mit Fixed Effects für Zeitperioden und Gruppenzugehörigkeit implementiert werden. Der interessierenden Effekt sind die Koeffizienten von Interaktionstermem zwischen den Indikatoren für die Nachbehandlungsperioden und für die Zugehörigkeit zu einer Behandlungsgruppe. 
+
+- In R können DID-Modelle mit `lm()` oder, in Fällen mit mehr als zwei Beobachtungsperioden, mit `fixest::feols()` geschätzt werden. In Forschungsdesigns mit mehreren Gruppen sollten cluster-robuste Standardfehler verwendet werden.
+
+:::
+
+---
+
+Die nachfolgende interaktive Grafik illustriert die Schätzung des ATT mit DID sowie die Verletzung der Annahme paralleler Trends anhand simulierte Daten für mehrere Zeitperioden. Der verwendete DID-Schätzer ist der KQ-Schätzer in Modell \eqref{eq:DIDREG}, d.h. wir betrachten ein Forschungsdesign in dem zwei Zeitperioden für die Schätzung verwendet werden, wobei die Behandlung zwischen diesen Perioden erfolgt. 
 
 **Interaktive Elemente der Visualisierung**
 
@@ -203,77 +274,716 @@ Die nachfolgende interaktive Grafik illustriert die Schätzung des ATT mit DID f
 
   - Für *positive* Behandlungseffekte wird der ATT *überschätzt*: die Verzerrung entspricht der Überlagerung der gestrichelten schwarzen linie mit der orangenen Linie des geschätzten Effekts. 
   
-  - Für *negative* Behandlungseffekte wird der ATT unterschätzt: die Verzerrung entspricht der gestrichelten schwarzen linie oberhalb der orangenen Linie des geschätzten Effekts.
+  - Für *negative* Behandlungseffekte wird der ATT unterschätzt: die Verzerrung entspricht der gestrichelten schwarzen Linie oberhalb der orangenen Linie des geschätzten Effekts.
 
 <iframe width="100%" height="813" frameborder="0"
   src="https://observablehq.com/embed/@mca91/did?cells=didformula%2Cchart%2Cviewof+ptrends%2Cviewof+showTrends%2Cviewof+showData%2Cviewof+treatPeriod%2Cviewof+effect"></iframe>
 
-Die Implementierung von DID-Schätzern erfolgt meist anhand linearer Regression. Das Modell für zwei Zeitperioden ist
+---
 
-\begin{align}
-  Y_{i,\,t} = \alpha + \beta_1 B_i + \beta_2 Z_t + \beta_3 (B_i \times Z_t) + \epsilon_{i,\,t}, \quad t\in\{0,1\}, \label{eq:DIDREG}
-\end{align}
+## Schätzung von DID-Forschungsdesigns mit R
 
-wobei $\beta_3$ der interessierende Behandlungseffekt ist. Der Regressor $B_i \times Z_t$ ergibt sich als die Interaktion zwischen der Behandlungsgruppenzugehörigkeit $B_i$ und einem Indikator für den Zeitpunkt *nach* der Intervention, $Z_i = \mathbb{I}_{\{t=1\}}$. Es ist $\widehat\beta_3 = \widehat{\beta}_\text{DID}$, d.h. der KQ-Schätzer von $\beta_3$ ist der DID-Schätzer des ATT und numerisch äquivalent zu \eqref{eq:DIDMOMENTS}.
+Wir erläutern nachfolgend die Schätzung von DID-Designs mit zwei Zeitperioden mit R und visualisieren die geschätzten Komponenten von $\widehat{\beta}_\text{DID}$ ähnlich wie in der interaktiven Visualisierung. Hierzu erzeugen wir simulierte Daten gemäß der Vorschrift
 
-Die Berechnung von $\widehat\beta_\text{DID}$ anhand von Modell \eqref{eq:DIDREG} ist praktisch, da wir so Inferenzstatistiken mit etablierten R-Funktionen wie gewohnt berechnen können.
+\begin{align*}
+  Y_{i,t} &= 2 + 3 \cdot Z_t + 5 \cdot B_i + 4 \cdot (Z_t \cdot B_i) + \epsilon_{i,t}\\
+  \epsilon_{i,t} &\sim N(0, 1)\\
+  Z_t &= \mathbb{I}_{\{ t = 1 \}} \\
+  B_i &= \mathbb{I}_{\{ i \in \textup{Behandlungsgruppe} \}},
+\end{align*}
+wobei wir jeweils $100$ Beobachtungen beider Gruppen zu beiden Zeitpunkten generieren.
 
-::: callout-note
-#### Key Facts zum einfachen DID-Schätzer
 
-- DID benötigt Beobachtungen einer Behandlungs- und einer Kontrollgruppe zu mindestens zwei verschiedenen Zeitpunkten.  
+```{r}
+library(tibble)
+library(dplyr)
 
-- Im DID-Forschungsdesign kann der ATT durch einen Vergleich von Differenzen in den Ergebnissen vor und nach einer Behandlung zwischen Behandlungs- und Kontrollgruppen identifiziert werden. 
+# Seed setzen
+set.seed(1234)
 
-- DID ist empfindlich gegenüber Verletzungen der Annahme, dass die zeitlichen Trends in den Ergebnissen für beide Gruppen vor der Intervention parallel verlaufen.
+# Anzahl der Beobachtungen (pro Gruppe u. Zeitpunkt)
+n <- 100
 
-- Der DID-Schätzer kann in einem Regressionsmodell mit Interaktionsterm zwischen Zeit- und Gruppenvariablen implementiert werden.
+# Daten simulieren
+did_data <- tibble(
+  Z = rep(rep(c(0, 1), each = n), times = 2),
+  B = rep(c(0, 1), each = 2 * n),
+  epsilon = rnorm(4 * n),
+  outcome = 2 + 3 * Z + 5 * B + 4 * Z * B + epsilon
+)
 
-:::
+# Überblick
+glimpse(did_data)
+```
 
-## Beispiel: Effekt von Steuererleichterungen auf weibliche Beschäftigungsquote 
+Mit `lm()` implementieren wir ein einfaches Interaktionsmodell und lesen den geschätzten Effekt aus.
 
-Der Earned Income Tax Credit (EITC) ist ein Steuerguthaben für US-Amerkanische Familien die unterhalb einer gesetztlich festgelegten Einkoemmnsgrenze liegen. Der genaue Betrag des EITC hängt gestaffelt vom Einkommen ab und, ähnlich zum Kindergeld in Deutschland, steigt mit der Anzahl der zu versorgenden Kinder. Ein wichtiger Unterschied zum Kindergeld ist, dass der EITC nicht beantragt werden muss: Qualifizierten Familien wird der Betrag automatisch durch die Behörden im Steuerausgleich gutgeschrieben. Somit kann Selbstselektion in die Behandlungsgruppe ausgeschlossen werden, da sich die Behandlung ausschließlich durch die im Rahmen der EITC-Ausweitung geänderten Anspruchsgrundlagen ergibt.
+```{r}
+# Modell mit Regression schätzen
+did_model <- lm(
+  formula = outcome ~ Z * B, 
+  data = did_data
+)
 
-@EissaLiebman1996 betrachten Veränderungen in der EITC-Gesetzgebung als Intervention, deren Auswirkungen mit sozio-ökonimischen Paneldaten in einem DID-Ansatz untersucht werden können. Die Studie analysiert die Auswirkungen der ersten Ausweitung des EITC im Jahr 1986 auf die Beschäftigung und Löhne von Frauen. Diese Erweiterung erhöhte die gewährten Steuererleichterungen und die für eine Qualifikation für das Programm zu unterschreitende Einkommensgrenze. 
+# Geschätzten ATE auslesen
+(
+  estimated_effect <- coef(did_model)["Z:B"]
+)
+```
 
-Ein zentraler Befund der Studie ist, dass die EITC-Ausweitung von 1986 einen statistisch signifikanten Anstieg der Arbeitsbeteiligung alleinerziehender Frauen von geschätzten 3\% bewirkt hat. Weiterhin gab es signifikante positive Effekte auf die geleisteten Arbeitsstunden und Nachweise für Einkommensverbesserungen in dieser Gruppe. Diese Ergebnisse sind starke Evidenz, dass Maßnahmen wie der EITC effektiv dazu beitragen können, die Erwerbssituation in der Zielgruppe zu steigern und somit die wirtsschafts- und sozialpolitische Ziele derartiger Programme realisierbar sind.
+Die Schätzung des Behandlungseffekts von $`r round(estimated_effect, 2)`$ liegt nahe beim wahren Effekt von $4$. Eine äquivalente Schätzung können wir mit `fixest::feols()` erhalten. 
 
-Im Jahr 1993 wurde das Programm erneut ausgweitet: Vor 1993 gab es lediglich eine Einkommensstufe für Familien mit Kindern. 1993 wurde eine zusätzliche Stufe für Familien mit zwei oder mehr Kindern eigeführt, die damit einen höheren maximalen Kreditbetrag erhalten konnten als Familien mit nur einem Kind. Dies führte zu einer größeren finanziellen Unterstützung einkommensschwacher Familien.
+```{r}
+library(fixest)
+
+# Interaktionsmodell mit feols() schätzen
+feols(
+  fml = outcome ~ Z * B,
+  data = did_data
+)
+```
+
+Für eine Schätzung mit Two-way-fixed-effects modifizieren wir den Funktionsaufruf von `feols()`
+
+```{r}
+# Two-way-FE-Regression
+feols(
+  fml = outcome ~ I(Z * B) | B + Z,
+  data = did_data
+)
+```
+
+Beachte, dass im Formel-Argument `fml` mit `I(Z * B)` lediglich der Interaktionseffekt als Regressor festgelegt wird. Fixe Effekte für Gruppenzugehörigkeit und Zeitpunkte werden durch den Zusatz `| B + Z` spezifiziert.^[`I(Z * B)` statt `Z * B` stellt sicher, dass perferkte Multikollinearität aufgrund der Fixed-Effekts für `B` und `Z` vermieden wird.] Diese Reihenfolge führt zur Berechnung von cluster-robusten Standardfehlern auf Gruppen-Ebene (`B`). Wie erwartet können wir anhand des $t$-Tests die Nullhypothese $H_0:\,\beta_\text{DID} = 0$ zu jeden relevanten Signifikanzniveau ablehnen.
+
+Für die Visualisierung der Schätzung mit `ggplot2::ggplot()` berechnen wir zunächst Stichprobenmittelwerte für die Outcome-Variable `y` beider Gruppen zu beiden Zeitpunkten.
+
+```{r}
+# Stichprobenmittelwerte berechnen
+options(digits = 4)
+(
+  means <- did_data %>%
+  group_by(Z, B) %>%
+  summarize(
+    mean_outcome = mean(outcome), 
+   .groups = 'drop'
+  )
+)
+```
+
+Die Stichprobenmittelwerte in `means` ermöglichen uns die Schätzung von $\textcolor{red}{E(Y_B(0)|t=2)}$, das kontrafaktische erwartete Outcome (counterfactual) der Behandlungsgruppe zum Zeitpunkt $t=2$,
+
+\begin{align*}
+  \textcolor{red}{\overline{Y_B(0)|t=2}} =&\, \textcolor{red}{\overline{Y_B(0)|t=1}}
+  + \bigg( \textcolor{blue}{\overline{Y_K(0)|t=2}} - \textcolor{blue}{\overline{Y_K(0)|t=1}} \bigg)\\
+  =&\, \textcolor{red}{7.2} + (\textcolor{blue}{5.0} - \textcolor{blue}{1.8}) \\
+  =&\, \textcolor{red}{10.4}.
+\end{align*}
+
+```{r}
+# Counterfactual für Behandlungsgruppe in t=1
+(
+  counterfactual <- means %>%
+  filter(Z == 0 & B == 1) %>%
+  pull(mean_outcome) +
+  
+  (
+    means %>%
+     filter(Z == 1 & B == 0) %>%
+     pull(mean_outcome) -
+   
+    means %>%
+     filter(Z == 0 & B == 0) %>%
+     pull(mean_outcome)
+   )
+)
+```
+
+Der geschätzte Behandlungseffekt ist 
+\begin{align*}
+\textcolor{orange}{\widehat{\beta}_\text{DID}} =&\, \textcolor{red}{\overline{Y_B(1)\vert t=2}} - \textcolor{red}{\overline{Y_B(0)\vert t=2}}\\
+=&\,\textcolor{red}{14} - \textcolor{red}{10.4}\\
+=&\, \textcolor{orange}{3.6}.
+\end{align*}
+
+Wir plotten die Daten mit `ggplot2` und zeichnen die Trends sowie den geschätzten Behandlungseffekt ein.
+
+```{r}
+#| label: fig-DIDSIMB
+#| fig-cap: "Einfache DID-Schätzung mit R für simulierte Daten"
+# Simulierte daten plotten
+did_data %>%
+  ggplot(
+    mapping = aes(
+      x = factor(Z), 
+      y = outcome, 
+      color = factor(B), 
+      group = factor(B))
+    ) +
+  geom_point(
+    position = position_jitter(
+      width = .1, 
+      seed = 1234
+      )
+    ) +
+  labs(
+    x = "Zeitpunkt",
+    y = "Outcome Y",
+    color = "B"
+  ) +
+  scale_color_manual(
+    values = c("1" = "red", "0" = "blue")
+  ) +
+  # Trendlinien einzeichnen
+  stat_summary(
+    fun = mean, 
+    geom = "line", 
+    size = 1.5
+    ) +
+  # Counterfactual für B-Gruppe einzeichnen
+  geom_segment(
+    mapping = aes(
+      x = 1, 
+      xend = 2, 
+      y = means$mean_outcome[
+        means$Z == 0 & means$B == 1
+        ],
+      yend = counterfactual
+    ),
+    linetype = "dashed", 
+    color = "red", 
+    size = 1
+    ) +
+  # gesch. Behandlungseffekt einzeichnen
+  geom_segment(
+    mapping = aes(
+      x = 2, 
+      xend = 2, 
+      y = counterfactual,
+      yend = counterfactual + estimated_effect
+    ),
+    linetype = "dashed", 
+    color = "orange", 
+    size = 1) +
+  theme_cowplot() +
+  theme(legend.position = "top")
+```
+
+
+## Case Study: Effekt von Steuererleichterungen auf Erwerbsbeteilligung 
+
+Der [Earned Income Tax Credit](https://www.irs.gov/credits-deductions/individuals/earned-income-tax-credit-eitc) (EITC) ist ein Steuerguthaben für US-Amerkanische Familien, die unterhalb einer gesetztlich festgelegten Einkoemmnsgrenze liegen. Der genaue Betrag des EITC hängt gestaffelt vom Einkommen ab und, ähnlich zum Kindergeld in Deutschland, steigt mit der Anzahl der zu versorgenden Kinder. Ein wichtiger Unterschied zum Kindergeld ist, dass der EITC nicht beantragt werden muss: Qualifizierten Familien wird der Betrag automatisch durch die Behörden im Jahressteuerausgleich gutgeschrieben. Somit kann Selbstselektion in die Behandlungsgruppe ausgeschlossen werden, da sich die Behandlung ausschließlich durch die im Rahmen der EITC-Ausweitung geänderten Anspruchsgrundlagen ergibt.
+
+@EissaLiebman1996 betrachten Veränderungen in der EITC-Gesetzgebung als Intervention, deren Auswirkungen mit sozio-ökonomischen Paneldaten in einem DID-Ansatz untersucht werden können. Die Studie analysiert die Auswirkungen der ersten Ausweitung des EITC im Jahr 1986 auf die Erwerbsbeteiligung und die Löhne von Müttern im erwerbsfähigen Alter. Diese Erweiterung erhöhte die gewährten Steuererleichterungen und die zur Qualifikation für das Programm zu unterschreitende Einkommensgrenze. 
+
+Ein zentraler Befund der Studie ist, dass die EITC-Ausweitung von 1986 einen statistisch signifikanten Anstieg der Arbeitsbeteiligung alleinerziehender Frauen von geschätzten 3\% bewirkt hat. @EissaLiebman1996 finden weiterhin signifikante positive Effekte auf die geleisteten Arbeitsstunden und Evidenz für Einkommensverbesserungen in dieser Gruppe. Die Studienergebnisse sind starke Evidenz, dass Maßnahmen wie der EITC effektiv dazu beitragen können, die Erwerbssituation in der Zielgruppe zu steigern und somit die wirtsschafts- und sozialpolitische Ziele derartiger Programme realisierbar sind.
+
+Im Jahr 1993 wurde das Programm erneut ausgweitet: Vor 1993 gab es lediglich eine Einkommensstufe für Familien mit Kindern. 1993 wurde eine zusätzliche Stufe für Familien mit zwei oder mehr Kindern eigeführt, die damit einen höheren maximalen Kreditbetrag erhalten konnten als Familien mit nur einem Kind. Dies führte zu einer größeren steuerlichen Entlastung armutsbedrohter Familien.
 
 @Adireksombat2010 untersucht die Effekte der zweiten EITC-Ausweitung ebenfalls mit einem DID Ansatz und findet Evidenz für einen Anstieg der Arbeitbeteiligung von etwa 5\% in der Zielgruppe alleinerziehender Frauen mit mindestens 2 Kindern.
 
-Zur Illustration der empirischen Anwendung von DID mit R untersuchen wir Effekte der EITC-Ausweitung von 1993 nachfolgend anhand eines ähnlichen Datensatzes wie in der Studie von @Adireksombat2010. Diese Daten sind im Datensatz XYZ verfügbar und erfassen jährliche sozio-ökonomische Merkmale für Familien im Zeitraum von 1991 bis 1996.
+Zur Illustration der empirischen Anwendung von DID mit R untersuchen wir Effekte der EITC-Ausweitung von 1993 nachfolgend anhand eines ähnlichen Datensatzes aus dem [CPS](https://www.census.gov/programs-surveys/cps.html) wie in der Studie von @Adireksombat2010. Diese Daten umfassen jährliche sozio-ökonomische Merkmale für US-amerikanische Frauen im Zeitraum von 1991 bis 1996 und sind in der Datei `eitc_data.csv` verfügbar.
 
+Wir lesen den Datensatz zunächst ein.
 
 ```{r}
+library(readr)
+
+# EITC-Datensatz einlesen
 eitc_data <- read_csv("datasets/eitc_data.csv")
 ```
 
-Eine Zusammenfassung des Datensatzes ist in Tabelle XYZ dargestellt.
+Eine Übersicht des Datensatzes `eitc_data` ist in @tbl-EITCdata dargestellt.
+
+```{r, echo = F}
+#| tbl-cap: "Sozi-ökomonische Variablen zu US-Familien aus dem CPS"
+#| label: tbl-EITCdata
+tibble(
+  Variable = c(
+    "state", "year", "urate", "children", 
+    "nonwhite", "finc", "earn", "age", "ed", 
+    "work", "unearn"
+    ),
+  Beschreibung = c(
+    "ID-Code Bundesstaat",
+    "Steuerjahr",
+    "Arbeitslosenquote im Bundesstaat (%)",
+    "Anz. Kinder der Frau",
+    "Dummy für nicht-weiße Frauen",
+    "Haushaltseinkommen im Steuerjahr (US-$)",
+    "Einkommen der Frau im Steuerjahr (US-$)",
+    "Alter",
+    "Ausbildungsniveau der Frau (Jahre)",
+    "Dummy für Berufstätigkeit",
+    "= Haushaltseinkommen - Einkommen der Frau (Tsd. US-$) "
+  )
+) %>%
+  gt() %>%
+  tabopts
+```
+
+Wir erweitern das `tibble`-Objekt zunächst um eine Dummy-Variable für Mütter (`anykids`), sowie spezifischere Dummies für Frauen mit einem Kind (`onechild`) oder mit zwei oder mehr Kindern (`twomorekids`). Weiterhin erzeugen wir einen Indikator für Beobachtungen *nach* der EITC-Ausweitung im Jahr 1993 (`after1993`).
 
 ```{r}
-# Kategorische Variable für Anz. Kinder hinzufügen
+# Dummies für Frauen mit Kindern
+# und Post-Interventionsprediode hinzufügen 
 eitc_data <- eitc_data %>%
   mutate(
-    nchildren = case_when(
-      children == 0 ~ "0",
-      children == 1 ~ "1",
-      children >= 2 ~ "2+"
+    onechild = if_else(children == 1, TRUE, FALSE),
+    twomorekids = if_else(children >= 2, TRUE, FALSE),
+    anykids = if_else(children > 0, TRUE, FALSE),
+    after1993 = if_else(year > 1993, TRUE, FALSE)
+  )
+```
+
+Einen Überblick über den modifizierten Datensatz erhalten wir mit `glimpse()`.
+
+```{r}
+# Modifikationen kontrollieren
+glimpse(eitc_data)
+```
+
+Die Plausibilität der Annahme paralleler Trends können wir graphisch anhand einer Gegenüberstellung der *Beschäftigungsquote* (`avg.work = mean(work)`) für Frauen mit und ohne Kindern (`anykids`) über die Zeit (`year`) einschätzen. Wir gruppieren hierzu den Datensatz entsprechend und fassen die Outcome-Variable (`work`) gruppenweise zusammen.
+
+```{r}
+# Zeitpunkt-Gruppen-Mittelwerte berechnen
+(
+  eitc_summarised <- eitc_data %>%
+  group_by(year, anykids) %>%
+  summarise(
+    avg.work = mean(work)
+  )
+)
+```
+
+```{r}
+#| fig-cap: "Trends in der Erwerbsbeteiligung US-amerikanischer Frauen im CPS-Datensatz"
+#| label: "fig-EITCtrends"
+
+# Graphischer Vergleich der Trends
+ggplot(data = eitc_summarised) +
+  geom_line(
+    mapping = aes(
+      x = year, 
+      y = avg.work, 
+      col = anykids
+    )
+  ) +
+  # Indikator für EITC-Erweiterung 1993
+  geom_vline(
+    xintercept = 1993, 
+    lty = "dashed"
+  ) +
+  scale_x_continuous("Jahr") +
+  scale_y_continuous("Beschäftigungsquote") +
+  scale_color_manual(
+    values = c("TRUE" = "red", "FALSE" = "blue")
+  ) +
+  guides(color = guide_legend(title = "Kinder?")) +
+  theme_cowplot()
+```
+
+@fig-EITCtrends zeigt, dass die Beschäftigungsquote für kinderlose Frauen deutlich oberhalb der Quote für Mütter verläuft. Die Trends vor der EITC-Ausweitung im Jahr 1993 sind sehr ähnlich, sodass eine parallele Entwicklung plausibel scheint.
+
+### Schätzungen des ATT mit linearen Modellen {#sec-didattest}
+
+Wir berechnen Zunächst den Behandlungseffekt der für Frauen mit Kindern relativ zu kinderlosen Frauen gemäß \eqref{eq:DIDMOMENTS}, wobei wir jeweils *sämtliche* Perioden vor und nach der Behandlung einbeziehen. Dies führt zu den Ergebnissen in @tbl-EITCSM, wobei
+\begin{align}
+  \textcolor{orange}{\widehat\beta_\text{DID}} = (\textcolor{red}{B} - \textcolor{red}{A}) - (\textcolor{blue}{D} - \textcolor{blue}{C})
+\end{align}
+der geschätzte Behandlungseffekt ist.
+
+|                                        | v. EITC-Ausweitung      | n. EITC-Ausweitung      | Differenz                  |
+|----------------------------------------|:-----------------------:|:-----------------------:|:--------------------------:|
+| **Kinder**                             | $\textcolor{red}{A = .446}$   | $\textcolor{red}{B = .491}$  | $\textcolor{red}{.045}$  |
+| **k. Kinder**                          | $\textcolor{blue}{C = .575}$ | $\textcolor{blue}{D = .573}$ | $\textcolor{blue}{-.002}$  |
+| $\textcolor{orange}{\widehat{\beta}_\text{DID}}$ |                           |                            | $\textcolor{orange}{.047}$ |
+
+
+: `eitc_data`: Stichprobenmittelwerte für `work` {#tbl-EITCSM}
+
+Die nachfolgenden Code-Chunks zeigen die Schritte zur Berechnung von $\widehat{\beta}_\text{DID}$ mit R.
+
+```{r}
+# A, B, C und D berechnen
+(
+  ABCD <- eitc_data %>%
+    group_by(after1993, anykids) %>%
+    summarise(avg.work = mean(work))
+)
+```
+
+
+```{r}
+# Differenzen bilden
+DminusC <- ABCD %>%
+    filter(anykids == FALSE) %>%
+    pull(avg.work) %>%
+    diff()
+
+BminusA <- ABCD %>%
+    filter(anykids == TRUE) %>%
+    pull(avg.work) %>%
+    diff()
+```
+
+```{r}
+# DID-Schätzung: Differenz der Stichprobenmittel-Differenzen
+beta_DID_means <- BminusA - DminusC
+beta_DID_means
+```
+
+Durch Iteration von `summarise()` können wir diese Rechenschritte effizienter ausführen.
+
+```{r}
+# Effizienter:
+eitc_data  %>% 
+    group_by(after1993, anykids) %>% 
+    summarise(avg.work = mean(work)) %>%
+    summarise(diff_time = diff(avg.work)) %>%
+    summarise(beta_DID_means = diff(diff_time)) %>%
+    pull(beta_DID_means)
+```
+
+Wir erhalten also eine positive Schätzung des Behandlungseffekts. Die Interpretation ist, dass die Ausweitung des EITC im Jahr 1993 zu einem Anstieg der Erwerbsbeteiligung in der Gruppe der Frauen mit Kindern von durchschittlich $`r round(beta_DID_means, 4) * 100`\%$ in den Folgeperioden geführt hat. 
+
+Für die Berechnung von Inferenzstatistiken bezüglich $\beta_\text{DID}$ schätzen wir ein lineares Interaktionsmodell gemäß \eqref{eq:DIDREG},
+
+\begin{align}
+  \begin{split}
+    \text{work}_{i,t} =&\, \beta_0 + \beta_1 \text{anykids}_{i,t} + \beta_2 \text{after1993}_t \\
+  +&\, \beta_3 (\text{anykids}_{i,t} \times \text{after1993}_t) + \epsilon_{i,t}.
+  \end{split}\label{eq:eitcmod}
+\end{align}
+
+
+```{r}
+# Equivalente Schätzung u. Inferenz 
+# mit linearem Interaktionsmodell
+DiD_reg <- lm(
+  formula = work ~ anykids * after1993, 
+  data = eitc_data
+)
+```
+
+Der geschätzte Koeffizient des Interkationsterms stimmt mit der händisch berechneten Schätzung überein.
+
+```{r}
+tidy(DiD_reg) %>% 
+  filter(term == "anykidsTRUE:after1993TRUE") %>% 
+  pull(estimate)
+```
+
+Mit `coeftest()` berechnen wir heteroskedastie-robuste Inferenzstatistiken.
+
+```{r}
+# Robuste Inferenzstatistiken
+coeftest(
+  x = DiD_reg, 
+  vcov. = vcovHC, 
+  type = "HC1"
+)
+```
+
+Der Koeffizient des Interaktionsterms ist zum 1\%-Niveau signifikant. `fixest::feols()` liefert eine identische Schätzung.
+
+```{r}
+library(fixest)
+(
+  DID_twoway <- feols(
+    fml = work ~ anykids * after1993,
+    data = eitc_data, 
+    vcov = "HC1"
+  )
+)
+```
+
+Wir erweitern Modell \eqref{eq:eitcmod} nun um Fixed Effekts für den [US-Bundesstaat](https://cps.ipums.org/cps-action/variables/statefip) sowie das Jahr,
+
+\begin{align}
+  \begin{split}
+    \text{work}_{i,t} =&\, \theta_\text{Staat} + \eta_t \\
+    +&\, \beta_1 \text{anykids}_{i,t} + \beta_2 (\text{anykids}_{i,t} \times \text{after1993}_t) + \epsilon_{i,t}.
+    \end{split}\label{eq:eitcmodfe}
+\end{align}
+
+Anhand der Dummy-Variablen für Bundesstaaten ($\theta_\text{Staat}$) und Jahre ($\eta_t$) kontrollieren wir für unbeobachtete zeitinvariante Unterschiede zwischen den Bundesstaaten sowie für allgemeine zeitliche Trends und Schocks, die alle Bundesstaaten in einem bestimmten Jahr betreffen. Dies schließt etwaige Backdoor-Pfade durch den Einfluss spezifischer Eigenschaften der Bundesstaaten (Kultur, Geografie, langfristige politische Einstellungen, etc.) und gemeinsamer zeitlicher Einflüsse.
+
+```{r}
+library(fixest)
+(
+  DID_twoway <- feols(
+    fml = work ~ anykids + I(anykids * after1993) 
+    | state + year,
+    data = eitc_data
+  )
+)
+```
+
+Die Schätzung des ATT bei Kontrolle für Zeit- und Bundesstaat-Effekte in \eqref{eq:eitcmodfe} unterscheidet sich nur geringfügig gegenüber dem Ergebnis für das Modell \eqref{eq:eitcmod}. Beachte, dass der Behandlungseffekt auch bei geclusterten Standardfehlern auf Bundesstaaten-Ebene (`| state + year`) signifikant ist.
+
+Ein weiterer Vorteil von DID-Schätzungen mit Regression ist die Möglichkeit zur Kontrolle für individuen-spezifische Kovariablen, um Backdoors aufgrund systematischer Unterschiede zwischen Kontroll- und Behandlungsgruppen zu vermeiden. 
+
+Wir erweitern Modell \eqref{eq:eitcmodfec} um sozio-ökonomische Charakteristika der Frauen: Einen Dummy für nicht-weiße Frauen (`nonwhite`), quadratische Terme in Alter (`age`) und Ausbildungsniveau (`ed`) sowie weitere Einkünfte des Haushalts (`unearn`),
+
+\begin{align}
+  \begin{split}
+    \text{work}_{i,t} =&\, \theta_\text{Staat} + \eta_t \\
+    +&\, \beta_1 \text{anykids}_{i,t} + \beta_2 (\text{anykids}_{i,t} \times \text{after1993}_t) \\
+    +&\, \beta_3 \text{unearn} + \beta_4 \text{nonwhite} \\
+    +&\, \beta_5 \text{age} + \beta_6 \text{age}^2 + \beta_7 \text{ed} + \beta_8 \text{ed}^2 \\
+    +&\, \epsilon_{i,t}.
+    \end{split}\label{eq:eitcmodfec}
+\end{align}
+
+```{r}
+# Year-FE + State-FE + Kontrollvariablen
+(
+  DID_FE_controls <- feols(
+    fml = work ~ anykids + I(anykids * after1993) 
+    
+    + unearn + nonwhite 
+    + age + I(age^2)
+    + ed + I(ed^2)
+    
+    | state + year, 
+    
+    data = eitc_data
+  )
+)
+```
+
+Die Schätzung von \eqref{eq:eitcmodfec} ergibt mit $`r DID_FE_controls$coefficients["I(anykids * after1993)"]`$ eine etwas größere Schätzung eines positiven signifikanten Effekt der EITC-Ausweitung auf die Erwerbsbeteiligung von Müttern.
+
+Wie oben erläutert, führte die EITC-Ausweitung von 1993 unter anderem ein Stufensystem für die Höhe des EITC in Ahängigkeit der Kinder-Anzahl ein, sodass unterschiedlich starke Anreize zur Aufnahme einer Beschäftigung für Mütter mit nur einem Kind und mehreren Kindern plausibel sind. Anhand der Dummy-Variablen für (genau) ein Kind (`onechild`) sowie zwei oder mehr Kinder (`twomorekids`) können wir eine differenziertere Schätzung des Effekts hinsichtlich des Betreuungsaufwands erhalten. Hierzu modifizieren wir Modell \eqref{eq:eitcmodfec} entsprechend:
+
+\begin{align}
+  \begin{split}
+    \text{work}_{i,t} =&\, \theta_\text{Staat} + \eta_t \\
+    +&\, \beta_1 \text{onechild}_{i,t} + \beta_2 (\text{onechild}_{i,t} \times \text{after1993}_t) \\
+    +&\, \beta_3 \text{twomorechild}_{i,t} + \beta_4 (\text{twomorechild}_{i,t} \times \text{after1993}_t) \\
+    +&\, \beta_5 \text{unearn} + \beta_6 \text{nonwhite} + \beta_7 \text{age} + \beta_8 \text{age}^2 + \beta_9 \text{ed} + \beta_{10} \text{ed}^2 \\
+    +&\, \epsilon_{i,t}.
+  \end{split}\label{eq:eitcmodfecd}
+\end{align}
+
+```{r}
+# Differenzierung: onechild / twomorekids
+(
+  DID_FE_spec_controls <- feols(
+    fml = work ~ 
+      onechild + I(onechild * after1993) 
+    + twomorekids + I(twomorekids * after1993) 
+    
+    + unearn + nonwhite 
+    + age + I(age^2)
+    + ed + I(ed^2)
+    
+    | state + year,
+    
+    data = eitc_data
+  )
+)
+```
+
+Die interessierenden geschätzten Koeffizienten von `I(onechild * after1993)` und `I(twomorekids * after1993)` sind $`r DID_FE_spec_controls$coefficients["I(onechild * after1993)"]`$ und $`r DID_FE_spec_controls$coefficients["I(twomorekids * after1993)"]`$. Auch hier sind die Koeffizienten signifikant von null verschieden. Der größere Koeffizient für den Effekt auf Mütter mit zwei oder mehr Kinder liefert Evidenz dafür, dass die Einführung der Zahlstufe für größere Familien im Rahmen der EITC-Ausweitung von 1993 tatsächlich einen etwas stärkeren Anreiz auf die Zielgruppe mit mehreren Kindern hatte.
+
+
+### Probit-Spezifikationen
+
+In sämtlichen Modellen in @sec-didattest haben wir $\text{work}_{i,t}$ als kontinulierliche Variable behandelt und den bedingten Erwartungswert als lineare Funktion modelliert. Da $\text{work}_{i,t}$ eine binäre Variable ist, haben wir damit implizit die bedingte *Wahrscheinlichkeit* der Erwerbsbeteiligung $P(\text{work}_{i,t} = 1\vert \boldsymbol{x}_{i,t})$ modelliert. Wie in @sec-lpm erläutert, kann ein solches lineares Wahrscheinlichkeitsmodell (LPM) einen nicht-linearen Verlauf der Wahrscheinlichkeitsfunktion $P(\text{work}_{i,t} = 1\vert \boldsymbol{x}_{i,t})$ nicht exakt abbilden, wobei tatsächliche Behandlungseffekte unter- oder überschätzt werden können. In manchen Fällen können geschätzte Wahrscheinlichkeiten sogar außerhalb des Intervalls $[0,1]$ liegen. Statt eines LPM sollte ein generalisiertes lineares Modell (GLM) verwendet werden. 
+
+Wir modellieren nachfolgend den Effekt der EITC-Anpassung auf die Wahrscheinlichkeit einer Erwerbsbeteiligung von Müttern mit [Probit-Regression](#sec-abcd). Anstatt `stats::glm()` verwenden wir `fixest::feglm()`.^[Eine weitere Option ist `alpaca::feglm()`.] Analog zu `fixest::feols()` erlaubt `fixest::feglm()` die Schätzung von Probit-Regressionen mit Fixed Effekts. Partielle Effekte können mit dem Paket `marginaleffects` berechnet werden. Wir schätzen zunächst eine Fixed-Effects-Probit-Regression analog zu \eqref{eq:eitcmodfe}, d.h.
+
+\begin{align}
+  \begin{split}
+    \Phi^{-1}\bigg[P(\text{work}_{i,t} = 1\vert \boldsymbol{x}_{i,t})\bigg] 
+    =&\, \eta_t + \theta_\text{Staat} + \beta_1 \text{anykids}_{i,t}\\ 
+    +&\, \beta_2 (\text{anykids}_{i,t} \times \text{after1993}_{i,t}).\\
+  \end{split}
+\end{align}
+
+Für die Berechnung der partiellen Effekte mit `marginaleffects::avg_slopes()` definieren wir die interargierten Regressoren direkt im Datensatz.
+
+```{r}
+# Interagierte Regressoren definieren
+eitc_data <- eitc_data %>% 
+  mutate(
+    int_anykids = anykids * after1993,
+    int_onechild = onechild * after1993,
+    int_twomore = twomorekids * after1993
+  )
+```
+
+Die Struktur von `feglm()` folgt dem selben Schema wie `feols()`. Das zusätzliche Argument `family = binomial("probit")` legt die entsprechende Link-Funktion fest.
+
+```{r}
+# Probit-Regression mit TWFE
+(
+  EITC_DID_probit <- feglm(
+    fml = work ~ anykids + int_anykids
+    | state + year, 
+    family = binomial("probit"),
+    data = eitc_data
+  )
+)
+```
+
+Die Schätzung ergibt einen positiven Effekt für `int_anykids`. Wie im linearen Modell ist der  Koeffizient von `int_anykids` signifikant. Beachte, dass dieser Koeffizient die geschätzte Änderung der *latenten Variable* des Probit-Modells misst und *nicht* direkt als Behandlungseffekt interpretiert werden darf. Stattdessen können wir mit `marginaleffects::avg_slopes()` den durchschnittlichen partiellen Effekt des Interaktionsterms für Frauen in der Behandlungsgruppe für die Jahre 1994 bis 1996  berechnen. `marginaleffects::datagrid()` setzt Variablen ohne spezifizierte Werte auf ihren Mittelwert (kontinuierlich) oder Modus (kategorisch). Der Modus von `state` ist 93 (California).
+
+```{r}
+library(marginaleffects)
+
+EITC_DID_probit %>% 
+  avg_slopes(
+    variables = "int_anykids", 
+    newdata = datagrid(
+      anykids = 1, 
+      year = 1994:1996
     )
   )
 ```
 
+Der geschätzte durchschnittliche partielle Effekt der EITC-Ausweitung für Mütter im Bundesstaat California für die Jahre 1994 bis 1996 ist eine Erhöhung der Wahrscheinlichkeit der Erwerbsbeteiligung um etwa $4.57\%$.
 
+Analog zu Modell \eqref{eq:eitcmodfecd} kontrollieren wir in einer weiteren Regression zusätzlich für sozio-ökonomische Charakteristika und differenzieren zwischen dem Effekt für Frauen mit einem Kind und Müttern mit zwei oder mehr Kindern anhand des Modells
 
-## Terrorism
+\begin{align}
+  \begin{split}
+    \Phi^{-1}\bigg[P(\text{work}_{i,t} = 1)\bigg] =&\, \theta_\text{Staat} + \eta_t \\
+    +&\, \beta_1 \text{onechild}_{i,t} + \beta_2 (\text{onechild}_{i,t} \times \text{after1993}_t) \\
+    +&\, \beta_3 \text{twomorechild}_{i,t} + \beta_4 (\text{twomorechild}_{i,t} \times \text{after1993}_t) \\
+    +&\, \beta_5 \text{unearn} + \beta_6 \text{nonwhite} + \beta_7 \text{age} + \beta_8 \text{age}^2 + \beta_9 \text{ed} + \beta_{10} \text{ed}^2 \\
+    +&\, \epsilon_{i,t}.
+  \end{split}
+\end{align}
+
 
 ```{r}
-polizeipraesenz <- read_csv("datasets/polizeipraesenz.csv")
+# Probit-FE-Regression mit Kontrollvariablen
+# und Differenzierung des Effekts
+(
+  EITC_DID_probit <- feglm(
+    fml = work ~ onechild + int_onechild
+    + twomorekids + int_twomore
+    
+    + unearn + nonwhite + age + ed 
+    + I(ed^2) + I(age^2)
+    
+    | year + state, 
+    family = binomial("probit"),
+    data = eitc_data
+  )
+)
+```
+
+Wir können nun zwei partielle Effekte berechnen: 1. für `int_onechild` und 2. für `int_twomore`. Hierzu setzten wir jeweils die übrigen Dummy-Variablen mit Bezug zur Anzahl der Kinder auf null. Weiterhin setzen wir `nonwhite = 0`, d.h. wir betrachten den Effekt für weiße Frauen im Bundesstaat California, wobei die übrigen Regressoren den Wert der jeweiligen Stichprobenmittel haben.
+
+```{r}
+# 1. Durchschn. Partieller Effekt onechild
+EITC_DID_probit %>% 
+  avg_slopes(
+    variable = "int_onechild",
+    datagrid(
+      onechild = 1, 
+      twomorekids = 0, 
+      int_twomore = 0,
+      year = 1994:1996,
+      nonwhite = 0
+    )
+  )
 ```
 
 ```{r}
-# Table 2
+# 1. Durchschn. Partieller Effekt twomore
+EITC_DID_probit %>% 
+  avg_slopes(
+    variable = "int_twomore",
+    datagrid(
+      int_onechild = 0, 
+      onechild = 0, 
+      twomorekids = 1, 
+      year = 1994:1996,
+      nonwhite = 0
+    )
+  )
+```
+
+Ähnlich wie in Modell \eqref{eq:eitcmodfecd} erhalten wir signifikante positive Schätzungen. Der durchschnittliche Effekt für `int_twomore` ist mit einer Erhöhung der Wahrscheinlichkeit zur Aufnahme einer Beschäftigung von etwa $6.16\%$ etwas höher als die $4.11\%$ für `int_onechild`.
+
+## Case Study: Effekt von Polizeipräsenz auf Autodiebstähle
+
+Nach einem Terroranschlag auf das größte jüdische Gemeindezentrum in Buenos Aires am 18. Juli 1994 wurden sämtliche jüdische und muslimische Einrichtungen in der Stadt rund um die Uhr von der argentinischen Polizei geschützt. Somit führte dieses Ereignis zu einer geografischen quasi-experimentellen Allokation von Polizeikräften in Gegenden mit entsprechenden Einrichtungen. In einem Forschungsdesign, dass die lokale Straßenkriminalität Kriminalität erklären soll, kann die sich aus der Allokation ergebende Variation in der Polizeipräsenz als exogen angenommen werden. @DiTellaSchargrodsky2004 nutzen diesen Umstand, um anhand von Polizeistatistiken und Daten zu Autodiebstählen in Buenos Aires vor und nach dem Terroranschlag den Effekt erhöhter Polizeipräsenz auf die Kriminalität in einem Difference-in-Differences-Ansatz zu untersuchen. Die Studienergebnisse deuten darauf hin, dass es einen starken abschreckenden Effekt von Polizeistreifen gibt, der sich nur in einem engen Umkreis um den Häuserblock in dem die Polizei stationiert ist, auswirkt.
+
+In diesem Kapitel reproduzieren wir Kernergebnisse der Studie mit R. Die benötigten Daten sind auf der [Webseite der American Economic Association](https://www.aeaweb.org/articles?id=10.1257/000282804322970733) verfügbar. Die Daten stammen aus drei nicht zusammenhängenden Stadtvierteln von Buenos Aires die etwa 3.2\% der Stadtfläche ausmachen und 6.9\% der Bevölkerung beherbergen, wobei sich jedem Viertel eine Polizeistation befindet. Bei den untersuchten Stadtvierteln handelt es sich um die Viertel mit der größten Anzahl jüdischer Einrichtungen in der Stadt. Der Großteil der Häuserblocks in diesen Vierteln (insgesamt 876 Blöcke) liegen nicht in der Nähe einer geschützten Einrichtung. Blocks die mehr als zwei Blocks von einer geschützten Einrichtung entfernt liegen, bilden die Kontrollgruppe. 
+
+Wir verwenden nachfolgend den modifizierten Datensatz `polizeipraesenz.RDS`. 
+
+```{r}
+# Datensatz einlesen
+polizeipraesenz <- readRDS("datasets/polizeipraesenz.RDS")
+```
+
+| Variable   | Beschreibung                                 |
+|:----------:|:--------------------------------------------:|
+| institut   | Jüdische Einrichtung im Block                |
+| distanz    | Entf. zu Block mit Einrichtung (in Blocks)   |
+| monat      | Monat der Beobachtung                        |
+| observ     | ID-Variable für Block                        |
+| totrob     | Diebstähle pro Monat (normalisiert)          |
+
+: `polizeipraesenz`: Autodiebstähle in Buenos Aires {#tbl-polpr}
+
+Zur Einschätzung der Annahme paralleler Trends berechnen wir zunächst die Durschnittliche Anzahl an Autodiebstählen Blöcke mit bzw. ohne jüdische Institutionen für die Monate April bis Dezember. Beachte, dass die Variable `monat` zwei Ausprägungen für den Monat des Anschlags aufweist: `Juli (1 - 17)` für die Juli-Tage vor dem Anschlag und für die verbleibenden Tage `Juli (18 - 31)`.
+
+```{r}
+# Trends berechnen
+(
+  polizeipraesenz_Trends <- polizeipraesenz %>%
+    mutate(institut = as.factor(institut)) %>%
+    group_by(monat, institut) %>%
+    summarise(
+      `Durchschn. Diebstähle` = mean(totrob)
+    )
+)
+```
+
+Die in `polizeipraesenz_Trends` erfasste Trendentwicklung für Blöcke in der Behandlungsgruppe (`institut == 1`) und in der Kontrollgruppe (`institut == 0`) plotten wir mit `ggplot2()`.
+
+```{r}
+#| label: fig-totrobtrends
+#| fig-cap: "Geschätzte Trends für Autodiebstähle in Buenos Aires im Jahr 1994"
+# Trends plotten
+polizeipraesenz_Trends %>%
+  ggplot(
+    mapping = aes(
+      x = monat, 
+      y = `Durchschn. Diebstähle`, 
+      color = institut, 
+      group = institut
+    )
+  ) +
+  geom_line() +
+  geom_vline(
+    xintercept = "Juli (18 - 31)", 
+    lty = "dashed") +
+  geom_point() +
+  labs(
+    x = "Monat",
+    y = "Durchschn. Anz. Diebstähle / Monat"
+  ) +
+  theme_cowplot() +
+  theme(
+    axis.text.x = element_text(
+      angle = 45, 
+      hjust = 1
+    ), 
+    legend.position = "top"
+  )
+```
+
+@fig-totrobtrends zeigt einen ähnlichen Verlauf der Trends für den Zeitraum unmittelbar vor dem Anschalg am 18. Juli.
+
+```{r}
 dat_listcol <- polizeipraesenz %>% 
   group_by(observ, monat) %>%
   mutate(totrob = sum(totrob)) %>%
@@ -282,51 +992,78 @@ dat_listcol <- polizeipraesenz %>%
     d2 = list(totrob[distanz == 2]),
     d1 = list(totrob[distanz == 1]),
     same = list(totrob[institut == 1])
-    ) 
+  )
+```
+
+
+```{r}
+#| label: tab-deskstatdistanz
+#| tbl-cap: "Deskriptive Statistiken für "
+# Mittelwerte und Standardabweichungen
+mean_sd <- dat_listcol %>%
+  group_by(monat) %>%
+  summarise(
+    across(
+      d2more:same,
+      .fns = list(
+        mean = ~ mean(unlist(.)), 
+        sd = ~ sd(unlist(.))
+        )
+    ),
+  )
+```
+
+```{r}
+the_diffs <- dat_listcol %>%
+  
+  group_by(monat) %>%
+  summarise(
+    diff1 = list(
+      t.test(x = unlist(same), y = unlist(d2more))
+    ),
+    diff2 = list(
+      t.test(x = unlist(d1), y = unlist(same))
+    ),
+    diff3 = list(
+      t.test(x = unlist(d2), y = unlist(d2more))
+    ), 
+    .groups = "keep"
+  ) %>%
+  
+  transmute(
+    across(
+      diff1:diff3, 
+      .fns = list(
+        m = ~ map_dbl(., \(x) diff(x$estimate)), 
+        sd = ~ map_dbl(., \(x) x$stderr)
+      )
+    )
+  )
+
+form <- the_diffs %>%
+  transmute(
+    across(
+      contains("_m"), ~ 
+        sprintf("%.4f (%.4f)", ., get(sub(".m$", "_sd", cur_column()))), 
+      .names = "{.col}"
+    )
+  )
+
+form %>% 
+  gt::gt() %>% 
+  tabopts()
 ```
 
 
 
-
-# means and SDs
-dat_listcol %>%
-  group_by(monat) %>%
-  summarise(
-    across(d2more:same,
-           list(mean = ~ mean(unlist(.)), sd = ~ sd(unlist(.)))
-    ),
-  )
-
-the_diffs <- dat_listcol %>%
-  group_by(monat) %>%
-  summarise(
-    diff1 = list( t.test(x = unlist(same), y = unlist(d2more)) ),
-    diff2 = list( t.test(x = unlist(d1), y = unlist(same)) ),
-    diff3 = list( t.test(x = unlist(d2), y = unlist(d2more)) ), 
-    .groups = "keep"
-  ) %>%
-  transmute(
-    across(diff1:diff3, 
-           list(
-             m = ~ map_dbl(., \(x) diff(x$estimate)), 
-             sd = ~ map_dbl(., \(x) x$stderr)
-           )
-    )
-  )
   
 
-form <- the_diffs %>%
-  transmute(across(contains("_m"), ~sprintf("%.4f (%.4f)", ., get(sub(".m$", "_sd", cur_column()))), .names = "{.col}_formatted"))
-
-form %>% gt::gt()
-
+```{r}
 # Table 3
-library(AER)
+library(fixest)
+library(modelsummary)
 
-
-
-# (A)
-dat_DID <- dat %>%
+dat_DID <- polizeipraesenz %>%
   mutate(
     treated = institut == 1,
     group = monat > "Juli (1 - 17)",
@@ -335,52 +1072,68 @@ dat_DID <- dat %>%
   ) %>% 
   filter(monat != "Juli (18 - 31)")
 
-# fixest
-feols(fml = totrob ~ I(treated * group) | observ + monat, data = dat_DID, vcov = "HC1")
-
-# plm
-pdata <- pdata.frame(dat_DID, index = c("observ", "monat"))
-
-model <- plm(formula = totrob ~ I(treated * group) , data = pdata, model = "within", effect = "twoway")
-summary(model, vcov = vcovHC(model, method = "white1"))
-
+# (A)
+feols(
+  fml = totrob ~ 
+    I(treated * group) 
+    | observ + monat, 
+  data = dat_DID, 
+  vcov = "HC1"
+)
 
 # (B)
-# fixest
-feols(fml = totrob ~ I(treated * group) + I(oneblock * group) | observ + monat, data = dat_DID, vcov = "HC1")
-
-# plm
-model <- plm(formula = totrob ~ (treated + oneblock) * group, data = pdata, model = "within", effect = "twoway")
-summary(model, vcov = vcovHC(model, method = "white1"))
+feols(
+  fml = totrob ~ 
+    I(treated * group) + 
+    I(oneblock * group) 
+    | observ + monat, 
+  data = dat_DID, 
+  vcov = "HC1"
+)
 
 # (C)
-# fixest
-feols(fml = totrob ~ I(treated * group) + I(oneblock * group) + I(twoblocks * group) | observ + monat, data = dat_DID, vcov = "HC1")
-
-model <- plm(formula = totrob ~ (treated + oneblock + twoblocks) * group, data = pdata, model = "within", effect = "twoway")
-summary(model, vcov = vcovHC(model, method = "white1"))
+feols(
+  fml = totrob ~ 
+    I(treated * group) + 
+    I(oneblock * group) + 
+    I(twoblocks * group) 
+    | observ + monat, 
+  data = dat_DID, 
+  vcov = "HC1"
+)
 
 # (D)
-pdata <- pdata.frame(dat_DID %>% filter(monat >= "August"), index = c("observ", "monat"))
-model <- plm(formula = totrob ~ (treated + oneblock + twoblocks) * group, data = pdata, model = "within", effect = "time")
-summary(model, vcov = vcovHC(model, method = "white1"))
+feols(
+  fml = totrob ~ 
+    I(treated * group) + 
+    I(oneblock * group) + 
+    I(twoblocks * group) 
+    | monat,
+  data = dat_DID %>% 
+    filter(monat >= "August"),
+  vcov = "HC1"
+)
 
 # (E)
 # (doesnt match for some reason)
-# fixest
-feols(fml = totrob ~ I(treated * group) + I(oneblock * group) + I(twoblocks * group), 
-      data = dat_DID %>% filter(distanz <= 2), 
-      vcov = "HC1")
+feols(
+  fml = totrob ~ 
+    I(treated * group) + 
+    I(oneblock * group) + 
+    I(twoblocks * group), 
+  data = dat_DID %>% 
+    filter(distanz <= 2), 
+  vcov = "HC1"
+)
+```
 
-pdata <- pdata.frame(dat_DID %>% filter(distanz <= 2), index = c("observ", "monat"))
-model <- plm(formula = totrob ~ (treated + oneblock + twoblocks) : group, data = pdata, model = "within", effect = "individual")
-summary(model, vcov = vcovHC(model, method = "white1"))
 
 
+```{r}
 #### Table 4 ####
 
 # (A)
-dat_DID <- dat %>%
+dat_DID <- polizeipraesenz %>%
   mutate(
     treated = institut == 1,
     group = dplyr::between(mes, 5, 7),
@@ -389,7 +1142,6 @@ dat_DID <- dat %>%
   ) %>% 
   filter(mes <= 7)
 
-# fixest
 mod4_A <- feols(
   fml = totrob ~ 
     I(treated * group) 
@@ -406,7 +1158,6 @@ dat_DID <- dat_DID %>%
     group = dplyr::between(mes, 6, 7)
   ) 
 
-# fixest
 mod4_B <- feols(
   fml = totrob ~ 
     I(treated * group) 
@@ -423,7 +1174,6 @@ dat_DID <- dat_DID %>%
     group = mes == 7,
   )
 
-# fixest
 mod4_C <- feols(
   fml = totrob ~ 
     I(treated * group) 
@@ -435,6 +1185,7 @@ mod4_C <- feols(
 )
 
 
+# Tabellarische Zusamenfassung
 modelsummary(
   models = list(
     A = mod4_A,
@@ -442,9 +1193,12 @@ modelsummary(
     C = mod4_C
   ), 
   stars = T,
-  gof_omit   = "^(?!(R2|Num.Obs.)$).*"
-)
+  gof_omit = "^(?!(R2|Num.Obs.)$).*", 
+  output = "gt"
+) 
+```
 
+```{r}
 #### Table 5 ####
 
 dat_DID_T5 <- dat_DID %>%
@@ -476,7 +1230,6 @@ feols(fml = totrob ~
 )
 
 # (C)
-# fixest
 feols(fml = totrob ~ 
         I(treated * group) 
       + I(oneblock * group) 
@@ -487,7 +1240,6 @@ feols(fml = totrob ~
 )
 
 # (E)
-# fixest
 feols(fml = totrob ~ 
         I(treated * group) 
       + I(oneblock * group) 
@@ -498,7 +1250,6 @@ feols(fml = totrob ~
 )
 
 # (F)
-# fixest
 feols(fml = totrob ~ 
         I(treated * group) 
       + I(oneblock * group) 
@@ -511,6 +1262,8 @@ feols(fml = totrob ~
         ),
       vcov = "HC1"
 )
+```
+
 
 ## Zusammenfassung
 

@@ -1,0 +1,177 @@
+# Regression
+
+```{r}
+library(tidyverse)
+library(cowplot)
+```
+
+
+## Binäre Abhängige Variable
+
+### Das Lineare Wahrscheinlichkeitsmodell {#sec-lpm}
+
+Das lineare Regressionsmodell
+
+$$Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \dots + \beta_k X_{ki} + u_i$$
+
+mit einer binären abhängigen Variablen $Y_i\in\{0,1\}$ wird als *lineares Wahrscheinlichkeitsmodell* bezeichnet. Wie üblich modllieren wie den Erwartungswert der abhängigen Variable gegeben der Regressoren $X_1,\dots,X_k$ als lineare Funktion, d.h.
+
+$$E(Y\vert X_1,X_2,\dots,X_k) = P(Y=1\vert X_1, X_2,\dots, X_3).$$ Da $Y$ eine binäre Variable ist, gilt hier
+
+$$ P(Y = 1 \vert X_1, X_2, \dots, X_k) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_k X_k.$$
+
+Das lineare Wahrscheinlichkeitsmodell beschreibt also die *Wahrscheinlichkeit*, dass $Y=1$ als lineare Funktion der Regressoren: $\beta_j$ misst die Änderung in der Wahrscheinlichkeit das $Y_i=1$, unter der Bedingung, dass die anderen $k-1$ Regressoren konstant gehalten werden. Genau wie in der gewöhnlichen multiplen Regression können die $\beta_j$ mit der KQ-Methode geschätzt werden.
+
+Aufgrund der Beschränktheit der $Y_i$ auf $\{0,1\}$ sind die $u_i$ heteroskedastisch. Folglich sollten Inferenzstatistiken mit robusten Standardfehlern berechnet werden. Weiterhin ist zu beachten, dass $R^2$ in den meisten Anwendungen von linearen Wahrscheinlichkeitsmodellen keine hilfreiche Interpretation hat, da das geschätzte Modell die Daten nicht perfekt erklären kann, wenn die abhängige Variable binär, aber die Regressoren kontinuierlich verteilt sind.
+
+Das lineare Wahrscheinlichkeitsmodell hat einen wesentlichen Nachteil: Wir nehmen an, dass die bedingte Wahrscheinlichkeitsfunktion linear ist. Daher ist $P(Y=1\vert X_1,\dots,X_k)$ nicht auf das für Wahrscheinlichkeiten definierte Intervall $[0,1]$ beschränkt, sodass das angepasste Modell für extreme Regressorwerte keine sinnvolle Interpretation haben kann.
+
+Diese Gegebenheit verlangt nach einem Ansatz, der eine nichtlineare Funktion verwendet, um die bedingte Wahrscheinlichkeitsfunktion einer binären abhängigen Variable zu modellieren. Häufig verwendete Methoden sind Probit- und Logit-Regression.
+
+## Probit-Regression
+
+Bei der Probit-Regression wird die Standardnormalverteilungsfunktion $\Phi(\cdot)$ verwendet, um die Regressionsfunktion bei einer binären abhängigen Variable zu modellieren. Wir nehmen an, dass
+\begin{align}
+  E(Y\vert X) = P(Y=1\vert X) = \Phi(\beta_0 + \beta_1 X). \label{eq:probitmodel}
+\end{align}
+
+$\beta_0 + \beta_1 X$ in \eqref{eq:probitmodel} ist hier ein *Quantil* $z$ der Standardnormalverteilung,
+\begin{align}
+\Phi(z) = P(Z \leq z) \ , \ Z \sim \mathcal{N}(0,1),
+\end{align}
+sodass der Koeffizient $\beta_1$ in \eqref{eq:probitmodel} die Änderung in $z$ misst, die mit einer Änderung von einer Einheit in $X$ verbunden ist. Obwohl der Effekt einer Änderung in $X$ auf $z$ linear ist, ist der Zusammenhang zwischen $z$ und der abhängigen Variable $Y$ *nicht linear*: $\Phi$ ist eine nicht-lineare Funktion von $X$ (vgl. @fig-snvf)!
+
+```{r}
+#| label: fig-snvf
+#| fig-cap: "Verteilungsfunction einer N(0,1)-Zufallsvariable"
+# N(0,1)-Verteilungsfunktion
+ggplot() +
+  geom_function(fun = pnorm) +
+  scale_x_continuous(
+    name = "z", 
+    limits = c(-4, 4)
+  ) +
+  scale_y_continuous(name = "P(Z<z)") +
+  theme_cowplot()
+```
+
+Da die abhängige Variable eine nichtlineare Funktion der Regressoren ist, hat der Koeffizient von $X$ keine einfache Interpretation. Die Änderung in der Wahrscheinlichkeit, dass $Y=1$ ist, durch eine Änderung in $X$ (partieller Effekt) kann berechnet werden als:
+
+\begin{align}
+  \frac{\partial\textup{E}(Y\vert X)}{\partial X} = \frac{\partial\textup{P}(Y=1\vert X)}{\partial X} = \frac{\partial\Phi(\beta_0 + \beta_1 X)}{\partial X} = \phi(\beta_0 + \beta_1 X) \beta_1,
+\end{align}
+wobei $\phi(\cdot)$ die Dichtefunktion der Standardnormalverteilung ist. In empirischen Anwendungen wird der partielle Effekt häufig als Differenz in geschätzten Wahrscheinlichkeiten angegeben:
+
+1. Berechne die geschätzte Wahrscheinlichkeit, dass $Y=1$ für einen Bezugswert $X$.
+2. Berechne die geschätzte Wahrscheinlichkeit, dass $Y=1$ für $X + \Delta X$.
+3. Berechne die Differenz zwischen der geschätzten Wahrscheinlichkeiten.
+
+Wie im linearen Wahrscheinlichkeitsmodell kann das Modell \eqref{eq:probitmodel} auf eine Probit-Regression mit mehreren Regressoren $X_j$, $j=1,\dots,k$ verallgemeinert werden, um das Risiko einer Verzerrung durch ausgelassene Variablen zu mindern. Die Schritte 1 bis 3 für die Berechnung des partiellen Effekts einer Änderung in $X_j$ erfolgen dann unter der Annahme, dass die übrigen $k-1$ Regressoren konstant gehalten werden, wobei der partielle Effekt von den jeweiligen Regressorwerten abhängt. 
+
+## Logistische Regression
+
+
+## Vergleich der Methoden
+
+```{r}
+# Daten simulieren
+set.seed(1234)
+
+n <- 30000 # Stichprobengröße
+
+simdata <- tibble(
+  X = rnorm(n = n, mean = 5, sd = 2), # Regressor
+  P = pnorm(0.75 * X - 4 + rnorm(n)), # + Rauschen
+)
+
+# Binäre Outcome-Variable hinzufügen
+simdata <- simdata %>%
+  mutate(Y = as.integer(runif(n) < P))
+```
+
+```{r}
+# lineares Wahrscheinlichkeitsmodell schätzen
+mod_lp <- lm(formula = Y ~ X, data = simdata)
+```
+
+```{r}
+# geschätzte Wahrscheinlichkeitsfunktion
+# für lineares Modell
+X <- seq(0, 11, 0.01)
+
+pred <- tibble(
+  X = X, 
+  LP = predict(
+    object = mod_lp, 
+    newdata = tibble(X)
+  )
+)
+```
+
+```{r}
+# geschätztes lineares Modell plotten
+simdata %>%
+  ggplot(mapping = aes(x = X, y = Y)) +
+  geom_point(
+    position = position_jitter(
+      height = .01,
+      seed = 1234
+    )
+  ) +
+  geom_line(
+    data = pred, 
+    mapping = aes(y = LP)
+  ) +
+  theme_cowplot()
+```
+
+```{r}
+# Probit-Modell schätzen
+mod_probit <- glm(
+  formula = Y ~ X,
+  data = simdata, 
+  family = binomial(link = "probit")
+)
+```
+
+```{r}
+# Logit-Modell schätzen
+mod_logit <- glm(
+  formula = Y ~ X,
+  data = simdata, 
+  family = binomial(link = "logit")
+)
+```
+
+```{r}
+# gesch. WSK-Funktion für Probit- und Logit-Modelle
+pred <- pred %>%
+  mutate(
+    Probit = predict(mod_probit, tibble(X), type = "response"),
+    Logit = predict(mod_logit, tibble(X), type = "response")
+  ) %>%
+  pivot_longer(
+  cols = LP:Logit, 
+  names_to = "Methode", 
+  values_to = "Wsk"
+)
+```
+
+```{r}
+# Vergleich mit linearem Modell
+simdata %>%
+  ggplot(mapping = aes(x = X, y = Y) ) +
+  geom_point(
+    position = position_jitter(
+      height = .01, 
+      seed = 1234
+    )
+  ) +
+  geom_line(
+    data = pred, 
+    mapping = aes(y = Wsk, color = Methode)
+  ) +
+  scale_y_continuous(breaks = c(0, 1)) +
+  theme_cowplot()
+```
+
