@@ -788,7 +788,7 @@ Wie oben erläutert, führte die EITC-Ausweitung von 1993 unter anderem ein Stuf
 Die interessierenden geschätzten Koeffizienten von `I(onechild * after1993)` und `I(twomorekids * after1993)` sind $`r DID_FE_spec_controls$coefficients["I(onechild * after1993)"]`$ und $`r DID_FE_spec_controls$coefficients["I(twomorekids * after1993)"]`$. Auch hier sind die Koeffizienten signifikant von null verschieden. Der größere Koeffizient für den Effekt auf Mütter mit zwei oder mehr Kinder liefert Evidenz dafür, dass die Einführung der Zahlstufe für größere Familien im Rahmen der EITC-Ausweitung von 1993 tatsächlich einen etwas stärkeren Anreiz auf die Zielgruppe mit mehreren Kindern hatte.
 
 
-### Probit-Spezifikationen
+### Probit-Spezifikationen {#sec-eitc-probit}
 
 In sämtlichen Modellen in @sec-didattest haben wir $\text{work}_{i,t}$ als kontinulierliche Variable behandelt und den bedingten Erwartungswert als lineare Funktion modelliert. Da $\text{work}_{i,t}$ eine binäre Variable ist, haben wir damit implizit die bedingte *Wahrscheinlichkeit* der Erwerbsbeteiligung $P(\text{work}_{i,t} = 1\vert \boldsymbol{x}_{i,t})$ modelliert. Wie in @sec-lpm erläutert, kann ein solches lineares Wahrscheinlichkeitsmodell (LPM) einen nicht-linearen Verlauf der Wahrscheinlichkeitsfunktion $P(\text{work}_{i,t} = 1\vert \boldsymbol{x}_{i,t})$ nicht exakt abbilden, wobei tatsächliche Behandlungseffekte unter- oder überschätzt werden können. In manchen Fällen können geschätzte Wahrscheinlichkeiten sogar außerhalb des Intervalls $[0,1]$ liegen. Statt eines LPM sollte ein generalisiertes lineares Modell (GLM) verwendet werden. 
 
@@ -912,9 +912,9 @@ EITC_DID_probit %>%
 
 ## Case Study: Effekt von Polizeipräsenz auf Autodiebstähle
 
-Nach einem Terroranschlag auf das größte jüdische Gemeindezentrum in Buenos Aires am 18. Juli 1994 wurden sämtliche jüdische und muslimische Einrichtungen in der Stadt rund um die Uhr von der argentinischen Polizei geschützt. Somit führte dieses Ereignis zu einer geografischen quasi-experimentellen Allokation von Polizeikräften in Gegenden mit entsprechenden Einrichtungen. In einem Forschungsdesign, dass die lokale Straßenkriminalität Kriminalität erklären soll, kann die sich aus der Allokation ergebende Variation in der Polizeipräsenz als exogen angenommen werden. @DiTellaSchargrodsky2004 nutzen diesen Umstand, um anhand von Polizeistatistiken und Daten zu Autodiebstählen in Buenos Aires vor und nach dem Terroranschlag den Effekt erhöhter Polizeipräsenz auf die Kriminalität in einem Difference-in-Differences-Ansatz zu untersuchen. Die Studienergebnisse deuten darauf hin, dass es einen starken abschreckenden Effekt von Polizeistreifen gibt, der sich nur in einem engen Umkreis um den Häuserblock in dem die Polizei stationiert ist, auswirkt.
+Nach einem Terroranschlag auf das größte jüdische Gemeindezentrum in Buenos Aires am 18. Juli 1994 wurden sämtliche jüdische und muslimische Einrichtungen in der Stadt rund um die Uhr von der argentinischen Polizei geschützt. Somit führte dieses Ereignis zu einer geografischen quasi-experimentellen Allokation von Polizeikräften in Gegenden mit entsprechenden Einrichtungen. In einem Forschungsdesign, dass die lokale Straßenkriminalität Kriminalität erklären soll, kann die sich aus der Allokation ergebende Variation in der Polizeipräsenz als exogen angenommen werden. @DiTellaSchargrodsky2004 nutzen diesen Umstand, um anhand von Polizeistatistiken und Daten zu Autodiebstählen in Buenos Aires vor und nach dem Terroranschlag den Effekt erhöhter Polizeipräsenz auf die Kriminalität in einem Difference-in-Differences-Ansatz zu untersuchen. Die Studienergebnisse deuten darauf hin, dass es einen starken abschreckenden Effekt von Polizeistreifen gibt, der sich nur in einem engen Umkreis um Häuserblocks in denen die Polizeipräsenz erhöht wurde, auswirkt.
 
-In diesem Kapitel reproduzieren wir Kernergebnisse der Studie mit R. Die benötigten Daten sind auf der [Webseite der American Economic Association](https://www.aeaweb.org/articles?id=10.1257/000282804322970733) verfügbar. Die Daten stammen aus drei nicht zusammenhängenden Stadtvierteln von Buenos Aires die etwa 3.2\% der Stadtfläche ausmachen und 6.9\% der Bevölkerung beherbergen, wobei sich jedem Viertel eine Polizeistation befindet. Bei den untersuchten Stadtvierteln handelt es sich um die Viertel mit der größten Anzahl jüdischer Einrichtungen in der Stadt. Der Großteil der Häuserblocks in diesen Vierteln (insgesamt 876 Blöcke) liegen nicht in der Nähe einer geschützten Einrichtung. Blocks die mehr als zwei Blocks von einer geschützten Einrichtung entfernt liegen, bilden die Kontrollgruppe. 
+In diesem Kapitel reproduzieren wir Kernergebnisse der Studie mit R. Die benötigten Daten sind auf der [Webseite der American Economic Association](https://www.aeaweb.org/articles?id=10.1257/000282804322970733) verfügbar. Die Daten stammen aus drei nicht zusammenhängenden Stadtvierteln von Buenos Aires die etwa $3.2\%$ der Stadtfläche ausmachen und $6.9\%$ der Bevölkerung beherbergen, wobei sich jedem Viertel eine Polizeistation befindet. Bei den untersuchten Stadtvierteln handelt es sich um die Viertel mit der größten Anzahl jüdischer Einrichtungen in der Stadt. Der Großteil der Häuserblocks in diesen Vierteln (insgesamt 876 Blocks) liegen nicht in der Nähe einer geschützten Einrichtung. Blocks die mehr als zwei Blocks von einer geschützten Einrichtung entfernt liegen, bilden die Kontrollgruppe. 
 
 Wir verwenden nachfolgend den modifizierten Datensatz `polizeipraesenz.RDS`. 
 
@@ -926,6 +926,7 @@ polizeipraesenz <- readRDS("datasets/polizeipraesenz.RDS")
 | Variable   | Beschreibung                                 |
 |:----------:|:--------------------------------------------:|
 | institut   | Jüdische Einrichtung im Block                |
+| barrio    | Stadtviertel                                 |
 | distanz    | Entf. zu Block mit Einrichtung (in Blocks)   |
 | monat      | Monat der Beobachtung                        |
 | observ     | ID-Variable für Block                        |
@@ -933,7 +934,9 @@ polizeipraesenz <- readRDS("datasets/polizeipraesenz.RDS")
 
 : `polizeipraesenz`: Autodiebstähle in Buenos Aires {#tbl-polpr}
 
-Zur Einschätzung der Annahme paralleler Trends berechnen wir zunächst die Durschnittliche Anzahl an Autodiebstählen Blöcke mit bzw. ohne jüdische Institutionen für die Monate April bis Dezember. Beachte, dass die Variable `monat` zwei Ausprägungen für den Monat des Anschlags aufweist: `Juli (1 - 17)` für die Juli-Tage vor dem Anschlag und für die verbleibenden Tage `Juli (18 - 31)`.
+### Trend-Vergleich
+
+Zur Einschätzung der Annahme paralleler Trends berechnen wir zunächst die Durschnittliche Anzahl an Autodiebstählen Blocks mit bzw. ohne jüdische Institutionen für die Monate April bis Dezember. Beachte, dass die Variable `monat` zwei Ausprägungen für den Monat des Anschlags aufweist: `Juli (1 - 17)` für die Juli-Tage vor dem Anschlag und für die verbleibenden Tage `Juli (18 - 31)`.
 
 ```{r}
 # Trends berechnen
@@ -947,7 +950,7 @@ Zur Einschätzung der Annahme paralleler Trends berechnen wir zunächst die Durs
 )
 ```
 
-Die in `polizeipraesenz_Trends` erfasste Trendentwicklung für Blöcke in der Behandlungsgruppe (`institut == 1`) und in der Kontrollgruppe (`institut == 0`) plotten wir mit `ggplot2()`.
+Die in `polizeipraesenz_Trends` erfasste Trendentwicklung für Blocks in der Behandlungsgruppe (`institut == 1`) und in der Kontrollgruppe (`institut == 0`) plotten wir mit `ggplot2()`.
 
 ```{r}
 #| label: fig-totrobtrends
@@ -983,22 +986,34 @@ polizeipraesenz_Trends %>%
 
 @fig-totrobtrends zeigt einen ähnlichen Verlauf der Trends für den Zeitraum unmittelbar vor dem Anschalg am 18. Juli.
 
+Tabelle 2 in @DiTellaSchargrodsky2004 präsentiert t-Tests für Unterschiede in der Mittleren Anzahl der Diebstähle pro Monat zwischen Blocks mit jüdischen Einrichtungen und verschiedenen distanz-basierten Untergruppen von Blocks ohne eine jüdische Einrichtungen für jede Periode. Zur Reproduktion dieser Ergebnisse erstellen zunächst eine Listen-Spalten für die beobachteten Diebstähle in Abhängigkeit der Distanz zum nächsten Block mit einer jüdischen Einrichtung.
+
+- `d2more` Zwei oder mehr Blocks entfernt
+- `d2`: Zwei Blocks entfernt
+- `d1`: Ein Block entfernt
+- `same`: Jüdische Einrichtung im selben Block
+
 ```{r}
-dat_listcol <- polizeipraesenz %>% 
-  group_by(observ, monat) %>%
-  mutate(totrob = sum(totrob)) %>%
-  transmute(
-    d2more = list(totrob[distanz > 2]),
-    d2 = list(totrob[distanz == 2]),
-    d1 = list(totrob[distanz == 1]),
-    same = list(totrob[institut == 1])
-  )
+(
+  dat_listcol <- polizeipraesenz %>% 
+    group_by(observ, monat) %>%
+    transmute(
+      d2more = list(totrob[distanz > 2]),
+      d2 = list(totrob[distanz == 2]),
+      d1 = list(totrob[distanz == 1]),
+      same = list(totrob[institut == 1])
+    )
+)
 ```
 
+Mit `summarise()` können wir Stichprobenmittel und Standardabweichungen der Diebstähle in Blocks dieser Kategorien für alle Perioden berechnen. Anschließend kombinieren wir die Ergebnisse jeweils mit `sprintf()` und formatieren das Ergebnis mit `modelsummary::modelsummary_df()`.^[`"%.4f\n(%.4f)"` gibt das Format des resultierenden `character` an: Mittelwerte und SDs (in Klammern), gerundet auf vier Nachkommastellen. `\n` bewirkt einen Zeilenumbruch.] @tbl-deskstatdistanz Zeit die Spalten A bis D aus Tabelle 2 in @DiTellaSchargrodsky2004.
 
 ```{r}
-#| label: tab-deskstatdistanz
-#| tbl-cap: "Deskriptive Statistiken für "
+#| label: tbl-deskstatdistanz
+#| tbl-cap: "Deskriptive Statistiken für Diebstähle nach Entfernung zur nächsten jüdischen Einrichtung"
+
+library(modelsummary)
+
 # Mittelwerte und Standardabweichungen
 mean_sd <- dat_listcol %>%
   group_by(monat) %>%
@@ -1008,262 +1023,538 @@ mean_sd <- dat_listcol %>%
       .fns = list(
         mean = ~ mean(unlist(.)), 
         sd = ~ sd(unlist(.))
-        )
+      )
     ),
+    .groups = "keep"
   )
+
+# Desk. Statistiken kombinieren
+formatted_mean_sd <- mean_sd %>%
+  transmute(
+    monat,
+    "D>2 (A)" = sprintf("%.4f\n(%.4f)", d2more_mean, d2more_sd),
+    "same (B)" = sprintf("%.4f\n(%.4f)", same_mean, same_sd),
+    "D1 (C)" = sprintf("%.4f\n(%.4f)", d1_mean, d1_sd),
+    "D2 (D)" = sprintf("%.4f\n(%.4f)", d2_mean, d2_sd)
+  )
+
+# Tabelle mit modelsummary_df() ausgeben
+modelsummary::datasummary_df(formatted_mean_sd)
 ```
 
+Der nächste Chunk reproduziert die Spalten E bis F von Tabelle 2 in @DiTellaSchargrodsky2004. Die Einträge sind Mittelwertdifferenzen (Standardfehler in Klammern) zwischen den betrachteten Gruppen von Blocks sowie Ergebnisse für t-Tests (Signifikanz-Sternchen) der Hypothese, dass die jeweilige mittlere Anzahl an Autodiebstählen nicht verschieden ist.
+
+Wir definieren zunächst eine Funktion `format_ttest()`, die die gewünschen Statistiken aus einem mit `t.test()` berechneten Objekte ausliest und entsprechend formatiert. Anschließend nutzen wir diese Funktion, um die Daten in `dat_listcol` entsprechend der Definition in @DiTellaSchargrodsky2004 für jeden Monat zusammenzufassen. Die Ergebnisse formatieren wir wieder mit `datasummary_df()`.
+
 ```{r}
-the_diffs <- dat_listcol %>%
+#| label: tbl-ttestsdist
+#| tbl-cap: "Mittelwertdifferenzen in Autodiebstählen und t-Tests"
+
+# Funktion: Ergebnisse von t.test() 
+# mit Signifikanzsternchen
+format_ttest <- function(ttest_result) {
+  estimate <- diff(ttest_result$estimate)
+  stderr <- ttest_result$stderr
+  p_value <- ttest_result$p.value
   
+  stars <- if (p_value < 0.001) {
+    "***"
+  } else if (p_value < 0.01) {
+    "**"
+  } else if (p_value < 0.05) {
+    "*"
+  } else {
+    ""
+  }
+  
+  sprintf("%.4f (%.4f)%s", estimate, stderr, stars)
+}
+
+# Berechnung der t-Tests, Formatierung der Ergebnisse
+results <- dat_listcol %>%
   group_by(monat) %>%
   summarise(
-    diff1 = list(
-      t.test(x = unlist(same), y = unlist(d2more))
-    ),
-    diff2 = list(
-      t.test(x = unlist(d1), y = unlist(same))
-    ),
-    diff3 = list(
-      t.test(x = unlist(d2), y = unlist(d2more))
-    ), 
-    .groups = "keep"
-  ) %>%
-  
-  transmute(
-    across(
-      diff1:diff3, 
-      .fns = list(
-        m = ~ map_dbl(., \(x) diff(x$estimate)), 
-        sd = ~ map_dbl(., \(x) x$stderr)
-      )
-    )
+    "(E) Diff: B - A" = format_ttest(t.test(unlist(d2more), unlist(same))),
+    "(F) Diff: C - A" = format_ttest(t.test(unlist(d2more), unlist(d1))),
+    "(G) Diff: D - A" = format_ttest(t.test(unlist(d2more), unlist(d2)))
   )
 
-form <- the_diffs %>%
-  transmute(
-    across(
-      contains("_m"), ~ 
-        sprintf("%.4f (%.4f)", ., get(sub(".m$", "_sd", cur_column()))), 
-      .names = "{.col}"
-    )
-  )
-
-form %>% 
-  gt::gt() %>% 
-  tabopts()
+# Formatierung der Tabelle mit modelsummary_df()
+modelsummary::datasummary_df(results)
 ```
 
+@tbl-ttestsdist zeigt eine einschlägige Entwicklung der Differenzen über die Zeit: In den Monaten *vor* dem Anschlag (und der anschließenden Allokation von Polizeipräsenz) bestehen weder zwischen weit entfernten Blocks und solchen mit einer jüdischen Einrichtung (Spalte E) noch zwischen Blocks ohne eine Einrichtung (Spalten F und G) signifikante unterschiede in der Anzahl der Autodiebstähle. *Nach* der politischen Intervention ergibt sich ein anderes Bild: In Spalte (E) von @tbl-ttestsdist finden wir signifikante *negative* Differenzen. Dies ist Evidenz, das die Kriminalität in besonders gut bewachten Blocks (Spalte B in @tbl-deskstatdistanz) in den Folgeperioden des Anschlags geringer war als in Blocks die, mehr als zwei Blocks von einer bewachteten Einrichtung entfernt sind (Spalte A in @tbl-deskstatdistanz). Mit Ausnahme einer Signifikanten Differenz im August 1994 finden wir keine Hinweise auf derartige Unterschiede zwischen Blocks in den Kontrollgruppen (Spalten F und G).
 
+### Two-Way-Fixed-Effects-Schätzungen
 
-  
+@DiTellaSchargrodsky2004 betrachten (Sub-Modelle) der folgenden Regressionsspezifikation für die Schätzung des Effekts von Polizeipräsenz auf die Anzahl der Autodiebstähle.
+
+\begin{align}
+  \begin{split}
+  \text{totrob}_{i,t} =&\, \text{monat}_t + \text{block}_i \\
+  + &\, \alpha_0 \text{same}_{i,t} + \alpha_1 \text{oneblock}_{i,t} \\
+  + &\, \alpha_2 \text{twoblocks}_{i,t} + \epsilon_{i,t}
+  \end{split}\label{eq:ppbase}
+\end{align}
+
+Hierbei sind $\text{monat}_t$ und $\text{block}_i$ Fixed Effekte für den Monat sowie den Block. Die übrigen Variablen sind für Beobachtungen ab dem Anschlag am 18. Juli 1994 und in Abhäbgigkeit der Distanz zur nächsten jüdischen Einrichtnug definiert:
+
+- $\text{same}_{i,t}$: Dummy-Variable für jüdische Einrichtung im Block und Beobachtung nach dem 17. Juli 1994
+
+- $\text{oneblock}_{i,t}$: Dummy-Variable für Blocks mit einem Block Entfernung zum nächsten Block mit einer jüdischen Einrichtung und Beobachtung nach dem 17. Juli 1994
+
+- $\text{twoblocks}_{i,t}$: Dummy-Variable für Blocks mit einer Entfernung von zwei Blocks zum nächsten Block mit einer jüdischen Einrichtung und Beobachtung nach dem 17. Juli 1994
+
+Im nächsten Code-Chunk definieren wir diese Variablen und, gemäß der Vorgehensweise in @DiTellaSchargrodsky2004, entfernen Beobachtungen für den Zeitraum im Juli nach dem Anschlag (18.07.1994 bis 31.07.1994).
 
 ```{r}
-# Table 3
-library(fixest)
-library(modelsummary)
-
+# Variablen definieren und Beobachtungen subsetten
 dat_DID <- polizeipraesenz %>%
   mutate(
-    treated = institut == 1,
-    group = monat > "Juli (1 - 17)",
-    oneblock = distanz == 1,
-    twoblocks = distanz == 2
+    same = institut == 1 & monat > "Juli (1 - 17)",
+    oneblock = distanz == 1 &  monat > "Juli (1 - 17)",
+    twoblocks = distanz == 2 &  monat > "Juli (1 - 17)"
   ) %>% 
   filter(monat != "Juli (18 - 31)")
+```
 
-# (A)
-feols(
-  fml = totrob ~ 
-    I(treated * group) 
+Die Kernergebnisse der Studie werden in Tabelle 3 im Paper präsentiert. Hier werden fünf Regressionen betrachtet:
+
+- **Regression (A)**
+
+  \begin{align}
+      \begin{split}
+        \text{totrob}_{i,t} 
+          =&\, \text{monat}_t + \text{block}_i \\
+         + &\, \alpha_0 \text{same}_{i,t} \\
+         + &\, \epsilon_{i,t}
+      \end{split}\label{eq:ppbaseA}
+  \end{align}
+  
+  Modell \eqref{eq:ppbaseA} betrachtet lediglich die geographisch "engste" Definition des Behandlungseffekts: $\alpha_0$ ist der ATT für Blocks mit einer jüdischen Einrichtung. Die Kontrollgruppe besteht aus *sämtlichen* Blocks ohne jüdische Einrichtung. 
+
+- **Regression (B)**
+
+  \begin{align}
+      \begin{split}
+        \text{totrob}_{i,t} 
+          =&\, \text{monat}_t + \text{block}_i \\
+         + &\, \alpha_0 \text{same}_{i,t} \\
+         + &\, \alpha_1 \text{oneblock}_{i,t} \\
+         + &\, \epsilon_{i,t}
+      \end{split}\label{eq:ppbaseB}
+  \end{align}
+  
+  Modell \eqref{eq:ppbaseB} erweitert die Behandlungsgruppe um Blocks, die genau einen Block von einem Block mit erhötem Polizeischutz entfernt sind. Die Kontrollgruppe besteht aus Blocks mit einer Entfernung von *zwei oder mehr Blocks* bis zur nächsten jüdischen Einrichtung.
+  
+- **Regression (C)**
+
+  \begin{align}
+      \begin{split}
+        \text{totrob}_{i,t} 
+          =&\, \text{monat}_t + \text{block}_i \\
+         + &\, \alpha_0 \text{same}_{i,t} \\
+         + &\, \alpha_1 \text{oneblock}_{i,t} \\
+         + &\, \alpha_1 \text{twoblocks}_{i,t} \\
+         + &\, \epsilon_{i,t}
+      \end{split}\label{eq:ppbaseC}
+  \end{align}
+
+  Modell \eqref{eq:ppbaseC} betrachtet zusätzlich den Behandlungseffekt in Blocks mit zwei Blocks entfernung zu einem Block mir erhöhter Polizeipräsenz. Die Kontrollgruppe besteht aus Blocks mit einer Entfernung von *mehr als zwei Blocks* bis zur nächsten jüdischen Einrichtung.
+
+- **Regression (D) -- Querschnitts-Variation**
+
+  Da @DiTellaSchargrodsky2004 eine große Ähnlichkeit hinsichtlich demografischer Merkmale und Autodiebstahlsraten vor der Intervention in Gebieten mit und ohne jüdische Einrichtungen beobachten, betrachten sie auch einen einfachen Querschnittsschätzer. Regression (D) nutzt die Spezifikation \eqref{eq:ppbaseC}, aber berücksichtigt nur Beobachtungen für den Zeitraum nach dem Anschlag (August bis Dezember) und nutzt lediglich Fixed Effekts für die *Monate*.
+
+- **Regression (E) -- Zeitreihen-Variation**
+
+  Regression (E) ist eine alternative Spezifikation zu \eqref{eq:ppbaseC} bei der lediglich die zeitliche Variation in der Behandlungsgruppe (Entfernung zur nächsten Einrichtung $\leq$ zwei Blocks) genutzt wird. Hierzu werden Fixed Effekts nur für die *Blocks*, jedoch nicht für die Monate berechnet.
+
+Wie implementieren nachfolgend die Regressionen (A) bis (E) mit `fixest::feols()` unter Verwendung heteroskedastie-robuster Standardfehler (`vcov = "HC1"`). Alle Regressionen nutzen den oben definierten Datensatz `dat_DID`, wobei wir für die Schätzungen in (D) und (E) mit `filter()` die entsprechenden Subsets auswählen.
+
+```{r}
+# Regression (A)
+(
+  T3A <- feols(
+    fml = totrob ~ 
+      same
     | observ + monat, 
-  data = dat_DID, 
-  vcov = "HC1"
+    data = dat_DID, 
+    vcov = "HC1"
+  )
 )
 
-# (B)
-feols(
-  fml = totrob ~ 
-    I(treated * group) + 
-    I(oneblock * group) 
+# Regression (B)
+(
+  T3B <- feols(
+    fml = totrob ~ 
+      same  
+    + oneblock 
     | observ + monat, 
-  data = dat_DID, 
-  vcov = "HC1"
+    data = dat_DID, 
+    vcov = "HC1"
+  )
 )
 
-# (C)
-feols(
-  fml = totrob ~ 
-    I(treated * group) + 
-    I(oneblock * group) + 
-    I(twoblocks * group) 
+# Regression (C)
+(
+  T3C <- feols(
+    fml = totrob ~ 
+      same
+    + oneblock 
+    + twoblocks 
     | observ + monat, 
-  data = dat_DID, 
-  vcov = "HC1"
+    data = dat_DID, 
+    vcov = "HC1"
+  )
 )
 
-# (D)
-feols(
-  fml = totrob ~ 
-    I(treated * group) + 
-    I(oneblock * group) + 
-    I(twoblocks * group) 
+# Regression (D)
+(
+  T3D <- feols(
+    fml = totrob ~ 
+      same
+    + oneblock
+    + twoblocks 
     | monat,
-  data = dat_DID %>% 
-    filter(monat >= "August"),
-  vcov = "HC1"
+    data = dat_DID %>% 
+      filter(
+        monat >= "August"
+      ),
+    vcov = "HC1"
+  )
 )
 
-# (E)
-# (doesnt match for some reason)
-feols(
-  fml = totrob ~ 
-    I(treated * group) + 
-    I(oneblock * group) + 
-    I(twoblocks * group), 
-  data = dat_DID %>% 
-    filter(distanz <= 2), 
-  vcov = "HC1"
+# Regression (E)
+(
+  T3E <- feols(
+    fml = totrob ~
+      same 
+    + oneblock 
+    + twoblocks 
+    | observ,
+    data = dat_DID %>% 
+      filter(
+        distanz <= 2
+      ), 
+    vcov = "HC1"
+  )
+)
+```
+
+Zur Reproduktion von Tabelle 3 in @DiTellaSchargrodsky2004 sammeln wir die geschätzten Modelle und erzeugen einen tabelarrische Zusammenfassung mit `modelsummary::modelsummary()`. Über das Argument `gof_omit = "^(?!(R2|Num.Obs.|FE.*)$).*"` wählen wir unter den Goodness-of-Fit-Statistiken $R^2$, die Anzahl der Beobachtungen, sowie Indikatoren für die verwendeten Fixed Effekts mit einem [Regular Expression](https://de.wikipedia.org/wiki/Regulärer_Ausdruck) aus.^[Der Ausdruck `^(?!(R2|Num.Obs.|FE.*)$).*` matcht jede Zeichenkette, außer sie ist "R2", "Num.Obs." oder beginnt mit "FE". Andere Statistiken als diese Matches werden also in der Tabelle ausgelassen.]
+
+```{r}
+#| tbl-cap: "Schätzungen des Effekts von Polizeipräsenz auf Autodiebstähle"
+#| label: tbl-ditella3
+
+# Tabellarischer Vergleich mit modelsummary()
+# (Tabelle 3 in Ditella und Schargrodsky, 2004)
+modelsummary(
+  models = list(
+    "(3A)" = T3A, 
+    "(3B)" = T3B, 
+    "(3C)" = T3C, 
+    "(3D)" = T3D, 
+    "(3E)" = T3E
+  ),
+  stars = T,
+  gof_omit = "^(?!(R2|Num.Obs.|FE.*)$).*", 
+  output = "gt"
+)
+```
+
+@tbl-ditella3 präsentiert die Ergebnisse. Der Koeffizient von `same` ist jeweils in den Regressionen (3A), (3B) und (3C) negativ und hoch-signifikant. Die Stärke des geschätzten Effekt (und der Standardfehler) unterscheidet sich kaum zwischen den Modellen. Weiterhin sind die Koeffizienten von `oneblock` und `twoblocks` jeweils nicht signifikant von null verschieden. Die Interpretation dieser Ergebnisse ist, dass es einen lokal-beschränkten Effekt der erhöhten Polizeipräsenz auf Autodiebstähle in Blocks mit Polizeischutz gab: Die Polizeipräsenz verringerte die durchschnittliche Anzahl der Diebstähle in diesen Blocks um etwa $.08$ Diebstähle pro Monat.
+
+Die Ergebnisse für die Modelle (3D) und (3E) zeigen ebenfalls signifikante negative Effekte des Polizeischutz anhand von Querschnitts- und Zeitreihenvariation und untermauern damit die Robustheit des gewählten Forschungsdesigns.
+
+Zur besseren Interpretation des geschätzten Effekt in Modell (C) vergleichen wir mit der durchschnittlichen Anzahl der Diebstähle pro Monat in der Kontrollgruppe (Blocks mit einer Entfernung von mehr als zwei Blocks zum nächsten geschützten Block) für den Zeitraum von August 1994 bis Dezember 1994:^[Wir berechnen also $\widehat{\alpha}_0 / \overline{\text{Diebstahlrate}} \cdot 100$.]
+
+```{r}
+# Vergl. Effekt mit durchschnittlicher Anz. Diebstähle 
+# in der Kontrollgruppe
+( 
+  # gesch. Effekt
+  T3C %>% 
+    coefficients() %>% 
+    .["sameTRUE"] 
+) / 
+  ( # Durchschnittt
+    polizeipraesenz %>% 
+      filter(
+        monat >= "August" & monat <= "Dezember",
+        distanz > 2
+      ) %>%
+      summarise(
+        m_totrob = mean(totrob)
+      ) %>% 
+      pull(m_totrob)
+  ) * 100
+```
+Die Rechnung zeigt, dass es in dem betrachten Zeitraum durch die Behandlung mit zusätzlicher Polizeipräsenz zu einem Rückgang der Anzahl an Autodiebstählen um durchschnittlich $75\%$ in Blocks mit jüdischen Einrichtungen kam.
+
+### Placebo-Tests
+
+Placebo-Tests sind nützlich, um zu überprüfen, ob der geschätzte Zusammenhang zwischen der Erhöhung der Polizeipräsenz und der Verringerung der Kriminalität tatsächlich kausal ist oder ob andere Faktoren eine Rolle spielen. Ein möglicher Einfluss könnte beispielsweise durch zufällige temporäre Schwankungen in den Kriminalitätsraten entstehen. @DiTellaSchargrodsky2004 wiederholen hierzu die Analyse anhand der Spezifikationen (3A), (3B) und (3C) für fiktive Interventionszeitpunkte *vor dem Anschlag*. Hierbei werden Ende April (4A), Ende Mai (4B) und Ende Juni (4C) als fiktive Zeitpunkte für die Placebo-Behandlung gewählt. Wenn diese Placebo-Tests ähnliche Ergebnisse (signifikante negative Schätzungen) wie die ursprüngliche Untersuchung liefern, könnte dies darauf hindeuten, dass die in @tbl-ditella3 geschätzten Effekte nicht kausal sind.
+
+Wir replizieren diese Ergebnisse, indem wir die Schätzungen von (3A), (3B) und (3C) mit entsprechender Definition des Behandlungsindikators (`group`) jeweils für modifizierte Datensätze mit sämtlichen $3504$ Beobachtungen vor dem Anschlag (`filter(monat <= "Juli (1 - 17)")`) wiederholen. 
+
+```{r}
+# (4A)
+# Placebo-Schätzung für 
+dat_T4A <- polizeipraesenz %>%
+  mutate(
+    group = monat >= "Mai" & monat <= "Juli (1 - 17)",
+    same = (institut == 1) * group,
+    oneblock = (distanz == 1) * group,
+    twoblocks = (distanz == 2) * group
+  ) %>% 
+  filter(monat <= "Juli (1 - 17)")
+
+(
+  T4A <- feols(
+    fml = totrob ~ 
+      same +
+      oneblock +
+      twoblocks 
+    | observ + monat, 
+    data = dat_T4A, 
+    vcov = "HC1"
+  )
+)
+
+# (4B)
+dat_T4B <- dat_T4A %>%
+  mutate(
+    group = monat >= "Juni" & monat <= "Juli (1 - 17)",
+    same = (institut == 1) * group,
+    oneblock = (distanz == 1) * group,
+    twoblocks = (distanz == 2) * group
+  ) 
+
+(
+  T4B <- feols(
+    fml = totrob ~ 
+      same
+    + oneblock
+    + twoblocks 
+    | observ + monat, 
+    data = dat_T4B, 
+    vcov = "HC1"
+  )
+)
+
+# (4C)
+dat_T4C <- dat_T4A %>%
+  mutate(
+    group = monat %in% c("Juli (1 - 17)"),
+    same = (institut == 1) * group,
+    oneblock = (distanz == 1) * group,
+    twoblocks = (distanz == 2) * group
+  ) 
+
+(
+  T4C <- feols(
+    fml = totrob ~ 
+      same
+    + oneblock
+    + twoblocks
+    | observ + monat, 
+    data = dat_T4C, 
+    vcov = "HC1"
+  )
 )
 ```
 
 
 
 ```{r}
-#### Table 4 ####
-
-# (A)
-dat_DID <- polizeipraesenz %>%
-  mutate(
-    treated = institut == 1,
-    group = dplyr::between(mes, 5, 7),
-    oneblock = distanz == 1,
-    twoblocks = distanz == 2
-  ) %>% 
-  filter(mes <= 7)
-
-mod4_A <- feols(
-  fml = totrob ~ 
-    I(treated * group) 
-  + I(oneblock * group) 
-  + I(twoblocks * group) 
-  | observ + monat, 
-  data = dat_DID, 
-  vcov = "HC1"
-)
-
-# (B)
-dat_DID <- dat_DID %>%
-  mutate(
-    group = dplyr::between(mes, 6, 7)
-  ) 
-
-mod4_B <- feols(
-  fml = totrob ~ 
-    I(treated * group) 
-  + I(oneblock * group) 
-  + I(twoblocks * group) 
-  | observ + monat, 
-  data = dat_DID, 
-  vcov = "HC1"
-)
-
-# (C)
-dat_DID <- dat_DID %>%
-  mutate(
-    group = mes == 7,
-  )
-
-mod4_C <- feols(
-  fml = totrob ~ 
-    I(treated * group) 
-  + I(oneblock * group) 
-  + I(twoblocks * group) 
-  | observ + monat, 
-  data = dat_DID, 
-  vcov = "HC1"
-)
-
-
-# Tabellarische Zusamenfassung
+#| tbl-cap: "Placebo-Tests für fiktive Anschlagszeitpunkte bis Ende Juni"
+#| label: tbl-placebopp
+# Tabellarische Zusamenfassung mit modelsummary()
+# (Tabelle 4 in Ditella und Schargrodsky, 2004)
 modelsummary(
   models = list(
-    A = mod4_A,
-    B = mod4_B,
-    C = mod4_C
+    "(4A)" = T4A,
+    "(4B)" = T4B,
+    "(4C)" = T4C
   ), 
   stars = T,
-  gof_omit = "^(?!(R2|Num.Obs.)$).*", 
+  gof_omit = "^(?!(R2|Num.Obs.|FE.*)$).*", 
+  notes = "Fiktive Interventionen: (4A) Ende April. (4B): Ende Mai. (4C): Ende Juni.",
   output = "gt"
 ) 
 ```
 
-```{r}
-#### Table 5 ####
+Die Ergebnisse in @tbl-placebopp stützen die kausale Interpretation der Regressionen in @tbl-ditella3: Für keinen der fiktiven Zeitpunkte einer Intervention vor dem tatsächlichen Anschlag im Juli 1994 finden wir signifikante Unterschiede in der beobachteten Diebstahlrate zwischen Blocks mit einer jüdischen Einrichtung und solchen ohne.
 
+### Weitere Robustness-Checks
+
+@DiTellaSchargrodsky2004 betrachten weitere Robustness-Checks. Die Autoren merken zunächst an, dass (positive) Korrelation innerhalb der Block-spezifischen Fehlerterme über die Zeit (und zwischen den Blocks eines Viertels) zu einer Unterschätzung der Unsicherheit der Treatment-Effekt-Schätzer in den DID-Regressionen mit herkömmlichen Standardfehler-Formeln führen kann. In DID-Designs kann dieses Problem durch die Korrelation der Behandlung über die Zeit noch verstärkt werden. Daher werden alternative Spezifikationen betrachtet, um die Robustheit der Interenzstatistiken in @tbl-ditella3 hinsichtlich Korrelation in den Fehlerterme zu überprüfen. Dies geschieht in den Regressionen (T5A) bis (T5C). Weitere Modelle kontrollieren für Stadtviertel-spezifische Effekte (T5D), verwenden eine um Blocks ohne gemeldete Diebstähle reduzierten Datensatz (T5E) und nutzen eine Poisson-Spezifikation. Wir fassen diese Ansätze kurz zusammen:
+
+- Regression (T5A): Entfernen der Zeitvariation von $\textit{totrob}_{i,t}$ *innerhalb* der Blocks durch Verwendung von Durchschnittswerten für die Monate vor und nach dem Anschlag. Regression dieser Durchschnittswerte auf die Behandlungsvariablen, wie in \eqref{eq:ppbaseC}.
+
+- Regression (T5B): Schätzung der Spezifikation \eqref{eq:ppbaseC} und Berechnung von Inferenzstatistiken mit cluster-robusten Standardfehlern (Clustering auf Block-Ebene).
+
+- Regression (T5C): Um in Regression \eqref{eq:ppbaseC} möglicher Korrelation zwischen den Blocks innerhalb eines Standviertel und Korrelation Stadtviertel-spezifischer Schocks über die Zeit zu begegnen, clustern @DiTellaSchargrodsky2004 Standardfehler auf Stadtviertel-Monats-Ebene.   
+
+- Regression (T5D): Diese Regression ersetzt in \eqref{eq:ppbaseC} die Fixed Effects für die Monate durch  Stadtviertel-spezifische Zeit-Effekte (anhand von Indikatorvariablen zur Berechenung der geclusterten Standardfehler in T5C). Wenn keine Stadtviertel-spezifischen Einflüsse vorliegen, sollten die geschätzten Koeffizienten mit denen für das Modell \eqref{eq:ppbaseC} vergleichbar sein.
+
+- Regresion (T5E): Regression \eqref{eq:ppbaseC} ohne Blocks in denen keine Diebstähle im Beobachtungszeitraum erfasst wurden. Auslassen dieser Beobachtungen sollte die Signifikanz des ATT-Schätzer nicht beeinflussen, jedoch zu einem stärkeren (negativen) Effekt führen, da die Kontrollgruppe dann ausschließlich aus Blocks mit gemeldeten Auto-Diebstählen besteht.
+
+- Regresion (T5F): Die Daten erfassen das Aufkommen von Ereignissen (Diebstähle) innerhalb eines bestimmten Raum-Zeitbezugs (pro Block und Monat) beschreiben. Solche Daten können mit Modellen für Zählvariablen beschrieben werden. @DiTellaSchargrodsky2004 schätzen eine [Poisson-Regression](sec-poissonreg). Hierbei wird der (log) Poisson-Parameter $\lambda_{i,t}$ (die *Inzidenzrate*) durch die lineare Funktion in \eqref{eq:ppbaseC} modelliert, d.h.
+
+    \begin{align}
+    \begin{split}
+      \log(\lambda_{i,t}) 
+        =&\, \text{monat}_t + \text{block}_i \\
+        + &\, \alpha_0 \text{same}_{i,t} \\
+        + &\, \alpha_1 \text{oneblock}_{i,t} \\
+        + &\, \alpha_1 \text{twoblocks}_{i,t} \\
+        + &\, \epsilon_{i,t}.
+      \end{split}\label{eq:pppois}
+    \end{align}
+
+    Eine Schätzung des Behandlungseffekts anhand von Poisson-Regression sollte zu ähnlichen Schlussfolgerungen führen, wie die lineare Regression \eqref{eq:ppbaseC}.
+
+Für die Reproduktion der Robustness-Checks mit R erweitern wir `dat_DID` um eine Indikatorvariable für den Zeitraum vor dem Anschlag (`pre`) und eine kategorische Variable für Stadtviertel-Monat-Effekte `mbc`.
+
+```{r}
+# Datensatz für weitere Robustness-Checks
 dat_DID_T5 <- dat_DID %>%
   mutate(
+    # Indikator: vor Anschlag
+    pre = monat < "Juli (18 - 31)",
+    # Interaktion: Stadtviertel x Monat
     mbc = paste0(barrio, "_", monat)
   )
+```
 
-# (A)
-# fixest
-feols(
-  fml = totrob ~ 
-    I(treated * group) 
-  + I(oneblock * group) 
-  + I(twoblocks * group) 
-  | observ + monat,
-  data = dat_DID_T5,
-  vcov = "HC1"
+Die Spezifikationen (T5A) bis (T5E) implementieren wir wie zuvor mit `fixest::feols()` unter Anpassung des Datensatzes, sofern relevant. Für cluster-robuste Standardfehler kann das Argument `vcov = ~ cluster` gesetzt werden, wobei `cluster` zu verwendende Ebene ist. Die Poisson-Spezifikation \eqref{eq:pppois} in (T5F) schätzen wir mit `fixest::feglm()`.^[Der R-Befehl hierfür ist ähnlich wie für die Probit-Regressionen in @sec-eitc-probit.]
+
+```{r}
+# (5A)
+(
+  T5A <- feols(
+    fml = totrob ~ 
+      same
+    + oneblock
+    + twoblocks
+    | observ + monat,
+    data = dat_DID_T5 %>%
+      group_by(observ, pre) %>%
+      mutate(
+        totrob = mean(totrob)
+      )
+  )
 )
 
-# (B)
-# fixest
-feols(fml = totrob ~ 
-    I(treated * group) 
-  + I(oneblock * group) 
-  + I(twoblocks * group) 
-  | observ + monat,
-  data = dat_DID_T5, 
-  vcov = vcov_cluster("observ")
+# (5B)
+(
+  T5B <- feols(
+    fml = totrob ~ 
+      same
+    + oneblock
+    + twoblocks
+    | observ + monat,
+    data = dat_DID_T5, 
+    vcov = ~ observ
+  )
 )
 
-# (C)
-feols(fml = totrob ~ 
-        I(treated * group) 
-      + I(oneblock * group) 
-      + I(twoblocks * group) 
-      | observ + monat,
-      data = dat_DID_T5, 
-      vcov = vcov_cluster("mbc")
+# (5C)
+(
+  T5C <- feols(
+    fml = totrob ~ 
+      same
+    + oneblock
+    + twoblocks
+    | observ + monat,
+    data = dat_DID_T5, 
+    vcov = ~ mbc
+  )
 )
 
-# (E)
-feols(fml = totrob ~ 
-        I(treated * group) 
-      + I(oneblock * group) 
-      + I(twoblocks * group) 
-      | observ + mbc,
-      data = dat_DID_T5,
-      vcov = "HC1"
+# (5D)
+(
+  T5D <- feols(
+    fml = totrob ~ 
+      same 
+    + oneblock 
+    + twoblocks 
+    | observ + mbc,
+    data = dat_DID_T5,
+    vcov = "HC1"
+  )
 )
 
-# (F)
-feols(fml = totrob ~ 
-        I(treated * group) 
-      + I(oneblock * group) 
-      + I(twoblocks * group) 
-      | observ + monat,
-      data = dat_DID_T5 %>% 
-        group_by(observ) %>% 
-        filter(
-          sum(totrob) > 0
-        ),
-      vcov = "HC1"
+# (5E)
+(
+  T5E <- feols(
+    fml = totrob ~ 
+      same
+    + oneblock
+    + twoblocks
+    | observ + monat,
+    data = dat_DID_T5 %>% 
+      group_by(observ) %>% 
+      filter(
+        sum(totrob) > 0
+      ),
+    vcov = "HC1"
+  )
+)
+
+# (5F) 
+(
+  T5F <- feglm(
+    fml = totrob ~ 
+      same
+    + oneblock
+    + twoblocks
+    | observ + monat,
+    data = dat_DID_T5 %>% 
+      group_by(observ) %>% 
+      filter(
+        sum(totrob) > 0
+      ), 
+    family = "poisson", 
+    vcov = "HC1"
+  )
 )
 ```
 
+```{r}
+#| tbl-cap: "Weitere Robustness-Checks"
+#| label: tbl-pprobust
+# Tabellarische Zusamenfassung
+# (Tabelle 5 in Di Tella und Schargrodsky, 2004)
+modelsummary(
+  models = list(
+    "(T5A)" = T5A,
+    "(T5B)" = T5B,
+    "(T5C)" = T5C,
+    "(T5D)" = T5D,
+    "(T5E)" = T5E,
+    "(T5F)" = T5F
+  ), 
+  stars = T,
+  gof_omit = "^(?!(R2|Std.Errors|Num.Obs.|FE.*)$).*", 
+  exponentiate = c(rep(F, 5), T),
+  vcov = list("HC1", ~observ, ~mbc, "HC1", "HC1", "HC1"),  
+  output = "gt"
+) 
+```
+
+Anhand von @tbl-pprobust finden wir weitere Evidenz für die Robustheit der DID-Schätzung (T3C) in @tbl-ditella3:
+
+- Die Schlussfolgerungen anhand der Inferenzstatistiken sind nicht sensibel gegenüber den unterschiedlichen Spezifikationen für die Berechnung der Standardfehler in (T5A) bis (T5C).
+
+- Die Alternative Spezifikation von Fixed Effects für Kombination von Stadtviertel und Monat (`mbc`) in (T5D) beeinflusst den Koeffizientenschätzer von `same` nur marginal. Auch hier ist der geschätzte ATT signifikant.
+
+- Wie erwartet führt die Verkleinerung der Kontrollgruppe auf Blocks mit gemeldeten Diebstählen in (T5E) zu einer größeren Schätzung des Effekts. Der Effekt bleibt signifikant.
+
+- In der Poisson-Regression in (T5F) finden wir ebenfalls einen signifikanten Effekt von `same`. Beachte das dieser Koeffizient den *multiplikativen* Einfluss von Polizeipräsenz auf die Inzidenzrate (durchschnittliche Anzahl an Diebstählen pro Monat pro Block) angibt. Die Interpretation des Schätzwerts von etwa $0.3$ bedeutet also eine *Reduktion* der Inzidenz um eta $70\%$ in Blocks mit erhöhter Polizeipräsenz gegenüber der Kontrollgruppe (Blocks mit mehr als zwei Blocks Entfernung zur nächsten jüdischen Einrichtung). Diese Schätzung stimmt also gut überein mit unserer Interpretation der Ergebnisse in @tbl-ditella3.
 
 ## Zusammenfassung
 

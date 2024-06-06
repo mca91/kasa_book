@@ -28,7 +28,7 @@ Das lineare Wahrscheinlichkeitsmodell hat einen wesentlichen Nachteil: Wir nehme
 
 Diese Gegebenheit verlangt nach einem Ansatz, der eine nichtlineare Funktion verwendet, um die bedingte Wahrscheinlichkeitsfunktion einer binären abhängigen Variable zu modellieren. Häufig verwendete Methoden sind Probit- und Logit-Regression.
 
-## Probit-Regression
+### Probit-Regression
 
 Bei der Probit-Regression wird die Standardnormalverteilungsfunktion $\Phi(\cdot)$ verwendet, um die Regressionsfunktion bei einer binären abhängigen Variable zu modellieren. Wir nehmen an, dass
 \begin{align}
@@ -43,7 +43,7 @@ sodass der Koeffizient $\beta_1$ in \eqref{eq:probitmodel} die Änderung in $z$ 
 
 ```{r}
 #| label: fig-snvf
-#| fig-cap: "Verteilungsfunction einer N(0,1)-Zufallsvariable"
+#| fig-cap: "Verteilungsfunktion einer N(0,1)-Zufallsvariable"
 # N(0,1)-Verteilungsfunktion
 ggplot() +
   geom_function(fun = pnorm) +
@@ -68,16 +68,16 @@ wobei $\phi(\cdot)$ die Dichtefunktion der Standardnormalverteilung ist. In empi
 
 Wie im linearen Wahrscheinlichkeitsmodell kann das Modell \eqref{eq:probitmodel} auf eine Probit-Regression mit mehreren Regressoren $X_j$, $j=1,\dots,k$ verallgemeinert werden, um das Risiko einer Verzerrung durch ausgelassene Variablen zu mindern. Die Schritte 1 bis 3 für die Berechnung des partiellen Effekts einer Änderung in $X_j$ erfolgen dann unter der Annahme, dass die übrigen $k-1$ Regressoren konstant gehalten werden, wobei der partielle Effekt von den jeweiligen Regressorwerten abhängt. 
 
-## Logistische Regression
+### Logistische Regression
 
 
-## Vergleich der Methoden
+### Schätzung mit R
 
 ```{r}
 # Daten simulieren
 set.seed(1234)
 
-n <- 30000 # Stichprobengröße
+n <- 2000 # Stichprobengröße
 
 simdata <- tibble(
   X = rnorm(n = n, mean = 5, sd = 2), # Regressor
@@ -114,13 +114,16 @@ simdata %>%
   ggplot(mapping = aes(x = X, y = Y)) +
   geom_point(
     position = position_jitter(
-      height = .01,
+      height = .025,
       seed = 1234
-    )
+    ),
+    alpha = .25,
+    color = "blue"
   ) +
   geom_line(
     data = pred, 
-    mapping = aes(y = LP)
+    mapping = aes(y = LP),
+    lwd = .75
   ) +
   theme_cowplot()
 ```
@@ -173,5 +176,190 @@ simdata %>%
   ) +
   scale_y_continuous(breaks = c(0, 1)) +
   theme_cowplot()
+```
+
+## Modellierung von Zählvariablen mit Poisson-Regression {#sec-poissonreg}
+
+Die Poisson-Regression ist ein statistisches Modell, das verwendet wird, um Zählvariablen (d.h. Variablen, die diskrete, nicht-negative Werte annehmen) zu modellieren, insbesondere wenn die Zählwerte eine Poisson-Verteilung aufweisen. Dieses Modell wird häufig in Fällen verwendet, in denen die abhängige Variable die Anzahl der Ereignisse in einem bestimmten Zeitraum oder Raum beschreibt, wie z.B. die Anzahl der Verkehrsunfälle in einer Stadt innerhalb eines Monats.
+
+### Poisson-Verteilung
+
+Eine Zufallsvariable $Y$ folgt einer Poisson-Verteilung mit Parameter $\lambda$, wenn ihre Wahrscheinlichkeitsverteilung gegeben ist durch:
+
+\begin{align}
+P(Y = y) = \frac{\lambda^y e^{-\lambda}}{y!} \quad \text{für} \quad y = 0, 1, 2, \ldots
+\end{align}
+
+Hierbei ist $\lambda$ sowohl der Mittelwert als auch die Varianz der Verteilung ($\mathbb{E}[Y] = \text{Var}(Y) = \lambda$).
+
+```{r}
+n <- 500
+dat <- tibble(
+  Y = rpois(n = n, lambda = 5)
+)
+```
+
+
+```{r}
+#| fig-cap: "Stichprobenverteilung und Poisson-Dichtefunktion"
+#| label: fig-poissonexample
+ggplot(
+    data = dat, 
+    mapping = aes(x = Y)
+) +
+    geom_histogram(
+        mapping = aes(y = after_stat(density)), 
+        binwidth = 1, 
+        color = "white"
+    ) +
+    geom_line(
+        data = tibble(
+            X = 0:13,
+            Y = dpois(x = X, lambda = 5)
+        ),
+        mapping = aes(x = X, y = Y),
+        color = "red"
+    ) +
+    theme_cowplot()
+```
+
+
+### Der Regressionsansatz
+
+In der Poisson-Regression modellieren wir den Erwartungswert der abhängigen Variable $Y$ als eine Funktion der unabhängigen Variablen $\mathbf{X} = (X_1, X_2, \ldots, X_k)$. Der Erwartungswert von $Y$ wird durch den Parameter $\lambda$ repräsentiert, der wiederum eine Funktion der unabhängigen Variablen ist. Die Beziehung wird typischerweise durch eine logarithmische Verknüpfungsfunktion beschrieben:
+
+\begin{align}
+\log(\lambda_i) = \mathbf{X}_i^\top \boldsymbol{\beta}
+\end{align}
+
+Dies kann auch als
+
+\begin{align}
+\lambda_i = \exp(\mathbf{X}_i^\top \boldsymbol{\beta})
+\end{align}
+
+geschrieben werden, wobei:
+
+- $\lambda_i$ der Erwartungswert von $Y$ für Beobachtung $i$,
+
+- $\mathbf{X}_i$ der Vektor der unabhängigen Variablen für Beobachtung $i$ und
+
+- $\boldsymbol{\beta}$ der Vektor der Regressionskoeffizienten ist.
+
+### Modellanpassung
+
+Die Parameter $\boldsymbol{\beta}$ werden durch Maximum-Likelihood-Schätzung (MLE) geschätzt. Die Likelihood-Funktion für $n$ Beobachtungen ist gegeben durch
+
+\begin{align}
+L(\boldsymbol{\beta}) = \prod_{i=1}^n \frac{\lambda_i^{y_i} e^{-\lambda_i}}{y_i!}.
+\end{align}
+
+Die Log-Likelihood-Funktion ist daher
+
+\begin{align}
+\mathcal{L}(\boldsymbol{\beta}) = \sum_{i=1}^n \left( y_i \log(\lambda_i) - \lambda_i - \log(y_i!). \right)
+\end{align}
+
+Da $\lambda_i = \exp(\mathbf{X}_i^\top \boldsymbol{\beta})$, wird die Log-Likelihood-Funktion zu
+
+\begin{align}
+\mathcal{L}(\boldsymbol{\beta}) = \sum_{i=1}^n \left( y_i (\mathbf{X}_i^\top \boldsymbol{\beta}) - \exp(\mathbf{X}_i^\top \boldsymbol{\beta}) - \log(y_i!) \right)
+\end{align}
+
+Den Maximum-Likelihood-Schätzer $\widehat{\boldsymbol{\beta}}$ erhalten wir durch Maximierung der Log-Likelihoodfunktion $\mathcal{L}(\boldsymbol{\beta})$. Eine R-Implementierung finden wir in `stats::glm()`.
+
+### Interpretation der Koeffizienten
+
+Die Koeffizienten $\boldsymbol{\beta}$ in der Poisson-Regression haben eine log-lineare Beziehung zur Zählvariable. Für einen bestimmten Koeffizienten $\beta_j$ ist die Interpretation wiefolgt:
+
+- Ein Anstieg der unabhängigen Variable $X_j$ um eine Einheit führt zu einer Änderung des *Logarithmus* des Erwartungswertes von $Y$ um $\beta_j$.
+
+- Der Erwartungswert $\lambda$ ändert sich *multiplikativ* um $\exp(\beta_j)$.
+
+Angenommen, wir haben eine unabhängige Variable $X$ (z.B. die Anzahl der durchgeführten Werbekampagnen) und eine Zählvariable $Y$ (z.B. die Anzahl der Verkäufe). Das Modell könnte wie folgt aussehen:
+
+\begin{align}
+\log(\lambda) = \beta_0 + \beta_1 X
+\end{align}
+
+Wenn $\beta_1 = 0.5$, bedeutet dies, dass jede zusätzliche Werbekampagne die erwartete Anzahl der Verkäufe um einen Faktor von $\exp(0.5) \approx 1.65$ erhöht. Das heißt, die *Rate* der Verkäufe steigt um 65\% für jede zusätzliche Werbekampagne.
+
+```{r}
+# Setze den Zufallszahlengenerator für Reproduzierbarkeit
+#set.seed(1234)
+
+# Anzahl der Beobachtungen
+n <- 500
+
+# Simuliere die unabhängige Variable X (Anzahl der Werbekampagnen)
+X <- sample(1:8, replace = T, size = n)
+
+# Setze die wahren Parameter für das Modell
+beta_1 <- 0.4  # Koeffizient für X
+
+# Berechne den Erwartungswert lambda basierend auf dem Modell
+lambda <- exp(2 + beta_1 * X)
+
+# Simuliere die abhängige Variable Y (Anzahl der Verkäufe) als Poisson-verteilte Zufallsvariable
+Y <- rpois(n, lambda = lambda)
+
+dat <- tibble(X = X, Y = Y)
+```
+
+```{r}
+ggplot(
+  data = dat, 
+  mapping = aes(x = Y)
+  ) +
+  geom_histogram(binwidth = 2) +
+  theme_cowplot()
+```
+
+
+```{r}
+# Poisson-Regression schätzen
+model <- glm(
+  formula = Y ~ X, 
+  family = poisson(link = "log"), 
+  data = dat
+)
+
+# Zusammenfassung des gesch. Modells
+summary(model)
+```
+
+```{r}
+#| fig-cap: "Simulierte Daten und angepasstes Poisson-Modell"
+#| label: fig-poissonregexample
+
+# Vorhersagen
+dat$predicted <- predict(model, type = "response")
+
+# Simulierte Daten und Schätzungen
+ggplot(
+  data = dat, 
+  mapping = aes(x = X, y = Y)
+) +
+  geom_point(
+    mapping = aes(color = "Simulierte Daten"), 
+    alpha = 0.5, 
+    position = position_jitter(width = .1)
+  ) +
+  geom_line(
+    aes(y = predicted, color = "Geschätztes Modell")
+    ) +
+  labs(
+    x = "Anzahl der Werbekampagnen",
+    y = "Anzahl der Eisverkäufe"
+  ) +
+  scale_color_manual(
+    "",
+    values = c(
+      "Simulierte Daten" = "blue", 
+      "Geschätztes Modell" = "red"
+    )
+  ) +
+  theme_cowplot() +
+  theme(legend.position = "top")
 ```
 
