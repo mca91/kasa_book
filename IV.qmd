@@ -1,0 +1,432 @@
+---
+webr: 
+  show-startup-message: true
+  packages: [
+            'dplyr',
+            'ggplot2',
+            'fixest',
+            'tidyr',
+            'readr'
+            ]
+---
+
+# IV-Regression
+
+```{r, echo=F, message=FALSE}
+library(gt)
+library(tidyverse)
+# Formatierung von gt-Tabellen
+tabopts <- function(x) {
+    fmt_number(x, decimals = 3, drop_trailing_zeros = T) %>%
+  tab_options(table_body.hlines.color = "white", 
+              column_labels.border.bottom.color = "black", 
+             column_labels.border.top.color = "black",
+             table_body.border.bottom.color = "black", 
+             table.border.bottom.color = "black",
+             column_labels.font.weight = "bold", 
+             table.font.color = "black", 
+             table.font.size = 16)
+}
+```
+
+```{r}
+library(readr)
+
+# Datensatz 'rainconflict' einlesen
+rainconflict <- read_csv2(
+  file = "datasets/rainconflict.csv"
+)
+```
+
+```{r}
+# Überblick verschaffen
+glimpse(rainconflict)
+```
+
+```{r, echo = F}
+#| tbl-cap: "`rainconflict` -- Polit-ökonomische Charakteristika afrikanischer Länder v. 1981 bis 1999"
+#| label: tbl-rainconfdata
+tribble(
+  ~Variable, ~Beschreibung,
+  "any_prior", "Dummyvariable: Konflikt mit mind. 25 Toten im Jahr t",
+  "war_prio", "Dummyvariable: Konflikt mit mind. 1000 Toten im Jahr t",
+  "ccode", "Länderkennung",
+  "country", "Land",
+  "gdp_g", "(BIP_t - BIP_t-1) / BIP_t-1",
+  "gdp_g_l", "(BIP_t-1 - BIP_t-2) / BIP_t-2",
+  "GPCP_g", "(Niederschlag_t - Niederschlag_t-1) / Niederschlag_t-1",
+  "GPCP_g_l", "GPCP_g in t-1",
+  "GPCP_g_fl", "GPCP_g in t+1",
+  "gdp_1979", "Log Pro-Kopf-BIP in 1979",
+  "polity2_IV", "Diff. zw. Demokratie- und Autokrarie-Score im Jahr t (-10 bis 10)",
+  "polity2l", "polity2_IV im Jahr t-1 (-10 bis 10)",
+  "ethfrac", "Ethno-linguistische Fragmentierung (Anteil)",
+  "relfrac", "Religiöse Fragmentierung (Anteil)",
+  "oil", "Dummy für Öl-exportierendes Land",
+  "lmtnest", "Log Anteil Gebirgsregionen an Landesfläche",
+  "lpopl1", "Log Bevölkerung im Jahr t-1",
+  "tot_100_g", "Handelsbedingungen (Index, 1995 = 100)",
+  "year", "Jahr der Beobachtung"
+) %>%
+  gt()
+```
+
+```{r}
+# ccode zu Typ 'factor' transformieren
+rainconflict <- rainconflict %>% 
+  mutate(
+    ccode = as.factor(ccode)
+  )
+```
+
+```{r}
+#| tbl-cap: "`rainconflict` -- Statistische Zusammenfassung"
+#| label: tbl-rainconfdatasum
+library(modelsummary)
+
+# Statistische Zusammenfassung
+datasummary(
+  formula = All( rainconflict %>% select(-ccode, -year) )   
+    ~ (mean + sd) * Arguments(na.rm = TRUE) 
+    + N, 
+  fmt = 4,
+  data = rainconflict 
+) 
+```
+
+```{r}
+library(fixest)
+
+# (1)
+(
+  rncnf_mod1 <- feols(
+    fml = gdp_g ~ GPCP_g + GPCP_g_l,
+    data = rainconflict,
+    vcov = ~ ccode
+  )
+)
+```
+
+```{r}
+# (2)
+rncnf_mod2 <- feols(
+  fml = gdp_g ~ GPCP_g + GPCP_g_l
+  + gdp_1979
+  + polity2l 
+  + ethfrac 
+  + relfrac 
+  + oil 
+  + lmtnest 
+  + lpopl1
+  + year:ccode,
+  data = rainconflict,
+  vcov = ~ ccode
+) 
+
+rncnf_mod2 %>% 
+  print(n = 10)
+```
+
+```{r}
+# (3)
+rncnf_mod3 <- feols(
+  fml = gdp_g ~ GPCP_g + GPCP_g_l 
+  + year:ccode
+  | ccode,
+  data = rainconflict,
+  vcov = ~ ccode
+) 
+
+rncnf_mod3 %>% 
+  print(n = 2)
+```
+
+```{r}
+# (4)
+rncnf_mod4 <- feols(
+  fml = gdp_g ~ GPCP_g + GPCP_g_l + GPCP_g_fl
+  + year:ccode 
+  | ccode,
+  data = rainconflict,
+  vcov = ~ ccode
+) 
+
+rncnf_mod4 %>% 
+  print(n = 3)
+```
+
+```{r}
+# (5)
+rncnf_mod5 <- feols(
+  fml = gdp_g ~ GPCP_g + GPCP_g_l 
+  + tot_100_g 
+  + year:ccode 
+  | ccode,
+  data = rainconflict,
+  vcov = ~ ccode
+) 
+
+rncnf_mod5 %>%
+  print(n = 3)
+```
+
+
+```{r}
+#| tbl-cap: "First-Stage-Regressionen für `gdp_g`"
+#| label: tbl-blablabla
+
+# Tabellarischer Vergleich mit modelsummary()
+# (Tabelle 3 in Ditella und Schargrodsky, 2004)
+modelsummary(
+  models = list(
+    "(1)" = rncnf_mod1, 
+    "(2)" = rncnf_mod2, 
+    "(3)" = rncnf_mod3, 
+    "(4)" = rncnf_mod4, 
+    "(5)" = rncnf_mod5
+  ),
+  stars = T, 
+  coef_omit = "^year.*$",
+  gof_omit = "^(?!(R2|Num.Obs.|FE.*)$).*", 
+  output = "gt"
+)
+```
+
+
+```{r}
+S1_res <- tibble(
+
+  x = residuals(
+    feols(
+      fml = GPCP_g ~ GPCP_g_l
+      + year:ccode
+      | ccode,
+      data = rainconflict
+    )
+  ),
+  
+  y = residuals(
+    feols(
+      fml = gdp_g ~ GPCP_g_l
+      + year:ccode
+      | ccode,
+      data = rainconflict
+    )
+  )
+  
+)
+```
+
+```{r}
+
+library(ggplot2)
+library(cowplot)
+
+ggplot(
+  data = S1_res,
+  mapping = aes(x = x, y = y)) +
+  geom_point(
+    size = .75, 
+    alpha = .5
+  ) +
+  geom_smooth(method = "loess", span = .5) +
+  coord_cartesian(
+    xlim = c(-.4, .4), 
+    ylim = c(-.1, .1)
+  ) +
+  theme_cowplot()
+```
+
+```{r}
+feols(
+  fml = any_prio ~ GPCP_g + GPCP_g_l 
+  + year:ccode
+  | ccode,
+  data = rainconflict,
+  vcov = ~ ccode
+) %>% 
+  print(n = 2)
+```
+
+```{r}
+feols(
+  fml = war_prio ~ GPCP_g + GPCP_g_l 
+  + year:ccode
+  | ccode,
+  data = rainconflict,
+  vcov = ~ ccode
+) %>% 
+  print(n = 2)
+```
+
+```{r}
+rf_res <- tibble(
+  
+  x = residuals(
+    feols(
+      fml = GPCP_g_l ~ GPCP_g
+      + year:ccode
+      | ccode,
+      data = rainconflict
+    )
+  ),
+  
+  y = residuals(
+    feols(
+      fml = any_prio ~ GPCP_g
+      + year:ccode
+      | ccode,
+      data = rainconflict
+    )
+  )
+  
+)
+```
+
+```{r}
+ggplot(
+  data = rf_res , 
+  mapping = aes(x = x, y = y)) +
+  geom_point(pch = 19) +
+  geom_smooth(method = "loess") +
+  coord_cartesian(
+    xlim = c(-.4, .4), 
+    ylim = c(-.2, .4)
+  ) +
+  theme_cowplot()
+```
+
+```{r}
+
+# (1)
+mod_conf_probit <- feglm(
+  fml = any_prio ~
+    gdp_g + 
+    gdp_g_l
+  + gdp_1979
+  + polity2l 
+  + ethfrac 
+  + relfrac 
+  + oil 
+  + lmtnest 
+  + lpopl1 
+  + year,
+  data = rainconflict,
+  vcov = ~ ccode, 
+  family = binomial(link = "probit")
+) 
+
+library(marginaleffects)
+
+mod_conf_probit_avge <- mod_conf_probit %>% 
+  avg_slopes() 
+
+# (2)
+(
+mod_conf_ols <- feols(
+  fml = any_prio ~
+    gdp_g + 
+    gdp_g_l
+  + gdp_1979
+  + polity2l 
+  + ethfrac 
+  + relfrac 
+  + oil 
+  + lmtnest 
+  + lpopl1 
+  + year,
+  data = rainconflict,
+  vcov = ~ ccode
+) 
+)
+  
+# (3)
+feols(
+  fml = any_prio ~ -1
+  +  gdp_g + 
+    gdp_g_l
+  + gdp_1979
+  + polity2l 
+  + ethfrac 
+  + relfrac 
+  + oil 
+  + lmtnest 
+  + lpopl1 
+  + i(ccode, year),
+  data = rainconflict,
+  vcov = ~ ccode
+) %>% 
+  summary(n = 10)
+
+# (4)
+feols(
+  fml = any_prio ~ -1
+  +  gdp_g 
+  +  gdp_g_l
+  + i(ccode, year)
+  | ccode,
+  data = rainconflict,
+  vcov = ~ ccode
+) %>% 
+  summary(n = 10)
+
+
+#### IV models ####
+
+# (5)
+feols(
+  fml = any_prio ~
+  + gdp_1979
+  + polity2l 
+  + ethfrac 
+  + relfrac 
+  + oil 
+  + lmtnest 
+  + lpopl1 
+  + i(ccode, year)
+  | gdp_g + gdp_g_l ~ GPCP_g + GPCP_g_l, 
+  data = rainconflict,
+  vcov = ~ ccode
+) %>% 
+  summary(n = 10)
+
+# (6)
+feols(
+  fml = any_prio ~ 
+  + i(ccode, year)
+  | ccode
+  | gdp_g + gdp_g_l ~ GPCP_g + GPCP_g_l, 
+  data = rainconflict,
+  vcov = ~ ccode
+) %>% 
+  summary(n = 10)
+
+# (7)
+feols(
+  fml = war_prio ~ 
+    + i(ccode, year)
+  | ccode
+  | gdp_g + gdp_g_l ~ GPCP_g + GPCP_g_l, 
+  data = rainconflict,
+  vcov = ~ ccode
+) %>% 
+  summary(n = 10)
+
+library(modelsummary)
+
+modelsummary(
+  models = list(
+    mod_conf_probit_avge, 
+    mod_conf_ols
+    )
+  )
+```
+
+
+
+
+
+
+
+
+
