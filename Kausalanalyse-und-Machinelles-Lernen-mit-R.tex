@@ -451,7 +451,7 @@ Tabelle~\ref{tbl-Klausurergebnisse} händisch als R-Objekt der Klasse
 Variable \emph{Modul}. Der Datensatz liegt also \emph{nicht} im s.g.
 \emph{Tidy-Format} vor.
 
-\begin{tcolorbox}[enhanced jigsaw, colframe=quarto-callout-tip-color-frame, coltitle=black, breakable, titlerule=0mm, opacityback=0, colbacktitle=quarto-callout-tip-color!10!white, leftrule=.75mm, bottomtitle=1mm, title=\textcolor{quarto-callout-tip-color}{\faLightbulb}\hspace{0.5em}{Tidy-Format}, toptitle=1mm, arc=.35mm, rightrule=.15mm, bottomrule=.15mm, left=2mm, toprule=.15mm, colback=white, opacitybacktitle=0.6]
+\begin{tcolorbox}[enhanced jigsaw, opacityback=0, colback=white, rightrule=.15mm, colframe=quarto-callout-tip-color-frame, colbacktitle=quarto-callout-tip-color!10!white, arc=.35mm, opacitybacktitle=0.6, bottomtitle=1mm, breakable, leftrule=.75mm, toptitle=1mm, titlerule=0mm, bottomrule=.15mm, coltitle=black, title=\textcolor{quarto-callout-tip-color}{\faLightbulb}\hspace{0.5em}{Tidy-Format}, toprule=.15mm, left=2mm]
 
 Tidy-Format: Jede Spalte ist \textbf{\emph{eine}} Variable, jede Reihe
 ist \textbf{\emph{eine}} Beobachtung und jede Zelle enthält einen
@@ -3576,8 +3576,8 @@ bezüglich eines kausalen Effekts nach Matching und demonstrieren die
 Schätzung anhand unseres Website-Beispiels für den ATT nach
 Propensity-Score-Matching.
 
-\begin{tcolorbox}[enhanced jigsaw, colframe=quarto-callout-tip-color-frame, coltitle=black, breakable, titlerule=0mm, opacityback=0, colbacktitle=quarto-callout-tip-color!10!white, leftrule=.75mm, bottomtitle=1mm, title={\textbf{Algorithmus: Bootstrap-Schätzer für Matching mit Regression
-Adjustment}}, toptitle=1mm, arc=.35mm, rightrule=.15mm, bottomrule=.15mm, left=2mm, toprule=.15mm, colback=white, opacitybacktitle=0.6]
+\begin{tcolorbox}[enhanced jigsaw, opacityback=0, colback=white, rightrule=.15mm, colframe=quarto-callout-tip-color-frame, colbacktitle=quarto-callout-tip-color!10!white, arc=.35mm, opacitybacktitle=0.6, bottomtitle=1mm, breakable, leftrule=.75mm, toptitle=1mm, titlerule=0mm, bottomrule=.15mm, coltitle=black, title={\textbf{Algorithmus: Bootstrap-Schätzer für Matching mit Regression
+Adjustment}}, toprule=.15mm, left=2mm]
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -3920,7 +3920,7 @@ Der von Wooldridge (2010) vorgeschlagene Doubly-Robust-Schätzer (IPWRA)
 für den ATE erreicht seine vorteilhaften Eigenschaften durch eine
 geschickte Kombination von IPW und Regression Adjustment.
 
-\begin{tcolorbox}[enhanced jigsaw, colframe=quarto-callout-tip-color-frame, coltitle=black, breakable, titlerule=0mm, opacityback=0, colbacktitle=quarto-callout-tip-color!10!white, leftrule=.75mm, bottomtitle=1mm, title={\textbf{Algorithmus: IPWRA-Schätzer des ATE}}, toptitle=1mm, arc=.35mm, rightrule=.15mm, bottomrule=.15mm, left=2mm, toprule=.15mm, colback=white, opacitybacktitle=0.6]
+\begin{tcolorbox}[enhanced jigsaw, opacityback=0, colback=white, rightrule=.15mm, colframe=quarto-callout-tip-color-frame, colbacktitle=quarto-callout-tip-color!10!white, arc=.35mm, opacitybacktitle=0.6, bottomtitle=1mm, breakable, leftrule=.75mm, toptitle=1mm, titlerule=0mm, bottomrule=.15mm, coltitle=black, title={\textbf{Algorithmus: IPWRA-Schätzer des ATE}}, toprule=.15mm, left=2mm]
 
 Vgl. Wooldridge (2010).
 
@@ -4113,6 +4113,880 @@ Die Bootstrap-Schätzung des ATE mit IPWRA ist mit den Ergebnissen für
 die Bootstrap-Variante von \(\widehat{\tau}^\text{IPW}\) vergleichbar,
 hat allerdings einen etwas kleineren Standardfehler und ist somit
 genauer.
+
+\bookmarksetup{startatroot}
+
+\chapter{IV-Regression}\label{iv-regression}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(readr)}
+
+\CommentTok{\# Datensatz \textquotesingle{}rainconflict\textquotesingle{} einlesen}
+\NormalTok{rainconflict }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv2}\NormalTok{(}
+  \AttributeTok{file =} \StringTok{"datasets/rainconflict.csv"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Überblick verschaffen}
+\FunctionTok{glimpse}\NormalTok{(rainconflict)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Rows: 743
+Columns: 19
+$ any_prio   <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,~
+$ war_prio   <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,~
+$ ccode      <dbl> 404, 404, 404, 404, 404, 404, 404, 404, 404, 404, 404, 404,~
+$ country    <chr> "Guinea-Bissau", "Guinea-Bissau", "Guinea-Bissau", "Guinea-~
+$ gdp_g      <dbl> 0.216560572, 0.104712047, -0.042654045, 0.034653414, 0.0366~
+$ gdp_g_l    <dbl> -0.152877718, 0.216560572, 0.104712047, -0.042654045, 0.034~
+$ GPCP_g     <dbl> 0.170644149, 0.023161817, -0.215036541, 0.098459557, 0.0185~
+$ GPCP_g_l   <dbl> -0.048803251, 0.170644149, 0.023161817, -0.215036541, 0.098~
+$ GPCP_g_fl  <dbl> 0.023161817, -0.215036541, 0.098459557, 0.018551834, 0.0545~
+$ gdp_1979   <dbl> 0.556, 0.556, 0.556, 0.556, 0.556, 0.556, 0.556, 0.556, 0.5~
+$ polity2l   <dbl> -7, -7, -7, -7, -8, -8, -8, -8, -8, -8, -6, -6, -6, -6, 5, ~
+$ polity2_IV <dbl> -7, -7, -7, -8, -8, -8, -8, -8, -8, -6, -6, -6, -6, 5, 5, 5~
+$ ethfrac    <dbl> 0.8037570, 0.8037570, 0.8037570, 0.8037570, 0.8037570, 0.80~
+$ relfrac    <dbl> 0.5450, 0.5450, 0.5450, 0.5450, 0.5450, 0.5450, 0.5450, 0.5~
+$ oil        <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,~
+$ lmtnest    <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,~
+$ lpopl1     <dbl> 6.695799, 6.714170, 6.732211, 6.749931, 6.768493, 6.786717,~
+$ tot_100_g  <dbl> 0.3326812088, -0.0604966730, 0.0235692672, 0.6656700373, -0~
+$ year       <dbl> 1981, 1982, 1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990,~
+\end{verbatim}
+
+\begin{longtable}{ll}
+
+\caption{\label{tbl-rainconfdata}\texttt{rainconflict} --
+Polit-ökonomische Charakteristika afrikanischer Länder v. 1981 bis 1999}
+
+\tabularnewline
+
+\toprule
+Variable & Beschreibung \\ 
+\midrule\addlinespace[2.5pt]
+any\_prior & Dummyvariable: Konflikt mit mind. 25 Toten im Jahr t \\ 
+war\_prio & Dummyvariable: Konflikt mit mind. 1000 Toten im Jahr t \\ 
+ccode & Länderkennung \\ 
+country & Land \\ 
+gdp\_g & (BIP\_t - BIP\_t-1) / BIP\_t-1 \\ 
+gdp\_g\_l & (BIP\_t-1 - BIP\_t-2) / BIP\_t-2 \\ 
+GPCP\_g & (Niederschlag\_t - Niederschlag\_t-1) / Niederschlag\_t-1 \\ 
+GPCP\_g\_l & GPCP\_g in t-1 \\ 
+GPCP\_g\_fl & GPCP\_g in t+1 \\ 
+gdp\_1979 & Log Pro-Kopf-BIP in 1979 \\ 
+polity2\_IV & Diff. zw. Demokratie- und Autokrarie-Score im Jahr t (-10 bis 10) \\ 
+polity2l & polity2\_IV im Jahr t-1 (-10 bis 10) \\ 
+ethfrac & Ethno-linguistische Fragmentierung (Anteil) \\ 
+relfrac & Religiöse Fragmentierung (Anteil) \\ 
+oil & Dummy für Öl-exportierendes Land \\ 
+lmtnest & Log Anteil Gebirgsregionen an Landesfläche \\ 
+lpopl1 & Log Bevölkerung im Jahr t-1 \\ 
+tot\_100\_g & Handelsbedingungen (Index, 1995 = 100) \\ 
+year & Jahr der Beobachtung \\ 
+\bottomrule
+
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ccode zu Typ \textquotesingle{}factor\textquotesingle{} transformieren}
+\NormalTok{rainconflict }\OtherTok{\textless{}{-}}\NormalTok{ rainconflict }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{ccode =} \FunctionTok{as.factor}\NormalTok{(ccode)}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(modelsummary)}
+
+\CommentTok{\# Statistische Zusammenfassung}
+\FunctionTok{datasummary}\NormalTok{(}
+  \AttributeTok{formula =} \FunctionTok{All}\NormalTok{( rainconflict }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{ccode, }\SpecialCharTok{{-}}\NormalTok{year) )   }
+    \SpecialCharTok{\textasciitilde{}}\NormalTok{ (mean }\SpecialCharTok{+}\NormalTok{ sd) }\SpecialCharTok{*} \FunctionTok{Arguments}\NormalTok{(}\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{) }
+    \SpecialCharTok{+}\NormalTok{ N, }
+  \AttributeTok{fmt =} \DecValTok{4}\NormalTok{,}
+  \AttributeTok{data =}\NormalTok{ rainconflict }
+\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{table}
+
+\caption{\label{tbl-rainconfdatasum}\texttt{rainconflict} --
+Statistische Zusammenfassung}
+
+\centering{
+
+\centering
+\begin{tblr}[         %% tabularray outer open
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]},
+column{1}={halign=l,},
+column{2}={halign=r,},
+column{3}={halign=r,},
+column{4}={halign=r,},
+}                     %% tabularray inner close
+\toprule
+& mean & sd & N \\ \midrule %% TinyTableHeader
+any\_prio    & \num{0.2678}  & \num{0.4431} & 743 \\
+war\_prio    & \num{0.1669}  & \num{0.3731} & 743 \\
+gdp\_g       & \num{-0.0048} & \num{0.0707} & 743 \\
+gdp\_g\_l   & \num{-0.0056} & \num{0.0724} & 743 \\
+GPCP\_g      & \num{0.0182}  & \num{0.2094} & 743 \\
+GPCP\_g\_l  & \num{0.0113}  & \num{0.2067} & 743 \\
+GPCP\_g\_fl & \num{0.0150}  & \num{0.2107} & 743 \\
+gdp\_1979    & \num{1.1639}  & \num{0.9009} & 743 \\
+polity2l      & \num{-3.6083} & \num{5.5543} & 743 \\
+polity2\_IV  & \num{-3.4035} & \num{5.5766} & 736 \\
+ethfrac       & \num{0.6546}  & \num{0.2374} & 743 \\
+relfrac       & \num{0.4868}  & \num{0.1857} & 743 \\
+oil           & \num{0.1184}  & \num{0.3233} & 743 \\
+lmtnest       & \num{1.5783}  & \num{1.4334} & 743 \\
+lpopl1        & \num{8.7497}  & \num{1.2068} & 743 \\
+tot\_100\_g & \num{-0.0068} & \num{0.1552} & 661 \\
+\bottomrule
+\end{tblr}
+
+}
+
+\end{table}%
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(fixest)}
+
+\CommentTok{\# (1)}
+\NormalTok{(}
+\NormalTok{  rncnf\_mod1 }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+    \AttributeTok{fml =}\NormalTok{ gdp\_g }\SpecialCharTok{\textasciitilde{}}\NormalTok{ GPCP\_g }\SpecialCharTok{+}\NormalTok{ GPCP\_g\_l,}
+    \AttributeTok{data =}\NormalTok{ rainconflict,}
+    \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ ccode}
+\NormalTok{  )}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: gdp_g
+Observations: 743
+Standard-errors: Clustered (ccode) 
+             Estimate Std. Error  t value  Pr(>|t|)    
+(Intercept) -0.006147   0.002460 -2.49856 0.0166787 *  
+GPCP_g       0.055430   0.016301  3.40029 0.0015378 ** 
+GPCP_g_l     0.034058   0.013213  2.57761 0.0137398 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.069815   Adj. R2: 0.02088
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# (2)}
+\NormalTok{rncnf\_mod2 }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ gdp\_g }\SpecialCharTok{\textasciitilde{}}\NormalTok{ GPCP\_g }\SpecialCharTok{+}\NormalTok{ GPCP\_g\_l}
+  \SpecialCharTok{+}\NormalTok{ gdp\_1979}
+  \SpecialCharTok{+}\NormalTok{ polity2l }
+  \SpecialCharTok{+}\NormalTok{ ethfrac }
+  \SpecialCharTok{+}\NormalTok{ relfrac }
+  \SpecialCharTok{+}\NormalTok{ oil }
+  \SpecialCharTok{+}\NormalTok{ lmtnest }
+  \SpecialCharTok{+}\NormalTok{ lpopl1}
+  \SpecialCharTok{+}\NormalTok{ year}\SpecialCharTok{:}\NormalTok{ccode,}
+  \AttributeTok{data =}\NormalTok{ rainconflict,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ ccode}
+\NormalTok{) }
+
+\NormalTok{rncnf\_mod2 }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{print}\NormalTok{(}\AttributeTok{n =} \DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: gdp_g
+Observations: 743
+Standard-errors: Clustered (ccode) 
+             Estimate Std. Error   t value  Pr(>|t|)    
+(Intercept) -8.380394   7.836789 -1.069366 0.2913157    
+GPCP_g       0.053402   0.016788  3.180892 0.0028359 ** 
+GPCP_g_l     0.031518   0.013739  2.294105 0.0271135 *  
+gdp_1979    -0.568562   0.933728 -0.608916 0.5460230    
+polity2l    -0.000462   0.000697 -0.661827 0.5118772    
+ethfrac     -0.290995   5.315419 -0.054745 0.9566138    
+relfrac      6.344474   6.277193  1.010718 0.3182264    
+oil         -0.022946   0.011735 -1.955363 0.0575517 .  
+lmtnest     -0.154883   0.950072 -0.163022 0.8713219    
+lpopl1      -0.103898   0.140671 -0.738588 0.4644693    
+... 41 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.067787   Adj. R2: 0.012893
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# (3)}
+\NormalTok{rncnf\_mod3 }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ gdp\_g }\SpecialCharTok{\textasciitilde{}}\NormalTok{ GPCP\_g }\SpecialCharTok{+}\NormalTok{ GPCP\_g\_l }
+  \SpecialCharTok{+}\NormalTok{ year}\SpecialCharTok{:}\NormalTok{ccode}
+  \SpecialCharTok{|}\NormalTok{ ccode,}
+  \AttributeTok{data =}\NormalTok{ rainconflict,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ ccode}
+\NormalTok{) }
+
+\NormalTok{rncnf\_mod3 }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{print}\NormalTok{(}\AttributeTok{n =} \DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: gdp_g
+Observations: 743
+Fixed-effects: ccode: 41
+Standard-errors: Clustered (ccode) 
+         Estimate Std. Error t value  Pr(>|t|)    
+GPCP_g   0.048582   0.016523 2.94024 0.0054275 ** 
+GPCP_g_l 0.028004   0.013779 2.03236 0.0487938 *  
+... 41 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.065802     Adj. R2: 0.023299
+                 Within R2: 0.086915
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# (4)}
+\NormalTok{rncnf\_mod4 }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ gdp\_g }\SpecialCharTok{\textasciitilde{}}\NormalTok{ GPCP\_g }\SpecialCharTok{+}\NormalTok{ GPCP\_g\_l }\SpecialCharTok{+}\NormalTok{ GPCP\_g\_fl}
+  \SpecialCharTok{+}\NormalTok{ year}\SpecialCharTok{:}\NormalTok{ccode }
+  \SpecialCharTok{|}\NormalTok{ ccode,}
+  \AttributeTok{data =}\NormalTok{ rainconflict,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ ccode}
+\NormalTok{) }
+
+\NormalTok{rncnf\_mod4 }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{print}\NormalTok{(}\AttributeTok{n =} \DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: gdp_g
+Observations: 743
+Fixed-effects: ccode: 41
+Standard-errors: Clustered (ccode) 
+          Estimate Std. Error  t value  Pr(>|t|)    
+GPCP_g    0.048944   0.017837 2.743919 0.0090443 ** 
+GPCP_g_l  0.028235   0.013783 2.048544 0.0471081 *  
+GPCP_g_fl 0.000617   0.018501 0.033337 0.9735719    
+... 41 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.065801     Adj. R2: 0.021818
+                 Within R2: 0.086917
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# (5)}
+\NormalTok{rncnf\_mod5 }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ gdp\_g }\SpecialCharTok{\textasciitilde{}}\NormalTok{ GPCP\_g }\SpecialCharTok{+}\NormalTok{ GPCP\_g\_l }
+  \SpecialCharTok{+}\NormalTok{ tot\_100\_g }
+  \SpecialCharTok{+}\NormalTok{ year}\SpecialCharTok{:}\NormalTok{ccode }
+  \SpecialCharTok{|}\NormalTok{ ccode,}
+  \AttributeTok{data =}\NormalTok{ rainconflict,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ ccode}
+\NormalTok{) }
+
+\NormalTok{rncnf\_mod5 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{print}\NormalTok{(}\AttributeTok{n =} \DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: gdp_g
+Observations: 661
+Fixed-effects: ccode: 37
+Standard-errors: Clustered (ccode) 
+           Estimate Std. Error   t value  Pr(>|t|)    
+GPCP_g     0.053124   0.017432  3.047509 0.0043049 ** 
+GPCP_g_l   0.036616   0.014705  2.490060 0.0175258 *  
+tot_100_g -0.002280   0.022286 -0.102318 0.9190722    
+... 37 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.059582     Adj. R2: 0.052542
+                 Within R2: 0.114693
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Tabellarischer Vergleich mit modelsummary()}
+\CommentTok{\# (Tabelle 3 in Ditella und Schargrodsky, 2004)}
+\FunctionTok{modelsummary}\NormalTok{(}
+  \AttributeTok{models =} \FunctionTok{list}\NormalTok{(}
+    \StringTok{"(1)"} \OtherTok{=}\NormalTok{ rncnf\_mod1, }
+    \StringTok{"(2)"} \OtherTok{=}\NormalTok{ rncnf\_mod2, }
+    \StringTok{"(3)"} \OtherTok{=}\NormalTok{ rncnf\_mod3, }
+    \StringTok{"(4)"} \OtherTok{=}\NormalTok{ rncnf\_mod4, }
+    \StringTok{"(5)"} \OtherTok{=}\NormalTok{ rncnf\_mod5}
+\NormalTok{  ),}
+  \AttributeTok{stars =}\NormalTok{ T, }
+  \AttributeTok{coef\_omit =} \StringTok{"\^{}year.*$"}\NormalTok{,}
+  \AttributeTok{gof\_omit =} \StringTok{"\^{}(?!(R2|Num.Obs.|FE.*)$).*"}\NormalTok{, }
+  \AttributeTok{output =} \StringTok{"gt"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\setlength{\LTpost}{0mm}
+
+\begin{longtable}{lccccc}
+
+\caption{\label{tbl-blablabla}First-Stage-Regressionen für
+\texttt{gdp\_g}}
+
+\tabularnewline
+
+\toprule
+  & (1) & (2) & (3) & (4) & (5) \\ 
+\midrule\addlinespace[2.5pt]
+(Intercept) & -0.006* & -8.380 &  &  &  \\ 
+ & (0.002) & (7.837) &  &  &  \\ 
+GPCP\_g & 0.055** & 0.053** & 0.049** & 0.049** & 0.053** \\ 
+ & (0.016) & (0.017) & (0.017) & (0.018) & (0.017) \\ 
+GPCP\_g\_l & 0.034* & 0.032* & 0.028* & 0.028* & 0.037* \\ 
+ & (0.013) & (0.014) & (0.014) & (0.014) & (0.015) \\ 
+gdp\_1979 &  & -0.569 &  &  &  \\ 
+ &  & (0.934) &  &  &  \\ 
+polity2l &  & 0.000 &  &  &  \\ 
+ &  & (0.001) &  &  &  \\ 
+ethfrac &  & -0.291 &  &  &  \\ 
+ &  & (5.315) &  &  &  \\ 
+relfrac &  & 6.344 &  &  &  \\ 
+ &  & (6.277) &  &  &  \\ 
+oil &  & -0.023+ &  &  &  \\ 
+ &  & (0.012) &  &  &  \\ 
+lmtnest &  & -0.155 &  &  &  \\ 
+ &  & (0.950) &  &  &  \\ 
+lpopl1 &  & -0.104 &  &  &  \\ 
+ &  & (0.141) &  &  &  \\ 
+GPCP\_g\_fl &  &  &  & 0.001 &  \\ 
+ &  &  &  & (0.019) &  \\ 
+tot\_100\_g &  &  &  &  & -0.002 \\ 
+ &  &  &  &  & (0.022) \\ 
+Num.Obs. & 743 & 743 & 743 & 743 & 661 \\ 
+R2 & 0.024 & 0.079 & 0.133 & 0.133 & 0.162 \\ 
+FE: ccode &  &  & X & X & X \\ 
+\bottomrule
+
+\end{longtable}
+
+\begin{minipage}{\linewidth}
++ p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001\\
+\end{minipage}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{S1\_res }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}
+
+  \AttributeTok{x =} \FunctionTok{residuals}\NormalTok{(}
+    \FunctionTok{feols}\NormalTok{(}
+      \AttributeTok{fml =}\NormalTok{ GPCP\_g }\SpecialCharTok{\textasciitilde{}}\NormalTok{ GPCP\_g\_l}
+      \SpecialCharTok{+}\NormalTok{ year}\SpecialCharTok{:}\NormalTok{ccode}
+      \SpecialCharTok{|}\NormalTok{ ccode,}
+      \AttributeTok{data =}\NormalTok{ rainconflict}
+\NormalTok{    )}
+\NormalTok{  ),}
+  
+  \AttributeTok{y =} \FunctionTok{residuals}\NormalTok{(}
+    \FunctionTok{feols}\NormalTok{(}
+      \AttributeTok{fml =}\NormalTok{ gdp\_g }\SpecialCharTok{\textasciitilde{}}\NormalTok{ GPCP\_g\_l}
+      \SpecialCharTok{+}\NormalTok{ year}\SpecialCharTok{:}\NormalTok{ccode}
+      \SpecialCharTok{|}\NormalTok{ ccode,}
+      \AttributeTok{data =}\NormalTok{ rainconflict}
+\NormalTok{    )}
+\NormalTok{  )}
+  
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(cowplot)}
+
+\FunctionTok{ggplot}\NormalTok{(}
+  \AttributeTok{data =}\NormalTok{ S1\_res,}
+  \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ x, }\AttributeTok{y =}\NormalTok{ y)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}
+    \AttributeTok{size =}\NormalTok{ .}\DecValTok{75}\NormalTok{, }
+    \AttributeTok{alpha =}\NormalTok{ .}\DecValTok{5}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"loess"}\NormalTok{, }\AttributeTok{span =}\NormalTok{ .}\DecValTok{5}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{coord\_cartesian}\NormalTok{(}
+    \AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{.}\DecValTok{4}\NormalTok{, .}\DecValTok{4}\NormalTok{), }
+    \AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{.}\DecValTok{1}\NormalTok{, .}\DecValTok{1}\NormalTok{)}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_cowplot}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{IV_files/figure-pdf/unnamed-chunk-14-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ any\_prio }\SpecialCharTok{\textasciitilde{}}\NormalTok{ GPCP\_g }\SpecialCharTok{+}\NormalTok{ GPCP\_g\_l }
+  \SpecialCharTok{+}\NormalTok{ year}\SpecialCharTok{:}\NormalTok{ccode}
+  \SpecialCharTok{|}\NormalTok{ ccode,}
+  \AttributeTok{data =}\NormalTok{ rainconflict,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ ccode}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{print}\NormalTok{(}\AttributeTok{n =} \DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: any_prio
+Observations: 743
+Fixed-effects: ccode: 41
+Standard-errors: Clustered (ccode) 
+          Estimate Std. Error   t value Pr(>|t|)    
+GPCP_g   -0.023770   0.041969 -0.566373  0.57430    
+GPCP_g_l -0.121936   0.050328 -2.422836  0.02002 *  
+... 41 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.239168     Adj. R2: 0.671564
+                 Within R2: 0.374052
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ war\_prio }\SpecialCharTok{\textasciitilde{}}\NormalTok{ GPCP\_g }\SpecialCharTok{+}\NormalTok{ GPCP\_g\_l }
+  \SpecialCharTok{+}\NormalTok{ year}\SpecialCharTok{:}\NormalTok{ccode}
+  \SpecialCharTok{|}\NormalTok{ ccode,}
+  \AttributeTok{data =}\NormalTok{ rainconflict,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ ccode}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{print}\NormalTok{(}\AttributeTok{n =} \DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: war_prio
+Observations: 743
+Fixed-effects: ccode: 41
+Standard-errors: Clustered (ccode) 
+          Estimate Std. Error  t value Pr(>|t|)    
+GPCP_g   -0.062476   0.029051 -2.15060 0.037605 *  
+GPCP_g_l -0.068689   0.030678 -2.23904 0.030783 *  
+... 41 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.204541     Adj. R2: 0.661198
+                 Within R2: 0.385205
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rf\_res }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}
+  
+  \AttributeTok{x =} \FunctionTok{residuals}\NormalTok{(}
+    \FunctionTok{feols}\NormalTok{(}
+      \AttributeTok{fml =}\NormalTok{ GPCP\_g\_l }\SpecialCharTok{\textasciitilde{}}\NormalTok{ GPCP\_g}
+      \SpecialCharTok{+}\NormalTok{ year}\SpecialCharTok{:}\NormalTok{ccode}
+      \SpecialCharTok{|}\NormalTok{ ccode,}
+      \AttributeTok{data =}\NormalTok{ rainconflict}
+\NormalTok{    )}
+\NormalTok{  ),}
+  
+  \AttributeTok{y =} \FunctionTok{residuals}\NormalTok{(}
+    \FunctionTok{feols}\NormalTok{(}
+      \AttributeTok{fml =}\NormalTok{ any\_prio }\SpecialCharTok{\textasciitilde{}}\NormalTok{ GPCP\_g}
+      \SpecialCharTok{+}\NormalTok{ year}\SpecialCharTok{:}\NormalTok{ccode}
+      \SpecialCharTok{|}\NormalTok{ ccode,}
+      \AttributeTok{data =}\NormalTok{ rainconflict}
+\NormalTok{    )}
+\NormalTok{  )}
+  
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(}
+  \AttributeTok{data =}\NormalTok{ rf\_res , }
+  \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ x, }\AttributeTok{y =}\NormalTok{ y)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{pch =} \DecValTok{19}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"loess"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{coord\_cartesian}\NormalTok{(}
+    \AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{.}\DecValTok{4}\NormalTok{, .}\DecValTok{4}\NormalTok{), }
+    \AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{.}\DecValTok{2}\NormalTok{, .}\DecValTok{4}\NormalTok{)}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_cowplot}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{IV_files/figure-pdf/unnamed-chunk-18-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# (1)}
+\NormalTok{mod\_conf\_probit }\OtherTok{\textless{}{-}} \FunctionTok{feglm}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ any\_prio }\SpecialCharTok{\textasciitilde{}}
+\NormalTok{    gdp\_g }\SpecialCharTok{+} 
+\NormalTok{    gdp\_g\_l}
+  \SpecialCharTok{+}\NormalTok{ gdp\_1979}
+  \SpecialCharTok{+}\NormalTok{ polity2l }
+  \SpecialCharTok{+}\NormalTok{ ethfrac }
+  \SpecialCharTok{+}\NormalTok{ relfrac }
+  \SpecialCharTok{+}\NormalTok{ oil }
+  \SpecialCharTok{+}\NormalTok{ lmtnest }
+  \SpecialCharTok{+}\NormalTok{ lpopl1 }
+  \SpecialCharTok{+}\NormalTok{ year,}
+  \AttributeTok{data =}\NormalTok{ rainconflict,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ ccode, }
+  \AttributeTok{family =} \FunctionTok{binomial}\NormalTok{(}\AttributeTok{link =} \StringTok{"probit"}\NormalTok{)}
+\NormalTok{) }
+
+\FunctionTok{library}\NormalTok{(marginaleffects)}
+
+\NormalTok{mod\_conf\_probit\_avge }\OtherTok{\textless{}{-}}\NormalTok{ mod\_conf\_probit }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{avg\_slopes}\NormalTok{() }
+
+\CommentTok{\# (2)}
+\NormalTok{(}
+\NormalTok{mod\_conf\_ols }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ any\_prio }\SpecialCharTok{\textasciitilde{}}
+\NormalTok{    gdp\_g }\SpecialCharTok{+} 
+\NormalTok{    gdp\_g\_l}
+  \SpecialCharTok{+}\NormalTok{ gdp\_1979}
+  \SpecialCharTok{+}\NormalTok{ polity2l }
+  \SpecialCharTok{+}\NormalTok{ ethfrac }
+  \SpecialCharTok{+}\NormalTok{ relfrac }
+  \SpecialCharTok{+}\NormalTok{ oil }
+  \SpecialCharTok{+}\NormalTok{ lmtnest }
+  \SpecialCharTok{+}\NormalTok{ lpopl1 }
+  \SpecialCharTok{+}\NormalTok{ year,}
+  \AttributeTok{data =}\NormalTok{ rainconflict,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ ccode}
+\NormalTok{) }
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: any_prio
+Observations: 743
+Standard-errors: Clustered (ccode) 
+             Estimate Std. Error   t value Pr(>|t|)    
+(Intercept) -5.381928  12.515620 -0.430017 0.669491    
+gdp_g       -0.332716   0.263400 -1.263157 0.213846    
+gdp_g_l     -0.084997   0.240857 -0.352894 0.726021    
+gdp_1979    -0.040662   0.049894 -0.814961 0.419921    
+polity2l     0.000642   0.004515  0.142164 0.887664    
+ethfrac      0.230431   0.271367  0.849151 0.400851    
+relfrac     -0.237764   0.241595 -0.984144 0.330961    
+oil          0.045297   0.211526  0.214144 0.831523    
+lmtnest      0.075811   0.039371  1.925548 0.061291 .  
+lpopl1       0.068052   0.051102  1.331675 0.190506    
+year         0.002483   0.006366  0.390106 0.698528    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.414086   Adj. R2: 0.113662
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# (3)}
+\FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ any\_prio }\SpecialCharTok{\textasciitilde{}} \SpecialCharTok{{-}}\DecValTok{1}
+  \SpecialCharTok{+}\NormalTok{  gdp\_g }\SpecialCharTok{+} 
+\NormalTok{    gdp\_g\_l}
+  \SpecialCharTok{+}\NormalTok{ gdp\_1979}
+  \SpecialCharTok{+}\NormalTok{ polity2l }
+  \SpecialCharTok{+}\NormalTok{ ethfrac }
+  \SpecialCharTok{+}\NormalTok{ relfrac }
+  \SpecialCharTok{+}\NormalTok{ oil }
+  \SpecialCharTok{+}\NormalTok{ lmtnest }
+  \SpecialCharTok{+}\NormalTok{ lpopl1 }
+  \SpecialCharTok{+} \FunctionTok{i}\NormalTok{(ccode, year),}
+  \AttributeTok{data =}\NormalTok{ rainconflict,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ ccode}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{summary}\NormalTok{(}\AttributeTok{n =} \DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: any_prio
+Observations: 743
+Standard-errors: Clustered (ccode) 
+                 Estimate Std. Error   t value Pr(>|t|)    
+gdp_g           -0.387996   0.208988 -1.856550 0.070751 .  
+gdp_g_l         -0.086461   0.212442 -0.406986 0.686188    
+gdp_1979         2.287334   9.856030  0.232075 0.817663    
+polity2l        -0.001355   0.004148 -0.326768 0.745547    
+ethfrac         43.124761  50.926744  0.846800 0.402145    
+relfrac         39.765573  63.751088  0.623763 0.536324    
+oil              0.006172   0.086301  0.071511 0.943347    
+lmtnest         -3.835094   7.462461 -0.513918 0.610137    
+lpopl1           1.211169   0.671842  1.802760 0.078964 .  
+ccode::404:year -0.033077   0.019564 -1.690721 0.098669 .  
+... 40 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.294151   Adj. R2: 0.526933
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# (4)}
+\FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ any\_prio }\SpecialCharTok{\textasciitilde{}} \SpecialCharTok{{-}}\DecValTok{1}
+  \SpecialCharTok{+}\NormalTok{  gdp\_g }
+  \SpecialCharTok{+}\NormalTok{  gdp\_g\_l}
+  \SpecialCharTok{+} \FunctionTok{i}\NormalTok{(ccode, year)}
+  \SpecialCharTok{|}\NormalTok{ ccode,}
+  \AttributeTok{data =}\NormalTok{ rainconflict,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ ccode}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{summary}\NormalTok{(}\AttributeTok{n =} \DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: any_prio
+Observations: 743
+Fixed-effects: ccode: 41
+Standard-errors: Clustered (ccode) 
+                 Estimate Std. Error    t value  Pr(>|t|)    
+gdp_g           -0.210909   0.156046  -1.351587   0.18410    
+gdp_g_l          0.066801   0.158944   0.420279   0.67653    
+ccode::404:year  0.028626   0.001635  17.510274 < 2.2e-16 ***
+ccode::420:year -0.015243   0.000745 -20.452968 < 2.2e-16 ***
+ccode::432:year  0.007220   0.000373  19.349039 < 2.2e-16 ***
+ccode::433:year  0.059746   0.000225 265.584211 < 2.2e-16 ***
+ccode::434:year  0.000449   0.000485   0.924683   0.36068    
+ccode::435:year  0.000223   0.000544   0.410843   0.68338    
+ccode::436:year  0.035483   0.000574  61.802750 < 2.2e-16 ***
+ccode::437:year  0.000284   0.001085   0.261893   0.79475    
+... 33 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.239816     Adj. R2: 0.669782
+                 Within R2: 0.370655
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\#\# IV models \#\#\#\#}
+
+\CommentTok{\# (5)}
+\FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ any\_prio }\SpecialCharTok{\textasciitilde{}}
+  \SpecialCharTok{+}\NormalTok{ gdp\_1979}
+  \SpecialCharTok{+}\NormalTok{ polity2l }
+  \SpecialCharTok{+}\NormalTok{ ethfrac }
+  \SpecialCharTok{+}\NormalTok{ relfrac }
+  \SpecialCharTok{+}\NormalTok{ oil }
+  \SpecialCharTok{+}\NormalTok{ lmtnest }
+  \SpecialCharTok{+}\NormalTok{ lpopl1 }
+  \SpecialCharTok{+} \FunctionTok{i}\NormalTok{(ccode, year)}
+  \SpecialCharTok{|}\NormalTok{ gdp\_g }\SpecialCharTok{+}\NormalTok{ gdp\_g\_l }\SpecialCharTok{\textasciitilde{}}\NormalTok{ GPCP\_g }\SpecialCharTok{+}\NormalTok{ GPCP\_g\_l, }
+  \AttributeTok{data =}\NormalTok{ rainconflict,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ ccode}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{summary}\NormalTok{(}\AttributeTok{n =} \DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+TSLS estimation - Dep. Var.: any_prio
+                  Endo.    : gdp_g, gdp_g_l
+                  Instr.   : GPCP_g, GPCP_g_l
+Second stage: Dep. Var.: any_prio
+Observations: 743
+Standard-errors: Clustered (ccode) 
+               Estimate Std. Error   t value Pr(>|t|)    
+(Intercept) -153.157460  60.518562 -2.530752 0.015419 *  
+fit_gdp_g     -1.343217   1.462578 -0.918390 0.363920    
+fit_gdp_g_l   -2.714015   1.036990 -2.617205 0.012453 *  
+gdp_1979       9.446193  11.069500  0.853353 0.398545    
+polity2l      -0.005806   0.004843 -1.198875 0.237631    
+ethfrac       83.847478  47.883805  1.751061 0.087601 .  
+relfrac       95.038889  64.178048  1.480863 0.146478    
+oil           -0.058890   0.066111 -0.890779 0.378375    
+lmtnest        2.159746   7.025786  0.307403 0.760132    
+lpopl1        -0.336984   0.868944 -0.387809 0.700213    
+... 41 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.346685   Adj. R2: 0.342806
+F-test (1st stage), gdp_g  : stat = 7.81825, p = 4.389e-4, on 2 and 692 DoF.
+F-test (1st stage), gdp_g_l: stat = 5.56598, p = 0.003999, on 2 and 692 DoF.
+                 Wu-Hausman: stat = 2.56365, p = 0.077756, on 2 and 690 DoF.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# (6)}
+\FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ any\_prio }\SpecialCharTok{\textasciitilde{}} 
+  \SpecialCharTok{+} \FunctionTok{i}\NormalTok{(ccode, year)}
+  \SpecialCharTok{|}\NormalTok{ ccode}
+  \SpecialCharTok{|}\NormalTok{ gdp\_g }\SpecialCharTok{+}\NormalTok{ gdp\_g\_l }\SpecialCharTok{\textasciitilde{}}\NormalTok{ GPCP\_g }\SpecialCharTok{+}\NormalTok{ GPCP\_g\_l, }
+  \AttributeTok{data =}\NormalTok{ rainconflict,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ ccode}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{summary}\NormalTok{(}\AttributeTok{n =} \DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+TSLS estimation - Dep. Var.: any_prio
+                  Endo.    : gdp_g, gdp_g_l
+                  Instr.   : GPCP_g, GPCP_g_l
+Second stage: Dep. Var.: any_prio
+Observations: 743
+Fixed-effects: ccode: 41
+Standard-errors: Clustered (ccode) 
+                 Estimate Std. Error   t value   Pr(>|t|)    
+fit_gdp_g       -1.131763   1.362254 -0.830802 4.1102e-01    
+fit_gdp_g_l     -2.546473   1.070475 -2.378825 2.2230e-02 *  
+ccode::404:year  0.006632   0.013806  0.480372 6.3358e-01    
+ccode::420:year -0.005215   0.006294 -0.828648 4.1222e-01    
+ccode::432:year  0.012689   0.003059  4.148704 1.6945e-04 ***
+ccode::433:year  0.063170   0.001807 34.960834  < 2.2e-16 ***
+ccode::434:year  0.006202   0.004195  1.478344 1.4715e-01    
+ccode::435:year  0.008547   0.004353  1.963488 5.6568e-02 .  
+ccode::436:year  0.043387   0.004817  9.007338 3.5998e-11 ***
+ccode::437:year  0.017506   0.008435  2.075379 4.4425e-02 *  
+... 33 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.302046     Adj. R2: 0.476172
+                 Within R2: 0.001663
+F-test (1st stage), gdp_g  : stat = 6.67399, p = 0.001345, on 2 and 699 DoF.
+F-test (1st stage), gdp_g_l: stat = 5.70442, p = 0.003488, on 2 and 699 DoF.
+                 Wu-Hausman: stat = 3.14562, p = 0.043689, on 2 and 657 DoF.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# (7)}
+\FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ war\_prio }\SpecialCharTok{\textasciitilde{}} 
+    \SpecialCharTok{+} \FunctionTok{i}\NormalTok{(ccode, year)}
+  \SpecialCharTok{|}\NormalTok{ ccode}
+  \SpecialCharTok{|}\NormalTok{ gdp\_g }\SpecialCharTok{+}\NormalTok{ gdp\_g\_l }\SpecialCharTok{\textasciitilde{}}\NormalTok{ GPCP\_g }\SpecialCharTok{+}\NormalTok{ GPCP\_g\_l, }
+  \AttributeTok{data =}\NormalTok{ rainconflict,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ ccode}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{summary}\NormalTok{(}\AttributeTok{n =} \DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+TSLS estimation - Dep. Var.: war_prio
+                  Endo.    : gdp_g, gdp_g_l
+                  Instr.   : GPCP_g, GPCP_g_l
+Second stage: Dep. Var.: war_prio
+Observations: 743
+Fixed-effects: ccode: 41
+Standard-errors: Clustered (ccode) 
+                 Estimate Std. Error   t value  Pr(>|t|)    
+fit_gdp_g       -1.479970   0.800386 -1.849071  0.071848 .  
+fit_gdp_g_l     -0.768785   0.678533 -1.133010  0.263956    
+ccode::404:year -0.001514   0.007526 -0.201188  0.841571    
+ccode::420:year  0.007088   0.003431  2.066077  0.045340 *  
+ccode::432:year  0.003375   0.001670  2.020730  0.050037 .  
+ccode::433:year  0.015992   0.000992 16.119071 < 2.2e-16 ***
+ccode::434:year  0.004765   0.002306  2.065964  0.045351 *  
+ccode::435:year  0.004698   0.002393  1.963229  0.056599 .  
+ccode::436:year  0.005405   0.002624  2.059408  0.046005 *  
+ccode::437:year  0.008802   0.004699  1.872980  0.068392 .  
+... 33 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.228949     Adj. R2: 0.575516
+                 Within R2: 0.229726
+F-test (1st stage), gdp_g  : stat = 6.67399, p = 0.001345, on 2 and 699 DoF.
+F-test (1st stage), gdp_g_l: stat = 5.70442, p = 0.003488, on 2 and 699 DoF.
+                 Wu-Hausman: stat = 1.46546, p = 0.231725, on 2 and 657 DoF.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(modelsummary)}
+
+\FunctionTok{modelsummary}\NormalTok{(}
+  \AttributeTok{models =} \FunctionTok{list}\NormalTok{(}
+\NormalTok{    mod\_conf\_probit\_avge, }
+\NormalTok{    mod\_conf\_ols}
+\NormalTok{    )}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{table}
+\centering
+\begin{tblr}[         %% tabularray outer open
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]},
+column{1}={halign=l,},
+column{2}={halign=c,},
+column{3}={halign=c,},
+hline{24}={1,2,3}{solid, 0.05em, black},
+}                     %% tabularray inner close
+\toprule
+& (1) & (2) \\ \midrule %% TinyTableHeader
+ethfrac     & \num{0.220}   & \num{0.230}    \\
+& (\num{0.242}) & (\num{0.271})  \\
+gdp\_1979  & \num{-0.063}  & \num{-0.041}   \\
+& (\num{0.058}) & (\num{0.050})  \\
+gdp\_g     & \num{-0.350}  & \num{-0.333}   \\
+& (\num{0.301}) & (\num{0.263})  \\
+gdp\_g\_l & \num{-0.127}  & \num{-0.085}   \\
+& (\num{0.251}) & (\num{0.241})  \\
+lmtnest     & \num{0.072}   & \num{0.076}    \\
+& (\num{0.036}) & (\num{0.039})  \\
+lpopl1      & \num{0.074}   & \num{0.068}    \\
+& (\num{0.049}) & (\num{0.051})  \\
+oil         & \num{0.015}   & \num{0.045}    \\
+& (\num{0.210}) & (\num{0.212})  \\
+polity2l    & \num{0.001}   & \num{0.001}    \\
+& (\num{0.005}) & (\num{0.005})  \\
+relfrac     & \num{-0.271}  & \num{-0.238}   \\
+& (\num{0.241}) & (\num{0.242})  \\
+year        & \num{0.003}   & \num{0.002}    \\
+& (\num{0.006}) & (\num{0.006})  \\
+(Intercept) &                & \num{-5.382}   \\
+&                & (\num{12.516}) \\
+Num.Obs.    & \num{743}     & \num{743}      \\
+R2          & \num{0.122}   & \num{0.126}    \\
+R2 Adj.     & \num{0.099}   & \num{0.114}    \\
+AIC         & \num{779.8}   & \num{820.4}    \\
+BIC         & \num{830.6}   & \num{871.1}    \\
+RMSE        & \num{0.42}    & \num{0.41}     \\
+Std.Errors  &                & by: ccode       \\
+\bottomrule
+\end{tblr}
+\end{table}
 
 \bookmarksetup{startatroot}
 
@@ -4360,7 +5234,7 @@ globalen ATT zusammengefasst werden können.\footnote{Die Methoden von
   Callaway und Sant'Anna (2021) sind im R-Paket \texttt{did}
   implementiert.}
 
-\begin{tcolorbox}[enhanced jigsaw, colframe=quarto-callout-note-color-frame, coltitle=black, breakable, titlerule=0mm, opacityback=0, colbacktitle=quarto-callout-note-color!10!white, leftrule=.75mm, bottomtitle=1mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum einfachen DID-Schätzer}, toptitle=1mm, arc=.35mm, rightrule=.15mm, bottomrule=.15mm, left=2mm, toprule=.15mm, colback=white, opacitybacktitle=0.6]
+\begin{tcolorbox}[enhanced jigsaw, opacityback=0, colback=white, rightrule=.15mm, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, arc=.35mm, opacitybacktitle=0.6, bottomtitle=1mm, breakable, leftrule=.75mm, toptitle=1mm, titlerule=0mm, bottomrule=.15mm, coltitle=black, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum einfachen DID-Schätzer}, toprule=.15mm, left=2mm]
 
 \begin{itemize}
 \item
@@ -9775,7 +10649,7 @@ Erklärungskraft werden durch die Regularisierung in Richtung 0 gezwungen
 und reduzieren so die Varianz der Vorhersage gegenüber der
 (idealerweise) unverzerrten KQ-Schätzung.
 
-\begin{tcolorbox}[enhanced jigsaw, colframe=quarto-callout-note-color-frame, coltitle=black, breakable, titlerule=0mm, opacityback=0, colbacktitle=quarto-callout-note-color!10!white, leftrule=.75mm, bottomtitle=1mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Ridge Regression}, toptitle=1mm, arc=.35mm, rightrule=.15mm, bottomrule=.15mm, left=2mm, toprule=.15mm, colback=white, opacitybacktitle=0.6]
+\begin{tcolorbox}[enhanced jigsaw, opacityback=0, colback=white, rightrule=.15mm, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, arc=.35mm, opacitybacktitle=0.6, bottomtitle=1mm, breakable, leftrule=.75mm, toptitle=1mm, titlerule=0mm, bottomrule=.15mm, coltitle=black, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Ridge Regression}, toprule=.15mm, left=2mm]
 
 \begin{itemize}
 \item
@@ -10350,7 +11224,7 @@ und damit zu einer höheren Vorhersagegüte. Das ``sparsame'' mit
 Lasso-Regression geschätzte Modell ist dem ``großen'' mit KQ geschätztem
 Modell in dieser Hinsicht also überlegen.
 
-\begin{tcolorbox}[enhanced jigsaw, colframe=quarto-callout-note-color-frame, coltitle=black, breakable, titlerule=0mm, opacityback=0, colbacktitle=quarto-callout-note-color!10!white, leftrule=.75mm, bottomtitle=1mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Lasso-Regression}, toptitle=1mm, arc=.35mm, rightrule=.15mm, bottomrule=.15mm, left=2mm, toprule=.15mm, colback=white, opacitybacktitle=0.6]
+\begin{tcolorbox}[enhanced jigsaw, opacityback=0, colback=white, rightrule=.15mm, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, arc=.35mm, opacitybacktitle=0.6, bottomtitle=1mm, breakable, leftrule=.75mm, toptitle=1mm, titlerule=0mm, bottomrule=.15mm, coltitle=black, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Lasso-Regression}, toprule=.15mm, left=2mm]
 
 \begin{itemize}
 \item
@@ -11322,7 +12196,7 @@ Der Post-Double-Selection-Schätzer liefert unter den betrachteten
 Verfahren die beste Schätzung von \(\alpha_0\) und erlaubt gülstige
 statistische Inferenz. Der geschätzte Effekt ist hoch-signifikant.
 
-\begin{tcolorbox}[enhanced jigsaw, colframe=quarto-callout-note-color-frame, coltitle=black, breakable, titlerule=0mm, opacityback=0, colbacktitle=quarto-callout-note-color!10!white, leftrule=.75mm, bottomtitle=1mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum Post-Double-Selection-Schätzer}, toptitle=1mm, arc=.35mm, rightrule=.15mm, bottomrule=.15mm, left=2mm, toprule=.15mm, colback=white, opacitybacktitle=0.6]
+\begin{tcolorbox}[enhanced jigsaw, opacityback=0, colback=white, rightrule=.15mm, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, arc=.35mm, opacitybacktitle=0.6, bottomtitle=1mm, breakable, leftrule=.75mm, toptitle=1mm, titlerule=0mm, bottomrule=.15mm, coltitle=black, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum Post-Double-Selection-Schätzer}, toprule=.15mm, left=2mm]
 
 \begin{itemize}
 \item
