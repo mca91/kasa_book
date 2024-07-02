@@ -98,6 +98,7 @@ tabopts <- function(x) {
 }
 
 library(tidyverse)
+library(cowplot)
 # load the brexit data
 download.file(
     "https://raw.githubusercontent.com/mca91/kausal_data/main/brexit.csv",
@@ -106,7 +107,6 @@ download.file(
 brexit <- read_csv("datasets/brexit.csv") %>% as.data.frame
 
 # load the Synth package
-library(cowplot)
 library(broom)
 library(AER)
 options(pillar.sigfig = 2)

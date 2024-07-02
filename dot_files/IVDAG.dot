@@ -1,0 +1,14 @@
+digraph IV_DAG {
+  layout=neato
+  fontname="Helvetica,Arial,sans-serif"
+  node [fontname="Helvetica,Arial,sans-serif", shape=circle]
+  edge [fontname="Helvetica,Arial,sans-serif"]
+  U [pos="1.5,1.5!", color=gray, fontcolor=gray];
+  B [pos="0,0!"];
+  Y [pos="3,0!"];
+  Z [pos="-2,0!"];
+  U -> B [color=gray, label=beta_1]; 
+  U -> Y [color=gray]; 
+  B -> Y;
+  Z -> B;
+}

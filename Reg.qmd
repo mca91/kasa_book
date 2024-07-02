@@ -1,4 +1,4 @@
-# Regression
+# Regression {#sec-regression}
 
 ```{r}
 library(tidyverse)
