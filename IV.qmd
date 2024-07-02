@@ -29,6 +29,445 @@ tabopts <- function(x) {
 }
 ```
 
+Wie in Kapitel @sec-regression erläutert, können Regressionsmodelle unter Endogenitätsproblemen leiden: Der Fehlerterm in unserem Regressionsmodell ist mit dem/den interessierenden Regressor(en) korreliert, sodass der zugehörige Koeffizient inkonsistent geschätzt wird und damit nicht als kausaler Effekt interpretiert werden darf. Die häufigsten Ursachen für Endogenität, die in empirischen Anwendungen auftreten, sind ausgelassene Variablen, Messfehler und simultane Kausalität.
+
+Durch Hinzufügen potenziell relevanter Variablen in die Regression kann das Risiko einer verzerrten Schätzung des interessierenden kausalen Effekts anhand multipler Regression verringert werden. Wenn jedoch wichtige ausgelassene Variablen unbeobachtbar (U) sind oder aus anderen Gründen nicht zur Verfügung stehen, kann multiple Regression die Endogenität nicht beheben. Diese Problematik ergibt sich insbesondere bei simultaner Kausalität: Wenn die Kausalität von der Behandlungsvariable (B) zur Outcomevariable (Y) und umgekehrt verläuft, gibt es Backdoors, die nicht durch das Hinzufügen von Kontrollvariablen zum Regressionsmodell geschlossen werden können.
+
+Eine allgemeinere Technik, um Backdoors aufgrund unbeobachtbarer Variablen zu schließen, ist die Regression mit Instrumentvariablen (IV). Bei IV-Regression wird exogene Variation in einer Instrumentvariablen (Z) verwendet, um den Teil der Variation in der Behandlungsvariable zu isolieren, der *nicht* durch unbeobachtbare Faktoren verursacht wird, die sowohl B als auch Y beeinflussion. Der kausale Effekt von B auf Y wird dann anhand dieser exogene Variation in B geschätzt. Ein Forschungsdesign, in dem der kausale Effekt von B auf Y mit IV-Regression geschätzt werden kann, ist in @fig-IVDAG1 dargestellt.
+
+
+```{dot}
+//| fig-width: 6
+//| fig-height: 4
+//| fig-align: 'center'
+//| fig-cap: "IV-Design bei Backdoor durch unb. Confounder-Variablen"
+//| label: "fig-IVDAG1" 
+digraph IV_DAG {
+  layout=neato
+  fontname="Helvetica,Arial,sans-serif"
+  node [fontname="Helvetica,Arial,sans-serif", shape=circle]
+  edge [fontname="Helvetica,Arial,sans-serif"]
+  U [pos="1.5,1.5!", color=gray, fontcolor=gray];
+  B [pos="0,0!"];
+  Y [pos="3,0!"];
+  Z [pos="-2,0!"];
+  U -> B [color=gray]; 
+  U -> Y [color=gray]; 
+  B -> Y;
+  Z -> B;
+}
+```
+
+## Der einfache lineare IV-Schätzer
+
+Im folgenden nehmen wir an, dass sämtliche Zusammenhänge linear sind. Zunächst betrachten wir das einfache Regressionsmodell 
+
+\begin{align}
+  Y_i = \beta_0 + \beta_1 B_i + u_i \ \ , \ \ i=1,\dots,n, \label{eq:simpleiv}
+\end{align}
+
+wobei der Fehlerterm $u_i$ mit dem Regressor $B_i$ korreliert ist (d.h. $B$ ist ein *endogener* Regressor), sodass der KQ-Schätzer für den kausalen Effekt $\beta_1$ inkonsistent ist. 
+
+Damit $Z$ ein gültiges Instrument für $B$ in dem in @fig-IVDAG1 gezeigten Forschungsdesign ist, müssen die folgenden Bedingungen erfüllt sein:
+
+Sei $\text{Cov}(A,B)$ die Kovarianz zwischen den Variablen $A$ und $B$. $Z$ muss zwei Bedingungen erfüllen, um ein gültiges Instrument zu sein:
+
+- **1. Relevanz des Instruments für die endogene Variable**
+
+    $B$ und $Z$ *müssen* korreliert sein (Pfeil von Z nach B in @fig-IVDAG1): 
+    \begin{align}
+      \text{Cov}(B,Z) \neq 0 \label{eq:ivassum1}
+    \end{align}
+    
+- **2. Exogenität des Instruments hinsichtlich der Outcome-Variable**
+
+    Das Instrument $Z$ *darf nicht* mit dem Fehlerterm $u$ in der Modellgleichung \eqref{eq:simpleiv} korreliert sein (keine Pfade von Z nach Y außer durch B in @fig-IVDAG1):
+    \begin{align}
+      \text{Cov}(Z,u) = 0 \label{eq:ivassum2}
+    \end{align}
+
+Unter diesen Annahmen erlaubt das Forschungsdesign die Anwendung des einfachsten IV-Ansatzes, wobei eine endogene Variable $B$ durch eine Instrumentvariable $Z$ *instrumentiert* wird. Die folgende Umformung zeigt, warum der kausale Effekt von B auf Y anhand der (Ko)Variation in diesen Variablen identifiziert werden kann:
+
+\begin{alignat*}{2}
+  \textup{Cov}(Z,Y) &= \textup{Cov}(Z,\beta_0 + \beta_1 B + u) &\quad& \text{(Gl. \eqref{eq:simpleiv})} \\
+  \\
+  \textup{Cov}(Z,Y) &= \textup{Cov}(Z, \beta_1 B + u) &\quad& \text{($\beta_0$ konstant)} \\
+  \\
+  \textup{Cov}(Z,Y) &= \beta_1\textup{Cov}(Z,B) &\quad& \text{($\beta_1$ konstant, $Z$ exogen)} \\
+  \\
+  \beta_1 &= \frac{\textup{Cov}(Z,Y) }{\textup{Cov}(Z,B)} &\quad& \text{($Z$ relevant)}
+\end{alignat*}
+
+Eine naheliegende Implementierung gemäß dieses Identifikationsprinzips ist der einfache IV-Schätzer
+
+\begin{align}
+  \widehat{\beta}_{\textup{IV}} = \frac{\widehat{\textup{Cov}}(Z,Y) }{\widehat{\textup{Cov}}(Z,B)}, \label{eq:simpleivest}
+\end{align}
+
+wobei lediglich die Kovarianzfunktion $\textup{Cov}(\cdot,\cdot)$ durch ihr Stichprobenäquivalent $\widehat{\textup{Cov}}(\cdot,\cdot)$ ersetzt wird.
+
+**Erwartungswert und Konsistenz**
+
+Eine hilfreiche Darstellung von \eqref{eq:simpleivest} ist
+
+\begin{align*}
+  \widehat{\beta}_\textup{IV} = \beta_1 + \frac{\sum_{i=1}^n (Z_i-\overline Z) u_i}{\sum_{i=1}^n (Z_i - \overline{Z})B_i}.
+\end{align*}
+
+Anhand dieser Form kann der Erwartungswert sowie das Verhalten für große Stichproben untersucht werden. Eine wichtige Eigenschaft ist
+
+\begin{align}
+  \textup{E}\big(\widehat{\beta}_\textup{IV}\big) = \beta_1 + \underbrace{\textup{E}\bigg(\frac{\sum_{i=1}^n (Z_i-\overline Z) u_i}{\sum_{i=1}^n (Z_i - \overline{Z})B_i}\bigg)}_{\neq0},\label{eq:ivbiasterm}
+\end{align}
+
+sodass $\widehat{\beta}_\textup{IV}$ ein *verzerrter Schätzer* von $\beta_1$ ist.^[Beachte, dass der endogene Regressor $B_i$ mit $u_i$ korreliert, sodass der Erwartungswert des Bruchs in \eqref{eq:ivbiasterm} ungleich $0$ ist.] Glücklicherweise kann man zeigen, dass
+
+\begin{align*}
+  \frac{\sum_{i=1}^n (Z_i-\overline Z) u_i}{\sum_{i=1}^n (Z_i - \overline{Z})B_i}\to 0 \quad \text{für} \quad n\to\infty
+\end{align*}
+
+bei Gültigkeit der IV-Annahmen \eqref{eq:ivassum1} und \eqref{eq:ivassum2}, d.h. $\widehat{\beta}_\textup{IV}$ ist ein *konsistener* Schätzer für $\beta_1$,
+
+\begin{align*}
+  \widehat{\beta}_\textup{IV} \to \beta_1 \quad \text{für} \quad n\to\infty.
+\end{align*}
+
+
+**Schwache Instrumente**
+
+Beachte, dass die Annahme der Relevanz des Instruments für die Herleitung des Identifikationsprinzips und des Schätzers \eqref{eq:simpleivest} von entscheidender Bedeutung ist: Sind $Z$ und $B$ unkorreliert, so ist $\text{Cov}(B,Z) = 0$ und $\beta_1$ damit nicht identifizierbar. Weiterhin würde $\widehat{\text{Cov}}(B,Z)\to0$ wenn $n\to\infty$, sodass $\widehat{\beta}_{\textup{IV}}\to\infty$! 
+
+In empirischen Anwendungen ist $\text{Cov}(B,Z) = 0$ unwahrscheinlich. Die Kovarianz von $B$ und $Z$ kann jedoch gering sein. In diesem Fall bezeichnet man $Z$ als ein *schwaches Instrument*. Anhand von Gleichung \eqref{eq:simpleivest} können wir die Konsequenzen der Verwendung eines schachen Instruments ableiten: Ein sehr schwacher linearer Zusammenhang von $B$ und $Z$ --- und damit $\widehat{\text{Cov}}(B,Z) \approx 0$ --- kann trotz Relevanz von $Z$ zu einem Schätzer mit großer Varianz führen.
+
+Die Relevanz eines Instruments kann mit einem Hypothesentests geprüft werden. Wie die "Stärke" eines Instruments beurteilt werden sollte, ist eine nicht-triviale Frage. Wir betrachten diesen Aspekt näher in @sec-2SLS.
+
+
+## 2SLS-Verfahren {#sec-2SLS}
+
+Der einfache IV-Schätzer \eqref{eq:simpleivest} ist ein Spezialfall eines allgemeineren Regressionsverfahrens, das in zwei Schritten Durchgeführt wird. Im fall von Modell \eqref{eq:simpleiv} erfolgt die Schätzung anhand der folgenden einfachen Regressionen:
+
+- **1. Stufe: Regression von $B$ auf $Z$**
+
+    Regressiere die endogene Variable $B$ auf das Instrument $Z$:
+    \begin{align}
+      B_i = \alpha_0 + \alpha_1 Z_i + u_i, \quad 1,\dots,n.
+    \end{align}
+    Berechne die geschätzten Werte 
+    \begin{align}
+      \widehat{B}_i = \widehat{\alpha}_0 + \widehat{\alpha}_1 Z_i.
+    \end{align}
+
+    Die $\widehat{B}_i$ aus dieser Regression sind "bereinigt": Die Variation in den $\widehat{B}_i$ wird lediglich durch die exogene Variation in $Z$ verursacht.  
+
+- **2. Stufe: Regression von $Y$ auf $\widehat{B}$**
+
+    Regressiere die Beobachtungen der abhängigen Variable $Y_i$ auf die geschätzten Werte $\widehat{B}_i$ aus der 1. Stufe:
+    \begin{align}
+      Y_i = \gamma_0 + \gamma_1 \widehat{B}_i + e_i.
+    \end{align}
+    Der geschätzte Koeffizient $\widehat{\gamma}_1$ aus dieser Regression ist der Two-Stage-Least-Squares-Schätzer (2SLS-Schätzer) von $\beta_1$.
+
+### Äquivalenz von 2SLS und einfacher IV-Schätzer {#sec-equiviv}
+
+Der KQ-Schätzer von $\gamma_1$ in der 2. Stufe ist
+\begin{align}
+  \widehat{\gamma}_1 = \frac{\sum (\widehat{B}_i - \overline{\widehat{B}})(Y_i - \bar{Y})}{\sum (\widehat{B}_i - \bar{\widehat{B}})^2} = \frac{\widehat{\text{Cov}}(\widehat{B}, Y)}{\widehat{\textup{Var}}(\widehat{B}_i)}.
+\end{align}
+Da $\widehat{B}_i = \widehat{\alpha}_0 + \widehat{\alpha}_1 Z_i$, die angepassten Werte aus der 1. Stufe, eine lineare Funktion von $Z_i$ sind, können wir $\widehat{\text{Cov}}(\widehat{B}, Y)$ wie folgt schreiben:
+\begin{align}
+  \widehat{\text{Cov}}(\widehat{B}, Y) = \widehat{\alpha}_1 \widehat{\text{Cov}}(Z, Y)
+\end{align}
+Eine ähnliche Umformung zeigt, dass
+\begin{align}
+  \widehat{\text{Var}}(\widehat{B}) = \widehat{\alpha}_1^2 \widehat{\text{Var}}(Z).
+\end{align}
+
+Kombinieren wir diese Ergebnisse, erhalten wir folgende Darstellung für den KQ-Schätzer von $\gamma_1$ in der 2. Stufe:
+\begin{align}
+  \widehat{\gamma}_1 = \frac{\widehat{\text{Cov}}(\widehat{B}, Y)}{\widehat{\text{Var}}(\widehat{B})} = \frac{\widehat{\alpha}_1 \widehat{\text{Cov}}(Z, Y)}{\widehat{\alpha}_1^2 \widehat{\text{Var}}(Z)} = \frac{\widehat{\text{Cov}}(Z, Y)}{\widehat{\alpha}_1 \widehat{\text{Var}}(Z)}
+\end{align}
+
+Der KQ-Schätzer von $\widehat{\alpha}_1$ in der 1. Stufe ist definiert als $\widehat{\alpha}_1 = \frac{\widehat{\text{Cov}}(Z, B)}{\widehat{\text{Var}}(Z)}$. Somit gilt
+\begin{align}
+  \widehat{\gamma}_1 = \frac{\widehat{\text{Cov}}(Z, Y)}{\frac{\widehat{\text{Cov}}(Z, B)}{\widehat{\text{Var}}(Z)} \widehat{\text{Var}}(Z)} = \frac{\widehat{\text{Cov}}(Z, Y)}{\widehat{\text{Cov}}(Z, B)} = \widehat{\beta}_{\textup{IV}}.\label{eq:equiviv}
+\end{align}
+
+### Wozu 2SLS?
+
+```{dot}
+//| fig-width: 5
+//| fig-height: 4
+//| fig-align: 'center'
+//| fig-cap: "IV-Design mit beobachtbaren Confoundern"
+//| label: "fig-2SLSDAG" 
+digraph IV_DAG {
+  layout=neato
+  fontname="Helvetica,Arial,sans-serif"
+  node [fontname="Helvetica,Arial,sans-serif", shape=circle]
+  edge [fontname="Helvetica,Arial,sans-serif"]
+  X [pos="-2,1.5!"];
+  U [pos="1.5,1.5!", color=gray, fontcolor=gray];
+  B [pos="0,0!"];
+  Y [pos="3,0!"];
+  Z [pos="-2,0!"];
+  X -> Z;
+  X -> B;
+  X -> Y;
+  U -> B [color=gray]; 
+  U -> Y [color=gray]; 
+  B -> Y;
+  Z -> B;
+}
+```
+
+In der Praxis werden IV-Schätzungen mit statistischer Software häufig anhand einer Implementierung des 2SLS-Verfahren durchgeführt. Gründe hierfür sind:
+
+1. **Bedingte Exogenität**. Für den in @fig-IVDAG1 dargestellten DGP ist die Exogenität von Z gegeben. In empirischen Anwendungen kann es jedoch schwierig sein, ein Instrument Z zu finden, dass plausibel nur mit dem endogenen Regressor korreliert. Eine schwächere Bedingung als Exogenität ist Exogenität nach Kontrolle für *beobachtbare* gemeinsame Determinanten (X) von Z und Y.^[Formal: $\textup{Cov}(Z,u\vert X) = 0$.] 
+
+    Diese Situation ist in @fig-2SLSDAG dargestellt: Aufgrund der Pfeile von X zu Z und Y ist die Bedingung \eqref{eq:ivassum2} verletzt. Durch Kontrolle für X in *beiden* Regressionen des 2SLS-Verfahrens können die Pfade durch X geschlossen werden.
+    
+2. **Mehrere endogene Variablen / Instrumente**. Der 2SLS-Ansatz kann leicht für mehrere endogene Variablen (und mehrere Instrumentvariablen) erweitert werden. Für jede der endogenen Variablen erfolgt hierbei eine separate Regression in der ersten Stufe des 2SLS-Verfahrens, wobei jeweils mehrere Instrumente verwendet werden und zusätzlich für beobachtbare Kovariablen X kontrolliert werden kann.
+
+3. **Statistische Inferenz**. Die Berechnung von $\widehat{\beta}_\textup{IV}$ erfordert Sorgfalt bei der Konstruktion von Inferenzstatistiken. Die in @sec-equiviv gezeigte Äquivalenz impliziert, dass wir bei der Schätzung der Variabilität von $\widehat{\beta}_\textup{IV}$ die Unsicherheit aus den beiden KQ-Schätzungen des 2SLS-Verfahrens berücksichtigen müssen. Korrigierte Standardfehlerformeln können vergleichsweise einfach anhand der Regressionsdarstellung hergeleitet werden und sind statistischer Software implementiert (bspw. `ivreg` in R). 
+
+    Weiterhin ermöglicht das Regressions-Framework diagnostische Tests. So kann die Relevanz von Instrumenten anhand von F-Tests für die Koeffizienten in den Regressionen der ersten Stufe des 2SLS-Verfahrens überprüft werden. Sofern mehr Instrumente als endogene Variablen vorliegen, kann die Exogenität der Instrumente getestet werden.
+
+
+---
+
+**Interaktive Illustrationen des 2SLS-Verfahren**
+
+Der DGP im nachfolgenden interaktiven Beispiel ist
+
+\begin{align}
+  \begin{split}
+    X_i =&\, \gamma \cdot Z_i + v_i,\\
+    Y_i =&\, \beta_1 \cdot X_i + u_i,
+  \end{split}
+  \label{eq:OJSIVDGP}
+\end{align}
+wobei $Z_i \sim N(0, .25^2)$. Die Fehlerterme $v_i$ und $u_i$ sind $N(0,1)$-verteilt und folgen einer gemeinsam Normalverteilung mit Korrelationsparameter $\rho$,
+\begin{align}
+\begin{pmatrix}
+v_i \\ u_i
+\end{pmatrix}
+\sim N
+\bigg[
+\begin{pmatrix}
+0 \\ 0
+\end{pmatrix}
+\begin{pmatrix}
+1 & \rho \\
+\rho & 1
+\end{pmatrix}
+\bigg].
+\end{align}
+
+Wir sind daran interessiert, den Parameter $\beta_1$ zu schätzen, um den Effekt von $X$ auf $Y$ zu bestimmen, wobei wir $n=1000$ Beobachtungen von $(X_i, Y_i, Z_i)$ verwenden.
+
+Beachte, dass $X_i$ eine Funktion der (exogenen) Variable $Z_i$ und des Fehlerterms $v_i$ ist. Wenn die Fehlerterme $(v_i, u_i)’$ im DGP \eqref{eq:OJSIVDGP} korreliert sind ($\rho\neq0$), dann besteht Korrelation zwischen $X_i$ und $u_i$. Dies impliziert, dass $X$ ein endogener Regressor im "naiven" Regressionsmodell 
+\begin{align}
+Y_i = \beta_0 + \beta_1 X_i + e_i, \quad i = 1,\dots,N.
+\end{align}
+Der KQ-Schätzer von $\beta_1$ ist dann *verzerrt und inkonsistent*.
+
+Wenn $Z$ Erklärungskraft für $X$ hat, d.h. $\gamma\neq0$ mit $|\gamma|$ nicht zu klein gewählt ist ($Z$ ist relevant), und $Z$ nur über $X$ auf $Y$ wirkt ($Z$ ist exogen in der Gleichung von $Y_i$), dann kann der kausale Effekt von $X$ auf $Y$ anhand einer Instrumentvariablen-Regression mit $Z$ konsistent geschätzt werden.
+
+Die folgende Interaktive Grafik berechnet den 2SLS-Schätzer Analog zu der in @sec-2SLS erläuterten Vorgehensweise:
+
+1. Schätze das Regressionsmodell
+    
+    \begin{align}
+    X_i = \alpha_0 + \alpha_1 \cdot Z_i + \epsilon_i
+    \end{align}
+    und berechnen Sie die angepassten Werte $\widehat{X}_i$. Dieser Schritt isoliert die exogene Variation in $X_i$, die auf $Z_i$ zurückzuführen ist.
+
+2. Schätze den Effekt von $X$ auf $Y$ unter Verwendung von $\widehat{X}_i$, dem exogenen Teil von $X_i$ aus 1., in der Regression
+
+    \begin{align}
+    Y_i = \delta_0 + \delta_1 \cdot \widehat{X}_i  + \varepsilon_i.
+    \end{align}
+    Der KQ-Schätzer $\widehat{\delta}_1$ von $\delta_1$ ist der 2SLS-Schätzer von $\beta_1$.
+
+Die Grafik illustriert das Verhalten des IV-Schätzers (lila Grade) im Vergleich zum KQ-Schätzer (gestrichelte Grade) und zum wahren Zusammenhang (grüne Grade) für *eine* simulierte Stichprobe (gegeben der gewählten Parameter) anhand der geschätzten Regressionslinien. Die voreingestellten Parameter-Kombinationen zeigen 
+
+- die Verzerrung von 2SLS, wenn $Z$ ein schwaches Instrument für $X$ ist, 
+- eine Situation in der $X$ exogen ist (KQ ist unverzerrt), was zu vergleichbaren Schätzungen führt (sofern $Z$ kein Schwaches Instrument ist)
+- eine starke Verzerrung von KQ, wenn $X$ endogen und irrelevant ($\beta_1 = 0$) ist.
+
+<iframe width="100%" height="910" frameborder="0"
+  src="https://observablehq.com/embed/@mca91/ivreg?cells=webrinfo%2Cviewof+weak%2Cviewof+exogeneous%2Cviewof+beta1zero%2Cviewof+beta%2Cviewof+gamma%2Cviewof+cor%2Cviewof+showX_hat%2Cviewof+regtype%2Cchart%2Cloaded">
+</iframe>
+
+Anhand der obigen interaktiven Grafik lässt sich zwar die Verzerrung der Schätzer einschätzen, jedoch nicht ihre Unsicherheit. Um die gesamte Verteilung der Schätzer zu illustrieren, zeigt die nachstehende Grafik Kerndichteschätzungen für $N$ simulierte Stichproben der Größe $n$ für den gewählten DGP.^[Beachte, dass die Simulation insbesondere für große $N$ und $n$ einige Sekunden dauern kann (grauer Balken am linken Rand zeigt laufende Berechnung an).] Die voreingestellten Parameter-Kombinationen zeigen:
+
+- Wenn $Z$ ein schwaches Instrument ist, kann der IV-Schätzer verzerrt sein *und* eine deutlich größere Varianz als der KQ-Schätzer haben.
+- Wenn $X$ exogen ist, hat der IV-Schätzer eine größere Varianz als der KQ-Schätzer.
+- Wenn die Endogenität von $X$ "stark" ist (hohe Korrelation von $u$ und $v$), kann der IV-Schätzer auch in kleinen Stichproben hilfreich sein: IV hat eine deutlich geringere Verzerrung als KQ, aber eine größere Varianz.
+
+<iframe width="100%" height="1350" frameborder="0"
+  src="https://observablehq.com/embed/@mca91/bias-and-variance-in-iv-regression?cells=webrinfo%2Cviewof+weak%2Cviewof+exogeneous%2Cviewof+beta1zero%2Cviewof+N%2Cviewof+n%2Cviewof+beta%2Cviewof+gamma%2Cviewof+cor%2Cchart%2Cloaded%2Csimcode"></iframe>
+
+---
+
+```{r}
+#| message: false
+library(faux) # install.packages("faux")
+
+set.seed(1234)
+
+n <- 1000
+
+errors <- rnorm_multi(
+    n, mu = c(0, 0), sd = c(1, 1),
+    r = -0.8, varnames = c("u", "v"), 
+)
+
+Z <- rnorm(n, sd = .25)
+X <- 2 * Z + errors$v
+Y <- 0 * X + errors$u
+
+the_data <- data.frame(X, Y)
+```
+
+```{r}
+library(cowplot)
+
+the_data %>%
+  mutate(Xhat = lm(X ~ Z)$fitted) %>%
+  
+  ggplot(aes(x = X, y = Y)) + 
+  geom_point() +
+  geom_smooth(
+    method = "lm", 
+    se  = FALSE, 
+    col = "red"
+  ) +
+  geom_hline(
+    yintercept = 0, 
+    col = "darkgreen"
+    ) +
+  geom_smooth(
+    mapping = aes(x = Xhat, y = Y), 
+    method = "lm", 
+    se  = FALSE,
+    col = "steelblue"
+    ) +
+  theme_cowplot()
+```
+
+```{r}
+library(AER)
+
+KQ_mod_sim <- lm(
+  formula = Y ~ X,
+  data = the_data
+)
+
+summary(KQ_mod_sim)
+```
+
+```{r}
+library(ivreg)
+
+iv_mod_sim <- ivreg(
+  formula = Y ~ X | Z,
+  data = the_data
+)
+
+summary(iv_mod_sim)
+```
+
+
+## Beispiel: Der schwache Staat, die Bauern und die Mafia 
+
+@Acemogluetal2020 untersuchen den Aufstieg und die Auswirkungen der sizilianischen Mafia gegen Ende des 19. Jahrhunderts. Die Studie argumentiert, dass das Wachstum der Mafia teilweise auf das Aufkommen sozialistischer Bauern-Organisationen (Fasci siciliani) zurückzuführen ist, die in einem Umfeld schwacher staatlicher Präsenz die Rechte der Bauern verteidigten. Grundbesitzer, Verwalter und lokale Politiker wandten sich also an die Mafia, um diese sozialistische "Bedrohung" zu bekämpfen und die Kontrolle über die landwirtschaftlich arbeitende Bevölkerung zu behalten. Die Studie identifiziert einen signifikanten (positiven) kausalen Zusammenhang zwischen dem Aufstieg der Fasci und der Ausbreitung der Mafia in Sizilien.
+
+### Identifikationsstrategie
+
+Die Beziehung zwischen dem Aufkommen der Fasci und der Mafia-Aktivität im einfachen Regressionsmodell
+\begin{align}
+  \textup{Mafia-Aktivität} = \beta_0 + \beta_1 \textup{Fasci siciliani} + \varepsilon \label{eq:fascimafiamod1}
+\end{align}
+ist aufgrund mehrerer Faktoren endogen:
+
+1. **Externe Faktoren**, die sowohl die Entstehung der Fasci siciliani als auch der Mafia beeinflussen sind wahrscheinlich. Beispielsweise könnten wirtschaftliche Notlagen oder politische Instabilität sowohl die Organisation der Bauern als auch die Etablierung der Mafia begünstigen.
+
+2. **Simultante Kasalität**: Die Präsenz der Fasci könnte die Mafia-Aktivitäten beeinflussen und umgekehrt: Intensive Mafia-Aktivitäten könnten die Notwendigkeit für Bauernorganisationen erhöhen, was wiederum die Mafia stärkt. Außerdem erschwert die zeitliche Nähe zwischen der Entstehung der Fasci und der Verbreitung der Mafia die Identifizierung der Kausalrichtung.
+
+Wir können das Modell \eqref{eq:fascimafiamod1} um (messbare) unter 1. fallende Regressoren erweitern, um einer verzerrten Schätzung aufgrund relevanter ausgelassener Variablen vorzubeugen. Eine Verzerrung aufgrund der in 2. beschriebenen simultanen Kausalität kann jedoch *nicht* durch multiple Regression vermieden werden. 
+
+@Acemogluetal2020 nutzen die folgende Identifikationsstrategie: Eine extreme Dürre im Jahr 1893 (insbesondere Regenausfall im Frühlung) hatte einen erheblichen negativen Einfluss auf die landwirtschaftliche Produktion in Sizilien und verursachte große Not unter den Bauern, was die Entstehung der Fasci beförderte. Die Dürre kann als natürliches Experiment betrachtet werden, wobei durch die Variation in der Niederschlagsmenge (das Instrument) die Variation im Aufkommen von Fasci-Organisationen in verschiedenen Gemeinden isoliert werden kann, die unabhängig von der späteren Mafia-Aktivität ist. Anhand dieser exogenen Variation im Organisationsgrad der Bauern kann der Effekt auf die Entwicklung der Mafia identifiziert werden.
+
+
+
+## Case Study: Ökonomische Schocks und Bürgerkriege
+
+Ein Kernproblem bei der Schätzung der kausalen Beziehung zwischen wirtschaftlichen Schocks und dem Auftreten von kriegerischen Auseinandersetzungen ist die Endogenität von Variablen, die wirtschaftliche Stabilität messen [vgl. @FearonLaitin2003]. Beispielsweise kann eine Verschlechterung der wirtschaftlichen Bedingungen eines Landes die Wahrscheinlichkeit eines Konflikts im Inland erhöhen. Gleichermaßen beeinflussen kriegerische Handlung im Inland die wirtschaftliche Situation einer Volkswirtschaft negativ. 
+
+```{dot}
+//| fig-width: 6
+//| fig-height: 4
+//| fig-align: 'center'
+//| fig-cap: "Simultane Kausalität zw. Kriegsrisiko und Wirtschaftslage"
+//| label: "fig-IVDAGrain1" 
+digraph IV_DAG {
+  layout=neato
+  fontname="Helvetica,Arial,sans-serif"
+  node [fontname="Helvetica,Arial,sans-serif"]
+  edge [fontname="Helvetica,Arial,sans-serif"]
+  C [pos="3,5"];
+  BIP [pos="0,0!"];
+  Konflikt [pos="6,0!"];
+  C -> BIP; 
+  C -> Konflikt; 
+  BIP -> Konflikt;
+  Konflikt -> BIP;
+}
+```
+
+In der "Konfliktgleichung"
+
+```{=tex}
+\begin{align}
+  \text{Konflikt-Wsk.} = \beta_0 + \beta_1\, \Delta\text{BIP} + \text{Kontrollv.} + \epsilon\label{eq:rainconf1}
+\end{align}
+```
+
+liegt dann Endogenität des Regressors für "wirtschaftliche Stabilität", hier $\Delta\text{BIP}$, aufgrund von simultanter Kausalität vor. Die multiple Regression \eqref{eq:rainconf1} liefert dann eine verzerrte Schätzungen des interessierenden Effekts $\beta_1$.
+
+@Migueletal2004 untersuchen die kausale Beziehung zwischen wirtschaftlichen Schocks und dem Auftreten von Bürgerkriegen in 41 afrikanischen Sub-Sahara-Ländern für den Zeitraum von 1981 bis 1999.^[Siehe `rainconflict$country %>% unique()`.] Hierbei adressieren die Autoren das Endogenitätsproblem in einem IV-Ansatz mit Instrumenten, die mit wirtschaftlichen Schocks korreliert sind, aber nicht unmittelbar mit der Wahrscheinlichkeit eines Bürgerkriegs zusammenhängen. 
+
+Die Identifikationsstrategie basiert auf metereologischen Faktoren: In den betrachteten Agrarökonomien sind Schocks in den Niederschlägen entscheidend für die Entwicklung des Bruttoinlandsprodukts. Ungünstige Wetterbedingungen, die landwirtschaftliche Erträge negativ beeinflussen, haben einen direkten (negativen) Effekt auf die wirtschaftliche Situation. Variation in der Regenmenge ist jedoch keine unmittelbare Determinante der Konfliktwahrscheinlichkeit und folglich exogen in Modellgleichung \eqref{eq:rainconf1}. Maße für die Veränderungen in der Niederschlagsmenge sind somit plausible Instrumente für endogene Variablen, die Veränderungen im Bruttoinlandsprodukt messen.
+
+```{dot}
+//| fig-width: 6
+//| fig-height: 4
+//| fig-align: 'center'
+//| fig-cap: "IV-Design bei simultaner Kausalität zw. Kriegsrisiko und Wirtschaftslage"
+//| label: "fig-IVDAGrain2" 
+digraph IV_DAG {
+  layout=neato
+  fontname="Helvetica,Arial,sans-serif"
+  node [fontname="Helvetica,Arial,sans-serif"]
+  edge [fontname="Helvetica,Arial,sans-serif"]
+  C [pos="1.5,1.5!"];
+  Niederschlag [pos="-2,0!"];
+  BIP [pos="0,0!"];
+  Konflikt [pos="3,0!"];
+  
+  Niederschlag -> BIP;
+  C -> BIP; 
+  C -> Konflikt; 
+  BIP -> Konflikt;
+  Konflikt -> BIP;
+}
+```
+
+Anhand von Länder-Paneldaten mit Informationen über wirtschaftliche Indikatoren, Konfliktereignisse und Niederschläge, isolieren @Migueletal2004 in einem IV-Ansatz die exogene Variation der wirtschaftlichen Entwicklung, d.h. Variation in $\Delta\text{BIP}$ die nicht mit dem Fehlerterm in der Konfliktgleichung korreliert ist. Die Ergebnisse ihrer 2SLS-Schätzungen zeigen, dass negative ökonomische Schocks die Wahrscheinlichkeit eines Bürgerkriegs signifikant erhöhen. @Migueletal2004 zeigen weiterhin, dass ihre Ergebnisse robust gegenüber verschiedenen Modell-Spezifikationen unter Berücksichtigung diverser Kontrollvariablen sind.
+
+Wir reproduzieren nachfolgend die zentralen Ergebnisse von @Migueletal2004 anhand eines Auszugs (`rainconflict.csv`) aus dem der Studie zugrundeliegenden Datensatz. Der vollständige Datensatz ist, nach Registrierung, [hier](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/27324) verfügbar.
+
 ```{r}
 library(readr)
 
@@ -50,16 +489,16 @@ tribble(
   ~Variable, ~Beschreibung,
   "any_prior", "Dummyvariable: Konflikt mit mind. 25 Toten im Jahr t",
   "war_prio", "Dummyvariable: Konflikt mit mind. 1000 Toten im Jahr t",
-  "ccode", "Länderkennung",
-  "country", "Land",
+  "ccode", "Länderkennung (numerisch)",
+  "country", "Name des Landes",
   "gdp_g", "(BIP_t - BIP_t-1) / BIP_t-1",
   "gdp_g_l", "(BIP_t-1 - BIP_t-2) / BIP_t-2",
   "GPCP_g", "(Niederschlag_t - Niederschlag_t-1) / Niederschlag_t-1",
   "GPCP_g_l", "GPCP_g in t-1",
   "GPCP_g_fl", "GPCP_g in t+1",
   "gdp_1979", "Log Pro-Kopf-BIP in 1979",
-  "polity2_IV", "Diff. zw. Demokratie- und Autokrarie-Score im Jahr t (-10 bis 10)",
-  "polity2l", "polity2_IV im Jahr t-1 (-10 bis 10)",
+  "polity2_IV", "Diff. zw. Demokratie- und Autokrarie-Score im Jahr t (Skala v. -10 bis 10)",
+  "polity2l", "polity2_IV im Jahr t-1 (Skala v. -10 bis 10)",
   "ethfrac", "Ethno-linguistische Fragmentierung (Anteil)",
   "relfrac", "Religiöse Fragmentierung (Anteil)",
   "oil", "Dummy für Öl-exportierendes Land",
@@ -170,7 +609,6 @@ rncnf_mod5 %>%
   print(n = 3)
 ```
 
-
 ```{r}
 #| tbl-cap: "First-Stage-Regressionen für `gdp_g`"
 #| label: tbl-blablabla
@@ -191,7 +629,6 @@ modelsummary(
   output = "gt"
 )
 ```
-
 
 ```{r}
 S1_res <- tibble(
@@ -421,12 +858,3 @@ modelsummary(
     )
   )
 ```
-
-
-
-
-
-
-
-
-

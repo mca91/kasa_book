@@ -451,7 +451,7 @@ Tabelle~\ref{tbl-Klausurergebnisse} händisch als R-Objekt der Klasse
 Variable \emph{Modul}. Der Datensatz liegt also \emph{nicht} im s.g.
 \emph{Tidy-Format} vor.
 
-\begin{tcolorbox}[enhanced jigsaw, opacityback=0, colback=white, rightrule=.15mm, colframe=quarto-callout-tip-color-frame, colbacktitle=quarto-callout-tip-color!10!white, arc=.35mm, opacitybacktitle=0.6, bottomtitle=1mm, breakable, leftrule=.75mm, toptitle=1mm, titlerule=0mm, bottomrule=.15mm, coltitle=black, title=\textcolor{quarto-callout-tip-color}{\faLightbulb}\hspace{0.5em}{Tidy-Format}, toprule=.15mm, left=2mm]
+\begin{tcolorbox}[enhanced jigsaw, bottomtitle=1mm, colbacktitle=quarto-callout-tip-color!10!white, coltitle=black, arc=.35mm, title=\textcolor{quarto-callout-tip-color}{\faLightbulb}\hspace{0.5em}{Tidy-Format}, titlerule=0mm, opacityback=0, breakable, bottomrule=.15mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-tip-color-frame, toptitle=1mm, rightrule=.15mm, leftrule=.75mm, left=2mm, colback=white]
 
 Tidy-Format: Jede Spalte ist \textbf{\emph{eine}} Variable, jede Reihe
 ist \textbf{\emph{eine}} Beobachtung und jede Zelle enthält einen
@@ -1166,7 +1166,7 @@ die drei Arten über die Inseln verteilt sind.
 
 \bookmarksetup{startatroot}
 
-\chapter{Regression}\label{regression}
+\chapter{Regression}\label{sec-regression}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3576,8 +3576,8 @@ bezüglich eines kausalen Effekts nach Matching und demonstrieren die
 Schätzung anhand unseres Website-Beispiels für den ATT nach
 Propensity-Score-Matching.
 
-\begin{tcolorbox}[enhanced jigsaw, opacityback=0, colback=white, rightrule=.15mm, colframe=quarto-callout-tip-color-frame, colbacktitle=quarto-callout-tip-color!10!white, arc=.35mm, opacitybacktitle=0.6, bottomtitle=1mm, breakable, leftrule=.75mm, toptitle=1mm, titlerule=0mm, bottomrule=.15mm, coltitle=black, title={\textbf{Algorithmus: Bootstrap-Schätzer für Matching mit Regression
-Adjustment}}, toprule=.15mm, left=2mm]
+\begin{tcolorbox}[enhanced jigsaw, bottomtitle=1mm, colbacktitle=quarto-callout-tip-color!10!white, coltitle=black, arc=.35mm, title={\textbf{Algorithmus: Bootstrap-Schätzer für Matching mit Regression
+Adjustment}}, titlerule=0mm, opacityback=0, breakable, bottomrule=.15mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-tip-color-frame, toptitle=1mm, rightrule=.15mm, leftrule=.75mm, left=2mm, colback=white]
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -3920,7 +3920,7 @@ Der von Wooldridge (2010) vorgeschlagene Doubly-Robust-Schätzer (IPWRA)
 für den ATE erreicht seine vorteilhaften Eigenschaften durch eine
 geschickte Kombination von IPW und Regression Adjustment.
 
-\begin{tcolorbox}[enhanced jigsaw, opacityback=0, colback=white, rightrule=.15mm, colframe=quarto-callout-tip-color-frame, colbacktitle=quarto-callout-tip-color!10!white, arc=.35mm, opacitybacktitle=0.6, bottomtitle=1mm, breakable, leftrule=.75mm, toptitle=1mm, titlerule=0mm, bottomrule=.15mm, coltitle=black, title={\textbf{Algorithmus: IPWRA-Schätzer des ATE}}, toprule=.15mm, left=2mm]
+\begin{tcolorbox}[enhanced jigsaw, bottomtitle=1mm, colbacktitle=quarto-callout-tip-color!10!white, coltitle=black, arc=.35mm, title={\textbf{Algorithmus: IPWRA-Schätzer des ATE}}, titlerule=0mm, opacityback=0, breakable, bottomrule=.15mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-tip-color-frame, toptitle=1mm, rightrule=.15mm, leftrule=.75mm, left=2mm, colback=white]
 
 Vgl. Wooldridge (2010).
 
@@ -4118,6 +4118,336 @@ genauer.
 
 \chapter{IV-Regression}\label{iv-regression}
 
+Wie in Kapitel Kapitel~\ref{sec-regression} erläutert, können
+Regressionsmodelle unter Endogenitätsproblemen leiden: Der Fehlerterm in
+unserem Regressionsmodell ist mit dem/den interessierenden Regressor(en)
+korreliert, sodass der zugehörige Koeffizient inkonsistent geschätzt
+wird und damit nicht als kausaler Effekt interpretiert werden darf. Die
+häufigsten Ursachen für Endogenität, die in empirischen Anwendungen
+auftreten, sind ausgelassene Variablen, Messfehler und simultane
+Kausalität.
+
+Durch Hinzufügen potenziell relevanter Variablen in die Regression kann
+das Risiko einer verzerrten Schätzung des interessierenden kausalen
+Effekts anhand multipler Regression verringert werden. Wenn jedoch
+wichtige ausgelassene Variablen unbeobachtbar (U) sind oder aus anderen
+Gründen nicht zur Verfügung stehen, kann multiple Regression die
+Endogenität nicht beheben. Diese Problematik ergibt sich insbesondere
+bei simultaner Kausalität: Wenn die Kausalität von der
+Behandlungsvariable (B) zur Outcomevariable (Y) und umgekehrt verläuft,
+gibt es Backdoors, die nicht durch das Hinzufügen von Kontrollvariablen
+zum Regressionsmodell geschlossen werden können.
+
+Eine allgemeinere Technik, um Backdoors mit Regression zu schließen, ist
+die Regression mit Instrumentvariablen (IV). Bei IV-Regression wird
+exogene Variation in einer Instrumentvariablen (Z) verwendet, um den
+Teil der Variation in der Behandlungsvariable zu isolieren, der
+\emph{nicht} durch unbeobachtbare Faktoren verursacht wird, die sowohl B
+als auch Y beeinflussion. Der kausale Effekt von B auf Y wird dann
+anhand dieser exogene Variation in B geschätzt. Ein Forschungsdesign, in
+dem der kausale Effekt von B auf Y mit IV-Regression geschätzt werden
+kann, ist in Abbildung~\ref{fig-IVDAG1} dargestellt.
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics[width=6in,height=4in]{IV_files/figure-latex/dot-figure-1.png}
+
+}
+
+\caption{\label{fig-IVDAG1}IV-Design bei Backdoor durch unb.
+Confounder-Variablen}
+
+\end{figure}%
+
+\section{Der einfache lineare
+IV-Schätzer}\label{der-einfache-lineare-iv-schuxe4tzer}
+
+Im folgenden nehmen wir an, dass sämtliche Zusammenhänge linear sind.
+Zunächst betrachten wir das einfache Regressionsmodell
+
+\begin{align}
+  Y_i = \beta_0 + \beta_1 B_i + u_i \ \ , \ \ i=1,\dots,n, \label{eq:simpleiv}
+\end{align}
+
+wobei der Fehlerterm \(u_i\) mit dem Regressor \(B_i\) korreliert ist
+(d.h. \(B\) ist ein \emph{endogener} Regressor), sodass der KQ-Schätzer
+für den kausalen Effekt \(\beta_1\) inkonsistent ist.
+
+Damit \(Z\) ein gültiges Instrument für \(B\) in dem in
+Abbildung~\ref{fig-IVDAG1} gezeigten Forschungsdesign ist, müssen die
+folgenden Bedingungen erfüllt sein:
+
+Sei \(\text{Cov}(A,B)\) die Kovarianz zwischen den Variablen \(A\) und
+\(B\). \(Z\) muss zwei Bedingungen erfüllen, um ein gültiges Instrument
+zu sein:
+
+\begin{itemize}
+\item
+  \textbf{1. Relevanz des Instruments für die endogene Variable}
+
+  \(B\) und \(Z\) \emph{müssen} korreliert sein: \begin{align}
+      \text{Cov}(B,Z) \neq 0 \label{eq:ivassum1}
+    \end{align}
+\item
+  \textbf{2. Exogenität des Instruments hinsichtlich der
+  Outcome-Variable}
+
+  Das Instrument \(Z\) \emph{darf nicht} mit dem Fehlerterm \(u\) in der
+  Modellgleichung \eqref{eq:simpleiv} korreliert sein: \begin{align}
+      \text{Cov}(Z,u) = 0 \label{eq:ivassum2}
+    \end{align}
+\end{itemize}
+
+Unter diesen Annahmen erlaubt das Forschungsdesign die Anwendung des
+einfachsten IV-Ansatzes, wobei eine endogene Variable \(B\) durch eine
+Instrumentvariable \(Z\) \emph{instrumentiert} wird. Die folgende
+Umformung zeigt, warum der kausale Effekt von B auf Y anhand der
+(Ko)Variation in diesen Variablen identifiziert werden kann.
+
+\begin{align}
+  \textup{Cov}(Z,Y) = &\, \textup{Cov}(Z,\beta_0 + \beta_1 B + u) \tag{Gl. \eqref{eq:simpleiv} einsetzen} \\
+  \notag\\
+  =&\, \textup{Cov}(Z, \beta_1 B + u) \tag{$\beta_0$ konstant} \\
+  \notag\\
+  =&\,\, \beta_1\textup{Cov}(Z,B) \tag{IV-Annahme 2} \\
+  \notag\\
+  \Leftrightarrow \beta_1 =&\, \frac{\textup{Cov}(Z,Y) }{\textup{Cov}(Z,B)} \tag{IV-Annahme 1}
+\end{align}
+
+Eine naheliegende Implementierung gemäß dieses Identifikationsprinzips
+ist der einfache IV-Schätzer
+
+\begin{align}
+  \widehat{\beta}_{\textup{IV}} = \frac{\widehat{\textup{Cov}}(Z,Y) }{\widehat{\textup{Cov}}(Z,B)}, \label{eq:simpleivest}
+\end{align}
+
+wobei lediglich die Kovarianzfunktion \(\textup{Cov}(\cdot,\cdot)\)
+durch ihr Stichprobenäquivalent \(\widehat{\textup{Cov}}(\cdot,\cdot)\)
+ersetzt wird.
+
+\section{2SLS-Verfahren}\label{sls-verfahren}
+
+Der einfache IV-Schätzer \eqref{eq:simpleivest} im Kern ein
+Regressionsproblem handelt
+
+\begin{itemize}
+\item
+  \textbf{1. Stufe: Regression von \(B\) auf \(Z\)}
+
+  Regressiere die endogene Variable \(B\) auf das Instrument \(Z\):
+  \begin{align}
+      B_i = \alpha_0 + \alpha_1 Z_i + u_i, \quad 1,\dots,n.
+    \end{align} Berechne die geschätzten Werte \begin{align}
+      \widehat{B}_i = \widehat{\alpha}_0 + \widehat{\alpha}_1 Z_i.
+    \end{align}
+
+  Die \(\widehat{B}_i\) aus dieser Regression sind ``bereinigt'': Die
+  Variation in den \(\widehat{B}_i\) wird lediglich durch die exogene
+  Variation in \(Z\) verursacht.
+\item
+  \textbf{2. Stufe: Regression von \(Y\) auf \(\widehat{B}\)}
+
+  Regressiere die Beobachtungen der abhängigen Variable \(Y_i\) auf die
+  geschätzten Werte \(\widehat{B}_i\) aus der 1. Stufe: \begin{align}
+      Y_i = \gamma_0 + \gamma_1 \widehat{B}_i + e_i.
+    \end{align} Der geschätzte Koeffizient \(\widehat{\gamma}_1\) aus
+  dieser Regression ist der 2SLS-Schätzer von \(\beta_1\)
+\end{itemize}
+
+\textbf{Äquivalenz von 2SLS und einfacher IV-Schätzer}
+
+Der KQ-Schätzer von \(\gamma_1\) in der 2. Stufe ist \begin{align}
+  \widehat{\gamma}_1 = \frac{\sum (\widehat{B}_i - \overline{\widehat{B}})(Y_i - \bar{Y})}{\sum (\widehat{B}_i - \bar{\widehat{B}})^2}.
+\end{align} Da
+\(\widehat{B}_i = \widehat{\alpha}_0 + \widehat{\alpha}_1 Z_i\), die
+angepassten Werte aus der 1. Stufe, eine lineare Funktion von \(Z_i\)
+sind, können wir \(\widehat{\text{Cov}}(\widehat{B}, Y)\) wie folgt
+schreiben: \begin{align}
+  \widehat{\text{Cov}}(\widehat{B}, Y) = \widehat{\alpha}_1 \widehat{\text{Cov}}(Z, Y)
+\end{align} Eine ähnliche Umformung zeigt, dass \begin{align}
+  \widehat{\text{Var}}(\widehat{B}) = \widehat{\alpha}_1^2 \widehat{\text{Var}}(Z).
+\end{align}
+
+Kombinieren wir diese Ergebnisse, erhalten wir folgende Darstellung für
+den KQ-Schätzer von \(\gamma_1\) in der 2. Stufe: \begin{align}
+  \widehat{\gamma}_1 = \frac{\widehat{\text{Cov}}(\widehat{B}, Y)}{\widehat{\text{Var}}(\widehat{B})} = \frac{\widehat{\alpha}_1 \widehat{\text{Cov}}(Z, Y)}{\widehat{\alpha}_1^2 \widehat{\text{Var}}(Z)} = \frac{\widehat{\text{Cov}}(Z, Y)}{\widehat{\alpha}_1 \widehat{\text{Var}}(Z)}
+\end{align}
+
+Der KQ-Schätzer von \(\widehat{\alpha}_1\) in der 1. Stufe ist definiert
+als
+\(\widehat{\alpha}_1 = \frac{\widehat{\text{Cov}}(Z, B)}{\widehat{\text{Var}}(Z)}\).
+Somit gilt \begin{align}
+  \widehat{\gamma}_1 = \frac{\widehat{\text{Cov}}(Z, Y)}{\frac{\widehat{\text{Cov}}(Z, B)}{\widehat{\text{Var}}(Z)} \widehat{\text{Var}}(Z)} = \frac{\widehat{\text{Cov}}(Z, Y)}{\widehat{\text{Cov}}(Z, B)} = \widehat{\beta}_{\textup{IV}}.
+\end{align}
+
+In ökonometrischen Softwarepaketen
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Der im nachfolgenden interaktiven Beispiel betrachtete DGP ist
+
+\begin{align}
+  \begin{split}
+    X_i =&\, \gamma \cdot Z_i + v_i,\\
+    Y_i =&\, \beta_1 \cdot X_i + u_i,
+  \end{split}
+  \label{eq:OJSIVDGP}
+\end{align} wobei \(Z_i \sim N(0, .25^2)\) ist. Die Fehlerterme \(v_i\)
+und \(u_i\) sind \(N(0,1)\)-verteilt und folgen einer gemeinsam
+Normalverteilung mit Korrelationsparameter \(\rho\), \begin{align}
+\begin{pmatrix}
+v_i \\ u_i
+\end{pmatrix}
+\sim N
+\bigg[
+\begin{pmatrix}
+0 \\ 0
+\end{pmatrix}
+\begin{pmatrix}
+1 & \rho \\
+\rho & 1
+\end{pmatrix}
+\bigg].
+\end{align}
+
+Wir sind daran interessiert, den Parameter \(\beta_1\) zu schätzen, um
+den Effekt von \(X\) auf \(Y\) zu bestimmen, wobei wir \(n=1000\)
+Beobachtungen von \((X_i, Y_i, Z_i)\) verwenden.
+
+Beachte, dass \(X_i\) eine Funktion der (exogenen) Variable \(Z_i\) und
+des Fehlerterms \(v_i\) ist. Wenn die Fehlerterme \((v_i, u_i)’\) im DGP
+\eqref{eq:OJSIVDGP} korreliert sind (\(\rho\neq0\)), dann gibt es eine
+Korrelation zwischen \(X_i\) und \(u_i\). Dies impliziert, dass \(X\)
+ein endogener Regressor im ``naiven'' Regressionsmodell ist
+\begin{align}
+Y_i = \beta_0 + \beta_1 X_i + e_i, \quad i = 1,\dots,N,
+\end{align} und daher wird der KQ-Schätzer von \(\beta_1\) verzerrt und
+inkonsistent sein!
+
+Wenn \(Z\) Erklärungskraft für \(X\) hat, d.h. \(\gamma\neq0\) mit
+\(|\gamma|\) nicht zu klein (\(Z\) ist relevant), und \(Z\) nur über
+\(X\) auf \(Y\) wirkt (\(Z\) ist exogen in der Gleichung von \(Y_i\)),
+dann ist die Instrumentvariablen-Regression eine Möglichkeit,
+\(\beta_1\) konsistent zu schätzen.
+
+Zweistufen-Kleinste-Quadrate (2SLS)
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Erste Stufe: Schätzen Sie das lineare Regressionsmodell
+
+  \begin{align}
+   X_i = \alpha_0 + \alpha_1 \cdot Z_i + \epsilon_i
+   \end{align} und berechnen Sie die angepassten Werte
+  \(\widehat{X}_i\). Dieser Schritt isoliert die exogene Variation in
+  \(X_i\), die auf \(Z_i\) zurückzuführen ist.
+\item
+  Zweite Stufe: Schätzen Sie den Effekt von \(X\) auf \(Y\) unter
+  Verwendung von \(\widehat{X}_i\), dem exogenen Teil von \(X_i\) aus
+  Schritt 1, mittels der linearen Regression
+
+  \begin{align}
+   Y_i = \delta_0 + \delta_1 \cdot \widehat{X}_i  + \varepsilon_i.
+   \end{align} Der KQ-Schätzer \(\widehat{\delta}_1\) von \(\delta_1\)
+  ist der konsistente 2SLS-Schätzer von \(\beta_1\).
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Case Study: Ökonomische Schocks und
+Bürgerkriege}\label{case-study-uxf6konomische-schocks-und-buxfcrgerkriege}
+
+\texttt{\textasciigrave{}r\ 1+2\textasciigrave{}}
+
+Ein Kernproblem bei der Schätzung der kausalen Beziehung zwischen
+wirtschaftlichen Schocks und dem Auftreten von kriegerischen
+Auseinandersetzungen ist die Endogenität von Variablen, die
+wirtschaftliche Stabilität messen (vgl. Fearon und Laitin 2003).
+Beispielsweise kann eine Verschlechterung der wirtschaftlichen
+Bedingungen eines Landes die Wahrscheinlichkeit eines Konflikts im
+Inland erhöhen. Gleichermaßen beeinflussen kriegerische Handlung im
+Inland die wirtschaftliche Situation einer Volkswirtschaft negativ.
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics[width=6in,height=4in]{IV_files/figure-latex/dot-figure-3.png}
+
+}
+
+\caption{\label{fig-IVDAGrain1}Simultane Kausalität zw. Kriegsrisiko und
+Wirtschaftslage}
+
+\end{figure}%
+
+In der ``Konfliktgleichung''
+
+\begin{align}
+  \text{Konflikt-Wsk.} = \beta_0 + \beta_1\, \Delta\text{BIP} + \text{Kontrollv.} + \epsilon\label{eq:rainconf1}
+\end{align}
+
+liegt dann Endogenität des Regressors für ``wirtschaftliche
+Stabilität'', hier \(\Delta\text{BIP}\), aufgrund von simultanter
+Kausalität vor. Die multiple Regression \eqref{eq:rainconf1} liefert
+dann eine verzerrte Schätzungen des interessierenden Effekts
+\(\beta_1\).
+
+Miguel, Satyanath, und Sergenti (2004) untersuchen die kausale Beziehung
+zwischen wirtschaftlichen Schocks und dem Auftreten von Bürgerkriegen in
+41 afrikanischen Sub-Sahara-Ländern für den Zeitraum von 1981 bis
+1999.\footnote{Siehe
+  \texttt{rainconflict\$country\ \%\textgreater{}\%\ unique()}.} Hierbei
+adressieren die Autoren das Endogenitätsproblem in einem IV-Ansatz mit
+Instrumenten, die mit wirtschaftlichen Schocks korreliert sind, aber
+nicht unmittelbar mit der Wahrscheinlichkeit eines Bürgerkriegs
+zusammenhängen.
+
+Die Identifikationsstrategie basiert auf metereologischen Faktoren: In
+den betrachteten Agrarökonomien sind Schocks in den Niederschlägen
+entscheidend für die Entwicklung des Bruttoinlandsprodukts. Ungünstige
+Wetterbedingungen, die landwirtschaftliche Erträge negativ beeinflussen,
+haben einen direkten (negativen) Effekt auf die wirtschaftliche
+Situation. Variation in der Regenmenge ist jedoch keine unmittelbare
+Determinante der Konfliktwahrscheinlichkeit und folglich exogen in
+Modellgleichung \eqref{eq:rainconf1}. Maße für die Veränderungen in der
+Niederschlagsmenge sind somit plausible Instrumente für endogene
+Variablen, die Veränderungen im Bruttoinlandsprodukt messen.
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics[width=6in,height=4in]{IV_files/figure-latex/dot-figure-2.png}
+
+}
+
+\caption{\label{fig-IVDAGrain2}IV-Design bei simultaner Kausalität zw.
+Kriegsrisiko und Wirtschaftslage}
+
+\end{figure}%
+
+Anhand von Länder-Paneldaten mit Informationen über wirtschaftliche
+Indikatoren, Konfliktereignisse und Niederschläge, isolieren Miguel,
+Satyanath, und Sergenti (2004) in einem IV-Ansatz die exogene Variation
+der wirtschaftlichen Entwicklung, d.h. Variation in \(\Delta\text{BIP}\)
+die nicht mit dem Fehlerterm in der Konfliktgleichung korreliert ist.
+Die Ergebnisse ihrer 2SLS-Schätzungen zeigen, dass negative ökonomische
+Schocks die Wahrscheinlichkeit eines Bürgerkriegs signifikant erhöhen.
+Miguel, Satyanath, und Sergenti (2004) zeigen weiterhin, dass ihre
+Ergebnisse robust gegenüber verschiedenen Modell-Spezifikationen unter
+Berücksichtigung diverser Kontrollvariablen sind.
+
+Wir reproduzieren nachfolgend die zentralen Ergebnisse von Miguel,
+Satyanath, und Sergenti (2004) anhand eines Auszugs
+(\texttt{rainconflict.csv}) aus dem der Studie zugrundeliegenden
+Datensatz. Der vollständige Datensatz ist, nach Registrierung,
+\href{https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/27324}{hier}
+verfügbar.
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{library}\NormalTok{(readr)}
@@ -4172,16 +4502,16 @@ Variable & Beschreibung \\
 \midrule\addlinespace[2.5pt]
 any\_prior & Dummyvariable: Konflikt mit mind. 25 Toten im Jahr t \\ 
 war\_prio & Dummyvariable: Konflikt mit mind. 1000 Toten im Jahr t \\ 
-ccode & Länderkennung \\ 
-country & Land \\ 
+ccode & Länderkennung (numerisch) \\ 
+country & Name des Landes \\ 
 gdp\_g & (BIP\_t - BIP\_t-1) / BIP\_t-1 \\ 
 gdp\_g\_l & (BIP\_t-1 - BIP\_t-2) / BIP\_t-2 \\ 
 GPCP\_g & (Niederschlag\_t - Niederschlag\_t-1) / Niederschlag\_t-1 \\ 
 GPCP\_g\_l & GPCP\_g in t-1 \\ 
 GPCP\_g\_fl & GPCP\_g in t+1 \\ 
 gdp\_1979 & Log Pro-Kopf-BIP in 1979 \\ 
-polity2\_IV & Diff. zw. Demokratie- und Autokrarie-Score im Jahr t (-10 bis 10) \\ 
-polity2l & polity2\_IV im Jahr t-1 (-10 bis 10) \\ 
+polity2\_IV & Diff. zw. Demokratie- und Autokrarie-Score im Jahr t (Skala v. -10 bis 10) \\ 
+polity2l & polity2\_IV im Jahr t-1 (Skala v. -10 bis 10) \\ 
 ethfrac & Ethno-linguistische Fragmentierung (Anteil) \\ 
 relfrac & Religiöse Fragmentierung (Anteil) \\ 
 oil & Dummy für Öl-exportierendes Land \\ 
@@ -4541,7 +4871,7 @@ FE: ccode &  &  & X & X & X \\
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IV_files/figure-pdf/unnamed-chunk-14-1.pdf}
+\includegraphics{IV_files/figure-pdf/unnamed-chunk-17-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4640,7 +4970,7 @@ RMSE: 0.204541     Adj. R2: 0.661198
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IV_files/figure-pdf/unnamed-chunk-18-1.pdf}
+\includegraphics{IV_files/figure-pdf/unnamed-chunk-21-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -5234,7 +5564,7 @@ globalen ATT zusammengefasst werden können.\footnote{Die Methoden von
   Callaway und Sant'Anna (2021) sind im R-Paket \texttt{did}
   implementiert.}
 
-\begin{tcolorbox}[enhanced jigsaw, opacityback=0, colback=white, rightrule=.15mm, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, arc=.35mm, opacitybacktitle=0.6, bottomtitle=1mm, breakable, leftrule=.75mm, toptitle=1mm, titlerule=0mm, bottomrule=.15mm, coltitle=black, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum einfachen DID-Schätzer}, toprule=.15mm, left=2mm]
+\begin{tcolorbox}[enhanced jigsaw, bottomtitle=1mm, colbacktitle=quarto-callout-note-color!10!white, coltitle=black, arc=.35mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum einfachen DID-Schätzer}, titlerule=0mm, opacityback=0, breakable, bottomrule=.15mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, toptitle=1mm, rightrule=.15mm, leftrule=.75mm, left=2mm, colback=white]
 
 \begin{itemize}
 \item
@@ -10649,7 +10979,7 @@ Erklärungskraft werden durch die Regularisierung in Richtung 0 gezwungen
 und reduzieren so die Varianz der Vorhersage gegenüber der
 (idealerweise) unverzerrten KQ-Schätzung.
 
-\begin{tcolorbox}[enhanced jigsaw, opacityback=0, colback=white, rightrule=.15mm, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, arc=.35mm, opacitybacktitle=0.6, bottomtitle=1mm, breakable, leftrule=.75mm, toptitle=1mm, titlerule=0mm, bottomrule=.15mm, coltitle=black, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Ridge Regression}, toprule=.15mm, left=2mm]
+\begin{tcolorbox}[enhanced jigsaw, bottomtitle=1mm, colbacktitle=quarto-callout-note-color!10!white, coltitle=black, arc=.35mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Ridge Regression}, titlerule=0mm, opacityback=0, breakable, bottomrule=.15mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, toptitle=1mm, rightrule=.15mm, leftrule=.75mm, left=2mm, colback=white]
 
 \begin{itemize}
 \item
@@ -11224,7 +11554,7 @@ und damit zu einer höheren Vorhersagegüte. Das ``sparsame'' mit
 Lasso-Regression geschätzte Modell ist dem ``großen'' mit KQ geschätztem
 Modell in dieser Hinsicht also überlegen.
 
-\begin{tcolorbox}[enhanced jigsaw, opacityback=0, colback=white, rightrule=.15mm, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, arc=.35mm, opacitybacktitle=0.6, bottomtitle=1mm, breakable, leftrule=.75mm, toptitle=1mm, titlerule=0mm, bottomrule=.15mm, coltitle=black, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Lasso-Regression}, toprule=.15mm, left=2mm]
+\begin{tcolorbox}[enhanced jigsaw, bottomtitle=1mm, colbacktitle=quarto-callout-note-color!10!white, coltitle=black, arc=.35mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Lasso-Regression}, titlerule=0mm, opacityback=0, breakable, bottomrule=.15mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, toptitle=1mm, rightrule=.15mm, leftrule=.75mm, left=2mm, colback=white]
 
 \begin{itemize}
 \item
@@ -12196,7 +12526,7 @@ Der Post-Double-Selection-Schätzer liefert unter den betrachteten
 Verfahren die beste Schätzung von \(\alpha_0\) und erlaubt gülstige
 statistische Inferenz. Der geschätzte Effekt ist hoch-signifikant.
 
-\begin{tcolorbox}[enhanced jigsaw, opacityback=0, colback=white, rightrule=.15mm, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, arc=.35mm, opacitybacktitle=0.6, bottomtitle=1mm, breakable, leftrule=.75mm, toptitle=1mm, titlerule=0mm, bottomrule=.15mm, coltitle=black, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum Post-Double-Selection-Schätzer}, toprule=.15mm, left=2mm]
+\begin{tcolorbox}[enhanced jigsaw, bottomtitle=1mm, colbacktitle=quarto-callout-note-color!10!white, coltitle=black, arc=.35mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum Post-Double-Selection-Schätzer}, titlerule=0mm, opacityback=0, breakable, bottomrule=.15mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, toptitle=1mm, rightrule=.15mm, leftrule=.75mm, left=2mm, colback=white]
 
 \begin{itemize}
 \item
@@ -13929,6 +14259,11 @@ Eissa, N., und J. B. Liebman. 1996. {„Labor Supply Response to the
 Earned Income Tax Credit``}. \emph{The Quarterly Journal of Economics}
 111 (2): 605--37. \url{https://doi.org/10.2307/2946689}.
 
+\bibitem[\citeproctext]{ref-FearonLaitin2003}
+Fearon, James D., und David D. Laitin. 2003. {„Ethnicity, Insurgency,
+and Civil War.``} \emph{American Political Science Review} 97 (01):
+75--90. \url{https://doi.org/10.1017/s0003055403000534}.
+
 \bibitem[\citeproctext]{ref-GelmanImbens2019}
 Gelman, Andrew, und Guido Imbens. 2019. {„Why high-order polynomials
 should not be used in regression discontinuity designs``}. \emph{Journal
@@ -14000,6 +14335,12 @@ Presentation.
 McCrary, Justin. 2008. {„Manipulation of the running variable in the
 regression discontinuity design: A density test``}. \emph{Journal of
 Econometrics} 142 (2): 698--714.
+
+\bibitem[\citeproctext]{ref-Migueletal2004}
+Miguel, Edward, Shanker Satyanath, und Ernest Sergenti. 2004. {„Economic
+Shocks and Civil Conflict: An Instrumental Variables Approach``}.
+\emph{Journal of Political Economy} 112 (4): 725--53.
+\url{https://doi.org/10.1086/421174}.
 
 \bibitem[\citeproctext]{ref-RosenbaumRubin1983}
 Rosenbaum, Paul R., und Donald R. Rubin. 1983. {„The central role of the

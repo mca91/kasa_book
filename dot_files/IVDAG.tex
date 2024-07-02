@@ -1,0 +1,78 @@
+\documentclass{article}
+\usepackage[x11names, svgnames, rgb]{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{snakes,arrows,shapes}
+\usepackage{amsmath}
+%
+%
+
+%
+
+%
+
+\begin{document}
+\pagestyle{empty}
+%
+%
+%
+
+\enlargethispage{100cm}
+% Start of code
+% \begin{tikzpicture}[anchor=mid,>=latex',line join=bevel,]
+\begin{tikzpicture}[>=latex',line join=bevel,]
+  \pgfsetlinewidth{1bp}
+%%
+\pgfsetcolor{black}
+  % Edge: U -> B
+  \pgfsetcolor{gray}
+  \draw [->] (257.19bp,113.19bp) .. controls (238.84bp,94.837bp) and (204.87bp,60.866bp)  .. (174.8bp,30.796bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (199.4bp,83.524bp) node {beta\_1};
+  % Edge: U -> Y
+  \pgfsetcolor{gray}
+  \draw [->] (282.81bp,113.19bp) .. controls (301.16bp,94.837bp) and (335.13bp,60.866bp)  .. (365.2bp,30.796bp);
+  % Edge: B -> Y
+  \pgfsetcolor{black}
+  \draw [->] (180.42bp,18.0bp) .. controls (217.8bp,18.0bp) and (302.87bp,18.0bp)  .. (359.63bp,18.0bp);
+  % Edge: Z -> B
+  \draw [->] (36.238bp,18.0bp) .. controls (60.474bp,18.0bp) and (103.59bp,18.0bp)  .. (143.91bp,18.0bp);
+  % Node: U
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.75,0.75,0.75};
+  \pgfsetstrokecolor{strokecol}
+  \draw (270.0bp,126.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (270.0bp,126.0bp) node {U};
+\end{scope}
+  % Node: B
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (162.0bp,18.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (162.0bp,18.0bp) node {B};
+\end{scope}
+  % Node: Y
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (378.0bp,18.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (378.0bp,18.0bp) node {Y};
+\end{scope}
+  % Node: Z
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (18.0bp,18.0bp) ellipse (18.0bp and 18.0bp);
+  \draw (18.0bp,18.0bp) node {Z};
+\end{scope}
+%
+\end{tikzpicture}
+% End of code
+
+%
+\end{document}
+%
+
+
+
