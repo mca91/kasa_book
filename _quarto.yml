@@ -21,6 +21,7 @@ book:
     - R_Einfuehrung.qmd
     - Reg.qmd
     - Matching.qmd
+    - FixedEffects.qmd
     - IV.qmd
     - DiD.qmd
     - RDD.qmd

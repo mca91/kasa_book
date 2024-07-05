@@ -1,0 +1,2065 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.553">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Kausalanalyse und Machinelles Lernen mit R - 5&nbsp; Panel-Daten</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./IV.html" rel="next">
+<link href="./Matching.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Keine Treffer",
+    "search-matching-documents-text": "Treffer",
+    "search-copy-link-title": "Link in die Suche kopieren",
+    "search-hide-matches-text": "Zusätzliche Treffer verbergen",
+    "search-more-match-text": "weitere Treffer in diesem Dokument",
+    "search-more-matches-text": "weitere Treffer in diesem Dokument",
+    "search-clear-button-title": "Zurücksetzen",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Abbrechen",
+    "search-submit-button-title": "Abschicken",
+    "search-label": "Suchen"
+  }
+}</script><meta name="robots" content="noindex">
+<script>
+  MathJax = {
+    tex: {
+      tags: 'ams'  // should be 'ams', 'none', or 'all'
+    }
+  };
+</script><script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js" integrity="sha512-aoZChv+8imY/U1O7KIHXvO87EOzCuKO0GhFtpD6G2Cyjo/xPeTgdf3/bchB10iB+AojMTDkMHDPLKNxPJVqDcw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+<style>
+.qwebr-code-output-stdout {background-color: powderblue;}
+
+.qwebr-button-run {
+ width = 100%; 
+}
+
+.centered-caption {
+   text-align: center;
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/quizdown@latest/public/build/quizdown.js"></script><script>quizdown.init();</script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+</head>
+<body class="nav-sidebar floating slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./FixedEffects.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Panel-Daten</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./"></a><a href="./index.html">Kausalanalyse mit R</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Lesemodus umschalten">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Suchen"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Start</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./R_Einfuehrung.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Statistische Programmierung mit R</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Reg.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Matching.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Matching</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./FixedEffects.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Panel-Daten</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./IV.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">IV-Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./DiD.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./RDD.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./RegReg.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Regularisierte Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Machine Learning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Machine Learning</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./SyntheticControl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Synthetic Control</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Literatur.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Literatur</span></a>
+  </div>
+</li>
+    </ul>
+</div>
+    <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title"><a href="./index.html">Übersicht</a></h2>
+   
+  <ul>
+<li><a href="#sec-panel-uh" id="toc-sec-panel-uh" class="nav-link active" data-scroll-target="#sec-panel-uh"><span class="header-section-number">5.1</span> Backdoors durch unbeobachtbare Heterogenitäten</a></li>
+  <li><a href="#differenzen-und-fixed-effects" id="toc-differenzen-und-fixed-effects" class="nav-link" data-scroll-target="#differenzen-und-fixed-effects"><span class="header-section-number">5.2</span> Differenzen und Fixed Effects</a></li>
+  <li>
+<a href="#regression-in-differenzen" id="toc-regression-in-differenzen" class="nav-link" data-scroll-target="#regression-in-differenzen"><span class="header-section-number">5.3</span> Regression in Differenzen</a>
+  <ul class="collapse">
+<li><a href="#fixed-effects" id="toc-fixed-effects" class="nav-link" data-scroll-target="#fixed-effects"><span class="header-section-number">5.3.1</span> Fixed Effects</a></li>
+  </ul>
+</li>
+  <li><a href="#beispiel-einkommen-und-demokratie" id="toc-beispiel-einkommen-und-demokratie" class="nav-link" data-scroll-target="#beispiel-einkommen-und-demokratie"><span class="header-section-number">5.4</span> Beispiel: Einkommen und Demokratie</a></li>
+  </ul></nav>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    </div>
+<!-- main -->
+<main class="content page-columns page-full" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">
+<span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Panel-Daten</span>
+</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header><style>
+.qwebr-code-output-stdout {background-color: powderblue;}
+
+.qwebr-button-run, .qwebr-button-reset, .qwebr-button-copy {
+  background-color:  rgba(0, 0, 0, 0);
+  border-style: none;
+  font-weight: 400;
+  color: white; 
+  transition: none;
+}
+
+.qwebr-editor-toolbar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+  border-radius: 0 0 6px 6px;
+  background-color: darkgreen;
+  border-color: darkgreen;
+  border-width: 1px;
+  border-style: solid;
+  padding: 0 0; 
+  transition: color .1s ease-in-out, background-color .1s ease-in-out,border-color .1s ease-in-out,box-shadow .1s ease-in-out;
+}
+
+.qwebr-editor-toolbar:hover {
+  background-color: white;
+  border-color: darkgreen;
+  border-width: 1px;
+}
+
+.qwebr-editor-toolbar:hover * {
+  color: darkgreen;
+}
+
+.overflow-guard, .qwebr-editor, .monaco-editor {
+  border-radius: 6px 6px 0 0;
+  border-width: 1px 1px 0 1px;
+  border-color: darkgreen;
+}
+
+</style>
+<section id="sec-panel-uh" class="level2 page-columns page-full" data-number="5.1"><h2 data-number="5.1" class="anchored" data-anchor-id="sec-panel-uh">
+<span class="header-section-number">5.1</span> Backdoors durch unbeobachtbare Heterogenitäten</h2>
+<div class="cell">
+
+</div>
+<p>Betrachte das Panel-Regression-Modell</p>
+<p><span class="math display">\[\begin{align}
+  Y_{it} = \beta_0 + \beta_1 B_{it} + \beta_2 X_i + \beta_3 U_i \epsilon_{it},\label{eq:unobshetmodel}
+\end{align}\]</span></p>
+<p>wobei <span class="math inline">\(U_i\)</span> unbeobachtete und <span class="math inline">\(X_i\)</span> beobachtete, zeitlich-invariante Heterogenitäten zwischen den Beobachtungseinheiten <span class="math inline">\(i=1,\dots,n\)</span> sind. Wie üblich ist <span class="math inline">\(B_i\)</span> die Behandlungsvariable und <span class="math inline">\(\beta_1\)</span> der interessierende Effekt einer Veränderung von <span class="math inline">\(B_i\)</span> auf <span class="math inline">\(Y_i\)</span>.</p>
+<p>Angenommen wir beobachten <span class="math inline">\(Y_{it}\)</span> und <span class="math inline">\(B_{it}\)</span> für <span class="math inline">\(T=1\)</span>, also für eine Periode. Bei Korrelation zwischen den (aufgrund der <span class="math inline">\(U_i\)</span>) <strong>unbeobachtbaren</strong> zeit-invarianten Effekten <span class="math inline">\(\delta_i\)</span> und der Behandlungsvariable <span class="math inline">\(B\)</span> kann der kausale Effekt <span class="math inline">\(\beta_1\)</span> nicht identifiziert werden. Diese Situation ist in <a href="#fig-FEDAG1" class="quarto-xref">Abbildung&nbsp;<span>5.1</span></a> dargestellt.</p>
+<div class="cell page-columns page-full" data-fig-width="3" data-fig-height="3" data-layout-align="center">
+<div class="cell-output-display page-columns page-full">
+<div id="fig-FEDAG1" class="quarto-figure quarto-figure-center quarto-float anchored page-columns page-full">
+<figure class="quarto-float quarto-float-fig figure page-columns page-full"><div aria-describedby="fig-FEDAG1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>
+<svg width="288" height="288" viewbox="0.00 0.00 270.00 252.00" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none"><g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(36 216)"><title>FE_dag_single_period</title>
+<polygon fill="white" stroke="transparent" points="-36,36 -36,-216 234,-216 234,36 -36,36"></polygon><!-- U --><g id="node1" class="node"><title>U</title>
+<ellipse fill="none" stroke="gray" cx="171" cy="-162" rx="27" ry="18"></ellipse><text text-anchor="middle" x="171" y="-157.8" font-family="Helvetica,Arial,sans-serif" font-size="14.00" fill="gray">U</text></g><!-- X --><g id="node2" class="node"><title>X</title>
+<ellipse fill="none" stroke="black" cx="171" cy="-18" rx="27" ry="18"></ellipse><text text-anchor="middle" x="171" y="-13.8" font-family="Helvetica,Arial,sans-serif" font-size="14.00">X</text></g><!-- U&#45;&gt;X --><g id="edge1" class="edge"><title>U-&gt;X</title>
+<path fill="none" stroke="gray" stroke-dasharray="5,2" d="M171,-143.76C171,-119.2 171,-75.25 171,-46.35"></path><polygon fill="gray" stroke="gray" points="174.5,-46.09 171,-36.09 167.5,-46.09 174.5,-46.09"></polygon></g><!-- B --><g id="node3" class="node"><title>B</title>
+<ellipse fill="none" stroke="black" cx="27" cy="-18" rx="27" ry="18"></ellipse><text text-anchor="middle" x="27" y="-13.8" font-family="Helvetica,Arial,sans-serif" font-size="14.00">B</text></g><!-- U&#45;&gt;B --><g id="edge3" class="edge"><title>U-&gt;B</title>
+<path fill="none" stroke="gray" stroke-dasharray="5,2" d="M155.86,-146.86C130.54,-121.54 79.46,-70.46 49.78,-40.78"></path><polygon fill="gray" stroke="gray" points="51.91,-37.97 42.37,-33.37 46.97,-42.91 51.91,-37.97"></polygon></g><!-- Y --><g id="node4" class="node"><title>Y</title>
+<ellipse fill="none" stroke="black" cx="27" cy="-162" rx="27" ry="18"></ellipse><text text-anchor="middle" x="27" y="-157.8" font-family="Helvetica,Arial,sans-serif" font-size="14.00">Y</text></g><!-- U&#45;&gt;Y --><g id="edge2" class="edge"><title>U-&gt;Y</title>
+<path fill="none" stroke="gray" stroke-dasharray="5,2" d="M143.91,-162C121.53,-162 89.5,-162 64.63,-162"></path><polygon fill="gray" stroke="gray" points="64.45,-158.5 54.45,-162 64.45,-165.5 64.45,-158.5"></polygon></g><!-- X&#45;&gt;B --><g id="edge5" class="edge"><title>X-&gt;B</title>
+<path fill="none" stroke="black" d="M143.91,-18C121.53,-18 89.5,-18 64.63,-18"></path><polygon fill="black" stroke="black" points="64.45,-14.5 54.45,-18 64.45,-21.5 64.45,-14.5"></polygon></g><!-- X&#45;&gt;Y --><g id="edge4" class="edge"><title>X-&gt;Y</title>
+<path fill="none" stroke="black" d="M155.86,-33.14C130.54,-58.46 79.46,-109.54 49.78,-139.22"></path><polygon fill="black" stroke="black" points="46.97,-137.09 42.37,-146.63 51.91,-142.03 46.97,-137.09"></polygon></g><!-- B&#45;&gt;Y --><g id="edge6" class="edge"><title>B-&gt;Y</title>
+<path fill="none" stroke="black" d="M27,-36.24C27,-60.8 27,-104.75 27,-133.65"></path><polygon fill="black" stroke="black" points="23.5,-133.91 27,-143.91 30.5,-133.91 23.5,-133.91"></polygon></g></g></svg>
+</div>
+</div>
+<figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-FEDAG1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Abbildung&nbsp;5.1: Backdoors durch beobachtete und unbeobachtete Variablen
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>Es bestehen Backdoors durch die <span class="math inline">\(U_i\)</span>, die wir nicht mit der Schätzung von <span class="math display">\[\begin{align}
+  Y_{it} = \beta_0 + \beta_1 B_{it} + \beta_2 X_i + \varepsilon_{it},\label{eq:femodelfail}
+\end{align}\]</span> einer (fehlspezifizierten) Regression, schließen können.</p>
+</section><section id="differenzen-und-fixed-effects" class="level2 page-columns page-full" data-number="5.2"><h2 data-number="5.2" class="anchored" data-anchor-id="differenzen-und-fixed-effects">
+<span class="header-section-number">5.2</span> Differenzen und Fixed Effects</h2>
+<p>Anhand von Panel-Daten mit <span class="math inline">\(T\geq2\)</span> können die in <a href="#sec-panel-uh" class="quarto-xref"><span>Kapitel 5.1</span></a> beschreibene Backdoors durch unbeobachtbare zeit-invariante Heterogenitäten mit Regression geschlossen werden.</p>
+<div class="cell page-columns page-full" data-fig-width="6" data-fig-height="4" data-layout-align="center">
+<div class="cell-output-display page-columns page-full">
+<div id="fig-FEDAG2" class="quarto-figure quarto-figure-center quarto-float anchored page-columns page-full">
+<figure class="quarto-float quarto-float-fig figure page-columns page-full"><div aria-describedby="fig-FEDAG2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>
+<svg width="576" height="384" viewbox="0.00 0.00 357.94 476.00" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none"><g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 472)"><title>FE_dag2</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-472 353.94,-472 353.94,4 -4,4"></polygon><!-- U --><g id="node1" class="node"><title>U</title>
+<ellipse fill="none" stroke="gray" cx="174.97" cy="-450" rx="27" ry="18"></ellipse><text text-anchor="middle" x="174.97" y="-445.8" font-family="Helvetica,Arial,sans-serif" font-size="14.00" fill="gray">U</text></g><!-- X --><g id="node2" class="node"><title>X</title>
+<ellipse fill="none" stroke="black" cx="174.97" cy="-18" rx="27" ry="18"></ellipse><text text-anchor="middle" x="174.97" y="-13.8" font-family="Helvetica,Arial,sans-serif" font-size="14.00">X</text></g><!-- U&#45;&gt;X --><g id="edge1" class="edge"><title>U-&gt;X</title>
+<path fill="none" stroke="gray" stroke-dasharray="5,2" d="M174.97,-431.99C174.97,-364.74 174.97,-128.08 174.97,-46.16"></path><polygon fill="gray" stroke="gray" points="178.47,-46.09 174.97,-36.09 171.47,-46.09 178.47,-46.09"></polygon></g><!-- B1 --><g id="node3" class="node"><title>B1</title>
+<ellipse fill="none" stroke="black" cx="30.97" cy="-162" rx="30.37" ry="18"></ellipse><text text-anchor="start" x="16.91" y="-158.8" font-family="Helvetica,Arial,sans-serif" font-size="14.00">B</text><text text-anchor="start" x="26.24" y="-158.8" font-family="Helvetica,Arial,sans-serif" baseline-shift="sub" font-size="14.00">t=1</text></g><!-- U&#45;&gt;B1 --><g id="edge3" class="edge"><title>U-&gt;B1</title>
+<path fill="none" stroke="gray" stroke-dasharray="5,2" d="M166.39,-432.85C142.24,-384.54 73.51,-247.09 44.33,-188.73"></path><polygon fill="gray" stroke="gray" points="47.28,-186.81 39.68,-179.43 41.02,-189.94 47.28,-186.81"></polygon></g><!-- Y1 --><g id="node4" class="node"><title>Y1</title>
+<ellipse fill="none" stroke="black" cx="30.97" cy="-306" rx="30.94" ry="18"></ellipse><text text-anchor="start" x="16.52" y="-302.8" font-family="Helvetica,Arial,sans-serif" font-size="14.00">Y</text><text text-anchor="start" x="26.63" y="-302.8" font-family="Helvetica,Arial,sans-serif" baseline-shift="sub" font-size="14.00">t=1</text></g><!-- U&#45;&gt;Y1 --><g id="edge2" class="edge"><title>U-&gt;Y1</title>
+<path fill="none" stroke="gray" stroke-dasharray="5,2" d="M159.83,-434.86C134.64,-409.67 83.96,-358.99 54.21,-329.25"></path><polygon fill="gray" stroke="gray" points="56.32,-326.4 46.78,-321.81 51.37,-331.35 56.32,-326.4"></polygon></g><!-- B2 --><g id="node5" class="node"><title>B2</title>
+<ellipse fill="none" stroke="black" cx="318.97" cy="-162" rx="30.37" ry="18"></ellipse><text text-anchor="start" x="304.91" y="-158.8" font-family="Helvetica,Arial,sans-serif" font-size="14.00">B</text><text text-anchor="start" x="314.24" y="-158.8" font-family="Helvetica,Arial,sans-serif" baseline-shift="sub" font-size="14.00">t=2</text></g><!-- U&#45;&gt;B2 --><g id="edge9" class="edge"><title>U-&gt;B2</title>
+<path fill="none" stroke="gray" stroke-dasharray="5,2" d="M183.54,-432.85C207.7,-384.54 276.42,-247.09 305.6,-188.73"></path><polygon fill="gray" stroke="gray" points="308.91,-189.94 310.25,-179.43 302.65,-186.81 308.91,-189.94"></polygon></g><!-- Y2 --><g id="node6" class="node"><title>Y2</title>
+<ellipse fill="none" stroke="black" cx="318.97" cy="-306" rx="30.94" ry="18"></ellipse><text text-anchor="start" x="304.52" y="-302.8" font-family="Helvetica,Arial,sans-serif" font-size="14.00">Y</text><text text-anchor="start" x="314.63" y="-302.8" font-family="Helvetica,Arial,sans-serif" baseline-shift="sub" font-size="14.00">t=2</text></g><!-- U&#45;&gt;Y2 --><g id="edge8" class="edge"><title>U-&gt;Y2</title>
+<path fill="none" stroke="gray" stroke-dasharray="5,2" d="M190.11,-434.86C215.3,-409.67 265.98,-358.99 295.72,-329.25"></path><polygon fill="gray" stroke="gray" points="298.56,-331.35 303.16,-321.81 293.61,-326.4 298.56,-331.35"></polygon></g><!-- X&#45;&gt;B1 --><g id="edge5" class="edge"><title>X-&gt;B1</title>
+<path fill="none" stroke="black" d="M159.83,-33.14C134.64,-58.33 83.96,-109.01 54.21,-138.75"></path><polygon fill="black" stroke="black" points="51.37,-136.65 46.78,-146.19 56.32,-141.6 51.37,-136.65"></polygon></g><!-- X&#45;&gt;Y1 --><g id="edge4" class="edge"><title>X-&gt;Y1</title>
+<path fill="none" stroke="black" d="M166.39,-35.15C142.24,-83.46 73.51,-220.91 44.33,-279.27"></path><polygon fill="black" stroke="black" points="41.02,-278.06 39.68,-288.57 47.28,-281.19 41.02,-278.06"></polygon></g><!-- X&#45;&gt;B2 --><g id="edge11" class="edge"><title>X-&gt;B2</title>
+<path fill="none" stroke="black" d="M190.11,-33.14C215.3,-58.33 265.98,-109.01 295.72,-138.75"></path><polygon fill="black" stroke="black" points="293.61,-141.6 303.16,-146.19 298.56,-136.65 293.61,-141.6"></polygon></g><!-- X&#45;&gt;Y2 --><g id="edge10" class="edge"><title>X-&gt;Y2</title>
+<path fill="none" stroke="black" d="M183.54,-35.15C207.7,-83.46 276.42,-220.91 305.6,-279.27"></path><polygon fill="black" stroke="black" points="302.65,-281.19 310.25,-288.57 308.91,-278.06 302.65,-281.19"></polygon></g><!-- B1&#45;&gt;Y1 --><g id="edge6" class="edge"><title>B1-&gt;Y1</title>
+<path fill="none" stroke="black" d="M30.97,-180.24C30.97,-204.8 30.97,-248.75 30.97,-277.65"></path><polygon fill="black" stroke="black" points="27.47,-277.91 30.97,-287.91 34.47,-277.91 27.47,-277.91"></polygon></g><!-- B1&#45;&gt;B2 --><g id="edge7" class="edge"><title>B1-&gt;B2</title>
+<path fill="none" stroke="black" d="M61.52,-162C113.58,-162 219.51,-162 277.96,-162"></path><polygon fill="black" stroke="black" points="278.3,-165.5 288.3,-162 278.3,-158.5 278.3,-165.5"></polygon></g><!-- B2&#45;&gt;Y2 --><g id="edge12" class="edge"><title>B2-&gt;Y2</title>
+<path fill="none" stroke="black" d="M318.97,-180.24C318.97,-204.8 318.97,-248.75 318.97,-277.65"></path><polygon fill="black" stroke="black" points="315.47,-277.91 318.97,-287.91 322.47,-277.91 315.47,-277.91"></polygon></g></g></svg>
+</div>
+</div>
+<figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-FEDAG2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Abbildung&nbsp;5.2: FE-Design mit Backdoors durch beobachtete und unbeobachtete zeit-invariante Variablen
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>Definiere <span class="math display">\[\delta_i = \beta_0 + \beta_3 U_i.\]</span> Nach einsetzen in <span class="math inline">\(\eqref{eq:unobshetmodel}\)</span> erhalten wir</p>
+<p><span class="math display">\[\begin{align}
+  Y_{it} = \delta_i + \beta_1 B_{it} + \beta_2 X_i + \epsilon_{it} \label{eq:femodel},
+\end{align}\]</span></p>
+<p>mit einheiten-spezifischen Konstanten <span class="math inline">\(\delta_i\)</span>, <span class="math inline">\(i=1,\dots,n\)</span>. Die <span class="math inline">\(\delta_i\)</span> können als individuelle Achsenabschnitte (“feste Effekte”) interpretieren werden, weshalb Modell <span class="math inline">\(\eqref{eq:femodel}\)</span> auch als “Fixed-Effects-Modell” bezeichnet wird.</p>
+</section><section id="regression-in-differenzen" class="level2 page-columns page-full" data-number="5.3"><h2 data-number="5.3" class="anchored" data-anchor-id="regression-in-differenzen">
+<span class="header-section-number">5.3</span> Regression in Differenzen</h2>
+<p>Wir betrachten zunächst den in <a href="#fig-FEDAG2" class="quarto-xref">Abbildung&nbsp;<span>5.2</span></a> dargestellten DGP für <span class="math inline">\(T=2\)</span> Zeitperioden. In dieser Situation können Backdoors durch <span class="math inline">\(U\)</span> anhand einer simplen Transformation von Modell <span class="math inline">\(\eqref{eq:femodel}\)</span> geschlossen werden: Regression in Zeit-Differenzen zwischen den Perioden <span class="math inline">\(t=2\)</span> und <span class="math inline">\(t=1\)</span>, <span class="math display">\[\begin{align}
+  \Delta Y_{it} = \beta_1 \Delta B_{it} + e_{it}, \qquad i=1,\dots,n,\qquad t=1,2 \label{eq:femodeldiff},
+\end{align}\]</span> wobei <span class="math inline">\(\Delta\,Y_{it} := Y_{i2} - Y_{i1}\)</span> und <span class="math inline">\(e_{it} := \epsilon_{i2} - \epsilon_{i1}\)</span> für <span class="math inline">\(t=2\)</span>. Beachte, dass <span class="math inline">\(\Delta\delta_i=\Delta X_i=0\)</span>. Differenzieren ergibt also ein Modell, in dem weder für <span class="math inline">\(X_i\)</span> noch für die (unbeobachtbaren) <span class="math inline">\(\delta_i\)</span> kontrolliert werden muss, damit <span class="math inline">\(\beta_1\)</span> identifiziert werden kann. Der Behandlungseffekt kann mit KQ geschätzt werden.</p>
+<p>Wir veranschaulichen die Schätzung eines Behandlungseffekts mit dem Differenzen-Ansatz für einen simulierten Datensatz <code>paneldata.csv</code>. Der mit <span class="math inline">\(n=12\)</span> Beobachtungseinheiten, die über <span class="math inline">\(T=8\)</span> Perioden beobachtet wurden. Alle Einheiten weisen unbeobachtbare zeit-invariante Heterogenitäten auf. Der wahre Behandlungseffekt beträgt jeweils <span class="math inline">\(\beta_1 = -1\)</span>.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;Der (R code für den) DGP ist <a href="https://stats.stackexchange.com/a/188559">diesem StackExchange-Post</a> entnommen.</p></div></div><div class="cell">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Datensatz 'paneldata.csv' einlesen</span></span>
+<span><span class="va">paneldata</span> <span class="op">&lt;-</span> <span class="fu">read_csv</span><span class="op">(</span><span class="st">"datasets/paneldata.csv"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">X</span>, <span class="va">Y</span>, <span class="va">ID</span>, <span class="va">time</span>, <span class="va">col</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Datensatz balanced?</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cran.r-project.org/package=plm">plm</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/plm/man/is.pbalanced.html">is.pbalanced</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">paneldata</span>, </span>
+<span>  index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"ID"</span>, <span class="st">"time"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Panel-Dimensionen bestimmen</span></span>
+<span><span class="va">paneldata</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">summarise</span><span class="op">(</span></span>
+<span>    N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">ID</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>    T <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">time</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 2
+      N     T
+  &lt;int&gt; &lt;int&gt;
+1    12     8</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Subsetting für 2 Perioden (t = {1, 2})</span></span>
+<span><span class="va">paneldata_T2</span> <span class="op">&lt;-</span> <span class="va">paneldata</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/between.html">between</a></span><span class="op">(</span><span class="va">time</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://lrberge.github.io/fixest/">fixest</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Naive KQ-Schätzung für t = 1</span></span>
+<span><span class="va">panel_KQ</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://lrberge.github.io/fixest/reference/feols.html">feols</a></span><span class="op">(</span></span>
+<span>  fml <span class="op">=</span> <span class="va">Y</span> <span class="op">~</span> <span class="va">X</span>, </span>
+<span>  data <span class="op">=</span> <span class="va">paneldata</span> <span class="op">%&gt;%</span> </span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">time</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">panel_KQ</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>OLS estimation, Dep. Var.: Y
+Observations: 12
+Standard-errors: IID 
+             Estimate Std. Error  t value   Pr(&gt;|t|)    
+(Intercept) -0.325557   1.977509 -0.16463 8.7252e-01    
+X            3.512724   0.255879 13.72804 8.1671e-08 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 3.12745   Adj. R2: 0.944573</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/">cowplot</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Plot: Naiver KQ-Schätzer für t = 1</span></span>
+<span><span class="op">(</span></span>
+<span>  <span class="va">p_panel</span> <span class="op">&lt;-</span> <span class="fu">ggplot</span><span class="op">(</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">X</span>, y <span class="op">=</span> <span class="va">Y</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">geom_point</span><span class="op">(</span></span>
+<span>      data <span class="op">=</span> <span class="va">paneldata</span> <span class="op">%&gt;%</span> </span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">time</span> <span class="op">&gt;</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>      color <span class="op">=</span> <span class="st">"gray"</span>,</span>
+<span>      show.legend <span class="op">=</span> <span class="cn">F</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">geom_point</span><span class="op">(</span></span>
+<span>      data <span class="op">=</span> <span class="va">paneldata</span> <span class="op">%&gt;%</span> </span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">time</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>      mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">col</span><span class="op">)</span>,</span>
+<span>      show.legend <span class="op">=</span> <span class="cn">F</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="co"># Naive KQ-Schätzung f. t = 1</span></span>
+<span>    <span class="fu">geom_smooth</span><span class="op">(</span></span>
+<span>      data <span class="op">=</span> <span class="va">paneldata</span> <span class="op">%&gt;%</span> </span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">time</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>      method <span class="op">=</span> <span class="st">"lm"</span>, </span>
+<span>      se <span class="op">=</span> <span class="cn">F</span>,</span>
+<span>      col <span class="op">=</span> <span class="st">"black"</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_cowplot</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="FixedEffects_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Panel-Schätzer: KQ-Regression in Differenzen</span></span>
+<span><span class="va">panel_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://lrberge.github.io/fixest/reference/feols.html">feols</a></span><span class="op">(</span></span>
+<span>  fml <span class="op">=</span> <span class="fu"><a href="https://lrberge.github.io/fixest/reference/l.html">d</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://lrberge.github.io/fixest/reference/l.html">d</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>, </span>
+<span>  data <span class="op">=</span> <span class="va">paneldata</span> <span class="op">%&gt;%</span> </span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span></span>
+<span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/between.html">between</a></span><span class="op">(</span><span class="va">time</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span>      <span class="op">)</span>,</span>
+<span>  panel.id <span class="op">=</span> <span class="op">~</span> <span class="va">ID</span> <span class="op">+</span> <span class="va">time</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">panel_diff</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>OLS estimation, Dep. Var.: d(Y, 1)
+Observations: 12
+Standard-errors: Clustered (ID) 
+            Estimate Std. Error   t value Pr(&gt;|t|)    
+(Intercept) -0.16789   0.280039 -0.599525 0.560968    
+d(X, 1)     -1.02316   0.335264 -3.051800 0.011012 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.891809   Adj. R2: 0.522708</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Plot: KQ-Schätzer in Differenzen</span></span>
+<span><span class="va">paneldata_diff</span> <span class="op">&lt;-</span> <span class="va">paneldata</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span></span>
+<span>    DeltaX <span class="op">=</span> <span class="va">X</span> <span class="op">-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html">lag</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>,</span>
+<span>    DeltaY <span class="op">=</span> <span class="va">Y</span> <span class="op">-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html">lag</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">drop_na</span><span class="op">(</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="fu">ggplot</span><span class="op">(</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">DeltaX</span>, y <span class="op">=</span> <span class="va">DeltaY</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span> </span>
+<span>    <span class="fu">geom_point</span><span class="op">(</span></span>
+<span>      data <span class="op">=</span> <span class="va">paneldata_diff</span> <span class="op">%&gt;%</span> </span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">time</span> <span class="op">&gt;</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>      color <span class="op">=</span> <span class="st">"gray"</span>,</span>
+<span>      show.legend <span class="op">=</span> <span class="cn">F</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">geom_point</span><span class="op">(</span></span>
+<span>      data <span class="op">=</span> <span class="va">paneldata_diff</span> <span class="op">%&gt;%</span> </span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">time</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>      mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">col</span><span class="op">)</span>,</span>
+<span>      show.legend <span class="op">=</span> <span class="cn">F</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_smooth</span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">paneldata_diff</span> <span class="op">%&gt;%</span> </span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">time</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>    method <span class="op">=</span> <span class="st">"lm"</span>, </span>
+<span>    se <span class="op">=</span> <span class="cn">F</span>,</span>
+<span>    color <span class="op">=</span> <span class="st">"black"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_cowplot</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="FixedEffects_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Erweiterung auf alle Perioden:</p>
+<div class="cell">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Naive KQ-Schätzung für t = 1,...,8</span></span>
+<span><span class="va">panel_KQ</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://lrberge.github.io/fixest/reference/feols.html">feols</a></span><span class="op">(</span></span>
+<span>  fml <span class="op">=</span> <span class="va">Y</span> <span class="op">~</span> <span class="va">X</span>, </span>
+<span>  data <span class="op">=</span> <span class="va">paneldata</span> </span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">panel_KQ</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>OLS estimation, Dep. Var.: Y
+Observations: 96
+Standard-errors: IID 
+            Estimate Std. Error  t value  Pr(&gt;|t|)    
+(Intercept) -1.45318   1.008859 -1.44042   0.15307    
+X            3.76470   0.134364 28.01868 &lt; 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 4.63461   Adj. R2: 0.891928</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/">cowplot</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Plot: Naiver KQ-Schätzer für t = 1,...,8</span></span>
+<span><span class="fu">ggplot</span><span class="op">(</span></span>
+<span>  mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">X</span>, y <span class="op">=</span> <span class="va">Y</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">paneldata</span> <span class="op">%&gt;%</span> </span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">time</span> <span class="op">&gt;</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>    color <span class="op">=</span> <span class="st">"gray"</span>,</span>
+<span>    show.legend <span class="op">=</span> <span class="cn">F</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">paneldata</span> <span class="op">%&gt;%</span> </span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">time</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">col</span><span class="op">)</span>,</span>
+<span>    show.legend <span class="op">=</span> <span class="cn">F</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co"># Naive KQ-Schätzung f. t = 1</span></span>
+<span>  <span class="fu">geom_smooth</span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">paneldata</span> <span class="op">%&gt;%</span> </span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">time</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>    method <span class="op">=</span> <span class="st">"lm"</span>, </span>
+<span>    se <span class="op">=</span> <span class="cn">F</span>,</span>
+<span>    col <span class="op">=</span> <span class="st">"black"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_cowplot</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="FixedEffects_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Panel-Schätzer: KQ-Regression in Differenzen</span></span>
+<span><span class="va">panel_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://lrberge.github.io/fixest/reference/feols.html">feols</a></span><span class="op">(</span></span>
+<span>  fml <span class="op">=</span> <span class="fu"><a href="https://lrberge.github.io/fixest/reference/l.html">d</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://lrberge.github.io/fixest/reference/l.html">d</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>, </span>
+<span>  data <span class="op">=</span> <span class="va">paneldata</span>,</span>
+<span>  panel.id <span class="op">=</span> <span class="op">~</span> <span class="va">ID</span> <span class="op">+</span> <span class="va">time</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">panel_diff</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>OLS estimation, Dep. Var.: d(Y, 1)
+Observations: 84
+Standard-errors: Clustered (ID) 
+         Estimate Std. Error  t value   Pr(&gt;|t|)    
+d(X, 1) -0.982042   0.135217 -7.26269 1.6178e-05 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 1.12641   Adj. R2: 0.571235</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Plot: KQ-Schätzer in Differenzen (alle t)</span></span>
+<span></span>
+<span>  <span class="fu">ggplot</span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">paneldata_diff</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">DeltaX</span>, y <span class="op">=</span> <span class="va">DeltaY</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span> </span>
+<span>    <span class="fu">geom_point</span><span class="op">(</span></span>
+<span>      color <span class="op">=</span> <span class="st">"gray"</span>,</span>
+<span>      show.legend <span class="op">=</span> <span class="cn">F</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">geom_point</span><span class="op">(</span></span>
+<span>      mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">col</span><span class="op">)</span>,</span>
+<span>      show.legend <span class="op">=</span> <span class="cn">F</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_smooth</span><span class="op">(</span></span>
+<span>    method <span class="op">=</span> <span class="st">"lm"</span>, </span>
+<span>    se <span class="op">=</span> <span class="cn">F</span>,</span>
+<span>    color <span class="op">=</span> <span class="st">"black"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_cowplot</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="FixedEffects_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="fixed-effects" class="level3 page-columns page-full" data-number="5.3.1"><h3 data-number="5.3.1" class="anchored" data-anchor-id="fixed-effects">
+<span class="header-section-number">5.3.1</span> Fixed Effects</h3>
+<p>Modell <span class="math inline">\(\eqref{eq:femodel}\)</span> kann weiterhin als eine Regression mit <span class="math inline">\(n-1\)</span> Dummy-Variablen und einer Konstante umgeschrieben werden:</p>
+<p><span class="math display">\[\begin{align}
+  Y_{it} = \beta_0 + \beta_1 X_{it} + \gamma_2 D^{(2)}_i + \gamma_3 D^{(3)}_i + \cdots + \gamma_n D^{(n)}_i + \epsilon_{it} \label{eq:drmodel}.
+\end{align}\]</span></p>
+<p>Das Modell <span class="math inline">\(\eqref{eq:drmodel}\)</span> hat <span class="math inline">\(n\)</span> verschiedene Achsenabschnitte — einen für jede Beobachtungseinheit.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> Die Modelle <span class="math inline">\(\eqref{eq:femodel}\)</span> und <span class="math inline">\(\eqref{eq:drmodel}\)</span> sind gleichwertige Darstellungen des Fixed-Effects-Modells.</p>
+<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;Für <span class="math inline">\(n-1\)</span> Einheiten ist der individuelle Achsenabschnitt damit <span class="math inline">\(\beta_0 + D^{(i)}_i\)</span> und für <em>eine</em> Einheit <span class="math inline">\(\beta_0\)</span>. Diese Einheit wird auch als <em>Referenzkategorie</em> bezeichnet. Alternativ kann das Modell mit <span class="math inline">\(n\)</span> Dummies und <em>ohne</em> die Konstante <span class="math inline">\(\beta_0\)</span> geschrieben werden.</p></div></div><p>Fixed Effects können Endogenität aufgrund simultaner Kausalität oder ausgelassender zeitlich variierender Faktoren (Variablen, welche die abhängige Variable beeinflussen und mit der Behandlungsvariable korreliert sind) nicht beheben. In solchen Szenarien können Panel-Methoden in Kombination mit einer Schätzstrategie basierend auf Instrument-Variablen hilfreich sein. Wir betrachten solche Schätzer in Kapitel <a href="IV.html" class="quarto-xref"><span>Kapitel 6</span></a>.</p>
+<hr>
+<p><strong>Interaktive Illustration von Panel-Schätzern</strong></p>
+<iframe width="100%" height="642" frameborder="0" src="https://observablehq.com/embed/@mca91/panelcomp?cells=viewof+showgroups%2Cviewof+showdgp%2Cviewof+regtype%2Ctheplot">
+</iframe>
+<div class="cell">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Fixed-Effects-Schätzung</span></span>
+<span><span class="va">panel_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://lrberge.github.io/fixest/reference/feols.html">feols</a></span><span class="op">(</span></span>
+<span>  fml <span class="op">=</span> <span class="va">Y</span> <span class="op">~</span> <span class="va">X</span> <span class="op">|</span> <span class="va">ID</span>,  </span>
+<span>  data <span class="op">=</span> <span class="va">paneldata</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">panel_FE</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>OLS estimation, Dep. Var.: Y
+Observations: 96
+Fixed-effects: ID: 12
+Standard-errors: Clustered (ID) 
+  Estimate Std. Error  t value   Pr(&gt;|t|)    
+X -1.04507    0.10473 -9.97865 7.5526e-07 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.746006     Adj. R2: 0.996829
+                 Within R2: 0.602694</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cran.r-project.org/package=plm">plm</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Random-Effects-Schätzung</span></span>
+<span><span class="va">panel_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/plm/man/plm.html">plm</a></span><span class="op">(</span></span>
+<span>  formula <span class="op">=</span> <span class="va">Y</span> <span class="op">~</span> <span class="va">X</span>,  </span>
+<span>  model <span class="op">=</span> <span class="st">"random"</span>,</span>
+<span>  index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"ID"</span>, <span class="st">"time"</span><span class="op">)</span>,  </span>
+<span>  data <span class="op">=</span> <span class="va">paneldata</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">panel_RE</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Oneway (individual) effect Random Effect Model 
+   (Swamy-Arora's transformation)
+
+Call:
+plm(formula = Y ~ X, data = paneldata, model = "random", index = c("ID", 
+    "time"))
+
+Balanced Panel: n = 12, T = 8, N = 96
+
+Effects:
+                 var std.dev share
+idiosyncratic 0.6437  0.8023 0.229
+individual    2.1732  1.4742 0.771
+theta: 0.811
+
+Residuals:
+   Min. 1st Qu.  Median 3rd Qu.    Max. 
+-6.0355 -1.9888 -0.1651  1.9196  6.4374 
+
+Coefficients:
+            Estimate Std. Error z-value  Pr(&gt;|z|)    
+(Intercept) 18.34586    2.31566  7.9225 2.328e-15 ***
+X            0.77031    0.26346  2.9238  0.003458 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Total Sum of Squares:    818.14
+Residual Sum of Squares: 749.94
+R-Squared:      0.083362
+Adj. R-Squared: 0.07361
+Chisq: 8.54862 on 1 DF, p-value: 0.0034579</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">paneldata</span> <span class="op">&lt;-</span> <span class="va">paneldata</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span></span>
+<span>    <span class="co"># Vorhergesagte Werte für FE-Schätzung</span></span>
+<span>    yhat_FE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html">fitted</a></span><span class="op">(</span><span class="va">panel_FE</span><span class="op">)</span>,</span>
+<span>    <span class="co"># Vorhergesagte Werte für RE-Schätzung</span></span>
+<span>    yhat_RE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">panel_RE</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ggplot</span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">paneldata</span>,</span>
+<span>  mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">X</span>, y <span class="op">=</span> <span class="va">Y</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">col</span><span class="op">)</span>, </span>
+<span>    show.legend <span class="op">=</span> <span class="cn">F</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co"># Pooling</span></span>
+<span>  <span class="fu">geom_smooth</span><span class="op">(</span></span>
+<span>    method <span class="op">=</span> <span class="st">"lm"</span>, </span>
+<span>    se <span class="op">=</span> <span class="cn">F</span>,</span>
+<span>    col <span class="op">=</span> <span class="st">"black"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co"># Fixed Effects</span></span>
+<span>  <span class="fu">geom_line</span><span class="op">(</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="va">yhat_FE</span>, group <span class="op">=</span> <span class="va">ID</span>, col <span class="op">=</span> <span class="va">col</span><span class="op">)</span>, </span>
+<span>    show.legend <span class="op">=</span> <span class="cn">F</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co"># Random Effects</span></span>
+<span>  <span class="fu">geom_line</span><span class="op">(</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>y <span class="op">=</span> <span class="va">yhat_RE</span><span class="op">)</span>, </span>
+<span>    lty <span class="op">=</span> <span class="st">"dashed"</span>, </span>
+<span>    show.legend <span class="op">=</span> <span class="cn">F</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_cowplot</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="FixedEffects_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section></section><section id="beispiel-einkommen-und-demokratie" class="level2" data-number="5.4"><h2 data-number="5.4" class="anchored" data-anchor-id="beispiel-einkommen-und-demokratie">
+<span class="header-section-number">5.4</span> Beispiel: Einkommen und Demokratie</h2>
+<p>Eine Vielzahl polit-ökonomischer Standardwerke und Studien <span class="citation" data-cites="Dahl1971 Huntington1991 Rueschemeyer1992">(bspw. <a href="Literatur.html#ref-Dahl1971" role="doc-biblioref">Dahl 1971</a>; <a href="Literatur.html#ref-Huntington1991" role="doc-biblioref">Huntington 1991</a>; <a href="Literatur.html#ref-Rueschemeyer1992" role="doc-biblioref">Rueschemeyer, Stephens, und Stephens 1992</a>)</span> liefert vermeindliche Belege für einen zentralen Grundsatz der <a href="https://de.wikipedia.org/wiki/Modernisierungstheorie">Modernisierungstheorie</a>: Ein höheres Pro-Kopf-Einkommen erhöht die Nachfrage der Bevölkerung nach politischer Freiheit und demokratischen Insitutionen. <span class="citation" data-cites="Acemogluetal2008">Acemoglu u.&nbsp;a. (<a href="Literatur.html#ref-Acemogluetal2008" role="doc-biblioref">2008a</a>)</span> argumentieren, dass der in derartigen länderübergreifenden Analysen mit Pooling häufig als positiv geschätzte Zusammenhang zwischen Einkommen und Demokratisierung nicht kausal interpetiert werden sollte. Ein Grund hierfür ist, dass ausgelassene länderspezifische zeit-invariante (möglicherweise unbeobachtbare) Faktoren, die sowohl die ökonomische Entwicklung als auch die Stärke demokratischer Institutionen beeinflussen, wahrscheinlich sind. Um diese mögliche Ursache für Endogenität des Zusammenhangs <span class="math display">\[\begin{align}
+  \text{Demokratisierung}_i = \beta_0 + \beta_1\,\text{PK-Einkommen}_i + \epsilon_i
+\end{align}\]</span> zu adressieren, nutzen <span class="citation" data-cites="Acemogluetal2008">Acemoglu u.&nbsp;a. (<a href="Literatur.html#ref-Acemogluetal2008" role="doc-biblioref">2008a</a>)</span> einen Panel-Regressionsansatz ähnlich zu <span class="math display">\[\begin{align}
+  \text{Demokratisierung}_{it} = \delta_i + \beta_1\,\text{PK-Einkommen}_{it} + \epsilon_{it}
+\end{align}\]</span> mit Fixed Effects <span class="math inline">\(\delta_i\)</span>, die für länderspezifische zeitinvariante Faktoren kontrollieren.</p>
+<p>Das Kernergebnis von <span class="citation" data-cites="Acemogluetal2008">Acemoglu u.&nbsp;a. (<a href="Literatur.html#ref-Acemogluetal2008" role="doc-biblioref">2008a</a>)</span> ist, dass es <em>keinen</em> kausalen Zusammenhang zwischen dem Einkommen (Wirtschaftswachstum) und der Demokratisierung gibt. Die Autoren zeigen, dass historische und geografische Faktoren, die sowohl das Einkommen als auch die politischen Institutionen beeinflussen, den beobachteten Zusammenhang verzerren können.</p>
+<p>Für die nachfolgenden Code-Beispiele nutzen wir einen Auszug des Datensatzes aus dem Replikationspaket für <span class="citation" data-cites="Acemogluetal2008">Acemoglu u.&nbsp;a. (<a href="Literatur.html#ref-Acemogluetal2008" role="doc-biblioref">2008a</a>)</span>, siehe <span class="citation" data-cites="Acemogluetal2008data">Acemoglu u.&nbsp;a. (<a href="Literatur.html#ref-Acemogluetal2008data" role="doc-biblioref">2008b</a>)</span>.</p>
+<div class="cell">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">acem</span> <span class="op">&lt;-</span> <span class="fu">readxl</span><span class="fu">::</span><span class="fu"><a href="https://readxl.tidyverse.org/reference/read_excel.html">read_xls</a></span><span class="op">(</span></span>
+<span>  <span class="st">"~/Downloads/113251-V1/Income-and-Democracy-Data-AER-adjustment.xls"</span>, </span>
+<span>  sheet <span class="op">=</span> <span class="st">"5 Year Panel"</span></span>
+<span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">acem</span> <span class="op">&lt;-</span> <span class="va">acem</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/between.html">between</a></span><span class="op">(</span><span class="va">year</span>, <span class="fl">1955</span>, <span class="fl">2000</span><span class="op">)</span>,</span>
+<span>    <span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">arrange</span><span class="op">(</span><span class="va">year</span><span class="op">)</span> </span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Pooling</span></span>
+<span><span class="fu"><a href="https://lrberge.github.io/fixest/reference/feols.html">feols</a></span><span class="op">(</span></span>
+<span>  fml <span class="op">=</span> <span class="va">fhpolrigaug</span> <span class="op">~</span> <span class="va">lrgdpch</span>,</span>
+<span>  panel.id <span class="op">=</span> <span class="op">~</span> <span class="va">country</span> <span class="op">+</span> <span class="va">year</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">acem</span>, </span>
+<span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>OLS estimation, Dep. Var.: fhpolrigaug
+Observations: 1,090
+Standard-errors: Clustered (country) 
+             Estimate Std. Error  t value  Pr(&gt;|t|)    
+(Intercept) -1.210494   0.094546 -12.8032 &lt; 2.2e-16 ***
+lrgdpch      0.217745   0.011194  19.4518 &lt; 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.273788   Adj. R2: 0.404579</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">acem_f</span> <span class="op">&lt;-</span> <span class="va">acem</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">year</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1970</span>, <span class="fl">1995</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">code</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">summarise</span><span class="op">(</span></span>
+<span>    dlrgdpch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html">diff</a></span><span class="op">(</span><span class="va">lrgdpch</span><span class="op">)</span>,</span>
+<span>    dfhpolrigaug <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html">diff</a></span><span class="op">(</span><span class="va">fhpolrigaug</span><span class="op">)</span></span>
+<span>    <span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">drop_na</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span></span>
+<span>  formula <span class="op">=</span> <span class="va">dfhpolrigaug</span> <span class="op">~</span> <span class="va">dlrgdpch</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">acem_f</span></span>
+<span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = dfhpolrigaug ~ dlrgdpch, data = acem_f)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-0.9582 -0.1541 -0.1172  0.2081  0.7079 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)   
+(Intercept)  0.12629    0.04008   3.151  0.00214 **
+dlrgdpch     0.03298    0.06354   0.519  0.60486   
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.3422 on 101 degrees of freedom
+Multiple R-squared:  0.00266,   Adjusted R-squared:  -0.007214 
+F-statistic: 0.2694 on 1 and 101 DF,  p-value: 0.6049</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">acem_f</span>,</span>
+<span>  mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span></span>
+<span>    x <span class="op">=</span> <span class="va">dlrgdpch</span>,</span>
+<span>    y <span class="op">=</span> <span class="va">dfhpolrigaug</span></span>
+<span>  <span class="op">)</span> </span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_hline</span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span>, lty <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_text</span><span class="op">(</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>label <span class="op">=</span> <span class="va">code</span><span class="op">)</span>,</span>
+<span>    position <span class="op">=</span> <span class="fu">position_jitter</span><span class="op">(</span></span>
+<span>      height <span class="op">=</span> <span class="fl">.05</span>, </span>
+<span>      seed <span class="op">=</span> <span class="fl">1234</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_smooth</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">F</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span></span>
+<span>    x <span class="op">=</span> <span class="st">"Diff. Log(Pro-Kopf-BIP) (1970 - 1995)"</span>,</span>
+<span>    y <span class="op">=</span> <span class="st">"Diff. Demokratie-Index (1970 - 1995)"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_cowplot</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="FixedEffects_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># time + country fixed effects</span></span>
+<span><span class="fu"><a href="https://lrberge.github.io/fixest/reference/feols.html">feols</a></span><span class="op">(</span></span>
+<span>  fml <span class="op">=</span> <span class="va">fhpolrigaug</span> <span class="op">~</span> <span class="fu"><a href="https://lrberge.github.io/fixest/reference/l.html">l</a></span><span class="op">(</span><span class="va">fhpolrigaug</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://lrberge.github.io/fixest/reference/l.html">l</a></span><span class="op">(</span><span class="va">lrgdpch</span><span class="op">)</span> </span>
+<span>  <span class="op">|</span> <span class="va">year</span> <span class="op">+</span> <span class="va">country</span>,</span>
+<span>  panel.id <span class="op">=</span> <span class="op">~</span> <span class="va">country</span> <span class="op">+</span> <span class="va">year</span>,</span>
+<span>  cluster <span class="op">=</span> <span class="op">~</span> <span class="va">country</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">acem</span>, </span>
+<span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>OLS estimation, Dep. Var.: fhpolrigaug
+Observations: 955
+Fixed-effects: year: 9,  country: 150
+Standard-errors: Clustered (country) 
+                  Estimate Std. Error  t value   Pr(&gt;|t|)    
+l(fhpolrigaug, 1) 0.377490   0.048071 7.852772 7.4009e-13 ***
+l(lrgdpch, 1)     0.008417   0.031587 0.266461 7.9025e-01    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.16588     Adj. R2: 0.748871
+                Within R2: 0.140859</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># time-fixed effects</span></span>
+<span><span class="fu"><a href="https://lrberge.github.io/fixest/reference/feols.html">feols</a></span><span class="op">(</span></span>
+<span>  fml <span class="op">=</span> <span class="va">fhpolrigaug</span> <span class="op">~</span> <span class="fu"><a href="https://lrberge.github.io/fixest/reference/l.html">l</a></span><span class="op">(</span><span class="va">fhpolrigaug</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://lrberge.github.io/fixest/reference/l.html">l</a></span><span class="op">(</span><span class="va">lrgdpch</span><span class="op">)</span> </span>
+<span>  <span class="op">|</span> <span class="va">year</span>,</span>
+<span>  panel.id <span class="op">=</span> <span class="op">~</span> <span class="va">country</span> <span class="op">+</span> <span class="va">year</span>,</span>
+<span>  cluster <span class="op">=</span> <span class="op">~</span> <span class="va">country</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">acem</span>, </span>
+<span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>OLS estimation, Dep. Var.: fhpolrigaug
+Observations: 955
+Fixed-effects: year: 9
+Standard-errors: Clustered (country) 
+                  Estimate Std. Error  t value   Pr(&gt;|t|)    
+l(fhpolrigaug, 1) 0.702504   0.036023 19.50147  &lt; 2.2e-16 ***
+l(lrgdpch, 1)     0.073042   0.009861  7.40714 8.8791e-12 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.191614     Adj. R2: 0.7178  
+                 Within R2: 0.705629</code></pre>
+</div>
+</div>
+
+
+<!-- -->
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-Acemogluetal2008" class="csl-entry" role="listitem">
+Acemoglu, Daron, Simon Johnson, James A. Robinson, und Pierre Yared. 2008a. <span>„Income and Democracy“</span>. <em>American Economic Review</em> 98 (3): 808–42. <a href="https://doi.org/10.1257/aer.98.3.808">https://doi.org/10.1257/aer.98.3.808</a>.
+</div>
+<div id="ref-Acemogluetal2008data" class="csl-entry" role="listitem">
+———. 2008b. <span>„Replication data for: Income and Democracy“</span>. ICPSR - Interuniversity Consortium for Political; Social Research. <a href="https://doi.org/10.3886/E113251V1">https://doi.org/10.3886/E113251V1</a>.
+</div>
+<div id="ref-Dahl1971" class="csl-entry" role="listitem">
+Dahl, Robert Alan. 1971. <em>Polyarchy: Participation and Opposition: Participation and opposition</em>. New Haven: Yale Univ. Press.
+</div>
+<div id="ref-Huntington1991" class="csl-entry" role="listitem">
+Huntington, Samuel P. 1991. <em>The Third Wave: Democratization in the Late Twentieth Century: Democratization in the late twentieth century</em>. Norman, OK: Univ. of Oklahoma Press.
+</div>
+<div id="ref-Rueschemeyer1992" class="csl-entry" role="listitem">
+Rueschemeyer, Dietrich, Evelyne H. Stephens, und John D. Stephens. 1992. <em>Capitalist development and democracy</em>. Cambridge: Polity Pr.
+</div>
+</div>
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Kopiert");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Kopiert");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="./Matching.html" class="pagination-link" aria-label="Matching">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Matching</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./IV.html" class="pagination-link" aria-label="IV-Regression">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">IV-Regression</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Quellcode</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb35" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="an">webr:</span><span class="co"> </span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="co">  show-startup-message: true</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="co">  packages: [</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="co">            'dplyr',</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="co">            'ggplot2',</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="co">            'sandwich',</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="co">            'tidyr',</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="co">            'readr',</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a><span class="co">            'Synth'</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="co">            ]</span></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a><span class="in">```{=html}</span></span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;style&gt;</span></span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a><span class="in">.qwebr-code-output-stdout {background-color: powderblue;}</span></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a><span class="in">.qwebr-button-run, .qwebr-button-reset, .qwebr-button-copy {</span></span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a><span class="in">  background-color:  rgba(0, 0, 0, 0);</span></span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a><span class="in">  border-style: none;</span></span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a><span class="in">  font-weight: 400;</span></span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a><span class="in">  color: white; </span></span>
+<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a><span class="in">  transition: none;</span></span>
+<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a><span class="in">.qwebr-editor-toolbar {</span></span>
+<span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a><span class="in">  width: 100%;</span></span>
+<span id="cb35-28"><a href="#cb35-28" aria-hidden="true" tabindex="-1"></a><span class="in">  display: flex;</span></span>
+<span id="cb35-29"><a href="#cb35-29" aria-hidden="true" tabindex="-1"></a><span class="in">  justify-content: space-between;</span></span>
+<span id="cb35-30"><a href="#cb35-30" aria-hidden="true" tabindex="-1"></a><span class="in">  box-sizing: border-box;</span></span>
+<span id="cb35-31"><a href="#cb35-31" aria-hidden="true" tabindex="-1"></a><span class="in">  border-radius: 0 0 6px 6px;</span></span>
+<span id="cb35-32"><a href="#cb35-32" aria-hidden="true" tabindex="-1"></a><span class="in">  background-color: darkgreen;</span></span>
+<span id="cb35-33"><a href="#cb35-33" aria-hidden="true" tabindex="-1"></a><span class="in">  border-color: darkgreen;</span></span>
+<span id="cb35-34"><a href="#cb35-34" aria-hidden="true" tabindex="-1"></a><span class="in">  border-width: 1px;</span></span>
+<span id="cb35-35"><a href="#cb35-35" aria-hidden="true" tabindex="-1"></a><span class="in">  border-style: solid;</span></span>
+<span id="cb35-36"><a href="#cb35-36" aria-hidden="true" tabindex="-1"></a><span class="in">  padding: 0 0; </span></span>
+<span id="cb35-37"><a href="#cb35-37" aria-hidden="true" tabindex="-1"></a><span class="in">  transition: color .1s ease-in-out, background-color .1s ease-in-out,border-color .1s ease-in-out,box-shadow .1s ease-in-out;</span></span>
+<span id="cb35-38"><a href="#cb35-38" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb35-39"><a href="#cb35-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-40"><a href="#cb35-40" aria-hidden="true" tabindex="-1"></a><span class="in">.qwebr-editor-toolbar:hover {</span></span>
+<span id="cb35-41"><a href="#cb35-41" aria-hidden="true" tabindex="-1"></a><span class="in">  background-color: white;</span></span>
+<span id="cb35-42"><a href="#cb35-42" aria-hidden="true" tabindex="-1"></a><span class="in">  border-color: darkgreen;</span></span>
+<span id="cb35-43"><a href="#cb35-43" aria-hidden="true" tabindex="-1"></a><span class="in">  border-width: 1px;</span></span>
+<span id="cb35-44"><a href="#cb35-44" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb35-45"><a href="#cb35-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-46"><a href="#cb35-46" aria-hidden="true" tabindex="-1"></a><span class="in">.qwebr-editor-toolbar:hover * {</span></span>
+<span id="cb35-47"><a href="#cb35-47" aria-hidden="true" tabindex="-1"></a><span class="in">  color: darkgreen;</span></span>
+<span id="cb35-48"><a href="#cb35-48" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb35-49"><a href="#cb35-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-50"><a href="#cb35-50" aria-hidden="true" tabindex="-1"></a><span class="in">.overflow-guard, .qwebr-editor, .monaco-editor {</span></span>
+<span id="cb35-51"><a href="#cb35-51" aria-hidden="true" tabindex="-1"></a><span class="in">  border-radius: 6px 6px 0 0;</span></span>
+<span id="cb35-52"><a href="#cb35-52" aria-hidden="true" tabindex="-1"></a><span class="in">  border-width: 1px 1px 0 1px;</span></span>
+<span id="cb35-53"><a href="#cb35-53" aria-hidden="true" tabindex="-1"></a><span class="in">  border-color: darkgreen;</span></span>
+<span id="cb35-54"><a href="#cb35-54" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb35-55"><a href="#cb35-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-56"><a href="#cb35-56" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;/style&gt;</span></span>
+<span id="cb35-57"><a href="#cb35-57" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-58"><a href="#cb35-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-59"><a href="#cb35-59" aria-hidden="true" tabindex="-1"></a><span class="fu"># Panel-Daten</span></span>
+<span id="cb35-60"><a href="#cb35-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-61"><a href="#cb35-61" aria-hidden="true" tabindex="-1"></a><span class="fu">## Backdoors durch unbeobachtbare Heterogenitäten {#sec-panel-uh}</span></span>
+<span id="cb35-62"><a href="#cb35-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-63"><a href="#cb35-63" aria-hidden="true" tabindex="-1"></a><span class="in">```{r, echo=F,message=F,warning=F}</span></span>
+<span id="cb35-64"><a href="#cb35-64" aria-hidden="true" tabindex="-1"></a><span class="in"># Formatierung von gt-Tabellen</span></span>
+<span id="cb35-65"><a href="#cb35-65" aria-hidden="true" tabindex="-1"></a><span class="in">library(gt)</span></span>
+<span id="cb35-66"><a href="#cb35-66" aria-hidden="true" tabindex="-1"></a><span class="in">tabopts &lt;- function(x) {</span></span>
+<span id="cb35-67"><a href="#cb35-67" aria-hidden="true" tabindex="-1"></a><span class="in">    fmt_number(x, decimals = 3, drop_trailing_zeros = T) %&gt;%</span></span>
+<span id="cb35-68"><a href="#cb35-68" aria-hidden="true" tabindex="-1"></a><span class="in">    tab_options(table_body.hlines.color = "white",</span></span>
+<span id="cb35-69"><a href="#cb35-69" aria-hidden="true" tabindex="-1"></a><span class="in">              column_labels.border.bottom.color = "black", </span></span>
+<span id="cb35-70"><a href="#cb35-70" aria-hidden="true" tabindex="-1"></a><span class="in">             column_labels.border.top.color = "black",</span></span>
+<span id="cb35-71"><a href="#cb35-71" aria-hidden="true" tabindex="-1"></a><span class="in">             table_body.border.bottom.color = "black", </span></span>
+<span id="cb35-72"><a href="#cb35-72" aria-hidden="true" tabindex="-1"></a><span class="in">             table.border.bottom.color = "black",</span></span>
+<span id="cb35-73"><a href="#cb35-73" aria-hidden="true" tabindex="-1"></a><span class="in">             column_labels.font.weight = "bold", </span></span>
+<span id="cb35-74"><a href="#cb35-74" aria-hidden="true" tabindex="-1"></a><span class="in">             table.font.color = "black", </span></span>
+<span id="cb35-75"><a href="#cb35-75" aria-hidden="true" tabindex="-1"></a><span class="in">             table.font.size = 16)</span></span>
+<span id="cb35-76"><a href="#cb35-76" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb35-77"><a href="#cb35-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-78"><a href="#cb35-78" aria-hidden="true" tabindex="-1"></a><span class="in"># load the tidyverse</span></span>
+<span id="cb35-79"><a href="#cb35-79" aria-hidden="true" tabindex="-1"></a><span class="in">library(tidyverse)</span></span>
+<span id="cb35-80"><a href="#cb35-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-81"><a href="#cb35-81" aria-hidden="true" tabindex="-1"></a><span class="in">options(pillar.sigfig = 2)</span></span>
+<span id="cb35-82"><a href="#cb35-82" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-83"><a href="#cb35-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-84"><a href="#cb35-84" aria-hidden="true" tabindex="-1"></a>Betrachte das Panel-Regression-Modell</span>
+<span id="cb35-85"><a href="#cb35-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-86"><a href="#cb35-86" aria-hidden="true" tabindex="-1"></a>\begin{align}</span>
+<span id="cb35-87"><a href="#cb35-87" aria-hidden="true" tabindex="-1"></a>  Y_{it} = \beta_0 + \beta_1 B_{it} + \beta_2 X_i + \beta_3 U_i \epsilon_{it},\label{eq:unobshetmodel}</span>
+<span id="cb35-88"><a href="#cb35-88" aria-hidden="true" tabindex="-1"></a>\end{align}</span>
+<span id="cb35-89"><a href="#cb35-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-90"><a href="#cb35-90" aria-hidden="true" tabindex="-1"></a>wobei $U_i$ unbeobachtete und $X_i$ beobachtete, zeitlich-invariante Heterogenitäten zwischen den Beobachtungseinheiten $i=1,\dots,n$ sind. Wie üblich ist $B_i$ die Behandlungsvariable und $\beta_1$ der interessierende Effekt einer Veränderung von $B_i$ auf $Y_i$. </span>
+<span id="cb35-91"><a href="#cb35-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-92"><a href="#cb35-92" aria-hidden="true" tabindex="-1"></a>Angenommen wir beobachten $Y_{it}$ und $B_{it}$ für $T=1$, also für eine Periode. Bei Korrelation zwischen den (aufgrund der $U_i$) **unbeobachtbaren** zeit-invarianten Effekten $\delta_i$ und der Behandlungsvariable $B$ kann der kausale Effekt $\beta_1$ nicht identifiziert werden. Diese Situation ist in @fig-FEDAG1 dargestellt.</span>
+<span id="cb35-93"><a href="#cb35-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-96"><a href="#cb35-96" aria-hidden="true" tabindex="-1"></a><span class="in">```{dot}</span></span>
+<span id="cb35-97"><a href="#cb35-97" aria-hidden="true" tabindex="-1"></a><span class="in">//| fig-width: 3</span></span>
+<span id="cb35-98"><a href="#cb35-98" aria-hidden="true" tabindex="-1"></a><span class="in">//| fig-height: 3</span></span>
+<span id="cb35-99"><a href="#cb35-99" aria-hidden="true" tabindex="-1"></a><span class="in">//| fig-align: 'center'</span></span>
+<span id="cb35-100"><a href="#cb35-100" aria-hidden="true" tabindex="-1"></a><span class="in">//| fig-cap: "Backdoors durch beobachtete und unbeobachtete Variablen"</span></span>
+<span id="cb35-101"><a href="#cb35-101" aria-hidden="true" tabindex="-1"></a><span class="in">//| label: "fig-FEDAG1" </span></span>
+<span id="cb35-102"><a href="#cb35-102" aria-hidden="true" tabindex="-1"></a><span class="in">digraph FE_dag_single_period {</span></span>
+<span id="cb35-103"><a href="#cb35-103" aria-hidden="true" tabindex="-1"></a><span class="in">    layout=neato</span></span>
+<span id="cb35-104"><a href="#cb35-104" aria-hidden="true" tabindex="-1"></a><span class="in">    fontname="Helvetica,Arial,sans-serif"</span></span>
+<span id="cb35-105"><a href="#cb35-105" aria-hidden="true" tabindex="-1"></a><span class="in">    node [fontname="Helvetica,Arial,sans-serif"]</span></span>
+<span id="cb35-106"><a href="#cb35-106" aria-hidden="true" tabindex="-1"></a><span class="in">    edge [fontname="Helvetica,Arial,sans-serif"]</span></span>
+<span id="cb35-107"><a href="#cb35-107" aria-hidden="true" tabindex="-1"></a><span class="in">    splines=true</span></span>
+<span id="cb35-108"><a href="#cb35-108" aria-hidden="true" tabindex="-1"></a><span class="in">    pad=.5</span></span>
+<span id="cb35-109"><a href="#cb35-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-110"><a href="#cb35-110" aria-hidden="true" tabindex="-1"></a><span class="in">    // Zeitinvariante Einflüsse</span></span>
+<span id="cb35-111"><a href="#cb35-111" aria-hidden="true" tabindex="-1"></a><span class="in">    U [pos="2,8!", label=&lt;U&gt;, color=gray, fontcolor=gray];</span></span>
+<span id="cb35-112"><a href="#cb35-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-113"><a href="#cb35-113" aria-hidden="true" tabindex="-1"></a><span class="in">    // Knoten für Zeitvariante Einflüsse</span></span>
+<span id="cb35-114"><a href="#cb35-114" aria-hidden="true" tabindex="-1"></a><span class="in">    X [pos="2,6!", label=&lt;X&gt;];</span></span>
+<span id="cb35-115"><a href="#cb35-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-116"><a href="#cb35-116" aria-hidden="true" tabindex="-1"></a><span class="in">    // Knoten für eine Periode</span></span>
+<span id="cb35-117"><a href="#cb35-117" aria-hidden="true" tabindex="-1"></a><span class="in">    B [pos="0,6!", label=&lt;B&gt;];</span></span>
+<span id="cb35-118"><a href="#cb35-118" aria-hidden="true" tabindex="-1"></a><span class="in">    Y [pos="0,8!", label=&lt;Y&gt;];</span></span>
+<span id="cb35-119"><a href="#cb35-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-120"><a href="#cb35-120" aria-hidden="true" tabindex="-1"></a><span class="in">    // Kanten für eine Periode</span></span>
+<span id="cb35-121"><a href="#cb35-121" aria-hidden="true" tabindex="-1"></a><span class="in">    U -&gt; X [color=gray, style=dashed];</span></span>
+<span id="cb35-122"><a href="#cb35-122" aria-hidden="true" tabindex="-1"></a><span class="in">    U -&gt; Y [color=gray, style=dashed];</span></span>
+<span id="cb35-123"><a href="#cb35-123" aria-hidden="true" tabindex="-1"></a><span class="in">    U -&gt; B [color=gray, style=dashed];</span></span>
+<span id="cb35-124"><a href="#cb35-124" aria-hidden="true" tabindex="-1"></a><span class="in">    X -&gt; Y;</span></span>
+<span id="cb35-125"><a href="#cb35-125" aria-hidden="true" tabindex="-1"></a><span class="in">    X -&gt; B;</span></span>
+<span id="cb35-126"><a href="#cb35-126" aria-hidden="true" tabindex="-1"></a><span class="in">    B -&gt; Y;</span></span>
+<span id="cb35-127"><a href="#cb35-127" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb35-128"><a href="#cb35-128" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-129"><a href="#cb35-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-130"><a href="#cb35-130" aria-hidden="true" tabindex="-1"></a>Es bestehen Backdoors durch die $U_i$, die wir nicht mit der Schätzung von </span>
+<span id="cb35-131"><a href="#cb35-131" aria-hidden="true" tabindex="-1"></a>\begin{align}</span>
+<span id="cb35-132"><a href="#cb35-132" aria-hidden="true" tabindex="-1"></a>  Y_{it} = \beta_0 + \beta_1 B_{it} + \beta_2 X_i + \varepsilon_{it},\label{eq:femodelfail}</span>
+<span id="cb35-133"><a href="#cb35-133" aria-hidden="true" tabindex="-1"></a>\end{align}</span>
+<span id="cb35-134"><a href="#cb35-134" aria-hidden="true" tabindex="-1"></a>einer (fehlspezifizierten) Regression, schließen können.</span>
+<span id="cb35-135"><a href="#cb35-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-136"><a href="#cb35-136" aria-hidden="true" tabindex="-1"></a><span class="fu">## Differenzen und Fixed Effects</span></span>
+<span id="cb35-137"><a href="#cb35-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-138"><a href="#cb35-138" aria-hidden="true" tabindex="-1"></a>Anhand von Panel-Daten mit $T\geq2$ können die in @sec-panel-uh beschreibene Backdoors durch unbeobachtbare zeit-invariante Heterogenitäten mit Regression geschlossen werden.</span>
+<span id="cb35-139"><a href="#cb35-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-142"><a href="#cb35-142" aria-hidden="true" tabindex="-1"></a><span class="in">```{dot}</span></span>
+<span id="cb35-143"><a href="#cb35-143" aria-hidden="true" tabindex="-1"></a><span class="in">//| fig-width: 6</span></span>
+<span id="cb35-144"><a href="#cb35-144" aria-hidden="true" tabindex="-1"></a><span class="in">//| fig-height: 4</span></span>
+<span id="cb35-145"><a href="#cb35-145" aria-hidden="true" tabindex="-1"></a><span class="in">//| fig-align: 'center'</span></span>
+<span id="cb35-146"><a href="#cb35-146" aria-hidden="true" tabindex="-1"></a><span class="in">//| fig-cap: "FE-Design mit Backdoors durch beobachtete und unbeobachtete zeit-invariante Variablen"</span></span>
+<span id="cb35-147"><a href="#cb35-147" aria-hidden="true" tabindex="-1"></a><span class="in">//| label: "fig-FEDAG2" </span></span>
+<span id="cb35-148"><a href="#cb35-148" aria-hidden="true" tabindex="-1"></a><span class="in">digraph FE_dag2 {</span></span>
+<span id="cb35-149"><a href="#cb35-149" aria-hidden="true" tabindex="-1"></a><span class="in">    layout=neato</span></span>
+<span id="cb35-150"><a href="#cb35-150" aria-hidden="true" tabindex="-1"></a><span class="in">    fontname="Helvetica,Arial,sans-serif"</span></span>
+<span id="cb35-151"><a href="#cb35-151" aria-hidden="true" tabindex="-1"></a><span class="in">    node [fontname="Helvetica,Arial,sans-serif"]</span></span>
+<span id="cb35-152"><a href="#cb35-152" aria-hidden="true" tabindex="-1"></a><span class="in">    edge [fontname="Helvetica,Arial,sans-serif"]</span></span>
+<span id="cb35-153"><a href="#cb35-153" aria-hidden="true" tabindex="-1"></a><span class="in">    splines=true</span></span>
+<span id="cb35-154"><a href="#cb35-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-155"><a href="#cb35-155" aria-hidden="true" tabindex="-1"></a><span class="in">    // Zeitinvariante Einflüsse</span></span>
+<span id="cb35-156"><a href="#cb35-156" aria-hidden="true" tabindex="-1"></a><span class="in">    U [pos="2,8!", label=&lt;U&gt;, color=gray, fontcolor=gray];</span></span>
+<span id="cb35-157"><a href="#cb35-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-158"><a href="#cb35-158" aria-hidden="true" tabindex="-1"></a><span class="in">    // Knoten für Zeitvariante Einflüsse</span></span>
+<span id="cb35-159"><a href="#cb35-159" aria-hidden="true" tabindex="-1"></a><span class="in">    X [pos="2,2!", label=&lt;X&gt;];</span></span>
+<span id="cb35-160"><a href="#cb35-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-161"><a href="#cb35-161" aria-hidden="true" tabindex="-1"></a><span class="in">    // Knoten für Perioden 1</span></span>
+<span id="cb35-162"><a href="#cb35-162" aria-hidden="true" tabindex="-1"></a><span class="in">    B1 [pos="0,4!", label=&lt;B&lt;SUB&gt;t=1&lt;/SUB&gt;&gt;];</span></span>
+<span id="cb35-163"><a href="#cb35-163" aria-hidden="true" tabindex="-1"></a><span class="in">    Y1 [pos="0,6!", label=&lt;Y&lt;SUB&gt;t=1&lt;/SUB&gt;&gt;];</span></span>
+<span id="cb35-164"><a href="#cb35-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-165"><a href="#cb35-165" aria-hidden="true" tabindex="-1"></a><span class="in">    // Knoten für Perioden 2</span></span>
+<span id="cb35-166"><a href="#cb35-166" aria-hidden="true" tabindex="-1"></a><span class="in">    B2 [pos="4,4!", label=&lt;B&lt;SUB&gt;t=2&lt;/SUB&gt;&gt;];</span></span>
+<span id="cb35-167"><a href="#cb35-167" aria-hidden="true" tabindex="-1"></a><span class="in">    Y2 [pos="4,6!", label=&lt;Y&lt;SUB&gt;t=2&lt;/SUB&gt;&gt;];</span></span>
+<span id="cb35-168"><a href="#cb35-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-169"><a href="#cb35-169" aria-hidden="true" tabindex="-1"></a><span class="in">    // Kanten für Perioden 1</span></span>
+<span id="cb35-170"><a href="#cb35-170" aria-hidden="true" tabindex="-1"></a><span class="in">    U -&gt; X [color=gray, style=dashed];</span></span>
+<span id="cb35-171"><a href="#cb35-171" aria-hidden="true" tabindex="-1"></a><span class="in">    U -&gt; Y1 [color=gray, style=dashed];</span></span>
+<span id="cb35-172"><a href="#cb35-172" aria-hidden="true" tabindex="-1"></a><span class="in">    U -&gt; B1 [color=gray, style=dashed];</span></span>
+<span id="cb35-173"><a href="#cb35-173" aria-hidden="true" tabindex="-1"></a><span class="in">    X -&gt; Y1;</span></span>
+<span id="cb35-174"><a href="#cb35-174" aria-hidden="true" tabindex="-1"></a><span class="in">    X -&gt; B1;</span></span>
+<span id="cb35-175"><a href="#cb35-175" aria-hidden="true" tabindex="-1"></a><span class="in">    B1 -&gt; Y1;</span></span>
+<span id="cb35-176"><a href="#cb35-176" aria-hidden="true" tabindex="-1"></a><span class="in">    B1 -&gt; B2;</span></span>
+<span id="cb35-177"><a href="#cb35-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-178"><a href="#cb35-178" aria-hidden="true" tabindex="-1"></a><span class="in">    // Kanten für Perioden 2</span></span>
+<span id="cb35-179"><a href="#cb35-179" aria-hidden="true" tabindex="-1"></a><span class="in">    U -&gt; Y2 [color=gray, style=dashed];</span></span>
+<span id="cb35-180"><a href="#cb35-180" aria-hidden="true" tabindex="-1"></a><span class="in">    U -&gt; B2 [color=gray, style=dashed];</span></span>
+<span id="cb35-181"><a href="#cb35-181" aria-hidden="true" tabindex="-1"></a><span class="in">    X -&gt; Y2;</span></span>
+<span id="cb35-182"><a href="#cb35-182" aria-hidden="true" tabindex="-1"></a><span class="in">    X -&gt; B2;</span></span>
+<span id="cb35-183"><a href="#cb35-183" aria-hidden="true" tabindex="-1"></a><span class="in">    B2 -&gt; Y2;</span></span>
+<span id="cb35-184"><a href="#cb35-184" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb35-185"><a href="#cb35-185" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-186"><a href="#cb35-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-187"><a href="#cb35-187" aria-hidden="true" tabindex="-1"></a>Definiere </span>
+<span id="cb35-188"><a href="#cb35-188" aria-hidden="true" tabindex="-1"></a>$$\delta_i = \beta_0 + \beta_3 U_i.$$ Nach einsetzen in \eqref{eq:unobshetmodel} erhalten wir </span>
+<span id="cb35-189"><a href="#cb35-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-190"><a href="#cb35-190" aria-hidden="true" tabindex="-1"></a>\begin{align}</span>
+<span id="cb35-191"><a href="#cb35-191" aria-hidden="true" tabindex="-1"></a>  Y_{it} = \delta_i + \beta_1 B_{it} + \beta_2 X_i + \epsilon_{it} \label{eq:femodel},</span>
+<span id="cb35-192"><a href="#cb35-192" aria-hidden="true" tabindex="-1"></a>\end{align}</span>
+<span id="cb35-193"><a href="#cb35-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-194"><a href="#cb35-194" aria-hidden="true" tabindex="-1"></a>mit einheiten-spezifischen Konstanten $\delta_i$, $i=1,\dots,n$. Die $\delta_i$ können als individuelle Achsenabschnitte ("feste Effekte") interpretieren werden, weshalb Modell \eqref{eq:femodel} auch als "Fixed-Effects-Modell" bezeichnet wird. </span>
+<span id="cb35-195"><a href="#cb35-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-196"><a href="#cb35-196" aria-hidden="true" tabindex="-1"></a><span class="fu">## Regression in Differenzen</span></span>
+<span id="cb35-197"><a href="#cb35-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-198"><a href="#cb35-198" aria-hidden="true" tabindex="-1"></a>Wir betrachten zunächst den in @fig-FEDAG2 dargestellten DGP für $T=2$ Zeitperioden. In dieser Situation können Backdoors durch $U$ anhand einer simplen Transformation von Modell \eqref{eq:femodel} geschlossen werden: Regression in Zeit-Differenzen zwischen den Perioden $t=2$ und $t=1$,</span>
+<span id="cb35-199"><a href="#cb35-199" aria-hidden="true" tabindex="-1"></a>\begin{align}</span>
+<span id="cb35-200"><a href="#cb35-200" aria-hidden="true" tabindex="-1"></a>  \Delta Y_{it} = \beta_1 \Delta B_{it} + e_{it}, \qquad i=1,\dots,n,\qquad t=1,2 \label{eq:femodeldiff},</span>
+<span id="cb35-201"><a href="#cb35-201" aria-hidden="true" tabindex="-1"></a>\end{align}</span>
+<span id="cb35-202"><a href="#cb35-202" aria-hidden="true" tabindex="-1"></a>wobei $\Delta\,Y_{it} := Y_{i2} - Y_{i1}$ und $e_{it} := \epsilon_{i2} - \epsilon_{i1}$ für $t=2$. Beachte, dass $\Delta\delta_i=\Delta X_i=0$. Differenzieren ergibt also ein Modell, in dem weder für $X_i$ noch für die (unbeobachtbaren) $\delta_i$ kontrolliert werden muss, damit $\beta_1$ identifiziert werden kann. Der Behandlungseffekt kann mit KQ geschätzt werden. </span>
+<span id="cb35-203"><a href="#cb35-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-204"><a href="#cb35-204" aria-hidden="true" tabindex="-1"></a>Wir veranschaulichen die Schätzung eines Behandlungseffekts mit dem Differenzen-Ansatz für einen simulierten Datensatz <span class="in">`paneldata.csv`</span>. Der  mit $n=12$ Beobachtungseinheiten, die über $T=8$ Perioden beobachtet wurden. Alle Einheiten weisen unbeobachtbare zeit-invariante Heterogenitäten auf. Der wahre Behandlungseffekt beträgt jeweils $\beta_1 = -1$.^<span class="co">[</span><span class="ot">Der (R code für den) DGP ist [diesem StackExchange-Post](https://stats.stackexchange.com/a/188559) entnommen.</span><span class="co">]</span></span>
+<span id="cb35-205"><a href="#cb35-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-208"><a href="#cb35-208" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-209"><a href="#cb35-209" aria-hidden="true" tabindex="-1"></a><span class="co"># Datensatz 'paneldata.csv' einlesen</span></span>
+<span id="cb35-210"><a href="#cb35-210" aria-hidden="true" tabindex="-1"></a>paneldata <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datasets/paneldata.csv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-211"><a href="#cb35-211" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(X, Y, ID, time, col)</span>
+<span id="cb35-212"><a href="#cb35-212" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-213"><a href="#cb35-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-216"><a href="#cb35-216" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-217"><a href="#cb35-217" aria-hidden="true" tabindex="-1"></a><span class="co"># Datensatz balanced?</span></span>
+<span id="cb35-218"><a href="#cb35-218" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plm)</span>
+<span id="cb35-219"><a href="#cb35-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-220"><a href="#cb35-220" aria-hidden="true" tabindex="-1"></a><span class="fu">is.pbalanced</span>(</span>
+<span id="cb35-221"><a href="#cb35-221" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> paneldata, </span>
+<span id="cb35-222"><a href="#cb35-222" aria-hidden="true" tabindex="-1"></a>  <span class="at">index =</span> <span class="fu">c</span>(<span class="st">"ID"</span>, <span class="st">"time"</span>)</span>
+<span id="cb35-223"><a href="#cb35-223" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-224"><a href="#cb35-224" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-225"><a href="#cb35-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-228"><a href="#cb35-228" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-229"><a href="#cb35-229" aria-hidden="true" tabindex="-1"></a><span class="co"># Panel-Dimensionen bestimmen</span></span>
+<span id="cb35-230"><a href="#cb35-230" aria-hidden="true" tabindex="-1"></a>paneldata <span class="sc">%&gt;%</span></span>
+<span id="cb35-231"><a href="#cb35-231" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb35-232"><a href="#cb35-232" aria-hidden="true" tabindex="-1"></a>    <span class="at">N =</span> <span class="fu">unique</span>(ID) <span class="sc">%&gt;%</span> <span class="fu">length</span>(),</span>
+<span id="cb35-233"><a href="#cb35-233" aria-hidden="true" tabindex="-1"></a>    <span class="at">T =</span> <span class="fu">unique</span>(time) <span class="sc">%&gt;%</span> <span class="fu">length</span>()</span>
+<span id="cb35-234"><a href="#cb35-234" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb35-235"><a href="#cb35-235" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-236"><a href="#cb35-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-239"><a href="#cb35-239" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-240"><a href="#cb35-240" aria-hidden="true" tabindex="-1"></a><span class="co"># Subsetting für 2 Perioden (t = {1, 2})</span></span>
+<span id="cb35-241"><a href="#cb35-241" aria-hidden="true" tabindex="-1"></a>paneldata_T2 <span class="ot">&lt;-</span> paneldata <span class="sc">%&gt;%</span> </span>
+<span id="cb35-242"><a href="#cb35-242" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb35-243"><a href="#cb35-243" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">between</span>(time, <span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb35-244"><a href="#cb35-244" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb35-245"><a href="#cb35-245" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-246"><a href="#cb35-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-249"><a href="#cb35-249" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-250"><a href="#cb35-250" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fixest)</span>
+<span id="cb35-251"><a href="#cb35-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-252"><a href="#cb35-252" aria-hidden="true" tabindex="-1"></a><span class="co"># Naive KQ-Schätzung für t = 1</span></span>
+<span id="cb35-253"><a href="#cb35-253" aria-hidden="true" tabindex="-1"></a>panel_KQ <span class="ot">&lt;-</span> <span class="fu">feols</span>(</span>
+<span id="cb35-254"><a href="#cb35-254" aria-hidden="true" tabindex="-1"></a>  <span class="at">fml =</span> Y <span class="sc">~</span> X, </span>
+<span id="cb35-255"><a href="#cb35-255" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> paneldata <span class="sc">%&gt;%</span> </span>
+<span id="cb35-256"><a href="#cb35-256" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(time <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb35-257"><a href="#cb35-257" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-258"><a href="#cb35-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-259"><a href="#cb35-259" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(panel_KQ)</span>
+<span id="cb35-260"><a href="#cb35-260" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-261"><a href="#cb35-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-264"><a href="#cb35-264" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-265"><a href="#cb35-265" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
+<span id="cb35-266"><a href="#cb35-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-267"><a href="#cb35-267" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot: Naiver KQ-Schätzer für t = 1</span></span>
+<span id="cb35-268"><a href="#cb35-268" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb35-269"><a href="#cb35-269" aria-hidden="true" tabindex="-1"></a>  p_panel <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(</span>
+<span id="cb35-270"><a href="#cb35-270" aria-hidden="true" tabindex="-1"></a>    <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> X, <span class="at">y =</span> Y)</span>
+<span id="cb35-271"><a href="#cb35-271" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb35-272"><a href="#cb35-272" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(</span>
+<span id="cb35-273"><a href="#cb35-273" aria-hidden="true" tabindex="-1"></a>      <span class="at">data =</span> paneldata <span class="sc">%&gt;%</span> </span>
+<span id="cb35-274"><a href="#cb35-274" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(time <span class="sc">&gt;</span> <span class="dv">1</span>),</span>
+<span id="cb35-275"><a href="#cb35-275" aria-hidden="true" tabindex="-1"></a>      <span class="at">color =</span> <span class="st">"gray"</span>,</span>
+<span id="cb35-276"><a href="#cb35-276" aria-hidden="true" tabindex="-1"></a>      <span class="at">show.legend =</span> F</span>
+<span id="cb35-277"><a href="#cb35-277" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb35-278"><a href="#cb35-278" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(</span>
+<span id="cb35-279"><a href="#cb35-279" aria-hidden="true" tabindex="-1"></a>      <span class="at">data =</span> paneldata <span class="sc">%&gt;%</span> </span>
+<span id="cb35-280"><a href="#cb35-280" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(time <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb35-281"><a href="#cb35-281" aria-hidden="true" tabindex="-1"></a>      <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">color =</span> col),</span>
+<span id="cb35-282"><a href="#cb35-282" aria-hidden="true" tabindex="-1"></a>      <span class="at">show.legend =</span> F</span>
+<span id="cb35-283"><a href="#cb35-283" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb35-284"><a href="#cb35-284" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Naive KQ-Schätzung f. t = 1</span></span>
+<span id="cb35-285"><a href="#cb35-285" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(</span>
+<span id="cb35-286"><a href="#cb35-286" aria-hidden="true" tabindex="-1"></a>      <span class="at">data =</span> paneldata <span class="sc">%&gt;%</span> </span>
+<span id="cb35-287"><a href="#cb35-287" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(time <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb35-288"><a href="#cb35-288" aria-hidden="true" tabindex="-1"></a>      <span class="at">method =</span> <span class="st">"lm"</span>, </span>
+<span id="cb35-289"><a href="#cb35-289" aria-hidden="true" tabindex="-1"></a>      <span class="at">se =</span> F,</span>
+<span id="cb35-290"><a href="#cb35-290" aria-hidden="true" tabindex="-1"></a>      <span class="at">col =</span> <span class="st">"black"</span></span>
+<span id="cb35-291"><a href="#cb35-291" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb35-292"><a href="#cb35-292" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_cowplot</span>()</span>
+<span id="cb35-293"><a href="#cb35-293" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-294"><a href="#cb35-294" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-295"><a href="#cb35-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-298"><a href="#cb35-298" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-299"><a href="#cb35-299" aria-hidden="true" tabindex="-1"></a><span class="co"># Panel-Schätzer: KQ-Regression in Differenzen</span></span>
+<span id="cb35-300"><a href="#cb35-300" aria-hidden="true" tabindex="-1"></a>panel_diff <span class="ot">&lt;-</span> <span class="fu">feols</span>(</span>
+<span id="cb35-301"><a href="#cb35-301" aria-hidden="true" tabindex="-1"></a>  <span class="at">fml =</span> <span class="fu">d</span>(Y) <span class="sc">~</span> <span class="fu">d</span>(X), </span>
+<span id="cb35-302"><a href="#cb35-302" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> paneldata <span class="sc">%&gt;%</span> </span>
+<span id="cb35-303"><a href="#cb35-303" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(</span>
+<span id="cb35-304"><a href="#cb35-304" aria-hidden="true" tabindex="-1"></a>        dplyr<span class="sc">::</span><span class="fu">between</span>(time, <span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb35-305"><a href="#cb35-305" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb35-306"><a href="#cb35-306" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel.id =</span> <span class="sc">~</span> ID <span class="sc">+</span> time</span>
+<span id="cb35-307"><a href="#cb35-307" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-308"><a href="#cb35-308" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-309"><a href="#cb35-309" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(panel_diff)</span>
+<span id="cb35-310"><a href="#cb35-310" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-311"><a href="#cb35-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-314"><a href="#cb35-314" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-315"><a href="#cb35-315" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot: KQ-Schätzer in Differenzen</span></span>
+<span id="cb35-316"><a href="#cb35-316" aria-hidden="true" tabindex="-1"></a>paneldata_diff <span class="ot">&lt;-</span> paneldata <span class="sc">%&gt;%</span> </span>
+<span id="cb35-317"><a href="#cb35-317" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb35-318"><a href="#cb35-318" aria-hidden="true" tabindex="-1"></a>    <span class="at">DeltaX =</span> X <span class="sc">-</span> dplyr<span class="sc">::</span><span class="fu">lag</span>(X),</span>
+<span id="cb35-319"><a href="#cb35-319" aria-hidden="true" tabindex="-1"></a>    <span class="at">DeltaY =</span> Y <span class="sc">-</span> dplyr<span class="sc">::</span><span class="fu">lag</span>(Y)</span>
+<span id="cb35-320"><a href="#cb35-320" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb35-321"><a href="#cb35-321" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span>
+<span id="cb35-322"><a href="#cb35-322" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-323"><a href="#cb35-323" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(</span>
+<span id="cb35-324"><a href="#cb35-324" aria-hidden="true" tabindex="-1"></a>    <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> DeltaX, <span class="at">y =</span> DeltaY)</span>
+<span id="cb35-325"><a href="#cb35-325" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
+<span id="cb35-326"><a href="#cb35-326" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(</span>
+<span id="cb35-327"><a href="#cb35-327" aria-hidden="true" tabindex="-1"></a>      <span class="at">data =</span> paneldata_diff <span class="sc">%&gt;%</span> </span>
+<span id="cb35-328"><a href="#cb35-328" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(time <span class="sc">&gt;</span> <span class="dv">2</span>),</span>
+<span id="cb35-329"><a href="#cb35-329" aria-hidden="true" tabindex="-1"></a>      <span class="at">color =</span> <span class="st">"gray"</span>,</span>
+<span id="cb35-330"><a href="#cb35-330" aria-hidden="true" tabindex="-1"></a>      <span class="at">show.legend =</span> F</span>
+<span id="cb35-331"><a href="#cb35-331" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb35-332"><a href="#cb35-332" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(</span>
+<span id="cb35-333"><a href="#cb35-333" aria-hidden="true" tabindex="-1"></a>      <span class="at">data =</span> paneldata_diff <span class="sc">%&gt;%</span> </span>
+<span id="cb35-334"><a href="#cb35-334" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(time <span class="sc">==</span> <span class="dv">2</span>),</span>
+<span id="cb35-335"><a href="#cb35-335" aria-hidden="true" tabindex="-1"></a>      <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">color =</span> col),</span>
+<span id="cb35-336"><a href="#cb35-336" aria-hidden="true" tabindex="-1"></a>      <span class="at">show.legend =</span> F</span>
+<span id="cb35-337"><a href="#cb35-337" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb35-338"><a href="#cb35-338" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(</span>
+<span id="cb35-339"><a href="#cb35-339" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> paneldata_diff <span class="sc">%&gt;%</span> </span>
+<span id="cb35-340"><a href="#cb35-340" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(time <span class="sc">==</span> <span class="dv">2</span>),</span>
+<span id="cb35-341"><a href="#cb35-341" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"lm"</span>, </span>
+<span id="cb35-342"><a href="#cb35-342" aria-hidden="true" tabindex="-1"></a>    <span class="at">se =</span> F,</span>
+<span id="cb35-343"><a href="#cb35-343" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"black"</span></span>
+<span id="cb35-344"><a href="#cb35-344" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
+<span id="cb35-345"><a href="#cb35-345" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_cowplot</span>()</span>
+<span id="cb35-346"><a href="#cb35-346" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-347"><a href="#cb35-347" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-348"><a href="#cb35-348" aria-hidden="true" tabindex="-1"></a>Erweiterung auf alle Perioden:</span>
+<span id="cb35-349"><a href="#cb35-349" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-352"><a href="#cb35-352" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-353"><a href="#cb35-353" aria-hidden="true" tabindex="-1"></a><span class="co"># Naive KQ-Schätzung für t = 1,...,8</span></span>
+<span id="cb35-354"><a href="#cb35-354" aria-hidden="true" tabindex="-1"></a>panel_KQ <span class="ot">&lt;-</span> <span class="fu">feols</span>(</span>
+<span id="cb35-355"><a href="#cb35-355" aria-hidden="true" tabindex="-1"></a>  <span class="at">fml =</span> Y <span class="sc">~</span> X, </span>
+<span id="cb35-356"><a href="#cb35-356" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> paneldata </span>
+<span id="cb35-357"><a href="#cb35-357" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-358"><a href="#cb35-358" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-359"><a href="#cb35-359" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(panel_KQ)</span>
+<span id="cb35-360"><a href="#cb35-360" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-361"><a href="#cb35-361" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-364"><a href="#cb35-364" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-365"><a href="#cb35-365" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
+<span id="cb35-366"><a href="#cb35-366" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-367"><a href="#cb35-367" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot: Naiver KQ-Schätzer für t = 1,...,8</span></span>
+<span id="cb35-368"><a href="#cb35-368" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(</span>
+<span id="cb35-369"><a href="#cb35-369" aria-hidden="true" tabindex="-1"></a>  <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> X, <span class="at">y =</span> Y)</span>
+<span id="cb35-370"><a href="#cb35-370" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb35-371"><a href="#cb35-371" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(</span>
+<span id="cb35-372"><a href="#cb35-372" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> paneldata <span class="sc">%&gt;%</span> </span>
+<span id="cb35-373"><a href="#cb35-373" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(time <span class="sc">&gt;</span> <span class="dv">1</span>),</span>
+<span id="cb35-374"><a href="#cb35-374" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"gray"</span>,</span>
+<span id="cb35-375"><a href="#cb35-375" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> F</span>
+<span id="cb35-376"><a href="#cb35-376" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb35-377"><a href="#cb35-377" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(</span>
+<span id="cb35-378"><a href="#cb35-378" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> paneldata <span class="sc">%&gt;%</span> </span>
+<span id="cb35-379"><a href="#cb35-379" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(time <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb35-380"><a href="#cb35-380" aria-hidden="true" tabindex="-1"></a>    <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">color =</span> col),</span>
+<span id="cb35-381"><a href="#cb35-381" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> F</span>
+<span id="cb35-382"><a href="#cb35-382" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb35-383"><a href="#cb35-383" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Naive KQ-Schätzung f. t = 1</span></span>
+<span id="cb35-384"><a href="#cb35-384" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(</span>
+<span id="cb35-385"><a href="#cb35-385" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> paneldata <span class="sc">%&gt;%</span> </span>
+<span id="cb35-386"><a href="#cb35-386" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(time <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb35-387"><a href="#cb35-387" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"lm"</span>, </span>
+<span id="cb35-388"><a href="#cb35-388" aria-hidden="true" tabindex="-1"></a>    <span class="at">se =</span> F,</span>
+<span id="cb35-389"><a href="#cb35-389" aria-hidden="true" tabindex="-1"></a>    <span class="at">col =</span> <span class="st">"black"</span></span>
+<span id="cb35-390"><a href="#cb35-390" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb35-391"><a href="#cb35-391" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_cowplot</span>()</span>
+<span id="cb35-392"><a href="#cb35-392" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-393"><a href="#cb35-393" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-396"><a href="#cb35-396" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-397"><a href="#cb35-397" aria-hidden="true" tabindex="-1"></a><span class="co"># Panel-Schätzer: KQ-Regression in Differenzen</span></span>
+<span id="cb35-398"><a href="#cb35-398" aria-hidden="true" tabindex="-1"></a>panel_diff <span class="ot">&lt;-</span> <span class="fu">feols</span>(</span>
+<span id="cb35-399"><a href="#cb35-399" aria-hidden="true" tabindex="-1"></a>  <span class="at">fml =</span> <span class="fu">d</span>(Y) <span class="sc">~</span> <span class="fu">d</span>(X) <span class="sc">-</span> <span class="dv">1</span>, </span>
+<span id="cb35-400"><a href="#cb35-400" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> paneldata,</span>
+<span id="cb35-401"><a href="#cb35-401" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel.id =</span> <span class="sc">~</span> ID <span class="sc">+</span> time</span>
+<span id="cb35-402"><a href="#cb35-402" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-403"><a href="#cb35-403" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-404"><a href="#cb35-404" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(panel_diff)</span>
+<span id="cb35-405"><a href="#cb35-405" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-406"><a href="#cb35-406" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-409"><a href="#cb35-409" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-410"><a href="#cb35-410" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot: KQ-Schätzer in Differenzen (alle t)</span></span>
+<span id="cb35-411"><a href="#cb35-411" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-412"><a href="#cb35-412" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(</span>
+<span id="cb35-413"><a href="#cb35-413" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> paneldata_diff,</span>
+<span id="cb35-414"><a href="#cb35-414" aria-hidden="true" tabindex="-1"></a>    <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> DeltaX, <span class="at">y =</span> DeltaY)</span>
+<span id="cb35-415"><a href="#cb35-415" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
+<span id="cb35-416"><a href="#cb35-416" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(</span>
+<span id="cb35-417"><a href="#cb35-417" aria-hidden="true" tabindex="-1"></a>      <span class="at">color =</span> <span class="st">"gray"</span>,</span>
+<span id="cb35-418"><a href="#cb35-418" aria-hidden="true" tabindex="-1"></a>      <span class="at">show.legend =</span> F</span>
+<span id="cb35-419"><a href="#cb35-419" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb35-420"><a href="#cb35-420" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(</span>
+<span id="cb35-421"><a href="#cb35-421" aria-hidden="true" tabindex="-1"></a>      <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">color =</span> col),</span>
+<span id="cb35-422"><a href="#cb35-422" aria-hidden="true" tabindex="-1"></a>      <span class="at">show.legend =</span> F</span>
+<span id="cb35-423"><a href="#cb35-423" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb35-424"><a href="#cb35-424" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(</span>
+<span id="cb35-425"><a href="#cb35-425" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"lm"</span>, </span>
+<span id="cb35-426"><a href="#cb35-426" aria-hidden="true" tabindex="-1"></a>    <span class="at">se =</span> F,</span>
+<span id="cb35-427"><a href="#cb35-427" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"black"</span></span>
+<span id="cb35-428"><a href="#cb35-428" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
+<span id="cb35-429"><a href="#cb35-429" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_cowplot</span>()</span>
+<span id="cb35-430"><a href="#cb35-430" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-431"><a href="#cb35-431" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-432"><a href="#cb35-432" aria-hidden="true" tabindex="-1"></a><span class="fu">### Fixed Effects</span></span>
+<span id="cb35-433"><a href="#cb35-433" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-434"><a href="#cb35-434" aria-hidden="true" tabindex="-1"></a>Modell \eqref{eq:femodel} kann weiterhin als eine Regression mit $n-1$ Dummy-Variablen und einer Konstante umgeschrieben werden:</span>
+<span id="cb35-435"><a href="#cb35-435" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-436"><a href="#cb35-436" aria-hidden="true" tabindex="-1"></a>\begin{align}</span>
+<span id="cb35-437"><a href="#cb35-437" aria-hidden="true" tabindex="-1"></a>  Y_{it} = \beta_0 + \beta_1 X_{it} + \gamma_2 D^{(2)}_i + \gamma_3 D^{(3)}_i + \cdots + \gamma_n D^{(n)}_i + \epsilon_{it} \label{eq:drmodel}.</span>
+<span id="cb35-438"><a href="#cb35-438" aria-hidden="true" tabindex="-1"></a>\end{align}</span>
+<span id="cb35-439"><a href="#cb35-439" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-440"><a href="#cb35-440" aria-hidden="true" tabindex="-1"></a>Das Modell \eqref{eq:drmodel} hat $n$ verschiedene Achsenabschnitte — einen für jede Beobachtungseinheit.^<span class="co">[</span><span class="ot">Für $n-1$ Einheiten ist der individuelle Achsenabschnitt damit $\beta_0 + D^{(i)}_i$ und für *eine* Einheit $\beta_0$. Diese Einheit wird auch als *Referenzkategorie* bezeichnet. Alternativ kann das Modell mit $n$ Dummies und *ohne* die Konstante $\beta_0$ geschrieben werden.</span><span class="co">]</span> Die Modelle \eqref{eq:femodel} und \eqref{eq:drmodel} sind gleichwertige Darstellungen des Fixed-Effects-Modells.</span>
+<span id="cb35-441"><a href="#cb35-441" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-442"><a href="#cb35-442" aria-hidden="true" tabindex="-1"></a>Fixed Effects können Endogenität aufgrund simultaner Kausalität oder ausgelassender zeitlich variierender Faktoren (Variablen, welche die abhängige Variable beeinflussen und mit der Behandlungsvariable korreliert sind) nicht beheben. In solchen Szenarien können Panel-Methoden in Kombination mit einer Schätzstrategie basierend auf Instrument-Variablen hilfreich sein. Wir betrachten solche Schätzer in Kapitel @sec-IV.</span>
+<span id="cb35-443"><a href="#cb35-443" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-444"><a href="#cb35-444" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb35-445"><a href="#cb35-445" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-446"><a href="#cb35-446" aria-hidden="true" tabindex="-1"></a>**Interaktive Illustration von Panel-Schätzern**</span>
+<span id="cb35-447"><a href="#cb35-447" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-448"><a href="#cb35-448" aria-hidden="true" tabindex="-1"></a>&lt;iframe width="100%" height="642" frameborder="0"</span>
+<span id="cb35-449"><a href="#cb35-449" aria-hidden="true" tabindex="-1"></a>  src="https://observablehq.com/embed/@mca91/panelcomp?cells=viewof+showgroups%2Cviewof+showdgp%2Cviewof+regtype%2Ctheplot"&gt;</span>
+<span id="cb35-450"><a href="#cb35-450" aria-hidden="true" tabindex="-1"></a>&lt;/iframe&gt;</span>
+<span id="cb35-451"><a href="#cb35-451" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-452"><a href="#cb35-452" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-455"><a href="#cb35-455" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-456"><a href="#cb35-456" aria-hidden="true" tabindex="-1"></a><span class="co"># Fixed-Effects-Schätzung</span></span>
+<span id="cb35-457"><a href="#cb35-457" aria-hidden="true" tabindex="-1"></a>panel_FE <span class="ot">&lt;-</span> <span class="fu">feols</span>(</span>
+<span id="cb35-458"><a href="#cb35-458" aria-hidden="true" tabindex="-1"></a>  <span class="at">fml =</span> Y <span class="sc">~</span> X <span class="sc">|</span> ID,  </span>
+<span id="cb35-459"><a href="#cb35-459" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> paneldata</span>
+<span id="cb35-460"><a href="#cb35-460" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-461"><a href="#cb35-461" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-462"><a href="#cb35-462" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(panel_FE)</span>
+<span id="cb35-463"><a href="#cb35-463" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-464"><a href="#cb35-464" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-465"><a href="#cb35-465" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-468"><a href="#cb35-468" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-469"><a href="#cb35-469" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plm)</span>
+<span id="cb35-470"><a href="#cb35-470" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-471"><a href="#cb35-471" aria-hidden="true" tabindex="-1"></a><span class="co"># Random-Effects-Schätzung</span></span>
+<span id="cb35-472"><a href="#cb35-472" aria-hidden="true" tabindex="-1"></a>panel_RE <span class="ot">&lt;-</span> <span class="fu">plm</span>(</span>
+<span id="cb35-473"><a href="#cb35-473" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> Y <span class="sc">~</span> X,  </span>
+<span id="cb35-474"><a href="#cb35-474" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">"random"</span>,</span>
+<span id="cb35-475"><a href="#cb35-475" aria-hidden="true" tabindex="-1"></a>  <span class="at">index =</span> <span class="fu">c</span>(<span class="st">"ID"</span>, <span class="st">"time"</span>),  </span>
+<span id="cb35-476"><a href="#cb35-476" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> paneldata</span>
+<span id="cb35-477"><a href="#cb35-477" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-478"><a href="#cb35-478" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-479"><a href="#cb35-479" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(panel_RE)</span>
+<span id="cb35-480"><a href="#cb35-480" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-481"><a href="#cb35-481" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-484"><a href="#cb35-484" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-485"><a href="#cb35-485" aria-hidden="true" tabindex="-1"></a>paneldata <span class="ot">&lt;-</span> paneldata <span class="sc">%&gt;%</span> </span>
+<span id="cb35-486"><a href="#cb35-486" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb35-487"><a href="#cb35-487" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Vorhergesagte Werte für FE-Schätzung</span></span>
+<span id="cb35-488"><a href="#cb35-488" aria-hidden="true" tabindex="-1"></a>    <span class="at">yhat_FE =</span> <span class="fu">fitted</span>(panel_FE),</span>
+<span id="cb35-489"><a href="#cb35-489" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Vorhergesagte Werte für RE-Schätzung</span></span>
+<span id="cb35-490"><a href="#cb35-490" aria-hidden="true" tabindex="-1"></a>    <span class="at">yhat_RE =</span> <span class="fu">predict</span>(panel_RE)</span>
+<span id="cb35-491"><a href="#cb35-491" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb35-492"><a href="#cb35-492" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-493"><a href="#cb35-493" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(</span>
+<span id="cb35-494"><a href="#cb35-494" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> paneldata,</span>
+<span id="cb35-495"><a href="#cb35-495" aria-hidden="true" tabindex="-1"></a>  <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> X, <span class="at">y =</span> Y)</span>
+<span id="cb35-496"><a href="#cb35-496" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb35-497"><a href="#cb35-497" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(</span>
+<span id="cb35-498"><a href="#cb35-498" aria-hidden="true" tabindex="-1"></a>    <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">color =</span> col), </span>
+<span id="cb35-499"><a href="#cb35-499" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> F</span>
+<span id="cb35-500"><a href="#cb35-500" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb35-501"><a href="#cb35-501" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Pooling</span></span>
+<span id="cb35-502"><a href="#cb35-502" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(</span>
+<span id="cb35-503"><a href="#cb35-503" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"lm"</span>, </span>
+<span id="cb35-504"><a href="#cb35-504" aria-hidden="true" tabindex="-1"></a>    <span class="at">se =</span> F,</span>
+<span id="cb35-505"><a href="#cb35-505" aria-hidden="true" tabindex="-1"></a>    <span class="at">col =</span> <span class="st">"black"</span></span>
+<span id="cb35-506"><a href="#cb35-506" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb35-507"><a href="#cb35-507" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Fixed Effects</span></span>
+<span id="cb35-508"><a href="#cb35-508" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(</span>
+<span id="cb35-509"><a href="#cb35-509" aria-hidden="true" tabindex="-1"></a>    <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">y =</span> yhat_FE, <span class="at">group =</span> ID, <span class="at">col =</span> col), </span>
+<span id="cb35-510"><a href="#cb35-510" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> F</span>
+<span id="cb35-511"><a href="#cb35-511" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb35-512"><a href="#cb35-512" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Random Effects</span></span>
+<span id="cb35-513"><a href="#cb35-513" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(</span>
+<span id="cb35-514"><a href="#cb35-514" aria-hidden="true" tabindex="-1"></a>    <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">y =</span> yhat_RE), </span>
+<span id="cb35-515"><a href="#cb35-515" aria-hidden="true" tabindex="-1"></a>    <span class="at">lty =</span> <span class="st">"dashed"</span>, </span>
+<span id="cb35-516"><a href="#cb35-516" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> F</span>
+<span id="cb35-517"><a href="#cb35-517" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb35-518"><a href="#cb35-518" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_cowplot</span>()</span>
+<span id="cb35-519"><a href="#cb35-519" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-520"><a href="#cb35-520" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-521"><a href="#cb35-521" aria-hidden="true" tabindex="-1"></a><span class="fu">## Beispiel: Einkommen und Demokratie</span></span>
+<span id="cb35-522"><a href="#cb35-522" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-523"><a href="#cb35-523" aria-hidden="true" tabindex="-1"></a>Eine Vielzahl polit-ökonomischer Standardwerke und Studien <span class="co">[</span><span class="ot">bspw. @Dahl1971; @Huntington1991; @Rueschemeyer1992</span><span class="co">]</span> liefert vermeindliche Belege für einen zentralen Grundsatz der <span class="co">[</span><span class="ot">Modernisierungstheorie</span><span class="co">](https://de.wikipedia.org/wiki/Modernisierungstheorie)</span>: Ein höheres Pro-Kopf-Einkommen erhöht die Nachfrage der Bevölkerung nach politischer Freiheit und demokratischen Insitutionen. @Acemogluetal2008 argumentieren, dass der in derartigen länderübergreifenden Analysen mit Pooling häufig als positiv geschätzte Zusammenhang zwischen Einkommen und Demokratisierung nicht kausal interpetiert werden sollte. Ein Grund hierfür ist, dass ausgelassene länderspezifische zeit-invariante (möglicherweise unbeobachtbare) Faktoren, die sowohl die ökonomische Entwicklung als auch die Stärke demokratischer Institutionen beeinflussen, wahrscheinlich sind. Um diese mögliche Ursache für Endogenität des Zusammenhangs</span>
+<span id="cb35-524"><a href="#cb35-524" aria-hidden="true" tabindex="-1"></a>\begin{align}</span>
+<span id="cb35-525"><a href="#cb35-525" aria-hidden="true" tabindex="-1"></a>  \text{Demokratisierung}_i = \beta_0 + \beta_1\,\text{PK-Einkommen}_i + \epsilon_i</span>
+<span id="cb35-526"><a href="#cb35-526" aria-hidden="true" tabindex="-1"></a>\end{align}</span>
+<span id="cb35-527"><a href="#cb35-527" aria-hidden="true" tabindex="-1"></a>zu adressieren, nutzen @Acemogluetal2008 einen Panel-Regressionsansatz ähnlich zu</span>
+<span id="cb35-528"><a href="#cb35-528" aria-hidden="true" tabindex="-1"></a>\begin{align}</span>
+<span id="cb35-529"><a href="#cb35-529" aria-hidden="true" tabindex="-1"></a>  \text{Demokratisierung}_{it} = \delta_i + \beta_1\,\text{PK-Einkommen}_{it} + \epsilon_{it}</span>
+<span id="cb35-530"><a href="#cb35-530" aria-hidden="true" tabindex="-1"></a>\end{align}</span>
+<span id="cb35-531"><a href="#cb35-531" aria-hidden="true" tabindex="-1"></a>mit Fixed Effects $\delta_i$, die für länderspezifische zeitinvariante Faktoren kontrollieren.</span>
+<span id="cb35-532"><a href="#cb35-532" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-533"><a href="#cb35-533" aria-hidden="true" tabindex="-1"></a>Das Kernergebnis von @Acemogluetal2008 ist, dass es *keinen* kausalen Zusammenhang zwischen dem Einkommen (Wirtschaftswachstum) und der Demokratisierung gibt. Die Autoren zeigen, dass historische und geografische Faktoren, die sowohl das Einkommen als auch die politischen Institutionen beeinflussen, den beobachteten Zusammenhang verzerren können. </span>
+<span id="cb35-534"><a href="#cb35-534" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-535"><a href="#cb35-535" aria-hidden="true" tabindex="-1"></a>Für die nachfolgenden Code-Beispiele nutzen wir einen Auszug des Datensatzes aus dem Replikationspaket für @Acemogluetal2008, siehe @Acemogluetal2008data.</span>
+<span id="cb35-536"><a href="#cb35-536" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-537"><a href="#cb35-537" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-538"><a href="#cb35-538" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-541"><a href="#cb35-541" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-542"><a href="#cb35-542" aria-hidden="true" tabindex="-1"></a>acem <span class="ot">&lt;-</span> readxl<span class="sc">::</span><span class="fu">read_xls</span>(</span>
+<span id="cb35-543"><a href="#cb35-543" aria-hidden="true" tabindex="-1"></a>  <span class="st">"~/Downloads/113251-V1/Income-and-Democracy-Data-AER-adjustment.xls"</span>, </span>
+<span id="cb35-544"><a href="#cb35-544" aria-hidden="true" tabindex="-1"></a>  <span class="at">sheet =</span> <span class="st">"5 Year Panel"</span></span>
+<span id="cb35-545"><a href="#cb35-545" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-546"><a href="#cb35-546" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-547"><a href="#cb35-547" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-550"><a href="#cb35-550" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-551"><a href="#cb35-551" aria-hidden="true" tabindex="-1"></a>acem <span class="ot">&lt;-</span> acem <span class="sc">%&gt;%</span> </span>
+<span id="cb35-552"><a href="#cb35-552" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb35-553"><a href="#cb35-553" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">between</span>(year, <span class="dv">1955</span>, <span class="dv">2000</span>),</span>
+<span id="cb35-554"><a href="#cb35-554" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb35-555"><a href="#cb35-555" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(year) </span>
+<span id="cb35-556"><a href="#cb35-556" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-557"><a href="#cb35-557" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-558"><a href="#cb35-558" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-561"><a href="#cb35-561" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-562"><a href="#cb35-562" aria-hidden="true" tabindex="-1"></a><span class="co"># Pooling</span></span>
+<span id="cb35-563"><a href="#cb35-563" aria-hidden="true" tabindex="-1"></a><span class="fu">feols</span>(</span>
+<span id="cb35-564"><a href="#cb35-564" aria-hidden="true" tabindex="-1"></a>  <span class="at">fml =</span> fhpolrigaug <span class="sc">~</span> lrgdpch,</span>
+<span id="cb35-565"><a href="#cb35-565" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel.id =</span> <span class="sc">~</span> country <span class="sc">+</span> year,</span>
+<span id="cb35-566"><a href="#cb35-566" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> acem, </span>
+<span id="cb35-567"><a href="#cb35-567" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-568"><a href="#cb35-568" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-569"><a href="#cb35-569" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-572"><a href="#cb35-572" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-573"><a href="#cb35-573" aria-hidden="true" tabindex="-1"></a>acem_f <span class="ot">&lt;-</span> acem <span class="sc">%&gt;%</span></span>
+<span id="cb35-574"><a href="#cb35-574" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1970</span>, <span class="dv">1995</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb35-575"><a href="#cb35-575" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(code) <span class="sc">%&gt;%</span></span>
+<span id="cb35-576"><a href="#cb35-576" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb35-577"><a href="#cb35-577" aria-hidden="true" tabindex="-1"></a>    <span class="at">dlrgdpch =</span> <span class="fu">diff</span>(lrgdpch),</span>
+<span id="cb35-578"><a href="#cb35-578" aria-hidden="true" tabindex="-1"></a>    <span class="at">dfhpolrigaug =</span> <span class="fu">diff</span>(fhpolrigaug)</span>
+<span id="cb35-579"><a href="#cb35-579" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb35-580"><a href="#cb35-580" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span>
+<span id="cb35-581"><a href="#cb35-581" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-582"><a href="#cb35-582" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(</span>
+<span id="cb35-583"><a href="#cb35-583" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> dfhpolrigaug <span class="sc">~</span> dlrgdpch,</span>
+<span id="cb35-584"><a href="#cb35-584" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> acem_f</span>
+<span id="cb35-585"><a href="#cb35-585" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-586"><a href="#cb35-586" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span>
+<span id="cb35-587"><a href="#cb35-587" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-588"><a href="#cb35-588" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-591"><a href="#cb35-591" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-592"><a href="#cb35-592" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(</span>
+<span id="cb35-593"><a href="#cb35-593" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> acem_f,</span>
+<span id="cb35-594"><a href="#cb35-594" aria-hidden="true" tabindex="-1"></a>  <span class="at">mapping =</span> <span class="fu">aes</span>(</span>
+<span id="cb35-595"><a href="#cb35-595" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> dlrgdpch,</span>
+<span id="cb35-596"><a href="#cb35-596" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> dfhpolrigaug</span>
+<span id="cb35-597"><a href="#cb35-597" aria-hidden="true" tabindex="-1"></a>  ) </span>
+<span id="cb35-598"><a href="#cb35-598" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb35-599"><a href="#cb35-599" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">lty =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb35-600"><a href="#cb35-600" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb35-601"><a href="#cb35-601" aria-hidden="true" tabindex="-1"></a>    <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">label =</span> code),</span>
+<span id="cb35-602"><a href="#cb35-602" aria-hidden="true" tabindex="-1"></a>    <span class="at">position =</span> <span class="fu">position_jitter</span>(</span>
+<span id="cb35-603"><a href="#cb35-603" aria-hidden="true" tabindex="-1"></a>      <span class="at">height =</span> .<span class="dv">05</span>, </span>
+<span id="cb35-604"><a href="#cb35-604" aria-hidden="true" tabindex="-1"></a>      <span class="at">seed =</span> <span class="dv">1234</span></span>
+<span id="cb35-605"><a href="#cb35-605" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb35-606"><a href="#cb35-606" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb35-607"><a href="#cb35-607" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> F) <span class="sc">+</span></span>
+<span id="cb35-608"><a href="#cb35-608" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb35-609"><a href="#cb35-609" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Diff. Log(Pro-Kopf-BIP) (1970 - 1995)"</span>,</span>
+<span id="cb35-610"><a href="#cb35-610" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Diff. Demokratie-Index (1970 - 1995)"</span></span>
+<span id="cb35-611"><a href="#cb35-611" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb35-612"><a href="#cb35-612" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_cowplot</span>()</span>
+<span id="cb35-613"><a href="#cb35-613" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-614"><a href="#cb35-614" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-617"><a href="#cb35-617" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-618"><a href="#cb35-618" aria-hidden="true" tabindex="-1"></a><span class="co"># time + country fixed effects</span></span>
+<span id="cb35-619"><a href="#cb35-619" aria-hidden="true" tabindex="-1"></a><span class="fu">feols</span>(</span>
+<span id="cb35-620"><a href="#cb35-620" aria-hidden="true" tabindex="-1"></a>  <span class="at">fml =</span> fhpolrigaug <span class="sc">~</span> <span class="fu">l</span>(fhpolrigaug) <span class="sc">+</span> <span class="fu">l</span>(lrgdpch) </span>
+<span id="cb35-621"><a href="#cb35-621" aria-hidden="true" tabindex="-1"></a>  <span class="sc">|</span> year <span class="sc">+</span> country,</span>
+<span id="cb35-622"><a href="#cb35-622" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel.id =</span> <span class="sc">~</span> country <span class="sc">+</span> year,</span>
+<span id="cb35-623"><a href="#cb35-623" aria-hidden="true" tabindex="-1"></a>  <span class="at">cluster =</span> <span class="sc">~</span> country,</span>
+<span id="cb35-624"><a href="#cb35-624" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> acem, </span>
+<span id="cb35-625"><a href="#cb35-625" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-626"><a href="#cb35-626" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-627"><a href="#cb35-627" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-630"><a href="#cb35-630" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb35-631"><a href="#cb35-631" aria-hidden="true" tabindex="-1"></a><span class="co"># time-fixed effects</span></span>
+<span id="cb35-632"><a href="#cb35-632" aria-hidden="true" tabindex="-1"></a><span class="fu">feols</span>(</span>
+<span id="cb35-633"><a href="#cb35-633" aria-hidden="true" tabindex="-1"></a>  <span class="at">fml =</span> fhpolrigaug <span class="sc">~</span> <span class="fu">l</span>(fhpolrigaug) <span class="sc">+</span> <span class="fu">l</span>(lrgdpch) </span>
+<span id="cb35-634"><a href="#cb35-634" aria-hidden="true" tabindex="-1"></a>  <span class="sc">|</span> year,</span>
+<span id="cb35-635"><a href="#cb35-635" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel.id =</span> <span class="sc">~</span> country <span class="sc">+</span> year,</span>
+<span id="cb35-636"><a href="#cb35-636" aria-hidden="true" tabindex="-1"></a>  <span class="at">cluster =</span> <span class="sc">~</span> country,</span>
+<span id="cb35-637"><a href="#cb35-637" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> acem, </span>
+<span id="cb35-638"><a href="#cb35-638" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-639"><a href="#cb35-639" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb35-640"><a href="#cb35-640" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-641"><a href="#cb35-641" aria-hidden="true" tabindex="-1"></a></span>
+</code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+</body></html>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.4.553">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Kausalanalyse und Machinelles Lernen mit R - 10&nbsp; Synthetic Control</title>
+<title>Kausalanalyse und Machinelles Lernen mit R - 11&nbsp; Synthetic Control</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -300,7 +300,7 @@ globalThis.qwebrCustomizedWebROptions = {
 };
 
 // Store cell data
-globalThis.qwebrCellDetails = [{"options":{"fig-cap":"","classes":"","message":"true","results":"markup","comment":"","label":"unnamed-chunk-1","dpi":72,"out-width":"700px","fig-width":7,"context":"setup","out-height":"","output":"true","autorun":"true","warning":"true","fig-height":5},"code":"\n# install wabassem nlopt from astamm's repository\ninstall.packages('nloptr', repos = 'https://astamm.r-universe.dev')\n\n# create dataset directory\ndir.create(\"datasets\")\n# Download the dataset\ndownload.file(\n    \"https://raw.githubusercontent.com/mca91/kausal_data/main/brexit.csv\",\n    'datasets/brexit.csv',\n)\n\n# load the brexit data\nbrexit <- read_csv(\"datasets/brexit.csv\") %>% as.data.frame\n\n# load the Synth package\nlibrary(Synth)\noptions(pillar.sigfig = 2)","id":1}];
+globalThis.qwebrCellDetails = [{"options":{"dpi":72,"message":"true","output":"true","fig-height":5,"label":"unnamed-chunk-1","comment":"","results":"markup","fig-width":7,"autorun":"true","out-width":"700px","context":"setup","warning":"true","fig-cap":"","out-height":"","classes":""},"id":1,"code":"\n# install wabassem nlopt from astamm's repository\ninstall.packages('nloptr', repos = 'https://astamm.r-universe.dev')\n\n# create dataset directory\ndir.create(\"datasets\")\n# Download the dataset\ndownload.file(\n    \"https://raw.githubusercontent.com/mca91/kausal_data/main/brexit.csv\",\n    'datasets/brexit.csv',\n)\n\n# load the brexit data\nbrexit <- read_csv(\"datasets/brexit.csv\") %>% as.data.frame\n\n# load the Synth package\nlibrary(Synth)\noptions(pillar.sigfig = 2)"}];
 
 </script><script type="module">
 // Declare startupMessageQWebR globally
@@ -1045,7 +1045,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./SyntheticControl.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Synthetic Control</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./SyntheticControl.html"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Synthetic Control</span></a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -1099,38 +1099,44 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./FixedEffects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Panel-Daten</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./IV.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">IV-Regression</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">IV-Regression</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./DiD.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./RDD.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./RegReg.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Regularisierte Regression</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Regularisierte Regression</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./Machine Learning.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Machine Learning</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Machine Learning</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./SyntheticControl.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Synthetic Control</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Synthetic Control</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -1144,12 +1150,12 @@ window.Quarto = {
     <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title"><a href="./index.html">Übersicht</a></h2>
    
   <ul>
-<li><a href="#sec-siscm" id="toc-sec-siscm" class="nav-link active" data-scroll-target="#sec-siscm"><span class="header-section-number">10.1</span> Schätzung von Interventionseffekten mit SCM</a></li>
+<li><a href="#sec-siscm" id="toc-sec-siscm" class="nav-link active" data-scroll-target="#sec-siscm"><span class="header-section-number">11.1</span> Schätzung von Interventionseffekten mit SCM</a></li>
   <li>
-<a href="#case-study-%C3%B6konomische-kosten-des-brexit" id="toc-case-study-ökonomische-kosten-des-brexit" class="nav-link" data-scroll-target="#case-study-%C3%B6konomische-kosten-des-brexit"><span class="header-section-number">10.2</span> Case Study: Ökonomische Kosten des Brexit</a>
+<a href="#case-study-%C3%B6konomische-kosten-des-brexit" id="toc-case-study-ökonomische-kosten-des-brexit" class="nav-link" data-scroll-target="#case-study-%C3%B6konomische-kosten-des-brexit"><span class="header-section-number">11.2</span> Case Study: Ökonomische Kosten des Brexit</a>
   <ul class="collapse">
-<li><a href="#placebo-tests-grafische-inferenz" id="toc-placebo-tests-grafische-inferenz" class="nav-link" data-scroll-target="#placebo-tests-grafische-inferenz"><span class="header-section-number">10.2.1</span> Placebo-Tests: Grafische Inferenz</a></li>
-  <li><a href="#statistische-inferenz" id="toc-statistische-inferenz" class="nav-link" data-scroll-target="#statistische-inferenz"><span class="header-section-number">10.2.2</span> Statistische Inferenz</a></li>
+<li><a href="#placebo-tests-grafische-inferenz" id="toc-placebo-tests-grafische-inferenz" class="nav-link" data-scroll-target="#placebo-tests-grafische-inferenz"><span class="header-section-number">11.2.1</span> Placebo-Tests: Grafische Inferenz</a></li>
+  <li><a href="#statistische-inferenz" id="toc-statistische-inferenz" class="nav-link" data-scroll-target="#statistische-inferenz"><span class="header-section-number">11.2.2</span> Statistische Inferenz</a></li>
   </ul>
 </li>
   </ul></nav>
@@ -1330,7 +1336,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 }
 </script><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
 <div class="quarto-title-block"><div><h1 class="title">
-<span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Synthetic Control</span>
+<span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Synthetic Control</span>
 </h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
 </div>
 
@@ -1393,8 +1399,8 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <div id="qwebr-insertion-location-1"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p>Synthetic Control Methoden (SCM) wurden in <span class="citation" data-cites="Abadieetal2010">A. D. Abadie Alberto und Hainmueller (<a href="Literatur.html#ref-Abadieetal2010" role="doc-biblioref">2010</a>)</span> für die Auswertung kausaler Effekte von politischen Interventionen vorgeschlagen. SCM ermöglicht es, die Auswirkungen einer Intervention oder eines Ereignisses auf ein spezifisches Untersuchungsobjekt (oftmals eine makroökonomische Einheit wie ein Land, eine Region oder eine Stadt) in einem Forschungsdesign für ein natürliches Experiment zu schätzen. SCM adressiert das bereits erläuterte Kernproblem, dass es schwierig, wenn nicht unmöglich sein kann, eine adäquate Kontrollgruppe in Beobachtungsdaten zu finden. Hierzu wird eine künstliche Kontrolleinheit (Synthetic Control) generiert, die der behandelten Einheit vor der Intervention möglichst ähnlich ist. Dieser synthetische Doppelgänger kann die unbeobachtbare Entwicklungen der behandelten Einheit <em>nach</em> der Intervention repräsentieren und so eine plausible Schätzung des kausalen Effekts der Intervention für die Post-Interventionsperioden gewährleisten.</p>
-<section id="sec-siscm" class="level2 page-columns page-full" data-number="10.1"><h2 data-number="10.1" class="anchored" data-anchor-id="sec-siscm">
-<span class="header-section-number">10.1</span> Schätzung von Interventionseffekten mit SCM</h2>
+<section id="sec-siscm" class="level2 page-columns page-full" data-number="11.1"><h2 data-number="11.1" class="anchored" data-anchor-id="sec-siscm">
+<span class="header-section-number">11.1</span> Schätzung von Interventionseffekten mit SCM</h2>
 <p>Ähnlich wie bei manchen Matching-Methoden wird bei SCM die Ähnlichkeit der synthetischen Einheit mit der untersuchten Einheit durch eine gewichtete Kombination von Kontrolleinheiten basierend auf ihren Prä-Interventionsmerkmalen erreicht. Seien <span class="math inline">\(i = 1, 2, \ldots, N\)</span> die Einheiten in der Stichprobe, wobei <span class="math inline">\(i = 1\)</span> die behandelte Einheit und <span class="math inline">\(i = 2, \ldots, N\)</span> potenziellen Kontrolleinheiten (auch <em>Donor pool</em> genannt) sind. Die Daten liegen für die Perioden <span class="math inline">\(t = 1, 2, \ldots, T\)</span> vor, mit <span class="math inline">\(T_0\)</span> dem Zeitpunkt direkt vor der Intervention und <span class="math inline">\(T_1, \ldots, T\)</span> den Perioden nach der Intervention.</p>
 <p>Für SCM bestimmen wir einen Vektor von Gewichten <span class="math inline">\(\mathbf{w}^* := (w_2^*, \ldots, w_k^*)^T\)</span>, der die Summe der quadrierten Differenzen zwischen den Ausprägungen von <span class="math inline">\(k\)</span> Charakteristika der behandelten Einheit vor der Intervention, <span class="math inline">\(X_{1,\,m}^{\text{Pre}}\)</span>, <span class="math inline">\(m=1,\dots,k\)</span>, und der gewichteten Summe dieser Charakteristika für die Kontrolleinheiten, <span class="math inline">\(X_{i,\,m}^{\text{Pre}}\)</span>, minimiert:</p>
 <p><span class="math display">\[\begin{align}
@@ -1413,11 +1419,11 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 \widehat{\tau}_t = Y_{1,\,t} - Y_{1,\,t}^{\text{synth}},\quad t &gt; T_0.
 \]</span></p>
 <p>Der mit SCM geschätzte Effekt ermittelt also für <span class="math inline">\(t &gt; T_0\)</span>, wie sich die Intervention auf die behandelte Einheit ausgewirkt hat durch einen Vergleich mit der Situation, die eingetreten wäre, wenn die Einheit nicht behandelt worden wäre, repräsentiert durch die synthetische Kontrollgruppe.</p>
-<p>Der SCM-Schätzer von <span class="citation" data-cites="Abadieetal2010">A. D. Abadie Alberto und Hainmueller (<a href="Literatur.html#ref-Abadieetal2010" role="doc-biblioref">2010</a>)</span> ist im R-Paket <code>Synth</code> <span class="citation" data-cites="Hainmuelleretal2011">(<a href="Literatur.html#ref-Hainmuelleretal2011" role="doc-biblioref"><strong>Hainmuelleretal2011?</strong></a>)</span> implementiert. Wir illustrieren die Methode nachfolgend mit einer empirischen Anwendung zu den Konsequenzen des Brexit auf die nachfolgende Entwicklung der britischen Volkswirtschaft.</p>
-</section><section id="case-study-ökonomische-kosten-des-brexit" class="level2 page-columns page-full" data-number="10.2"><h2 data-number="10.2" class="anchored" data-anchor-id="case-study-ökonomische-kosten-des-brexit">
-<span class="header-section-number">10.2</span> Case Study: Ökonomische Kosten des Brexit</h2>
+<p>Der SCM-Schätzer von <span class="citation" data-cites="Abadieetal2010">A. D. Abadie Alberto und Hainmueller (<a href="Literatur.html#ref-Abadieetal2010" role="doc-biblioref">2010</a>)</span> ist im R-Paket <code>Synth</code> <span class="citation" data-cites="Hainmuelleretal2011">(<a href="Literatur.html#ref-Hainmuelleretal2011" role="doc-biblioref">Hainmueller, Diamond, und Abadie 2011</a>)</span> implementiert. Wir illustrieren die Methode nachfolgend mit einer empirischen Anwendung zu den Konsequenzen des Brexit auf die nachfolgende Entwicklung der britischen Volkswirtschaft.</p>
+</section><section id="case-study-ökonomische-kosten-des-brexit" class="level2 page-columns page-full" data-number="11.2"><h2 data-number="11.2" class="anchored" data-anchor-id="case-study-ökonomische-kosten-des-brexit">
+<span class="header-section-number">11.2</span> Case Study: Ökonomische Kosten des Brexit</h2>
 <p><span class="citation" data-cites="Bornetal2019">Born u.&nbsp;a. (<a href="Literatur.html#ref-Bornetal2019" role="doc-biblioref">2019</a>)</span> untersuchen die ökonomischen Kosten des Brexits mit einem kausalanalytischen Forschungsansatz. Der Kern der empirischen Analyse ist eine Kombination von quasi-experimenteller Identifikation und struktureller Zeitreihenanalyse. Hiermit können nicht nur die aggregierten Kosten des EU-Ausstiegs für Großbrittanien zu quantifiziert, sondern auch die Kanäle indentifiziert werden, durch die die erwartete wirtschaftliche Desintegration die britische Makroökonomie beeinflusst hat. Hierbei identifizieren <span class="citation" data-cites="Bornetal2019">Born u.&nbsp;a. (<a href="Literatur.html#ref-Bornetal2019" role="doc-biblioref">2019</a>)</span> einen Anstieg der wirtschaftspolitischen Unsicherheit und eine Abwärtskorrektur der Wachstumserwartungen als Haupttreiber für den Rückgang der Wirtschaftsleistung.</p>
-<p>Der quasi-experimentelle Ansatz betrachtet das Brexit-Referendum als ein natürliches makroökonomisches Experiment und untersucht die Konsequenzn der wirtschaftlichen Desintegration für das Bruttoinlandsprodukt (BIP) im Nachfolgezeitraum mit SCM. Hierzu wird gemäß der in <a href="#sec-siscm" class="quarto-xref"><span>Kapitel 10.1</span></a> erläuterten Vorgehensweise ein syntetischer Doppelgänger für die britische Wirtschaft aus einem Donor Pool von 23 Volkswirtschaften konstruiert, und der Effekt des Referendums als Unterschied zwischen der tatsächlichen und synthetischen Trajektorien des BIP für Folgeperioden ermittelt. Die Analyse zeigt, dass das Brexit-Votum bis Ende 2018 zu einem BIP-Rückgang von etwa 1.7% bis 2.5% geführt hat.</p>
+<p>Der quasi-experimentelle Ansatz betrachtet das Brexit-Referendum als ein natürliches makroökonomisches Experiment und untersucht die Konsequenzn der wirtschaftlichen Desintegration für das Bruttoinlandsprodukt (BIP) im Nachfolgezeitraum mit SCM. Hierzu wird gemäß der in <a href="#sec-siscm" class="quarto-xref"><span>Kapitel 11.1</span></a> erläuterten Vorgehensweise ein syntetischer Doppelgänger für die britische Wirtschaft aus einem Donor Pool von 23 Volkswirtschaften konstruiert, und der Effekt des Referendums als Unterschied zwischen der tatsächlichen und synthetischen Trajektorien des BIP für Folgeperioden ermittelt. Die Analyse zeigt, dass das Brexit-Votum bis Ende 2018 zu einem BIP-Rückgang von etwa 1.7% bis 2.5% geführt hat.</p>
 <p>Wie reproduzieren nun die wesentlichen Ergebnisse des SCM-Ansatzes der Studie mit R. Hierfür lesen zunächst den Datensatz <code>brexit.csv</code> (<a href="https://raw.githubusercontent.com/mca91/kausal_data/main/brexit.csv">hier verfügbar</a>) in R ein. Dieser enthält vierteljährliche Beobachtungen makroökonomischer Variablen für 24 Länder für den Zeitraum 1995-Q1–2021-Q4.</p>
 <div class="cell">
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://readr.tidyverse.org">readr</a></span><span class="op">)</span></span>
@@ -1515,7 +1521,7 @@ $ ID            &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1
 </table>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-Born2019preds-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;10.1: <code>brexit</code> – Variablen und Definitionen
+Tabelle&nbsp;11.1: <code>brexit</code> – Variablen und Definitionen
 </figcaption></figure>
 </div>
 <p>Zur Berechnung von SCM mit dem R-Paket <code>Synth</code> müssen die Daten zunächst mit der Funktion <code><a href="https://rdrr.io/pkg/Synth/man/dataprep.html">Synth::dataprep()</a></code> aufbereitet werden, s. <code>?Synth::dataprep()</code> für weitere Details. Neben dem Datensatz (<code>foo</code>) unter expliziter Nennung der Prädiktoren (<code>predictors</code>) und der Outcome-Variable (<code>dependent</code>) übergeben wir Variablen für die Indentifikation von Einheiten (<code>ID</code>) und Zeitpunkten (<code>Time</code>), sowie Donor Pool (<code>controls.identifier</code>) und behandelter Einheit (<code>treatment.identifier</code>). Weiterhin werden die Vorbehandlungsperiode (<code>time.predictors.prior</code>) sowie der Zeitraum über den die Regressor-Gewichte <span class="math inline">\(v_m\)</span> bestimmt werden sollen (<code>time.optimize.ssr</code>), festgelegt. Für letztere übergeben wir einen numerischen Vektor für sämtliche Zeitpunkte von 1995-Q1 bis zum Brexit-Referendum in 2016-Q2.</p>
@@ -1567,12 +1573,12 @@ Tabelle&nbsp;10.1: <code>brexit</code> – Variablen und Definitionen
 <img src="SyntheticControl_files/figure-html/fig-bipv-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-bipv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;10.1: BIP relativ zu 2016
+Abbildung&nbsp;11.1: BIP relativ zu 2016
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p><a href="#fig-bipv" class="quarto-xref">Abbildung&nbsp;<span>10.1</span></a> zeigt, dass das BIP von Großbritannien zwar auch nach dem Brexit-Referendum (gepunktete Linie) gewachsen ist, jedoch vergleichsweise schwach. Eine Analyse mit SCM kann statistische Evidenz für den mutmaßlich negativen Effekt des Referendums auf das Wachstum in den Folgeperioden liefern.</p>
+<p><a href="#fig-bipv" class="quarto-xref">Abbildung&nbsp;<span>11.1</span></a> zeigt, dass das BIP von Großbritannien zwar auch nach dem Brexit-Referendum (gepunktete Linie) gewachsen ist, jedoch vergleichsweise schwach. Eine Analyse mit SCM kann statistische Evidenz für den mutmaßlich negativen Effekt des Referendums auf das Wachstum in den Folgeperioden liefern.</p>
 <p>Wir laden nun das Paket <code>Synth</code> und bereiten die Daten für die Analyse vor.</p>
 <div class="cell">
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># R-Paket 'Synth' laden</span></span>
@@ -1694,23 +1700,23 @@ $tab.loss
 <figure class="quarto-float quarto-float-tbl figure page-columns page-full"><div aria-describedby="tbl-brexitcw-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
 <div>
-<div id="kckdovbcyd" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#kckdovbcyd table {
+<div id="vmpqcojxsz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#vmpqcojxsz table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#kckdovbcyd thead, #kckdovbcyd tbody, #kckdovbcyd tfoot, #kckdovbcyd tr, #kckdovbcyd td, #kckdovbcyd th {
+#vmpqcojxsz thead, #vmpqcojxsz tbody, #vmpqcojxsz tfoot, #vmpqcojxsz tr, #vmpqcojxsz td, #vmpqcojxsz th {
   border-style: none;
 }
 
-#kckdovbcyd p {
+#vmpqcojxsz p {
   margin: 0;
   padding: 0;
 }
 
-#kckdovbcyd .gt_table {
+#vmpqcojxsz .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1736,12 +1742,12 @@ $tab.loss
   border-left-color: #D3D3D3;
 }
 
-#kckdovbcyd .gt_caption {
+#vmpqcojxsz .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#kckdovbcyd .gt_title {
+#vmpqcojxsz .gt_title {
   color: #000000;
   font-size: 125%;
   font-weight: initial;
@@ -1753,7 +1759,7 @@ $tab.loss
   border-bottom-width: 0;
 }
 
-#kckdovbcyd .gt_subtitle {
+#vmpqcojxsz .gt_subtitle {
   color: #000000;
   font-size: 85%;
   font-weight: initial;
@@ -1765,7 +1771,7 @@ $tab.loss
   border-top-width: 0;
 }
 
-#kckdovbcyd .gt_heading {
+#vmpqcojxsz .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1777,13 +1783,13 @@ $tab.loss
   border-right-color: #D3D3D3;
 }
 
-#kckdovbcyd .gt_bottom_border {
+#vmpqcojxsz .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#kckdovbcyd .gt_col_headings {
+#vmpqcojxsz .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #000000;
@@ -1798,7 +1804,7 @@ $tab.loss
   border-right-color: #D3D3D3;
 }
 
-#kckdovbcyd .gt_col_heading {
+#vmpqcojxsz .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1818,7 +1824,7 @@ $tab.loss
   overflow-x: hidden;
 }
 
-#kckdovbcyd .gt_column_spanner_outer {
+#vmpqcojxsz .gt_column_spanner_outer {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1830,15 +1836,15 @@ $tab.loss
   padding-right: 4px;
 }
 
-#kckdovbcyd .gt_column_spanner_outer:first-child {
+#vmpqcojxsz .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#kckdovbcyd .gt_column_spanner_outer:last-child {
+#vmpqcojxsz .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#kckdovbcyd .gt_column_spanner {
+#vmpqcojxsz .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -1850,11 +1856,11 @@ $tab.loss
   width: 100%;
 }
 
-#kckdovbcyd .gt_spanner_row {
+#vmpqcojxsz .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#kckdovbcyd .gt_group_heading {
+#vmpqcojxsz .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1880,7 +1886,7 @@ $tab.loss
   text-align: left;
 }
 
-#kckdovbcyd .gt_empty_group_heading {
+#vmpqcojxsz .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1895,15 +1901,15 @@ $tab.loss
   vertical-align: middle;
 }
 
-#kckdovbcyd .gt_from_md > :first-child {
+#vmpqcojxsz .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#kckdovbcyd .gt_from_md > :last-child {
+#vmpqcojxsz .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#kckdovbcyd .gt_row {
+#vmpqcojxsz .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1922,7 +1928,7 @@ $tab.loss
   overflow-x: hidden;
 }
 
-#kckdovbcyd .gt_stub {
+#vmpqcojxsz .gt_stub {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1935,7 +1941,7 @@ $tab.loss
   padding-right: 5px;
 }
 
-#kckdovbcyd .gt_stub_row_group {
+#vmpqcojxsz .gt_stub_row_group {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1949,15 +1955,15 @@ $tab.loss
   vertical-align: top;
 }
 
-#kckdovbcyd .gt_row_group_first td {
+#vmpqcojxsz .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#kckdovbcyd .gt_row_group_first th {
+#vmpqcojxsz .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#kckdovbcyd .gt_summary_row {
+#vmpqcojxsz .gt_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1967,16 +1973,16 @@ $tab.loss
   padding-right: 5px;
 }
 
-#kckdovbcyd .gt_first_summary_row {
+#vmpqcojxsz .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#kckdovbcyd .gt_first_summary_row.thick {
+#vmpqcojxsz .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#kckdovbcyd .gt_last_summary_row {
+#vmpqcojxsz .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1986,7 +1992,7 @@ $tab.loss
   border-bottom-color: #D3D3D3;
 }
 
-#kckdovbcyd .gt_grand_summary_row {
+#vmpqcojxsz .gt_grand_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1996,7 +2002,7 @@ $tab.loss
   padding-right: 5px;
 }
 
-#kckdovbcyd .gt_first_grand_summary_row {
+#vmpqcojxsz .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2006,7 +2012,7 @@ $tab.loss
   border-top-color: #D3D3D3;
 }
 
-#kckdovbcyd .gt_last_grand_summary_row_top {
+#vmpqcojxsz .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2016,11 +2022,11 @@ $tab.loss
   border-bottom-color: #D3D3D3;
 }
 
-#kckdovbcyd .gt_striped {
+#vmpqcojxsz .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#kckdovbcyd .gt_table_body {
+#vmpqcojxsz .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2029,7 +2035,7 @@ $tab.loss
   border-bottom-color: #000000;
 }
 
-#kckdovbcyd .gt_footnotes {
+#vmpqcojxsz .gt_footnotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2043,7 +2049,7 @@ $tab.loss
   border-right-color: #D3D3D3;
 }
 
-#kckdovbcyd .gt_footnote {
+#vmpqcojxsz .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -2052,7 +2058,7 @@ $tab.loss
   padding-right: 5px;
 }
 
-#kckdovbcyd .gt_sourcenotes {
+#vmpqcojxsz .gt_sourcenotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2066,7 +2072,7 @@ $tab.loss
   border-right-color: #D3D3D3;
 }
 
-#kckdovbcyd .gt_sourcenote {
+#vmpqcojxsz .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -2074,63 +2080,63 @@ $tab.loss
   padding-right: 5px;
 }
 
-#kckdovbcyd .gt_left {
+#vmpqcojxsz .gt_left {
   text-align: left;
 }
 
-#kckdovbcyd .gt_center {
+#vmpqcojxsz .gt_center {
   text-align: center;
 }
 
-#kckdovbcyd .gt_right {
+#vmpqcojxsz .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#kckdovbcyd .gt_font_normal {
+#vmpqcojxsz .gt_font_normal {
   font-weight: normal;
 }
 
-#kckdovbcyd .gt_font_bold {
+#vmpqcojxsz .gt_font_bold {
   font-weight: bold;
 }
 
-#kckdovbcyd .gt_font_italic {
+#vmpqcojxsz .gt_font_italic {
   font-style: italic;
 }
 
-#kckdovbcyd .gt_super {
+#vmpqcojxsz .gt_super {
   font-size: 65%;
 }
 
-#kckdovbcyd .gt_footnote_marks {
+#vmpqcojxsz .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#kckdovbcyd .gt_asterisk {
+#vmpqcojxsz .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#kckdovbcyd .gt_indent_1 {
+#vmpqcojxsz .gt_indent_1 {
   text-indent: 5px;
 }
 
-#kckdovbcyd .gt_indent_2 {
+#vmpqcojxsz .gt_indent_2 {
   text-indent: 10px;
 }
 
-#kckdovbcyd .gt_indent_3 {
+#vmpqcojxsz .gt_indent_3 {
   text-indent: 15px;
 }
 
-#kckdovbcyd .gt_indent_4 {
+#vmpqcojxsz .gt_indent_4 {
   text-indent: 20px;
 }
 
-#kckdovbcyd .gt_indent_5 {
+#vmpqcojxsz .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -2173,7 +2179,7 @@ $tab.loss
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-brexitcw-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;10.2: Gewichte für den synthetischen UK-Doppelgänger
+Tabelle&nbsp;11.2: Gewichte für den synthetischen UK-Doppelgänger
 </figcaption></figure>
 </div>
 </div>
@@ -2278,12 +2284,12 @@ $ type &lt;chr&gt; "Doppelgaenger", "Doppelgaenger", "Doppelgaenger", "Doppelgae
 <img src="SyntheticControl_files/figure-html/fig-ukuksdg-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-ukuksdg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;10.2: UK-BIP und synthetischer Doppelgänger
+Abbildung&nbsp;11.2: UK-BIP und synthetischer Doppelgänger
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p><a href="#fig-ukuksdg" class="quarto-xref">Abbildung&nbsp;<span>10.2</span></a> zeigt, dass der synthetische Doppelgänger über weite Teile der Vorperiode eine gute Anpassung an das beobachtete BIP von Großbritannien aufweist, insbesondere für den Zeitraum unmittelbar vor dem Brexit-Referendum. Nach dem Referendum zeigt sich bereits nach wenigen Quartalen eine deutliche Abweichung zwischen der geschätzten und der beobachteten Trajektorie. Eine Beschränkung der in <code>p_gdp</code> verwendeten Datenpunkte auf einen Bereich nahe des Referendums bestärkt diese Schlussfolgerung.</p>
+<p><a href="#fig-ukuksdg" class="quarto-xref">Abbildung&nbsp;<span>11.2</span></a> zeigt, dass der synthetische Doppelgänger über weite Teile der Vorperiode eine gute Anpassung an das beobachtete BIP von Großbritannien aufweist, insbesondere für den Zeitraum unmittelbar vor dem Brexit-Referendum. Nach dem Referendum zeigt sich bereits nach wenigen Quartalen eine deutliche Abweichung zwischen der geschätzten und der beobachteten Trajektorie. Eine Beschränkung der in <code>p_gdp</code> verwendeten Datenpunkte auf einen Bereich nahe des Referendums bestärkt diese Schlussfolgerung.</p>
 <div class="cell page-columns page-full">
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Close-up im Bereich des Referendums</span></span>
 <span><span class="va">p_gdp</span> <span class="op">+</span></span>
@@ -2298,12 +2304,12 @@ Abbildung&nbsp;10.2: UK-BIP und synthetischer Doppelgänger
 <img src="SyntheticControl_files/figure-html/fig-ukuksdgclose-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-ukuksdgclose-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;10.3: UK-BIP und synthetischer Doppelgänger – Close-Up
+Abbildung&nbsp;11.3: UK-BIP und synthetischer Doppelgänger – Close-Up
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p>In <a href="#fig-ukuksdg" class="quarto-xref">Abbildung&nbsp;<span>10.2</span></a> ist eine ab Mitte 2017 außerhalb des Standardabweichungsbereichs verlaufende Divergenz der Zeitreihen zu erkennen. Diese stellen wir nachfolgend anhand der Doppelgänger-Gap mit <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot2::ggplot()</a></code> dar.</p>
+<p>In <a href="#fig-ukuksdg" class="quarto-xref">Abbildung&nbsp;<span>11.2</span></a> ist eine ab Mitte 2017 außerhalb des Standardabweichungsbereichs verlaufende Divergenz der Zeitreihen zu erkennen. Diese stellen wir nachfolgend anhand der Doppelgänger-Gap mit <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot2::ggplot()</a></code> dar.</p>
 <div class="cell page-columns page-full">
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># BIP-Doppelgänger-Gap</span></span>
 <span><span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">gdp_gap</span><span class="op">)</span> <span class="op">+</span></span>
@@ -2338,12 +2344,12 @@ Abbildung&nbsp;10.3: UK-BIP und synthetischer Doppelgänger – Close-Up
 <img src="SyntheticControl_files/figure-html/fig-ukdggap-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-ukdggap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;10.4: UK-BIP und synthetischer Doppelgänger – Doppelgänger-Gap
+Abbildung&nbsp;11.4: UK-BIP und synthetischer Doppelgänger – Doppelgänger-Gap
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p>Die in <a href="#fig-ukdggap" class="quarto-xref">Abbildung&nbsp;<span>10.4</span></a> gezeigte Doppelgänger-Gap stimmt gut mit dem von <span class="citation" data-cites="Bornetal2019">Born u.&nbsp;a. (<a href="Literatur.html#ref-Bornetal2019" role="doc-biblioref">2019</a>)</span> geschätzten verlorenen Wachstums des BIP relativ zu 2016 um bis zu 2.5% bis Ende des Jahres 2018 überein.</p>
+<p>Die in <a href="#fig-ukdggap" class="quarto-xref">Abbildung&nbsp;<span>11.4</span></a> gezeigte Doppelgänger-Gap stimmt gut mit dem von <span class="citation" data-cites="Bornetal2019">Born u.&nbsp;a. (<a href="Literatur.html#ref-Bornetal2019" role="doc-biblioref">2019</a>)</span> geschätzten verlorenen Wachstums des BIP relativ zu 2016 um bis zu 2.5% bis Ende des Jahres 2018 überein.</p>
 <p>Als weiteres Maß für den Effekt des Referendums im Folgezeitraum können wir die mittlere Doppelgänger-Gap für sämtliche Beobachtungsperioden nach dem Brexit-Referendum schnell bestimmen.</p>
 <div class="cell">
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Mittlerer Unterschied nach dem Brexit-Referendum</span></span>
@@ -2355,8 +2361,8 @@ Abbildung&nbsp;10.4: UK-BIP und synthetischer Doppelgänger – Doppelgänger-Ga
 <pre><code>[1] -2.343273</code></pre>
 </div>
 </div>
-<section id="placebo-tests-grafische-inferenz" class="level3 page-columns page-full" data-number="10.2.1"><h3 data-number="10.2.1" class="anchored" data-anchor-id="placebo-tests-grafische-inferenz">
-<span class="header-section-number">10.2.1</span> Placebo-Tests: Grafische Inferenz</h3>
+<section id="placebo-tests-grafische-inferenz" class="level3 page-columns page-full" data-number="11.2.1"><h3 data-number="11.2.1" class="anchored" data-anchor-id="placebo-tests-grafische-inferenz">
+<span class="header-section-number">11.2.1</span> Placebo-Tests: Grafische Inferenz</h3>
 <p>Auch für SCM sind Placebo-Tests ein hilfreiches Instrument zur Überprüfung der Gültigkeit von Studienergebnissen. Eine gründliche Placebo-Analyse kann festzustellen, ob der beobachtete Effekt tatsächlich auf die Intervention zurückzuführen ist und nicht auf unberücksichtigte (möglicherweise unbeobachtbare) Faktoren.</p>
 <p>Ein Ansatz ist hierfür ist es, den synthetische-Doppelgänger für <em>fiktive Interventionszeitpunkte</em> vor dem tatsächlichen Behandlungszeitpunkt zu konstruieren, und die entsprechenden Trajektorien mit dem ursprünglichen Doppelgänger zu vergleichen. So kann die Validität der ursprünglichen Doppelgänger-Trajektorie im Hinblick auf mögliche anderweitige Ereignisse vor der Intervention geprüft werden: Doppelgänger-Trajektorien für fiktive, frühere Interventionen sollten sich nicht systematisch von der andhand von Daten bis zur tatsächlichen Intervention berechneten Trajektorie unterscheiden.</p>
 <p>Wir definieren hierzu eine Funktion <code>placebo()</code>, die einen syntethischen Doppelgänger des BIP Großbritanniens mit Gewichten auf Basis eines vorgegebenen Interventionszeitpunktes (<code>treat</code>) zurückgibt. Abgesehen vom früheren Interventionszeitpunkt (und der damit einhergehenden verkleinerten Stichprobe) erfolgt die Berechnung der Gewichte mit derselben Spezifikation wie zuvor.</p>
@@ -2418,7 +2424,7 @@ Abbildung&nbsp;10.4: UK-BIP und synthetischer Doppelgänger – Doppelgänger-Ga
 <span>  .f <span class="op">=</span>  \<span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">placebo</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> </span>
 <span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p><code>placebos_tbl</code> ist ein <code>tibble</code>-Objekt im tidy-Format. Wir können die Placebo-Doppelgänger sowie den ursprünglich berechneten Doppelgänger und das tatsächliche BIP also ähnlich wie in <a href="#fig-ukuksdg" class="quarto-xref">Abbildung&nbsp;<span>10.2</span></a> mit <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot2::ggplot()</a></code> darstellen.</p>
+<p><code>placebos_tbl</code> ist ein <code>tibble</code>-Objekt im tidy-Format. Wir können die Placebo-Doppelgänger sowie den ursprünglich berechneten Doppelgänger und das tatsächliche BIP also ähnlich wie in <a href="#fig-ukuksdg" class="quarto-xref">Abbildung&nbsp;<span>11.2</span></a> mit <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot2::ggplot()</a></code> darstellen.</p>
 <div class="cell page-columns page-full">
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Vergleich mit Placebo-Doppelgänger</span></span>
 <span><span class="op">(</span></span>
@@ -2462,7 +2468,7 @@ Abbildung&nbsp;10.4: UK-BIP und synthetischer Doppelgänger – Doppelgänger-Ga
 <img src="SyntheticControl_files/figure-html/fig-pdgukbip-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-pdgukbip-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;10.5: Placebo-Doppelgänger
+Abbildung&nbsp;11.5: Placebo-Doppelgänger
 </figcaption></figure>
 </div>
 </div>
@@ -2482,12 +2488,12 @@ Abbildung&nbsp;10.5: Placebo-Doppelgänger
 <img src="SyntheticControl_files/figure-html/fig-pdgukbipcu-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-pdgukbipcu-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;10.6: Placebo-Doppelgänger – Close-Up
+Abbildung&nbsp;11.6: Placebo-Doppelgänger – Close-Up
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p>Beachte, dass <code>position = position_jitter(height = .25)</code> eine zufällige, kleine Verschiebung (jitter) der Trajektorien der Placebo-Doppelgänger für eine bessere Unterscheidbarkeit bewirkt. <a href="#fig-pdgukbip" class="quarto-xref">Abbildung&nbsp;<span>10.5</span></a> und <a href="#fig-pdgukbipcu" class="quarto-xref">Abbildung&nbsp;<span>10.6</span></a> zeigen, dass sich die Placebo-Pfade für fiktive frühere Referenden (grau) nicht systematisch vom ursprünglich berechneten synthetischen Doppelgänger (rot) unterscheiden. Insbesondere finden wir keinen Rückgang der synthetischen BIP relativ zum beobachteten BIP für Großbritannien <em>vor</em> dem Referendum. Deutliche Abweichungen vom tatsächlichen BIP ergeben sich erst jenseits der tatsächlichen Referendums. Diese Placebo-Analyse bekräftigt also die Validität der Konstruktion des “Benchmark-Doppelgängers” für die Periode bis 2016-Q2 und die Schätzung des kausalen Effekts des Referendums anhand der entsprechenden Doppelgänger-Gap.</p>
+<p>Beachte, dass <code>position = position_jitter(height = .25)</code> eine zufällige, kleine Verschiebung (jitter) der Trajektorien der Placebo-Doppelgänger für eine bessere Unterscheidbarkeit bewirkt. <a href="#fig-pdgukbip" class="quarto-xref">Abbildung&nbsp;<span>11.5</span></a> und <a href="#fig-pdgukbipcu" class="quarto-xref">Abbildung&nbsp;<span>11.6</span></a> zeigen, dass sich die Placebo-Pfade für fiktive frühere Referenden (grau) nicht systematisch vom ursprünglich berechneten synthetischen Doppelgänger (rot) unterscheiden. Insbesondere finden wir keinen Rückgang der synthetischen BIP relativ zum beobachteten BIP für Großbritannien <em>vor</em> dem Referendum. Deutliche Abweichungen vom tatsächlichen BIP ergeben sich erst jenseits der tatsächlichen Referendums. Diese Placebo-Analyse bekräftigt also die Validität der Konstruktion des “Benchmark-Doppelgängers” für die Periode bis 2016-Q2 und die Schätzung des kausalen Effekts des Referendums anhand der entsprechenden Doppelgänger-Gap.</p>
 <p>Ein weiterer Placebo-Test in <span class="citation" data-cites="Bornetal2019">Born u.&nbsp;a. (<a href="Literatur.html#ref-Bornetal2019" role="doc-biblioref">2019</a>)</span> ist ein Vergleich der Doppelgänger-Gap Großbritanniens mit Doppelgänger-Gaps für fiktive Referenden in 2016-Q2 in Ländern mit wesentlichem Einfluss bei der Konstruktion des synthetischen Doppelgängers für Großbritannien: Die Schätzung des kausalen Effekts des Referendums auf das BIP in Großbritannien ist glaubwürdig, wenn lediglich die Doppelgänger-Gap für Großbritannien durch das Referendum beeinflusst wird, <em>nicht</em> aber die Doppelgänger-Gaps für Länder in der Kontrollgruppe.</p>
 <p>Für diese grafische Placebo-Analyse modifizieren wir die Funktion <code>placebo()</code> entsprechend. <code>placebo_gap()</code> berechnet die Doppelgänger-Gap für das mit <code>treat</code> identifizierte Land. Das <code>if</code>-Statement zu Beginn stellt sicher, dass Großbritannien <em>nicht</em> als Kontroll-Einheit für die Placebo-Gaps verwendet wird.</p>
 <div class="cell">
@@ -2557,7 +2563,7 @@ Abbildung&nbsp;10.6: Placebo-Doppelgänger – Close-Up
 <span>  </span>
 <span><span class="op">}</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Für die Berechnung der Placebo-Gaps iterieren wir über die Indizes der in <a href="#tbl-brexitcw" class="quarto-xref">Tabelle&nbsp;<span>10.2</span></a> gelisteten Volkswirtschaften der Kontrollgruppe für Großbritannien.</p>
+<p>Für die Berechnung der Placebo-Gaps iterieren wir über die Indizes der in <a href="#tbl-brexitcw" class="quarto-xref">Tabelle&nbsp;<span>11.2</span></a> gelisteten Volkswirtschaften der Kontrollgruppe für Großbritannien.</p>
 <div class="cell">
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Indizes für "Donor Countries" und UK</span></span>
 <span><span class="va">donors_and_UK</span> <span class="op">&lt;-</span> <span class="va">brexit</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> </span>
@@ -2613,7 +2619,7 @@ Abbildung&nbsp;10.6: Placebo-Doppelgänger – Close-Up
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span><span class="op">(</span><span class="va">sds</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>gdp_gap_std <span class="op">=</span> <span class="op">(</span><span class="va">gdp_gap</span> <span class="op">-</span> <span class="va">mean2015</span><span class="op">)</span><span class="op">/</span><span class="va">thesd</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Analog zum Code für <a href="#fig-ukdggap" class="quarto-xref">Abbildung&nbsp;<span>10.4</span></a> plotten wir die Placebo-Gap-Zeitreihen mit <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot2::ggplot()</a></code>.</p>
+<p>Analog zum Code für <a href="#fig-ukdggap" class="quarto-xref">Abbildung&nbsp;<span>11.4</span></a> plotten wir die Placebo-Gap-Zeitreihen mit <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot2::ggplot()</a></code>.</p>
 <div class="cell page-columns page-full">
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Placebo-Gaps mit UK-Gap vergleichen</span></span>
 <span><span class="fu">ggplot</span><span class="op">(</span></span>
@@ -2650,14 +2656,14 @@ Abbildung&nbsp;10.6: Placebo-Doppelgänger – Close-Up
 <img src="SyntheticControl_files/figure-html/fig-pdgukg-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-pdgukg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;10.7: Placebo- und UK-Doppelgänger-Gaps
+Abbildung&nbsp;11.7: Placebo- und UK-Doppelgänger-Gaps
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p><a href="#fig-pdgukg" class="quarto-xref">Abbildung&nbsp;<span>10.7</span></a> zeigt die standardisierten Placebo-Doppelgänger-Gaps für ein fiktives Referendum zum Zeitpunkt 2016-Q2 in den 5 Kontroll-Volkswirtschaften, die für Konstruktion des BIP-Doppelgängers von Großbrittannien relevant sind (grau). Der Vergleich mit der standardisierten Doppelgänger-Gap für Großbritannien (blau). Der Verlauf der Placebo-Gaps zeigt an, dass keine Abweichungen mit negativem Trend von der Referenzlinie bei 0 (kein Unterschied zwischen beobachtetem und syntetischem BIP) nach dem Referendum vorliegen. Damit liefert die Grafik keine Hinweise auf einen Effekt fiktiver Interventionen in den Kontroll-Ländern. Für Großbritannien jedoch ist, ähnlich wie in <a href="#fig-ukdggap" class="quarto-xref">Abbildung&nbsp;<span>10.4</span></a>, ein negativer Trend nach dem Referendum deutlich erkennbar.</p>
-</section><section id="statistische-inferenz" class="level3 page-columns page-full" data-number="10.2.2"><h3 data-number="10.2.2" class="anchored" data-anchor-id="statistische-inferenz">
-<span class="header-section-number">10.2.2</span> Statistische Inferenz</h3>
+<p><a href="#fig-pdgukg" class="quarto-xref">Abbildung&nbsp;<span>11.7</span></a> zeigt die standardisierten Placebo-Doppelgänger-Gaps für ein fiktives Referendum zum Zeitpunkt 2016-Q2 in den 5 Kontroll-Volkswirtschaften, die für Konstruktion des BIP-Doppelgängers von Großbrittannien relevant sind (grau). Der Vergleich mit der standardisierten Doppelgänger-Gap für Großbritannien (blau). Der Verlauf der Placebo-Gaps zeigt an, dass keine Abweichungen mit negativem Trend von der Referenzlinie bei 0 (kein Unterschied zwischen beobachtetem und syntetischem BIP) nach dem Referendum vorliegen. Damit liefert die Grafik keine Hinweise auf einen Effekt fiktiver Interventionen in den Kontroll-Ländern. Für Großbritannien jedoch ist, ähnlich wie in <a href="#fig-ukdggap" class="quarto-xref">Abbildung&nbsp;<span>11.4</span></a>, ein negativer Trend nach dem Referendum deutlich erkennbar.</p>
+</section><section id="statistische-inferenz" class="level3 page-columns page-full" data-number="11.2.2"><h3 data-number="11.2.2" class="anchored" data-anchor-id="statistische-inferenz">
+<span class="header-section-number">11.2.2</span> Statistische Inferenz</h3>
 <p>Die bisherigen Placebo-Tests liefern lediglich grafische Evidenz für die Signifikanz des negativen Effekts des Brexit-Referendums auf die Britische Volkswirtschaft. Methoden für statistische Inferenz für SCM sind Gegenstand aktueller Forschung. <span class="citation" data-cites="Bornetal2019">Born u.&nbsp;a. (<a href="Literatur.html#ref-Bornetal2019" role="doc-biblioref">2019</a>)</span> verwenden den End-Of-Sample Instability Test (<span class="math inline">\(S\)</span>) von <span class="citation" data-cites="Andrews2003">Andrews (<a href="Literatur.html#ref-Andrews2003" role="doc-biblioref">2003</a>)</span>. Dieses Verfahren kann für einen Test auf einen Strukturbruch gegen Ende einer Zeitreihe verwendet werden. In der vorliegende Studie wird der Test angewendet, um zu überprüfen, ob die Verteilung der Doppelgänger-Gap Großbritanniens für die letzen <span class="math inline">\(m\)</span> Perioden jenseits des Referendums signifikant verschieden ist von Verteilung vorheriger Perioden.</p>
 <p>Wir zeigen nachfolgend, wie diese Analyse in R mit der Funktion <code><a href="https://rdrr.io/pkg/CPAT/man/Andrews.test.html">CPAT::Andrews.test()</a></code> aus dem Paket <code>CPAT</code> durchgeführt werden kann. Wir testen zunächst auf eine signifikante Diskrepanz der Doppelgänger-Gap in Form eines Sturkturbruchs ab 2017 und fassen die Ergebnisse tabellarisch mit <code><a href="https://generics.r-lib.org/reference/tidy.html">broom::tidy()</a></code> und <code><a href="https://gt.rstudio.com/reference/gt.html">gt::gt()</a></code> zusammen.</p>
 <div class="cell page-columns page-full">
@@ -3132,7 +3138,7 @@ Abbildung&nbsp;10.7: Placebo- und UK-Doppelgänger-Gaps
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-growthpdssek-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;10.3: Andrews’ (1993) End-of-Sample Instability Test
+Tabelle&nbsp;11.3: Andrews’ (1993) End-of-Sample Instability Test
 </figcaption></figure>
 </div>
 </div>
@@ -3170,7 +3176,7 @@ Tabelle&nbsp;10.3: Andrews’ (1993) End-of-Sample Instability Test
 <img src="SyntheticControl_files/figure-html/fig-andrewspvals-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-andrewspvals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;10.8: P-Werte für Andrews’ (2003) Test
+Abbildung&nbsp;11.8: P-Werte für Andrews’ (2003) Test
 </figcaption></figure>
 </div>
 </div>
@@ -3185,13 +3191,16 @@ Abbildung&nbsp;10.8: P-Werte für Andrews’ (2003) Test
 Abadie, Alberto, Alexis Diamond, und Jens Hainmueller. 2014. <span>„Comparative Politics and the Synthetic Control Method: COMPARATIVE POLITICS AND THE SYNTHETIC CONTROL METHOD“</span>. <em>American Journal of Political Science</em> 59 (2): 495–510. <a href="https://doi.org/10.1111/ajps.12116">https://doi.org/10.1111/ajps.12116</a>.
 </div>
 <div id="ref-Abadieetal2010" class="csl-entry" role="listitem">
-Abadie, Alexis Diamond, Alberto, und Jens Hainmueller. 2010. <span>„Synthetic Control Methods for Comparative Case Stud- ies: Estimating the Effect of California’s Tobacco Control Program.“</span> <em>Journal of the American Statistical Association</em> 105 (490): 493–505. <a href="https://doi.org/10.1198/jasa.2009.ap08746">https://doi.org/10.1198/jasa.2009.ap08746</a>.
+Abadie, Alexis Diamond, Alberto, und Jens Hainmueller. 2010. <span>„Synthetic Control Methods for Comparative Case Studies: Estimating the Effect of California’s Tobacco Control Program.“</span> <em>Journal of the American Statistical Association</em> 105 (490): 493–505. <a href="https://doi.org/10.1198/jasa.2009.ap08746">https://doi.org/10.1198/jasa.2009.ap08746</a>.
 </div>
 <div id="ref-Andrews2003" class="csl-entry" role="listitem">
 Andrews, D. W. K. 2003. <span>„End-of-Sample Instability Tests“</span>. <em>Econometrica</em> 71 (6): 1661–94. <a href="https://doi.org/10.1111/1468-0262.00466">https://doi.org/10.1111/1468-0262.00466</a>.
 </div>
 <div id="ref-Bornetal2019" class="csl-entry" role="listitem">
 Born, Benjamin, Gernot J Müller, Moritz Schularick, und Petr Sedláček. 2019. <span>„The Costs of Economic Nationalism: Evidence from the Brexit Experiment*“</span>. <em>The Economic Journal</em> 129 (623): 2722–44. <a href="https://doi.org/10.1093/ej/uez020">https://doi.org/10.1093/ej/uez020</a>.
+</div>
+<div id="ref-Hainmuelleretal2011" class="csl-entry" role="listitem">
+Hainmueller, Jens, Alexis Diamond, und Alberto Abadie. 2011. <span>„Synth: An R Package for Synthetic Control Methods in Comparative Case Studies“</span>. <em>Journal of Statistical Software</em> 42 (13): 1–17. <a href="https://www.jstatsoft.org/v42/i13/">https://www.jstatsoft.org/v42/i13/</a>.
 </div>
 </div>
 </section></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
@@ -3655,7 +3664,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script><nav class="page-navigation"><div class="nav-page nav-page-previous">
       <a href="./Machine Learning.html" class="pagination-link" aria-label="Machine Learning">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Machine Learning</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Machine Learning</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
