@@ -1,4 +1,191 @@
-#IV
+
+##### Acemoglu paper #####
+
+# https://economics.mit.edu/people/faculty/daron-acemoglu/data-archive
+
+ADD_dat <- read_stata("~/Downloads/Supplementary/Datafortheweb/ADD_Mafia_district.dta")
+ADD_dat <- read_stata("~/Downloads/Supplementary/Datafortheweb/ADD_Mafia_municipality.dta")
+
+ADD_dat <- ADD_dat %>%
+  filter(
+    !is.na(sp3m1893_n30), # no water station in 30km radius
+    !is.na(Mafia1900) # no mafia presence classification
+  )
+
+map_chr(ADD_dat, ~ attr_getter("label")(.))
+
+lm(Mafia1900 ~ peasants_fasci, data = ADD_dat) %>%
+  summary()
+
+ggplot(, 
+       aes(x = sp3m1893_n30, y = Mafia1900 )) + 
+  geom_point()
+
+library(fixest)
+
+### Panel A ###
+# (1)
+mod <- feols(
+  peasants_fasci ~ sp3m1893_n30, 
+  #vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat,
+  ) 
+summary(mod)
+
+library(fwildclusterboot)
+boot_feols <- boottest(
+  mod, 
+  clustid = ~ distretto1853 + cl1_stn_sp1893_n30,
+  param = "sp3m1893_n30", 
+  B = 9999
+)
+summary(boot_feols)
+
+
+# (2)
+feols(
+  peasants_fasci ~ sp3m1893_n30 
+  + predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel, 
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat 
+  ) %>% 
+  summary()
+
+# (3)
+feols(
+  peasants_fasci ~ sp3m1893_n30 
+  + predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  + sulfurproduction1868_70
+  + Citrus_groves
+  + Olives_groves
+  + Vineyards
+  + Mafia1885
+  , 
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat 
+) %>% 
+  summary()
+
+# (4)
+feols(
+  peasants_fasci ~ sp3m1893_n30 
+  + predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  + sulfurproduction1868_70
+  + Citrus_groves
+  + Olives_groves
+  + Vineyards
+  + Mafia1885
+  
+  + lnpop1861
+  + lnsurface
+  + centreheight
+  + maxheight
+  + slope2
+  + pa_pdist1856
+  + port2_pdist1856
+  + roads1799
+  + ave_temp
+  + sp3m_ave_n30
+  + var_sp3m_n30
+  , 
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat 
+) %>% 
+  summary()
+
+
+### Panel B ###
+# (1)
+mod <- feols(
+  peasants_fasci ~ sp3m1893_n30
+  | provincia1853, 
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat,
+) 
+summary(mod)
+
+# (4)
+modB4a <- feols(
+  peasants_fasci ~
+  + predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  + sulfurproduction1868_70
+  + Citrus_groves
+  + Olives_groves
+  + Vineyards
+  + Mafia1885
+  
+  + lnpop1861
+  + lnsurface
+  + centreheight
+  + maxheight
+  + slope2
+  + pa_pdist1856
+  + port2_pdist1856
+  + roads1799
+  + ave_temp
+  + sp3m_ave_n30
+  + var_sp3m_n30
+  | provincia1853, 
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat 
+)
+
+modB4b <- feols(
+  sp3m1893_n30  ~ 
+  + predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  + sulfurproduction1868_70
+  + Citrus_groves
+  + Olives_groves
+  + Vineyards
+  + Mafia1885
+  
+  + lnpop1861
+  + lnsurface
+  + centreheight
+  + maxheight
+  + slope2
+  + pa_pdist1856
+  + port2_pdist1856
+  + roads1799
+  + ave_temp
+  + sp3m_ave_n30
+  + var_sp3m_n30
+  | provincia1853, 
+  data = ADD_dat 
+)
+
+plot(modB4b$residuals, modB4a$residuals, pch = 19)
+
+##### IV: rain and conflicts in Africa  ####
 
 library(tidyverse)
 library(haven)
@@ -7,8 +194,32 @@ library(fixest)
 #rainconflict <- read_stata("~/Downloads/dataverse_files/mss_repdata.dta")
 rainconflict <- read_stata("~/Downloads/dataverse_files/mss_repdata_feb07.dta")
 
-glimpse(rainconflict)
+rainconflict <- rainconflict %>%
+  select(
+    any_prio,
+    war_prio,
+    ccode,
+    country = country_name,
+    gdp_g,
+    gdp_g_l,
+    GPCP_g,
+    GPCP_g_l,
+    GPCP_g_fl,
+    gdp_1979 = y_0,
+    polity2l,
+    polity2_IV,
+    ethfrac,
+    relfrac,
+    oil = Oil,
+    lmtnest,
+    lpopl1,
+    tot_100_g,
+    year
+  )
 
+write_csv2(rainconflict, file = "~/git_projects/kausalanalyse_book/datasets/rainconflict.csv")
+
+glimpse(rainconflict)
 
 rainconflict <- rainconflict %>% 
   mutate(
@@ -287,7 +498,7 @@ feols(
 ) %>% 
   summary(n = 10)
 
-# (6)
+# (7)
 feols(
   fml = war_prio ~ 
     + i(country_code, year)
@@ -306,5 +517,6 @@ modelsummary(
     mod_conf_ols
     )
   )
+
 
 

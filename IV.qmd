@@ -10,7 +10,7 @@ webr:
             ]
 ---
 
-# IV-Regression
+# IV-Regression {#sec-IV}
 
 ```{r, echo=F, message=FALSE}
 library(gt)
@@ -120,7 +120,7 @@ Anhand dieser Form kann der Erwartungswert sowie das Verhalten für große Stich
   \textup{E}\big(\widehat{\beta}_\textup{IV}\big) = \beta_1 + \underbrace{\textup{E}\bigg(\frac{\sum_{i=1}^n (Z_i-\overline Z) u_i}{\sum_{i=1}^n (Z_i - \overline{Z})B_i}\bigg)}_{\neq0},\label{eq:ivbiasterm}
 \end{align}
 
-sodass $\widehat{\beta}_\textup{IV}$ ein *verzerrter Schätzer* von $\beta_1$ ist.^[Beachte, dass der endogene Regressor $B_i$ mit $u_i$ korreliert, sodass der Erwartungswert des Bruchs in \eqref{eq:ivbiasterm} ungleich $0$ ist.] Glücklicherweise kann man zeigen, dass
+sodass $\widehat{\beta}_\textup{IV}$ bei Endogenität von $X$ ein *verzerrter Schätzer* von $\beta_1$ ist.^[Beachte, dass der endogene Regressor $B_i$ mit $u_i$ korreliert, sodass der Erwartungswert des Bruchs in \eqref{eq:ivbiasterm} ungleich $0$ ist.] Glücklicherweise kann man zeigen, dass
 
 \begin{align*}
   \frac{\sum_{i=1}^n (Z_i-\overline Z) u_i}{\sum_{i=1}^n (Z_i - \overline{Z})B_i}\to 0 \quad \text{für} \quad n\to\infty
@@ -137,9 +137,13 @@ bei Gültigkeit der IV-Annahmen \eqref{eq:ivassum1} und \eqref{eq:ivassum2}, d.h
 
 Beachte, dass die Annahme der Relevanz des Instruments für die Herleitung des Identifikationsprinzips und des Schätzers \eqref{eq:simpleivest} von entscheidender Bedeutung ist: Sind $Z$ und $B$ unkorreliert, so ist $\text{Cov}(B,Z) = 0$ und $\beta_1$ damit nicht identifizierbar. Weiterhin würde $\widehat{\text{Cov}}(B,Z)\to0$ wenn $n\to\infty$, sodass $\widehat{\beta}_{\textup{IV}}\to\infty$! 
 
-In empirischen Anwendungen ist $\text{Cov}(B,Z) = 0$ unwahrscheinlich. Die Kovarianz von $B$ und $Z$ kann jedoch gering sein. In diesem Fall bezeichnet man $Z$ als ein *schwaches Instrument*. Anhand von Gleichung \eqref{eq:simpleivest} können wir die Konsequenzen der Verwendung eines schachen Instruments ableiten: Ein sehr schwacher linearer Zusammenhang von $B$ und $Z$ --- und damit $\widehat{\text{Cov}}(B,Z) \approx 0$ --- kann trotz Relevanz von $Z$ zu einem Schätzer mit großer Varianz führen.
+In empirischen Anwendungen ist $\text{Cov}(B,Z) = 0$ unwahrscheinlich. Die Kovarianz von $B$ und $Z$ kann jedoch gering sein. In diesem Fall bezeichnet man $Z$ als ein *schwaches Instrument*. Anhand von Gleichung \eqref{eq:simpleivest} können wir die Konsequenzen der Verwendung eines schachen Instruments ableiten: Ein sehr schwacher linearer Zusammenhang von $B$ und $Z$ --- und damit tendenziell $\widehat{\text{Cov}}(B,Z) \approx 0$ --- kann trotz Relevanz von $Z$ zu einem Schätzer mit großer Varianz führen.
 
 Die Relevanz eines Instruments kann mit einem Hypothesentests geprüft werden. Wie die "Stärke" eines Instruments beurteilt werden sollte, ist eine nicht-triviale Frage. Wir betrachten diesen Aspekt näher in @sec-2SLS.
+
+### Identifizierbarer Behandlungseffekt
+
+Regression ermöglicht in der Regel die Schätzung eines durchschnittlichen Behandlungseffekts (ATE) für eine betrachtete Population mit heterogenen Behandlungseffekten (in Modell \eqref{eq:simpleiv} unterstellen wir den empirisch unwahrscheinlichen Fall eines einheitlichen kausalen Effekts $\beta_1$). Das Adjustieren für Endogenität mit IV-Regression hat hier einen Preis: Beachte, dass im IV-Design ein Teil der beobachteten Variation der Behandlungsvariable $B$ (wie in \eqref{eq:simpleiv} angenommen) endogen ist und wir den Effekt von $B$ auf $Y$ anhand der *exogenen* Variation eines validen Instruments $Z$ schätzen. Daher können wir grundsätzlich nur einen *lokalen* durchschnittlichen Behandlungseffekt (LATE) identifizieren: Der LATE ist eine gewichtete Variante des ATE, wobei Beobachtungen, deren Behandlung gut durch $Z$ erklärt wird den größten Einfluss haben.^[Siehe Kapitel 10 und 19 in @Huntington-Klein2021 für nicht-technische Erläuterungen und Beispiel zu LATE.]  
 
 
 ## 2SLS-Verfahren {#sec-2SLS}
@@ -299,7 +303,9 @@ Die Grafik illustriert das Verhalten des IV-Schätzers (lila Grade) im Vergleich
   src="https://observablehq.com/embed/@mca91/ivreg?cells=webrinfo%2Cviewof+weak%2Cviewof+exogeneous%2Cviewof+beta1zero%2Cviewof+beta%2Cviewof+gamma%2Cviewof+cor%2Cviewof+showX_hat%2Cviewof+regtype%2Cchart%2Cloaded">
 </iframe>
 
-Anhand der obigen interaktiven Grafik lässt sich zwar die Verzerrung der Schätzer einschätzen, jedoch nicht ihre Unsicherheit. Um die gesamte Verteilung der Schätzer zu illustrieren, zeigt die nachstehende Grafik Kerndichteschätzungen für $N$ simulierte Stichproben der Größe $n$ für den gewählten DGP.^[Beachte, dass die Simulation insbesondere für große $N$ und $n$ einige Sekunden dauern kann (grauer Balken am linken Rand zeigt laufende Berechnung an).] Die voreingestellten Parameter-Kombinationen zeigen:
+Anhand der obigen interaktiven Grafik lässt sich zwar die Verzerrung der Schätzer einschätzen, jedoch nicht die Unsicherheit der Schätzung. Um die gesamte Verteilung der Schätzer in endlichen Stichproben zu illustrieren, zeigt die nachstehende Grafik Kerndichteschätzungen basierend auf $N$ simulierte Stichproben der Größe $n$ für den gewählten DGP.^[Beachte, dass die Simulation insbesondere für große $N$ und $n$ einige Sekunden dauern kann (grauer Balken am linken Rand zeigt laufende Berechnung an).] Die Applikation gibt weiterhin den R-Code für eine Simulation der Daten gemäß der gewählten Parameter aus.
+
+Die voreingestellten Parameter-Kombinationen zeigen:
 
 - Wenn $Z$ ein schwaches Instrument ist, kann der IV-Schätzer verzerrt sein *und* eine deutlich größere Varianz als der KQ-Schätzer haben.
 - Wenn $X$ exogen ist, hat der IV-Schätzer eine größere Varianz als der KQ-Schätzer.

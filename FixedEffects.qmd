@@ -1,0 +1,594 @@
+---
+webr: 
+  show-startup-message: true
+  packages: [
+            'dplyr',
+            'ggplot2',
+            'sandwich',
+            'tidyr',
+            'readr',
+            'Synth'
+            ]
+---
+
+```{=html}
+<style>
+.qwebr-code-output-stdout {background-color: powderblue;}
+
+.qwebr-button-run, .qwebr-button-reset, .qwebr-button-copy {
+  background-color:  rgba(0, 0, 0, 0);
+  border-style: none;
+  font-weight: 400;
+  color: white; 
+  transition: none;
+}
+
+.qwebr-editor-toolbar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+  border-radius: 0 0 6px 6px;
+  background-color: darkgreen;
+  border-color: darkgreen;
+  border-width: 1px;
+  border-style: solid;
+  padding: 0 0; 
+  transition: color .1s ease-in-out, background-color .1s ease-in-out,border-color .1s ease-in-out,box-shadow .1s ease-in-out;
+}
+
+.qwebr-editor-toolbar:hover {
+  background-color: white;
+  border-color: darkgreen;
+  border-width: 1px;
+}
+
+.qwebr-editor-toolbar:hover * {
+  color: darkgreen;
+}
+
+.overflow-guard, .qwebr-editor, .monaco-editor {
+  border-radius: 6px 6px 0 0;
+  border-width: 1px 1px 0 1px;
+  border-color: darkgreen;
+}
+
+</style>
+```
+
+# Panel-Daten
+
+## Backdoors durch unbeobachtbare Heterogenitäten {#sec-panel-uh}
+
+```{r, echo=F,message=F,warning=F}
+# Formatierung von gt-Tabellen
+library(gt)
+tabopts <- function(x) {
+    fmt_number(x, decimals = 3, drop_trailing_zeros = T) %>%
+    tab_options(table_body.hlines.color = "white",
+              column_labels.border.bottom.color = "black", 
+             column_labels.border.top.color = "black",
+             table_body.border.bottom.color = "black", 
+             table.border.bottom.color = "black",
+             column_labels.font.weight = "bold", 
+             table.font.color = "black", 
+             table.font.size = 16)
+}
+
+# load the tidyverse
+library(tidyverse)
+
+options(pillar.sigfig = 2)
+```
+
+Betrachte das Panel-Regression-Modell
+
+\begin{align}
+  Y_{it} = \beta_0 + \beta_1 B_{it} + \beta_2 X_i + \beta_3 U_i \epsilon_{it},\label{eq:unobshetmodel}
+\end{align}
+
+wobei $U_i$ unbeobachtete und $X_i$ beobachtete, zeitlich-invariante Heterogenitäten zwischen den Beobachtungseinheiten $i=1,\dots,n$ sind. Wie üblich ist $B_i$ die Behandlungsvariable und $\beta_1$ der interessierende Effekt einer Veränderung von $B_i$ auf $Y_i$. 
+
+Angenommen wir beobachten $Y_{it}$ und $B_{it}$ für $T=1$, also für eine Periode. Bei Korrelation zwischen den (aufgrund der $U_i$) **unbeobachtbaren** zeit-invarianten Effekten $\delta_i$ und der Behandlungsvariable $B$ kann der kausale Effekt $\beta_1$ nicht identifiziert werden. Diese Situation ist in @fig-FEDAG1 dargestellt.
+
+```{dot}
+//| fig-width: 3
+//| fig-height: 3
+//| fig-align: 'center'
+//| fig-cap: "Backdoors durch beobachtete und unbeobachtete Variablen"
+//| label: "fig-FEDAG1" 
+digraph FE_dag_single_period {
+    layout=neato
+    fontname="Helvetica,Arial,sans-serif"
+    node [fontname="Helvetica,Arial,sans-serif"]
+    edge [fontname="Helvetica,Arial,sans-serif"]
+    splines=true
+    pad=.5
+
+    // Zeitinvariante Einflüsse
+    U [pos="2,8!", label=<U>, color=gray, fontcolor=gray];
+
+    // Knoten für Zeitvariante Einflüsse
+    X [pos="2,6!", label=<X>];
+
+    // Knoten für eine Periode
+    B [pos="0,6!", label=<B>];
+    Y [pos="0,8!", label=<Y>];
+
+    // Kanten für eine Periode
+    U -> X [color=gray, style=dashed];
+    U -> Y [color=gray, style=dashed];
+    U -> B [color=gray, style=dashed];
+    X -> Y;
+    X -> B;
+    B -> Y;
+}
+```
+
+Es bestehen Backdoors durch die $U_i$, die wir nicht mit der Schätzung von 
+\begin{align}
+  Y_{it} = \beta_0 + \beta_1 B_{it} + \beta_2 X_i + \varepsilon_{it},\label{eq:femodelfail}
+\end{align}
+einer (fehlspezifizierten) Regression, schließen können.
+
+## Differenzen und Fixed Effects
+
+Anhand von Panel-Daten mit $T\geq2$ können die in @sec-panel-uh beschreibene Backdoors durch unbeobachtbare zeit-invariante Heterogenitäten mit Regression geschlossen werden.
+
+```{dot}
+//| fig-width: 6
+//| fig-height: 4
+//| fig-align: 'center'
+//| fig-cap: "FE-Design mit Backdoors durch beobachtete und unbeobachtete zeit-invariante Variablen"
+//| label: "fig-FEDAG2" 
+digraph FE_dag2 {
+    layout=neato
+    fontname="Helvetica,Arial,sans-serif"
+    node [fontname="Helvetica,Arial,sans-serif"]
+    edge [fontname="Helvetica,Arial,sans-serif"]
+    splines=true
+
+    // Zeitinvariante Einflüsse
+    U [pos="2,8!", label=<U>, color=gray, fontcolor=gray];
+
+    // Knoten für Zeitvariante Einflüsse
+    X [pos="2,2!", label=<X>];
+
+    // Knoten für Perioden 1
+    B1 [pos="0,4!", label=<B<SUB>t=1</SUB>>];
+    Y1 [pos="0,6!", label=<Y<SUB>t=1</SUB>>];
+
+    // Knoten für Perioden 2
+    B2 [pos="4,4!", label=<B<SUB>t=2</SUB>>];
+    Y2 [pos="4,6!", label=<Y<SUB>t=2</SUB>>];
+
+    // Kanten für Perioden 1
+    U -> X [color=gray, style=dashed];
+    U -> Y1 [color=gray, style=dashed];
+    U -> B1 [color=gray, style=dashed];
+    X -> Y1;
+    X -> B1;
+    B1 -> Y1;
+    B1 -> B2;
+
+    // Kanten für Perioden 2
+    U -> Y2 [color=gray, style=dashed];
+    U -> B2 [color=gray, style=dashed];
+    X -> Y2;
+    X -> B2;
+    B2 -> Y2;
+}
+```
+
+Definiere 
+$$\delta_i = \beta_0 + \beta_3 U_i.$$ Nach einsetzen in \eqref{eq:unobshetmodel} erhalten wir 
+
+\begin{align}
+  Y_{it} = \delta_i + \beta_1 B_{it} + \beta_2 X_i + \epsilon_{it} \label{eq:femodel},
+\end{align}
+
+mit einheiten-spezifischen Konstanten $\delta_i$, $i=1,\dots,n$. Die $\delta_i$ können als individuelle Achsenabschnitte ("feste Effekte") interpretieren werden, weshalb Modell \eqref{eq:femodel} auch als "Fixed-Effects-Modell" bezeichnet wird. 
+
+## Regression in Differenzen
+
+Wir betrachten zunächst den in @fig-FEDAG2 dargestellten DGP für $T=2$ Zeitperioden. In dieser Situation können Backdoors durch $U$ anhand einer simplen Transformation von Modell \eqref{eq:femodel} geschlossen werden: Regression in Zeit-Differenzen zwischen den Perioden $t=2$ und $t=1$,
+\begin{align}
+  \Delta Y_{it} = \beta_1 \Delta B_{it} + e_{it}, \qquad i=1,\dots,n,\qquad t=1,2 \label{eq:femodeldiff},
+\end{align}
+wobei $\Delta\,Y_{it} := Y_{i2} - Y_{i1}$ und $e_{it} := \epsilon_{i2} - \epsilon_{i1}$ für $t=2$. Beachte, dass $\Delta\delta_i=\Delta X_i=0$. Differenzieren ergibt also ein Modell, in dem weder für $X_i$ noch für die (unbeobachtbaren) $\delta_i$ kontrolliert werden muss, damit $\beta_1$ identifiziert werden kann. Der Behandlungseffekt kann mit KQ geschätzt werden. 
+
+Wir veranschaulichen die Schätzung eines Behandlungseffekts mit dem Differenzen-Ansatz für einen simulierten Datensatz `paneldata.csv`. Der  mit $n=12$ Beobachtungseinheiten, die über $T=8$ Perioden beobachtet wurden. Alle Einheiten weisen unbeobachtbare zeit-invariante Heterogenitäten auf. Der wahre Behandlungseffekt beträgt jeweils $\beta_1 = -1$.^[Der (R code für den) DGP ist [diesem StackExchange-Post](https://stats.stackexchange.com/a/188559) entnommen.]
+
+```{r}
+# Datensatz 'paneldata.csv' einlesen
+paneldata <- read_csv("datasets/paneldata.csv") %>% 
+  select(X, Y, ID, time, col)
+```
+
+```{r}
+# Datensatz balanced?
+library(plm)
+
+is.pbalanced(
+  x = paneldata, 
+  index = c("ID", "time")
+)
+```
+
+```{r}
+# Panel-Dimensionen bestimmen
+paneldata %>%
+  summarise(
+    N = unique(ID) %>% length(),
+    T = unique(time) %>% length()
+  )
+```
+
+```{r}
+# Subsetting für 2 Perioden (t = {1, 2})
+paneldata_T2 <- paneldata %>% 
+  filter(
+    dplyr::between(time, 1, 2)
+  )
+```
+
+```{r}
+library(fixest)
+
+# Naive KQ-Schätzung für t = 1
+panel_KQ <- feols(
+  fml = Y ~ X, 
+  data = paneldata %>% 
+    filter(time == 1)
+)
+
+summary(panel_KQ)
+```
+
+```{r}
+library(cowplot)
+
+# Plot: Naiver KQ-Schätzer für t = 1
+(
+  p_panel <- ggplot(
+    mapping = aes(x = X, y = Y)
+  ) +
+    geom_point(
+      data = paneldata %>% 
+        filter(time > 1),
+      color = "gray",
+      show.legend = F
+    ) +
+    geom_point(
+      data = paneldata %>% 
+        filter(time == 1),
+      mapping = aes(color = col),
+      show.legend = F
+    ) +
+    # Naive KQ-Schätzung f. t = 1
+    geom_smooth(
+      data = paneldata %>% 
+        filter(time == 1),
+      method = "lm", 
+      se = F,
+      col = "black"
+    ) +
+    theme_cowplot()
+)
+```
+
+```{r}
+# Panel-Schätzer: KQ-Regression in Differenzen
+panel_diff <- feols(
+  fml = d(Y) ~ d(X), 
+  data = paneldata %>% 
+      filter(
+        dplyr::between(time, 1, 2)
+      ),
+  panel.id = ~ ID + time
+)
+
+summary(panel_diff)
+```
+
+```{r}
+# Plot: KQ-Schätzer in Differenzen
+paneldata_diff <- paneldata %>% 
+  mutate(
+    DeltaX = X - dplyr::lag(X),
+    DeltaY = Y - dplyr::lag(Y)
+  ) %>%
+  drop_na()
+  
+  ggplot(
+    mapping = aes(x = DeltaX, y = DeltaY)
+  ) + 
+    geom_point(
+      data = paneldata_diff %>% 
+        filter(time > 2),
+      color = "gray",
+      show.legend = F
+    ) +
+    geom_point(
+      data = paneldata_diff %>% 
+        filter(time == 2),
+      mapping = aes(color = col),
+      show.legend = F
+    ) +
+  geom_smooth(
+    data = paneldata_diff %>% 
+      filter(time == 2),
+    method = "lm", 
+    se = F,
+    color = "black"
+  ) + 
+  theme_cowplot()
+```
+
+Erweiterung auf alle Perioden:
+
+```{r}
+# Naive KQ-Schätzung für t = 1,...,8
+panel_KQ <- feols(
+  fml = Y ~ X, 
+  data = paneldata 
+)
+
+summary(panel_KQ)
+```
+
+```{r}
+library(cowplot)
+
+# Plot: Naiver KQ-Schätzer für t = 1,...,8
+ggplot(
+  mapping = aes(x = X, y = Y)
+) +
+  geom_point(
+    data = paneldata %>% 
+      filter(time > 1),
+    color = "gray",
+    show.legend = F
+  ) +
+  geom_point(
+    data = paneldata %>% 
+      filter(time == 1),
+    mapping = aes(color = col),
+    show.legend = F
+  ) +
+  # Naive KQ-Schätzung f. t = 1
+  geom_smooth(
+    data = paneldata %>% 
+      filter(time == 1),
+    method = "lm", 
+    se = F,
+    col = "black"
+  ) +
+  theme_cowplot()
+```
+
+```{r}
+# Panel-Schätzer: KQ-Regression in Differenzen
+panel_diff <- feols(
+  fml = d(Y) ~ d(X) - 1, 
+  data = paneldata,
+  panel.id = ~ ID + time
+)
+
+summary(panel_diff)
+```
+
+```{r}
+# Plot: KQ-Schätzer in Differenzen (alle t)
+
+  ggplot(
+    data = paneldata_diff,
+    mapping = aes(x = DeltaX, y = DeltaY)
+  ) + 
+    geom_point(
+      color = "gray",
+      show.legend = F
+    ) +
+    geom_point(
+      mapping = aes(color = col),
+      show.legend = F
+    ) +
+  geom_smooth(
+    method = "lm", 
+    se = F,
+    color = "black"
+  ) + 
+  theme_cowplot()
+```
+
+### Fixed Effects
+
+Modell \eqref{eq:femodel} kann weiterhin als eine Regression mit $n-1$ Dummy-Variablen und einer Konstante umgeschrieben werden:
+
+\begin{align}
+  Y_{it} = \beta_0 + \beta_1 X_{it} + \gamma_2 D^{(2)}_i + \gamma_3 D^{(3)}_i + \cdots + \gamma_n D^{(n)}_i + \epsilon_{it} \label{eq:drmodel}.
+\end{align}
+
+Das Modell \eqref{eq:drmodel} hat $n$ verschiedene Achsenabschnitte — einen für jede Beobachtungseinheit.^[Für $n-1$ Einheiten ist der individuelle Achsenabschnitt damit $\beta_0 + D^{(i)}_i$ und für *eine* Einheit $\beta_0$. Diese Einheit wird auch als *Referenzkategorie* bezeichnet. Alternativ kann das Modell mit $n$ Dummies und *ohne* die Konstante $\beta_0$ geschrieben werden.] Die Modelle \eqref{eq:femodel} und \eqref{eq:drmodel} sind gleichwertige Darstellungen des Fixed-Effects-Modells.
+
+Fixed Effects können Endogenität aufgrund simultaner Kausalität oder ausgelassender zeitlich variierender Faktoren (Variablen, welche die abhängige Variable beeinflussen und mit der Behandlungsvariable korreliert sind) nicht beheben. In solchen Szenarien können Panel-Methoden in Kombination mit einer Schätzstrategie basierend auf Instrument-Variablen hilfreich sein. Wir betrachten solche Schätzer in Kapitel @sec-IV.
+
+---
+
+**Interaktive Illustration von Panel-Schätzern**
+
+<iframe width="100%" height="642" frameborder="0"
+  src="https://observablehq.com/embed/@mca91/panelcomp?cells=viewof+showgroups%2Cviewof+showdgp%2Cviewof+regtype%2Ctheplot">
+</iframe>
+
+
+```{r}
+# Fixed-Effects-Schätzung
+panel_FE <- feols(
+  fml = Y ~ X | ID,  
+  data = paneldata
+)
+
+summary(panel_FE)
+```
+
+
+```{r}
+library(plm)
+
+# Random-Effects-Schätzung
+panel_RE <- plm(
+  formula = Y ~ X,  
+  model = "random",
+  index = c("ID", "time"),  
+  data = paneldata
+)
+
+summary(panel_RE)
+```
+
+```{r}
+paneldata <- paneldata %>% 
+  mutate(
+    # Vorhergesagte Werte für FE-Schätzung
+    yhat_FE = fitted(panel_FE),
+    # Vorhergesagte Werte für RE-Schätzung
+    yhat_RE = predict(panel_RE)
+  )
+
+ggplot(
+  data = paneldata,
+  mapping = aes(x = X, y = Y)
+) +
+  geom_point(
+    mapping = aes(color = col), 
+    show.legend = F
+  ) +
+  # Pooling
+  geom_smooth(
+    method = "lm", 
+    se = F,
+    col = "black"
+  ) +
+  # Fixed Effects
+  geom_line(
+    mapping = aes(y = yhat_FE, group = ID, col = col), 
+    show.legend = F
+  ) +
+  # Random Effects
+  geom_line(
+    mapping = aes(y = yhat_RE), 
+    lty = "dashed", 
+    show.legend = F
+  ) +
+  theme_cowplot()
+```
+
+## Beispiel: Einkommen und Demokratie
+
+Eine Vielzahl polit-ökonomischer Standardwerke und Studien [bspw. @Dahl1971; @Huntington1991; @Rueschemeyer1992] liefert vermeindliche Belege für einen zentralen Grundsatz der [Modernisierungstheorie](https://de.wikipedia.org/wiki/Modernisierungstheorie): Ein höheres Pro-Kopf-Einkommen erhöht die Nachfrage der Bevölkerung nach politischer Freiheit und demokratischen Insitutionen. @Acemogluetal2008 argumentieren, dass der in derartigen länderübergreifenden Analysen mit Pooling häufig als positiv geschätzte Zusammenhang zwischen Einkommen und Demokratisierung nicht kausal interpetiert werden sollte. Ein Grund hierfür ist, dass ausgelassene länderspezifische zeit-invariante (möglicherweise unbeobachtbare) Faktoren, die sowohl die ökonomische Entwicklung als auch die Stärke demokratischer Institutionen beeinflussen, wahrscheinlich sind. Um diese mögliche Ursache für Endogenität des Zusammenhangs
+\begin{align}
+  \text{Demokratisierung}_i = \beta_0 + \beta_1\,\text{PK-Einkommen}_i + \epsilon_i
+\end{align}
+zu adressieren, nutzen @Acemogluetal2008 einen Panel-Regressionsansatz ähnlich zu
+\begin{align}
+  \text{Demokratisierung}_{it} = \delta_i + \beta_1\,\text{PK-Einkommen}_{it} + \epsilon_{it}
+\end{align}
+mit Fixed Effects $\delta_i$, die für länderspezifische zeitinvariante Faktoren kontrollieren.
+
+Das Kernergebnis von @Acemogluetal2008 ist, dass es *keinen* kausalen Zusammenhang zwischen dem Einkommen (Wirtschaftswachstum) und der Demokratisierung gibt. Die Autoren zeigen, dass historische und geografische Faktoren, die sowohl das Einkommen als auch die politischen Institutionen beeinflussen, den beobachteten Zusammenhang verzerren können. 
+
+Für die nachfolgenden Code-Beispiele nutzen wir einen Auszug des Datensatzes aus dem Replikationspaket für @Acemogluetal2008, siehe @Acemogluetal2008data.
+
+
+
+```{r}
+acem <- readxl::read_xls(
+  "~/Downloads/113251-V1/Income-and-Democracy-Data-AER-adjustment.xls", 
+  sheet = "5 Year Panel"
+)
+```
+
+```{r}
+acem <- acem %>% 
+  filter(
+    dplyr::between(year, 1955, 2000),
+    ) %>%
+  arrange(year) 
+```
+
+
+```{r}
+# Pooling
+feols(
+  fml = fhpolrigaug ~ lrgdpch,
+  panel.id = ~ country + year,
+  data = acem, 
+)
+```
+
+```{r}
+acem_f <- acem %>%
+  filter(year %in% c(1970, 1995)) %>%
+  group_by(code) %>%
+  summarise(
+    dlrgdpch = diff(lrgdpch),
+    dfhpolrigaug = diff(fhpolrigaug)
+    ) %>%
+  drop_na()
+
+lm(
+  formula = dfhpolrigaug ~ dlrgdpch,
+  data = acem_f
+) %>% 
+  summary()
+```
+  
+```{r}
+ggplot(
+  data = acem_f,
+  mapping = aes(
+    x = dlrgdpch,
+    y = dfhpolrigaug
+  ) 
+  ) +
+  geom_hline(yintercept = 0, lty = 2) +
+  geom_text(
+    mapping = aes(label = code),
+    position = position_jitter(
+      height = .05, 
+      seed = 1234
+      )
+    ) +
+  geom_smooth(method = "lm", se = F) +
+  labs(
+    x = "Diff. Log(Pro-Kopf-BIP) (1970 - 1995)",
+    y = "Diff. Demokratie-Index (1970 - 1995)"
+  ) +
+  theme_cowplot()
+```
+
+```{r}
+# time + country fixed effects
+feols(
+  fml = fhpolrigaug ~ l(fhpolrigaug) + l(lrgdpch) 
+  | year + country,
+  panel.id = ~ country + year,
+  cluster = ~ country,
+  data = acem, 
+)
+```
+
+```{r}
+# time-fixed effects
+feols(
+  fml = fhpolrigaug ~ l(fhpolrigaug) + l(lrgdpch) 
+  | year,
+  panel.id = ~ country + year,
+  cluster = ~ country,
+  data = acem, 
+)
+```
+
+
+

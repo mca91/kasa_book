@@ -451,7 +451,7 @@ Tabelle~\ref{tbl-Klausurergebnisse} händisch als R-Objekt der Klasse
 Variable \emph{Modul}. Der Datensatz liegt also \emph{nicht} im s.g.
 \emph{Tidy-Format} vor.
 
-\begin{tcolorbox}[enhanced jigsaw, bottomtitle=1mm, colbacktitle=quarto-callout-tip-color!10!white, coltitle=black, arc=.35mm, title=\textcolor{quarto-callout-tip-color}{\faLightbulb}\hspace{0.5em}{Tidy-Format}, titlerule=0mm, opacityback=0, breakable, bottomrule=.15mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-tip-color-frame, toptitle=1mm, rightrule=.15mm, leftrule=.75mm, left=2mm, colback=white]
+\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, titlerule=0mm, title=\textcolor{quarto-callout-tip-color}{\faLightbulb}\hspace{0.5em}{Tidy-Format}, colframe=quarto-callout-tip-color-frame, opacitybacktitle=0.6, rightrule=.15mm, breakable, bottomrule=.15mm, colback=white, bottomtitle=1mm, opacityback=0, arc=.35mm, colbacktitle=quarto-callout-tip-color!10!white, toprule=.15mm, toptitle=1mm, coltitle=black]
 
 Tidy-Format: Jede Spalte ist \textbf{\emph{eine}} Variable, jede Reihe
 ist \textbf{\emph{eine}} Beobachtung und jede Zelle enthält einen
@@ -3576,8 +3576,8 @@ bezüglich eines kausalen Effekts nach Matching und demonstrieren die
 Schätzung anhand unseres Website-Beispiels für den ATT nach
 Propensity-Score-Matching.
 
-\begin{tcolorbox}[enhanced jigsaw, bottomtitle=1mm, colbacktitle=quarto-callout-tip-color!10!white, coltitle=black, arc=.35mm, title={\textbf{Algorithmus: Bootstrap-Schätzer für Matching mit Regression
-Adjustment}}, titlerule=0mm, opacityback=0, breakable, bottomrule=.15mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-tip-color-frame, toptitle=1mm, rightrule=.15mm, leftrule=.75mm, left=2mm, colback=white]
+\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, titlerule=0mm, title={\textbf{Algorithmus: Bootstrap-Schätzer für Matching mit Regression
+Adjustment}}, colframe=quarto-callout-tip-color-frame, opacitybacktitle=0.6, rightrule=.15mm, breakable, bottomrule=.15mm, colback=white, bottomtitle=1mm, opacityback=0, arc=.35mm, colbacktitle=quarto-callout-tip-color!10!white, toprule=.15mm, toptitle=1mm, coltitle=black]
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -3920,7 +3920,7 @@ Der von Wooldridge (2010) vorgeschlagene Doubly-Robust-Schätzer (IPWRA)
 für den ATE erreicht seine vorteilhaften Eigenschaften durch eine
 geschickte Kombination von IPW und Regression Adjustment.
 
-\begin{tcolorbox}[enhanced jigsaw, bottomtitle=1mm, colbacktitle=quarto-callout-tip-color!10!white, coltitle=black, arc=.35mm, title={\textbf{Algorithmus: IPWRA-Schätzer des ATE}}, titlerule=0mm, opacityback=0, breakable, bottomrule=.15mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-tip-color-frame, toptitle=1mm, rightrule=.15mm, leftrule=.75mm, left=2mm, colback=white]
+\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, titlerule=0mm, title={\textbf{Algorithmus: IPWRA-Schätzer des ATE}}, colframe=quarto-callout-tip-color-frame, opacitybacktitle=0.6, rightrule=.15mm, breakable, bottomrule=.15mm, colback=white, bottomtitle=1mm, opacityback=0, arc=.35mm, colbacktitle=quarto-callout-tip-color!10!white, toprule=.15mm, toptitle=1mm, coltitle=black]
 
 Vgl. Wooldridge (2010).
 
@@ -4116,7 +4116,417 @@ genauer.
 
 \bookmarksetup{startatroot}
 
-\chapter{IV-Regression}\label{iv-regression}
+\chapter{Panel-Daten}\label{panel-daten}
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics[width=6in,height=4in]{FixedEffects_files/figure-latex/dot-figure-1.png}
+
+}
+
+\caption{\label{fig-FEDAG1}FE-Design mit Backdoors durch unb.
+zeitvariante Variablen}
+
+\end{figure}%
+
+\includegraphics[width=5.5in,height=3.5in]{FixedEffects_files/figure-latex/dot-figure-2.png}
+
+Fixed Effects können Endogenität aufgrund simultaner Kausalität oder
+ausgelassender zeitlich variierender Faktoren (Variablen, welche die
+abhängige Variable beeinflussen und mit der Behandlungsvariable
+korreliert sind) nicht beheben. In solchen Szenarien können
+Panel-Methoden in Kombination mit einer Schätzstrategie basierend auf
+Instrument-Variablen hilfreich sein. Wir betrachten solche Schätzer in
+Kapitel Kapitel~\ref{sec-IV}.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Datensatz \textquotesingle{}paneldata.csv\textquotesingle{} einlesen}
+\NormalTok{paneldata }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"datasets/paneldata.csv"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{select}\NormalTok{(X, Y, ID, time, col)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Datensatz balanced?}
+\FunctionTok{library}\NormalTok{(plm)}
+
+\FunctionTok{is.pbalanced}\NormalTok{(}
+  \AttributeTok{x =}\NormalTok{ paneldata, }
+  \AttributeTok{index =} \FunctionTok{c}\NormalTok{(}\StringTok{"ID"}\NormalTok{, }\StringTok{"time"}\NormalTok{)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] TRUE
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Panel{-}Dimensionen bestimmen}
+\NormalTok{paneldata }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{N =} \FunctionTok{unique}\NormalTok{(ID) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{length}\NormalTok{(),}
+    \AttributeTok{T =} \FunctionTok{unique}\NormalTok{(time) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{length}\NormalTok{()}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+# A tibble: 1 x 2
+      N     T
+  <int> <int>
+1    12     8
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(fixest)}
+
+\CommentTok{\# Naive KQ{-}Schätzung}
+\NormalTok{panel\_KQ }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ Y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ X, }
+  \AttributeTok{data =}\NormalTok{ paneldata}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(panel\_KQ)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: Y
+Observations: 96
+Standard-errors: IID 
+            Estimate Std. Error  t value  Pr(>|t|)    
+(Intercept) -1.45318   1.008859 -1.44042   0.15307    
+X            3.76470   0.134364 28.01868 < 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 4.63461   Adj. R2: 0.891928
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Fixed{-}Effects{-}Schätzung}
+\NormalTok{panel\_FE }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ Y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ X }\SpecialCharTok{|}\NormalTok{ ID,  }
+  \AttributeTok{data =}\NormalTok{ paneldata}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(panel\_FE)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: Y
+Observations: 96
+Fixed-effects: ID: 12
+Standard-errors: Clustered (ID) 
+  Estimate Std. Error  t value   Pr(>|t|)    
+X -1.04507    0.10473 -9.97865 7.5526e-07 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.746006     Adj. R2: 0.996829
+                 Within R2: 0.602694
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(plm)}
+
+\CommentTok{\# Random{-}Effects{-}Schätzung}
+\NormalTok{panel\_RE }\OtherTok{\textless{}{-}} \FunctionTok{plm}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ Y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ X,  }
+  \AttributeTok{model =} \StringTok{"random"}\NormalTok{,}
+  \AttributeTok{index =} \FunctionTok{c}\NormalTok{(}\StringTok{"ID"}\NormalTok{, }\StringTok{"time"}\NormalTok{),  }
+  \AttributeTok{data =}\NormalTok{ paneldata}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(panel\_RE)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Oneway (individual) effect Random Effect Model 
+   (Swamy-Arora's transformation)
+
+Call:
+plm(formula = Y ~ X, data = paneldata, model = "random", index = c("ID", 
+    "time"))
+
+Balanced Panel: n = 12, T = 8, N = 96
+
+Effects:
+                 var std.dev share
+idiosyncratic 0.6437  0.8023 0.229
+individual    2.1732  1.4742 0.771
+theta: 0.811
+
+Residuals:
+   Min. 1st Qu.  Median 3rd Qu.    Max. 
+-6.0355 -1.9888 -0.1651  1.9196  6.4374 
+
+Coefficients:
+            Estimate Std. Error z-value  Pr(>|z|)    
+(Intercept) 18.34586    2.31566  7.9225 2.328e-15 ***
+X            0.77031    0.26346  2.9238  0.003458 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Total Sum of Squares:    818.14
+Residual Sum of Squares: 749.94
+R-Squared:      0.083362
+Adj. R-Squared: 0.07361
+Chisq: 8.54862 on 1 DF, p-value: 0.0034579
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(cowplot)}
+
+\NormalTok{paneldata }\OtherTok{\textless{}{-}}\NormalTok{ paneldata }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{mutate}\NormalTok{(}
+    \CommentTok{\# Vorhergesagte Werte für FE{-}Schätzung}
+    \AttributeTok{yhat\_FE =} \FunctionTok{fitted}\NormalTok{(panel\_FE),}
+    \CommentTok{\# Vorhergesagte Werte für RE{-}Schätzung}
+    \AttributeTok{yhat\_RE =} \FunctionTok{predict}\NormalTok{(panel\_RE)}
+\NormalTok{  )}
+
+\FunctionTok{ggplot}\NormalTok{(}
+  \AttributeTok{data =}\NormalTok{ paneldata,}
+  \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ X, }\AttributeTok{y =}\NormalTok{ Y)}
+\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}
+    \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{color =}\NormalTok{ col), }
+    \AttributeTok{show.legend =}\NormalTok{ F}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \CommentTok{\# Pooling}
+  \FunctionTok{geom\_smooth}\NormalTok{(}
+    \AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }
+    \AttributeTok{se =}\NormalTok{ F,}
+    \AttributeTok{col =} \StringTok{"black"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \CommentTok{\# Fixed Effects}
+  \FunctionTok{geom\_line}\NormalTok{(}
+    \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ yhat\_FE, }\AttributeTok{group =}\NormalTok{ ID, }\AttributeTok{col =}\NormalTok{ col), }
+    \AttributeTok{show.legend =}\NormalTok{ F}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \CommentTok{\# Random Effects}
+  \FunctionTok{geom\_line}\NormalTok{(}
+    \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ yhat\_RE), }
+    \AttributeTok{lty =} \StringTok{"dashed"}\NormalTok{, }
+    \AttributeTok{show.legend =}\NormalTok{ F}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_cowplot}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{FixedEffects_files/figure-pdf/unnamed-chunk-10-1.pdf}
+
+\section{Beispiel: Einkommen und
+Demokratie}\label{beispiel-einkommen-und-demokratie}
+
+Eine Vielzahl polit-ökonomische Standardwerke und Studien (bspw. Dahl
+1971; Huntington 1991; Rueschemeyer, Stephens, und Stephens 1992)
+liefert vermeindliche Belege für einen zentralen Grundsatz der
+\href{https://de.wikipedia.org/wiki/Modernisierungstheorie}{Modernisierungstheorie}:
+Ein höheres Pro-Kopf-Einkommen erhöht die Nachfrage der Bevölkerung nach
+politischer Freiheit und demokratischen Insitutionen. Acemoglu u.~a.
+(2008) argumentieren, dass der in solchen länderübergreifenden Studien
+mit Pooling häufig als positiv geschätzte Zusammenhang zwischen
+Einkommen und Demokratisierung nicht kausal interpetiert werden sollte.
+Ein Grund hierfür ist, dass ausgelassene länderspezifische
+zeitinvariante (möglicherweise unbeobachtbare) Faktoren, die sowohl die
+ökonomische Entwicklung als auch die Stärke demokratischer Institutionen
+beeinflussen, wahrscheinlich sind. Um diese Ursache möglicher
+Endogenität des Zusammenhangs \begin{align}
+  \text{Demokratisierung}_i = \beta_0 + \beta_1\,\text{PK-Einkommen}_i + \epsilon_i
+\end{align} zu adressieren, nutzen Acemoglu u.~a. (2008) einen
+Panel-Regressionsansatz ähnlich zu \begin{align}
+  \text{Demokratisierung}_{it} = \delta_i + \beta_1\,\text{PK-Einkommen}_{it} + \epsilon_{it}
+\end{align} mit Fixed Effects \(\delta_i\), die für länderspezifische
+zeitinvariante Faktoren kontrollieren.
+
+Das Kernergebnis von Acemoglu u.~a. (2008) ist, dass es \emph{keinen}
+kausalen Zusammenhang zwischen dem Einkommen (Wirtschaftswachstum) und
+der Demokratisierung gibt. Die Autoren zeigen, dass historische und
+geografische Faktoren, die sowohl das Einkommen als auch die politischen
+Institutionen beeinflussen, den beobachteten Zusammenhang verzerren
+können.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{acem }\OtherTok{\textless{}{-}}\NormalTok{ readxl}\SpecialCharTok{::}\FunctionTok{read\_xls}\NormalTok{(}
+  \StringTok{"\textasciitilde{}/Downloads/113251{-}V1/Income{-}and{-}Democracy{-}Data{-}AER{-}adjustment.xls"}\NormalTok{, }
+  \AttributeTok{sheet =} \StringTok{"5 Year Panel"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{acem }\OtherTok{\textless{}{-}}\NormalTok{ acem }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(}
+\NormalTok{    dplyr}\SpecialCharTok{::}\FunctionTok{between}\NormalTok{(year, }\DecValTok{1955}\NormalTok{, }\DecValTok{2000}\NormalTok{),}
+\NormalTok{    ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{arrange}\NormalTok{(year) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Pooling}
+\FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ fhpolrigaug }\SpecialCharTok{\textasciitilde{}} \FunctionTok{l}\NormalTok{(lrgdpch),}
+  \AttributeTok{panel.id =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ country }\SpecialCharTok{+}\NormalTok{ year,}
+  \AttributeTok{data =}\NormalTok{ acem, }
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: fhpolrigaug
+Observations: 1,008
+Standard-errors: Clustered (country) 
+               Estimate Std. Error  t value  Pr(>|t|)    
+(Intercept)   -1.268605   0.098971 -12.8180 < 2.2e-16 ***
+l(lrgdpch, 1)  0.226083   0.011740  19.2572 < 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.275957   Adj. R2: 0.411098
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{acem\_f }\OtherTok{\textless{}{-}}\NormalTok{ acem }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(year }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\DecValTok{1970}\NormalTok{, }\DecValTok{1995}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(code) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{dlrgdpch =} \FunctionTok{diff}\NormalTok{(lrgdpch),}
+    \AttributeTok{dfhpolrigaug =} \FunctionTok{diff}\NormalTok{(fhpolrigaug)}
+\NormalTok{    ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{drop\_na}\NormalTok{()}
+
+\FunctionTok{lm}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ dfhpolrigaug }\SpecialCharTok{\textasciitilde{}}\NormalTok{ dlrgdpch,}
+  \AttributeTok{data =}\NormalTok{ acem\_f}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{summary}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+
+Call:
+lm(formula = dfhpolrigaug ~ dlrgdpch, data = acem_f)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-0.9582 -0.1541 -0.1172  0.2081  0.7079 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)   
+(Intercept)  0.12629    0.04008   3.151  0.00214 **
+dlrgdpch     0.03298    0.06354   0.519  0.60486   
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.3422 on 101 degrees of freedom
+Multiple R-squared:  0.00266,   Adjusted R-squared:  -0.007214 
+F-statistic: 0.2694 on 1 and 101 DF,  p-value: 0.6049
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(}
+  \AttributeTok{data =}\NormalTok{ acem\_f,}
+  \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}
+    \AttributeTok{x =}\NormalTok{ dlrgdpch,}
+    \AttributeTok{y =}\NormalTok{ dfhpolrigaug}
+\NormalTok{  ) }
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =} \DecValTok{0}\NormalTok{, }\AttributeTok{lty =} \DecValTok{2}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_text}\NormalTok{(}
+    \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{label =}\NormalTok{ code),}
+    \AttributeTok{position =} \FunctionTok{position\_jitter}\NormalTok{(}
+      \AttributeTok{height =}\NormalTok{ .}\DecValTok{05}\NormalTok{, }
+      \AttributeTok{seed =} \DecValTok{1234}
+\NormalTok{      )}
+\NormalTok{    ) }\SpecialCharTok{+}
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{se =}\NormalTok{ F) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{x =} \StringTok{"Diff. Log(Pro{-}Kopf{-}BIP) (1970 {-} 1995)"}\NormalTok{,}
+    \AttributeTok{y =} \StringTok{"Diff. Demokratie{-}Index (1970 {-} 1995)"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_cowplot}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{FixedEffects_files/figure-pdf/unnamed-chunk-15-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# time + country fixed effects}
+\FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ fhpolrigaug }\SpecialCharTok{\textasciitilde{}} \FunctionTok{l}\NormalTok{(fhpolrigaug) }\SpecialCharTok{+} \FunctionTok{l}\NormalTok{(lrgdpch) }
+  \SpecialCharTok{|}\NormalTok{ year }\SpecialCharTok{+}\NormalTok{ country,}
+  \AttributeTok{panel.id =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ country }\SpecialCharTok{+}\NormalTok{ year,}
+  \AttributeTok{cluster =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ country,}
+  \AttributeTok{data =}\NormalTok{ acem, }
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: fhpolrigaug
+Observations: 955
+Fixed-effects: year: 9,  country: 150
+Standard-errors: Clustered (country) 
+                  Estimate Std. Error  t value   Pr(>|t|)    
+l(fhpolrigaug, 1) 0.377490   0.048071 7.852772 7.4009e-13 ***
+l(lrgdpch, 1)     0.008417   0.031587 0.266461 7.9025e-01    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.16588     Adj. R2: 0.748871
+                Within R2: 0.140859
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# time{-}fixed effects}
+\FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ fhpolrigaug }\SpecialCharTok{\textasciitilde{}} \FunctionTok{l}\NormalTok{(fhpolrigaug) }\SpecialCharTok{+} \FunctionTok{l}\NormalTok{(lrgdpch) }
+  \SpecialCharTok{|}\NormalTok{ year,}
+  \AttributeTok{panel.id =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ country }\SpecialCharTok{+}\NormalTok{ year,}
+  \AttributeTok{cluster =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ country,}
+  \AttributeTok{data =}\NormalTok{ acem, }
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: fhpolrigaug
+Observations: 955
+Fixed-effects: year: 9
+Standard-errors: Clustered (country) 
+                  Estimate Std. Error  t value   Pr(>|t|)    
+l(fhpolrigaug, 1) 0.702504   0.036023 19.50147  < 2.2e-16 ***
+l(lrgdpch, 1)     0.073042   0.009861  7.40714 8.8791e-12 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.191614     Adj. R2: 0.7178  
+                 Within R2: 0.705629
+\end{verbatim}
+
+\bookmarksetup{startatroot}
+
+\chapter{IV-Regression}\label{sec-IV}
 
 Wie in Kapitel Kapitel~\ref{sec-regression} erläutert, können
 Regressionsmodelle unter Endogenitätsproblemen leiden: Der Fehlerterm in
@@ -4138,15 +4548,16 @@ Behandlungsvariable (B) zur Outcomevariable (Y) und umgekehrt verläuft,
 gibt es Backdoors, die nicht durch das Hinzufügen von Kontrollvariablen
 zum Regressionsmodell geschlossen werden können.
 
-Eine allgemeinere Technik, um Backdoors mit Regression zu schließen, ist
-die Regression mit Instrumentvariablen (IV). Bei IV-Regression wird
-exogene Variation in einer Instrumentvariablen (Z) verwendet, um den
-Teil der Variation in der Behandlungsvariable zu isolieren, der
-\emph{nicht} durch unbeobachtbare Faktoren verursacht wird, die sowohl B
-als auch Y beeinflussion. Der kausale Effekt von B auf Y wird dann
-anhand dieser exogene Variation in B geschätzt. Ein Forschungsdesign, in
-dem der kausale Effekt von B auf Y mit IV-Regression geschätzt werden
-kann, ist in Abbildung~\ref{fig-IVDAG1} dargestellt.
+Eine allgemeinere Technik, um Backdoors aufgrund unbeobachtbarer
+Variablen zu schließen, ist die Regression mit Instrumentvariablen (IV).
+Bei IV-Regression wird exogene Variation in einer Instrumentvariablen
+(Z) verwendet, um den Teil der Variation in der Behandlungsvariable zu
+isolieren, der \emph{nicht} durch unbeobachtbare Faktoren verursacht
+wird, die sowohl B als auch Y beeinflussion. Der kausale Effekt von B
+auf Y wird dann anhand dieser exogene Variation in B geschätzt. Ein
+Forschungsdesign, in dem der kausale Effekt von B auf Y mit
+IV-Regression geschätzt werden kann, ist in Abbildung~\ref{fig-IVDAG1}
+dargestellt.
 
 \begin{figure}[t]
 
@@ -4187,7 +4598,8 @@ zu sein:
 \item
   \textbf{1. Relevanz des Instruments für die endogene Variable}
 
-  \(B\) und \(Z\) \emph{müssen} korreliert sein: \begin{align}
+  \(B\) und \(Z\) \emph{müssen} korreliert sein (Pfeil von Z nach B in
+  Abbildung~\ref{fig-IVDAG1}): \begin{align}
       \text{Cov}(B,Z) \neq 0 \label{eq:ivassum1}
     \end{align}
 \item
@@ -4195,7 +4607,8 @@ zu sein:
   Outcome-Variable}
 
   Das Instrument \(Z\) \emph{darf nicht} mit dem Fehlerterm \(u\) in der
-  Modellgleichung \eqref{eq:simpleiv} korreliert sein: \begin{align}
+  Modellgleichung \eqref{eq:simpleiv} korreliert sein (keine Pfade von Z
+  nach Y außer durch B in Abbildung~\ref{fig-IVDAG1}): \begin{align}
       \text{Cov}(Z,u) = 0 \label{eq:ivassum2}
     \end{align}
 \end{itemize}
@@ -4204,17 +4617,17 @@ Unter diesen Annahmen erlaubt das Forschungsdesign die Anwendung des
 einfachsten IV-Ansatzes, wobei eine endogene Variable \(B\) durch eine
 Instrumentvariable \(Z\) \emph{instrumentiert} wird. Die folgende
 Umformung zeigt, warum der kausale Effekt von B auf Y anhand der
-(Ko)Variation in diesen Variablen identifiziert werden kann.
+(Ko)Variation in diesen Variablen identifiziert werden kann:
 
-\begin{align}
-  \textup{Cov}(Z,Y) = &\, \textup{Cov}(Z,\beta_0 + \beta_1 B + u) \tag{Gl. \eqref{eq:simpleiv} einsetzen} \\
-  \notag\\
-  =&\, \textup{Cov}(Z, \beta_1 B + u) \tag{$\beta_0$ konstant} \\
-  \notag\\
-  =&\,\, \beta_1\textup{Cov}(Z,B) \tag{IV-Annahme 2} \\
-  \notag\\
-  \Leftrightarrow \beta_1 =&\, \frac{\textup{Cov}(Z,Y) }{\textup{Cov}(Z,B)} \tag{IV-Annahme 1}
-\end{align}
+\begin{alignat*}{2}
+  \textup{Cov}(Z,Y) &= \textup{Cov}(Z,\beta_0 + \beta_1 B + u) &\quad& \text{(Gl. \eqref{eq:simpleiv})} \\
+  \\
+  \textup{Cov}(Z,Y) &= \textup{Cov}(Z, \beta_1 B + u) &\quad& \text{($\beta_0$ konstant)} \\
+  \\
+  \textup{Cov}(Z,Y) &= \beta_1\textup{Cov}(Z,B) &\quad& \text{($\beta_1$ konstant, $Z$ exogen)} \\
+  \\
+  \beta_1 &= \frac{\textup{Cov}(Z,Y) }{\textup{Cov}(Z,B)} &\quad& \text{($Z$ relevant)}
+\end{alignat*}
 
 Eine naheliegende Implementierung gemäß dieses Identifikationsprinzips
 ist der einfache IV-Schätzer
@@ -4227,10 +4640,87 @@ wobei lediglich die Kovarianzfunktion \(\textup{Cov}(\cdot,\cdot)\)
 durch ihr Stichprobenäquivalent \(\widehat{\textup{Cov}}(\cdot,\cdot)\)
 ersetzt wird.
 
-\section{2SLS-Verfahren}\label{sls-verfahren}
+\textbf{Erwartungswert und Konsistenz}
 
-Der einfache IV-Schätzer \eqref{eq:simpleivest} im Kern ein
-Regressionsproblem handelt
+Eine hilfreiche Darstellung von \eqref{eq:simpleivest} ist
+
+\begin{align*}
+  \widehat{\beta}_\textup{IV} = \beta_1 + \frac{\sum_{i=1}^n (Z_i-\overline Z) u_i}{\sum_{i=1}^n (Z_i - \overline{Z})B_i}.
+\end{align*}
+
+Anhand dieser Form kann der Erwartungswert sowie das Verhalten für große
+Stichproben untersucht werden. Eine wichtige Eigenschaft ist
+
+\begin{align}
+  \textup{E}\big(\widehat{\beta}_\textup{IV}\big) = \beta_1 + \underbrace{\textup{E}\bigg(\frac{\sum_{i=1}^n (Z_i-\overline Z) u_i}{\sum_{i=1}^n (Z_i - \overline{Z})B_i}\bigg)}_{\neq0},\label{eq:ivbiasterm}
+\end{align}
+
+sodass \(\widehat{\beta}_\textup{IV}\) bei Endogenität von \(X\) ein
+\emph{verzerrter Schätzer} von \(\beta_1\) ist.\footnote{Beachte, dass
+  der endogene Regressor \(B_i\) mit \(u_i\) korreliert, sodass der
+  Erwartungswert des Bruchs in \eqref{eq:ivbiasterm} ungleich \(0\) ist.}
+Glücklicherweise kann man zeigen, dass
+
+\begin{align*}
+  \frac{\sum_{i=1}^n (Z_i-\overline Z) u_i}{\sum_{i=1}^n (Z_i - \overline{Z})B_i}\to 0 \quad \text{für} \quad n\to\infty
+\end{align*}
+
+bei Gültigkeit der IV-Annahmen \eqref{eq:ivassum1} und
+\eqref{eq:ivassum2}, d.h. \(\widehat{\beta}_\textup{IV}\) ist ein
+\emph{konsistener} Schätzer für \(\beta_1\),
+
+\begin{align*}
+  \widehat{\beta}_\textup{IV} \to \beta_1 \quad \text{für} \quad n\to\infty.
+\end{align*}
+
+\textbf{Schwache Instrumente}
+
+Beachte, dass die Annahme der Relevanz des Instruments für die
+Herleitung des Identifikationsprinzips und des Schätzers
+\eqref{eq:simpleivest} von entscheidender Bedeutung ist: Sind \(Z\) und
+\(B\) unkorreliert, so ist \(\text{Cov}(B,Z) = 0\) und \(\beta_1\) damit
+nicht identifizierbar. Weiterhin würde \(\widehat{\text{Cov}}(B,Z)\to0\)
+wenn \(n\to\infty\), sodass \(\widehat{\beta}_{\textup{IV}}\to\infty\)!
+
+In empirischen Anwendungen ist \(\text{Cov}(B,Z) = 0\) unwahrscheinlich.
+Die Kovarianz von \(B\) und \(Z\) kann jedoch gering sein. In diesem
+Fall bezeichnet man \(Z\) als ein \emph{schwaches Instrument}. Anhand
+von Gleichung \eqref{eq:simpleivest} können wir die Konsequenzen der
+Verwendung eines schachen Instruments ableiten: Ein sehr schwacher
+linearer Zusammenhang von \(B\) und \(Z\) --- und damit tendenziell
+\(\widehat{\text{Cov}}(B,Z) \approx 0\) --- kann trotz Relevanz von
+\(Z\) zu einem Schätzer mit großer Varianz führen.
+
+Die Relevanz eines Instruments kann mit einem Hypothesentests geprüft
+werden. Wie die ``Stärke'' eines Instruments beurteilt werden sollte,
+ist eine nicht-triviale Frage. Wir betrachten diesen Aspekt näher in
+Kapitel~\ref{sec-2SLS}.
+
+\subsection{Identifizierbarer
+Behandlungseffekt}\label{identifizierbarer-behandlungseffekt}
+
+Regression ermöglicht in der Regel die Schätzung eines
+durchschnittlichen Behandlungseffekts (ATE) für eine betrachtete
+Population mit heterogenen Behandlungseffekten (in Modell
+\eqref{eq:simpleiv} unterstellen wir den empirisch unwahrscheinlichen
+Fall eines einheitlichen kausalen Effekts \(\beta_1\)). Das Adjustieren
+für Endogenität mit IV-Regression hat hier einen Preis: Beachte, dass im
+IV-Design ein Teil der beobachteten Variation der Behandlungsvariable
+\(B\) (wie in \eqref{eq:simpleiv} angenommen) endogen ist und wir den
+Effekt von \(B\) auf \(Y\) anhand der \emph{exogenen} Variation eines
+validen Instruments \(Z\) schätzen. Daher können wir grundsätzlich nur
+einen \emph{lokalen} durchschnittlichen Behandlungseffekt (LATE)
+identifizieren: Der LATE ist eine gewichtete Variante des ATE, wobei
+Beobachtungen, deren Behandlung gut durch \(Z\) erklärt wird den größten
+Einfluss haben.\footnote{Siehe Kapitel 10 und 19 in Huntington-Klein
+  (2021) für nicht-technische Erläuterungen und Beispiel zu LATE.}
+
+\section{2SLS-Verfahren}\label{sec-2SLS}
+
+Der einfache IV-Schätzer \eqref{eq:simpleivest} ist ein Spezialfall
+eines allgemeineren Regressionsverfahrens, das in zwei Schritten
+Durchgeführt wird. Im fall von Modell \eqref{eq:simpleiv} erfolgt die
+Schätzung anhand der folgenden einfachen Regressionen:
 
 \begin{itemize}
 \item
@@ -4253,13 +4743,15 @@ Regressionsproblem handelt
   geschätzten Werte \(\widehat{B}_i\) aus der 1. Stufe: \begin{align}
       Y_i = \gamma_0 + \gamma_1 \widehat{B}_i + e_i.
     \end{align} Der geschätzte Koeffizient \(\widehat{\gamma}_1\) aus
-  dieser Regression ist der 2SLS-Schätzer von \(\beta_1\)
+  dieser Regression ist der Two-Stage-Least-Squares-Schätzer
+  (2SLS-Schätzer) von \(\beta_1\).
 \end{itemize}
 
-\textbf{Äquivalenz von 2SLS und einfacher IV-Schätzer}
+\subsection{Äquivalenz von 2SLS und einfacher
+IV-Schätzer}\label{sec-equiviv}
 
 Der KQ-Schätzer von \(\gamma_1\) in der 2. Stufe ist \begin{align}
-  \widehat{\gamma}_1 = \frac{\sum (\widehat{B}_i - \overline{\widehat{B}})(Y_i - \bar{Y})}{\sum (\widehat{B}_i - \bar{\widehat{B}})^2}.
+  \widehat{\gamma}_1 = \frac{\sum (\widehat{B}_i - \overline{\widehat{B}})(Y_i - \bar{Y})}{\sum (\widehat{B}_i - \bar{\widehat{B}})^2} = \frac{\widehat{\text{Cov}}(\widehat{B}, Y)}{\widehat{\textup{Var}}(\widehat{B}_i)}.
 \end{align} Da
 \(\widehat{B}_i = \widehat{\alpha}_0 + \widehat{\alpha}_1 Z_i\), die
 angepassten Werte aus der 1. Stufe, eine lineare Funktion von \(Z_i\)
@@ -4279,14 +4771,74 @@ Der KQ-Schätzer von \(\widehat{\alpha}_1\) in der 1. Stufe ist definiert
 als
 \(\widehat{\alpha}_1 = \frac{\widehat{\text{Cov}}(Z, B)}{\widehat{\text{Var}}(Z)}\).
 Somit gilt \begin{align}
-  \widehat{\gamma}_1 = \frac{\widehat{\text{Cov}}(Z, Y)}{\frac{\widehat{\text{Cov}}(Z, B)}{\widehat{\text{Var}}(Z)} \widehat{\text{Var}}(Z)} = \frac{\widehat{\text{Cov}}(Z, Y)}{\widehat{\text{Cov}}(Z, B)} = \widehat{\beta}_{\textup{IV}}.
+  \widehat{\gamma}_1 = \frac{\widehat{\text{Cov}}(Z, Y)}{\frac{\widehat{\text{Cov}}(Z, B)}{\widehat{\text{Var}}(Z)} \widehat{\text{Var}}(Z)} = \frac{\widehat{\text{Cov}}(Z, Y)}{\widehat{\text{Cov}}(Z, B)} = \widehat{\beta}_{\textup{IV}}.\label{eq:equiviv}
 \end{align}
 
-In ökonometrischen Softwarepaketen
+\subsection{Wozu 2SLS?}\label{wozu-2sls}
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics[width=5in,height=4in]{IV_files/figure-latex/dot-figure-4.png}
+
+}
+
+\caption{\label{fig-2SLSDAG}IV-Design mit beobachtbaren Confoundern}
+
+\end{figure}%
+
+In der Praxis werden IV-Schätzungen mit statistischer Software häufig
+anhand einer Implementierung des 2SLS-Verfahren durchgeführt. Gründe
+hierfür sind:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Bedingte Exogenität}. Für den in Abbildung~\ref{fig-IVDAG1}
+  dargestellten DGP ist die Exogenität von Z gegeben. In empirischen
+  Anwendungen kann es jedoch schwierig sein, ein Instrument Z zu finden,
+  dass plausibel nur mit dem endogenen Regressor korreliert. Eine
+  schwächere Bedingung als Exogenität ist Exogenität nach Kontrolle für
+  \emph{beobachtbare} gemeinsame Determinanten (X) von Z und
+  Y.\footnote{Formal: \(\textup{Cov}(Z,u\vert X) = 0\).}
+
+  Diese Situation ist in Abbildung~\ref{fig-2SLSDAG} dargestellt:
+  Aufgrund der Pfeile von X zu Z und Y ist die Bedingung
+  \eqref{eq:ivassum2} verletzt. Durch Kontrolle für X in \emph{beiden}
+  Regressionen des 2SLS-Verfahrens können die Pfade durch X geschlossen
+  werden.
+\item
+  \textbf{Mehrere endogene Variablen / Instrumente}. Der 2SLS-Ansatz
+  kann leicht für mehrere endogene Variablen (und mehrere
+  Instrumentvariablen) erweitert werden. Für jede der endogenen
+  Variablen erfolgt hierbei eine separate Regression in der ersten Stufe
+  des 2SLS-Verfahrens, wobei jeweils mehrere Instrumente verwendet
+  werden und zusätzlich für beobachtbare Kovariablen X kontrolliert
+  werden kann.
+\item
+  \textbf{Statistische Inferenz}. Die Berechnung von
+  \(\widehat{\beta}_\textup{IV}\) erfordert Sorgfalt bei der
+  Konstruktion von Inferenzstatistiken. Die in Kapitel~\ref{sec-equiviv}
+  gezeigte Äquivalenz impliziert, dass wir bei der Schätzung der
+  Variabilität von \(\widehat{\beta}_\textup{IV}\) die Unsicherheit aus
+  den beiden KQ-Schätzungen des 2SLS-Verfahrens berücksichtigen müssen.
+  Korrigierte Standardfehlerformeln können vergleichsweise einfach
+  anhand der Regressionsdarstellung hergeleitet werden und sind
+  statistischer Software implementiert (bspw. \texttt{ivreg} in R).
+
+  Weiterhin ermöglicht das Regressions-Framework diagnostische Tests. So
+  kann die Relevanz von Instrumenten anhand von F-Tests für die
+  Koeffizienten in den Regressionen der ersten Stufe des 2SLS-Verfahrens
+  überprüft werden. Sofern mehr Instrumente als endogene Variablen
+  vorliegen, kann die Exogenität der Instrumente getestet werden.
+\end{enumerate}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
-Der im nachfolgenden interaktiven Beispiel betrachtete DGP ist
+\textbf{Interaktive Illustrationen des 2SLS-Verfahren}
+
+Der DGP im nachfolgenden interaktiven Beispiel ist
 
 \begin{align}
   \begin{split}
@@ -4294,8 +4846,8 @@ Der im nachfolgenden interaktiven Beispiel betrachtete DGP ist
     Y_i =&\, \beta_1 \cdot X_i + u_i,
   \end{split}
   \label{eq:OJSIVDGP}
-\end{align} wobei \(Z_i \sim N(0, .25^2)\) ist. Die Fehlerterme \(v_i\)
-und \(u_i\) sind \(N(0,1)\)-verteilt und folgen einer gemeinsam
+\end{align} wobei \(Z_i \sim N(0, .25^2)\). Die Fehlerterme \(v_i\) und
+\(u_i\) sind \(N(0,1)\)-verteilt und folgen einer gemeinsam
 Normalverteilung mit Korrelationsparameter \(\rho\), \begin{align}
 \begin{pmatrix}
 v_i \\ u_i
@@ -4318,26 +4870,26 @@ Beobachtungen von \((X_i, Y_i, Z_i)\) verwenden.
 
 Beachte, dass \(X_i\) eine Funktion der (exogenen) Variable \(Z_i\) und
 des Fehlerterms \(v_i\) ist. Wenn die Fehlerterme \((v_i, u_i)’\) im DGP
-\eqref{eq:OJSIVDGP} korreliert sind (\(\rho\neq0\)), dann gibt es eine
+\eqref{eq:OJSIVDGP} korreliert sind (\(\rho\neq0\)), dann besteht
 Korrelation zwischen \(X_i\) und \(u_i\). Dies impliziert, dass \(X\)
-ein endogener Regressor im ``naiven'' Regressionsmodell ist
-\begin{align}
-Y_i = \beta_0 + \beta_1 X_i + e_i, \quad i = 1,\dots,N,
-\end{align} und daher wird der KQ-Schätzer von \(\beta_1\) verzerrt und
-inkonsistent sein!
+ein endogener Regressor im ``naiven'' Regressionsmodell \begin{align}
+Y_i = \beta_0 + \beta_1 X_i + e_i, \quad i = 1,\dots,N.
+\end{align} Der KQ-Schätzer von \(\beta_1\) ist dann \emph{verzerrt und
+inkonsistent}.
 
 Wenn \(Z\) Erklärungskraft für \(X\) hat, d.h. \(\gamma\neq0\) mit
-\(|\gamma|\) nicht zu klein (\(Z\) ist relevant), und \(Z\) nur über
-\(X\) auf \(Y\) wirkt (\(Z\) ist exogen in der Gleichung von \(Y_i\)),
-dann ist die Instrumentvariablen-Regression eine Möglichkeit,
-\(\beta_1\) konsistent zu schätzen.
+\(|\gamma|\) nicht zu klein gewählt ist (\(Z\) ist relevant), und \(Z\)
+nur über \(X\) auf \(Y\) wirkt (\(Z\) ist exogen in der Gleichung von
+\(Y_i\)), dann kann der kausale Effekt von \(X\) auf \(Y\) anhand einer
+Instrumentvariablen-Regression mit \(Z\) konsistent geschätzt werden.
 
-Zweistufen-Kleinste-Quadrate (2SLS)
+Die folgende Interaktive Grafik berechnet den 2SLS-Schätzer Analog zu
+der in Kapitel~\ref{sec-2SLS} erläuterten Vorgehensweise:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  Erste Stufe: Schätzen Sie das lineare Regressionsmodell
+  Schätze das Regressionsmodell
 
   \begin{align}
    X_i = \alpha_0 + \alpha_1 \cdot Z_i + \epsilon_i
@@ -4345,22 +4897,251 @@ Zweistufen-Kleinste-Quadrate (2SLS)
   \(\widehat{X}_i\). Dieser Schritt isoliert die exogene Variation in
   \(X_i\), die auf \(Z_i\) zurückzuführen ist.
 \item
-  Zweite Stufe: Schätzen Sie den Effekt von \(X\) auf \(Y\) unter
-  Verwendung von \(\widehat{X}_i\), dem exogenen Teil von \(X_i\) aus
-  Schritt 1, mittels der linearen Regression
+  Schätze den Effekt von \(X\) auf \(Y\) unter Verwendung von
+  \(\widehat{X}_i\), dem exogenen Teil von \(X_i\) aus 1., in der
+  Regression
 
   \begin{align}
    Y_i = \delta_0 + \delta_1 \cdot \widehat{X}_i  + \varepsilon_i.
    \end{align} Der KQ-Schätzer \(\widehat{\delta}_1\) von \(\delta_1\)
-  ist der konsistente 2SLS-Schätzer von \(\beta_1\).
+  ist der 2SLS-Schätzer von \(\beta_1\).
 \end{enumerate}
+
+Die Grafik illustriert das Verhalten des IV-Schätzers (lila Grade) im
+Vergleich zum KQ-Schätzer (gestrichelte Grade) und zum wahren
+Zusammenhang (grüne Grade) für \emph{eine} simulierte Stichprobe
+(gegeben der gewählten Parameter) anhand der geschätzten
+Regressionslinien. Die voreingestellten Parameter-Kombinationen zeigen
+
+\begin{itemize}
+\tightlist
+\item
+  die Verzerrung von 2SLS, wenn \(Z\) ein schwaches Instrument für \(X\)
+  ist,
+\item
+  eine Situation in der \(X\) exogen ist (KQ ist unverzerrt), was zu
+  vergleichbaren Schätzungen führt (sofern \(Z\) kein Schwaches
+  Instrument ist)
+\item
+  eine starke Verzerrung von KQ, wenn \(X\) endogen und irrelevant
+  (\(\beta_1 = 0\)) ist.
+\end{itemize}
+
+Anhand der obigen interaktiven Grafik lässt sich zwar die Verzerrung der
+Schätzer einschätzen, jedoch nicht die Unsicherheit der Schätzung. Um
+die gesamte Verteilung der Schätzer in endlichen Stichproben zu
+illustrieren, zeigt die nachstehende Grafik Kerndichteschätzungen
+basierend auf \(N\) simulierte Stichproben der Größe \(n\) für den
+gewählten DGP.\footnote{Beachte, dass die Simulation insbesondere für
+  große \(N\) und \(n\) einige Sekunden dauern kann (grauer Balken am
+  linken Rand zeigt laufende Berechnung an).} Die Applikation gibt
+weiterhin den R-Code für eine Simulation der Daten gemäß der gewählten
+Parameter aus.
+
+Die voreingestellten Parameter-Kombinationen zeigen:
+
+\begin{itemize}
+\tightlist
+\item
+  Wenn \(Z\) ein schwaches Instrument ist, kann der IV-Schätzer verzerrt
+  sein \emph{und} eine deutlich größere Varianz als der KQ-Schätzer
+  haben.
+\item
+  Wenn \(X\) exogen ist, hat der IV-Schätzer eine größere Varianz als
+  der KQ-Schätzer.
+\item
+  Wenn die Endogenität von \(X\) ``stark'' ist (hohe Korrelation von
+  \(u\) und \(v\)), kann der IV-Schätzer auch in kleinen Stichproben
+  hilfreich sein: IV hat eine deutlich geringere Verzerrung als KQ, aber
+  eine größere Varianz.
+\end{itemize}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(faux) }\CommentTok{\# install.packages("faux")}
+
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{1234}\NormalTok{)}
+
+\NormalTok{n }\OtherTok{\textless{}{-}} \DecValTok{1000}
+
+\NormalTok{errors }\OtherTok{\textless{}{-}} \FunctionTok{rnorm\_multi}\NormalTok{(}
+\NormalTok{    n, }\AttributeTok{mu =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{), }\AttributeTok{sd =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{),}
+    \AttributeTok{r =} \SpecialCharTok{{-}}\FloatTok{0.8}\NormalTok{, }\AttributeTok{varnames =} \FunctionTok{c}\NormalTok{(}\StringTok{"u"}\NormalTok{, }\StringTok{"v"}\NormalTok{), }
+\NormalTok{)}
+
+\NormalTok{Z }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(n, }\AttributeTok{sd =}\NormalTok{ .}\DecValTok{25}\NormalTok{)}
+\NormalTok{X }\OtherTok{\textless{}{-}} \DecValTok{2} \SpecialCharTok{*}\NormalTok{ Z }\SpecialCharTok{+}\NormalTok{ errors}\SpecialCharTok{$}\NormalTok{v}
+\NormalTok{Y }\OtherTok{\textless{}{-}} \DecValTok{0} \SpecialCharTok{*}\NormalTok{ X }\SpecialCharTok{+}\NormalTok{ errors}\SpecialCharTok{$}\NormalTok{u}
+
+\NormalTok{the\_data }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(X, Y)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(cowplot)}
+
+\NormalTok{the\_data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Xhat =} \FunctionTok{lm}\NormalTok{(X }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Z)}\SpecialCharTok{$}\NormalTok{fitted) }\SpecialCharTok{\%\textgreater{}\%}
+  
+  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ X, }\AttributeTok{y =}\NormalTok{ Y)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{geom\_smooth}\NormalTok{(}
+    \AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }
+    \AttributeTok{se  =} \ConstantTok{FALSE}\NormalTok{, }
+    \AttributeTok{col =} \StringTok{"red"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{geom\_hline}\NormalTok{(}
+    \AttributeTok{yintercept =} \DecValTok{0}\NormalTok{, }
+    \AttributeTok{col =} \StringTok{"darkgreen"}
+\NormalTok{    ) }\SpecialCharTok{+}
+  \FunctionTok{geom\_smooth}\NormalTok{(}
+    \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ Xhat, }\AttributeTok{y =}\NormalTok{ Y), }
+    \AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }
+    \AttributeTok{se  =} \ConstantTok{FALSE}\NormalTok{,}
+    \AttributeTok{col =} \StringTok{"steelblue"}
+\NormalTok{    ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_cowplot}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{IV_files/figure-pdf/unnamed-chunk-5-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(AER)}
+
+\NormalTok{KQ\_mod\_sim }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ Y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ X,}
+  \AttributeTok{data =}\NormalTok{ the\_data}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(KQ\_mod\_sim)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+
+Call:
+lm(formula = Y ~ X, data = the_data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2.10480 -0.48829  0.00025  0.49527  2.42887 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.01074    0.02254   0.476    0.634    
+X           -0.64579    0.02025 -31.889   <2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.7128 on 998 degrees of freedom
+Multiple R-squared:  0.5047,    Adjusted R-squared:  0.5042 
+F-statistic:  1017 on 1 and 998 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ivreg)}
+
+\NormalTok{iv\_mod\_sim }\OtherTok{\textless{}{-}} \FunctionTok{ivreg}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ Y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ X }\SpecialCharTok{|}\NormalTok{ Z,}
+  \AttributeTok{data =}\NormalTok{ the\_data}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(iv\_mod\_sim)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+
+Call:
+ivreg(formula = Y ~ X | Z, data = the_data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-3.24501 -0.67660  0.01894  0.69021  3.52318 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)
+(Intercept)  0.020535   0.031863   0.644    0.519
+X           -0.007139   0.059949  -0.119    0.905
+
+Diagnostic tests:
+                 df1 df2 statistic p-value    
+Weak instruments   1 998     294.5  <2e-16 ***
+Wu-Hausman         1 997     415.3  <2e-16 ***
+Sargan             0  NA        NA      NA    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 1.007 on 998 degrees of freedom
+Multiple R-Squared: 0.0111, Adjusted R-squared: 0.01011 
+Wald test: 0.01418 on 1 and 998 DF,  p-value: 0.9052 
+\end{verbatim}
+
+\section{Beispiel: Der schwache Staat, die Bauern und die
+Mafia}\label{beispiel-der-schwache-staat-die-bauern-und-die-mafia}
+
+Acemoglu, De Feo, und De Luca (2020) untersuchen den Aufstieg und die
+Auswirkungen der sizilianischen Mafia gegen Ende des 19. Jahrhunderts.
+Die Studie argumentiert, dass das Wachstum der Mafia teilweise auf das
+Aufkommen sozialistischer Bauern-Organisationen (Fasci siciliani)
+zurückzuführen ist, die in einem Umfeld schwacher staatlicher Präsenz
+die Rechte der Bauern verteidigten. Grundbesitzer, Verwalter und lokale
+Politiker wandten sich also an die Mafia, um diese sozialistische
+``Bedrohung'' zu bekämpfen und die Kontrolle über die landwirtschaftlich
+arbeitende Bevölkerung zu behalten. Die Studie identifiziert einen
+signifikanten (positiven) kausalen Zusammenhang zwischen dem Aufstieg
+der Fasci und der Ausbreitung der Mafia in Sizilien.
+
+\subsection{Identifikationsstrategie}\label{identifikationsstrategie}
+
+Die Beziehung zwischen dem Aufkommen der Fasci und der Mafia-Aktivität
+im einfachen Regressionsmodell \begin{align}
+  \textup{Mafia-Aktivität} = \beta_0 + \beta_1 \textup{Fasci siciliani} + \varepsilon \label{eq:fascimafiamod1}
+\end{align} ist aufgrund mehrerer Faktoren endogen:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Externe Faktoren}, die sowohl die Entstehung der Fasci
+  siciliani als auch der Mafia beeinflussen sind wahrscheinlich.
+  Beispielsweise könnten wirtschaftliche Notlagen oder politische
+  Instabilität sowohl die Organisation der Bauern als auch die
+  Etablierung der Mafia begünstigen.
+\item
+  \textbf{Simultante Kasalität}: Die Präsenz der Fasci könnte die
+  Mafia-Aktivitäten beeinflussen und umgekehrt: Intensive
+  Mafia-Aktivitäten könnten die Notwendigkeit für Bauernorganisationen
+  erhöhen, was wiederum die Mafia stärkt. Außerdem erschwert die
+  zeitliche Nähe zwischen der Entstehung der Fasci und der Verbreitung
+  der Mafia die Identifizierung der Kausalrichtung.
+\end{enumerate}
+
+Wir können das Modell \eqref{eq:fascimafiamod1} um (messbare) unter 1.
+fallende Regressoren erweitern, um einer verzerrten Schätzung aufgrund
+relevanter ausgelassener Variablen vorzubeugen. Eine Verzerrung aufgrund
+der in 2. beschriebenen simultanen Kausalität kann jedoch \emph{nicht}
+durch multiple Regression vermieden werden.
+
+Acemoglu, De Feo, und De Luca (2020) nutzen die folgende
+Identifikationsstrategie: Eine extreme Dürre im Jahr 1893 (insbesondere
+Regenausfall im Frühlung) hatte einen erheblichen negativen Einfluss auf
+die landwirtschaftliche Produktion in Sizilien und verursachte große Not
+unter den Bauern, was die Entstehung der Fasci beförderte. Die Dürre
+kann als natürliches Experiment betrachtet werden, wobei durch die
+Variation in der Niederschlagsmenge (das Instrument) die Variation im
+Aufkommen von Fasci-Organisationen in verschiedenen Gemeinden isoliert
+werden kann, die unabhängig von der späteren Mafia-Aktivität ist. Anhand
+dieser exogenen Variation im Organisationsgrad der Bauern kann der
+Effekt auf die Entwicklung der Mafia identifiziert werden.
+
 \section{Case Study: Ökonomische Schocks und
 Bürgerkriege}\label{case-study-uxf6konomische-schocks-und-buxfcrgerkriege}
-
-\texttt{\textasciigrave{}r\ 1+2\textasciigrave{}}
 
 Ein Kernproblem bei der Schätzung der kausalen Beziehung zwischen
 wirtschaftlichen Schocks und dem Auftreten von kriegerischen
@@ -4871,7 +5652,7 @@ FE: ccode &  &  & X & X & X \\
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IV_files/figure-pdf/unnamed-chunk-17-1.pdf}
+\includegraphics{IV_files/figure-pdf/unnamed-chunk-22-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4970,7 +5751,7 @@ RMSE: 0.204541     Adj. R2: 0.661198
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IV_files/figure-pdf/unnamed-chunk-21-1.pdf}
+\includegraphics{IV_files/figure-pdf/unnamed-chunk-26-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -5564,7 +6345,7 @@ globalen ATT zusammengefasst werden können.\footnote{Die Methoden von
   Callaway und Sant'Anna (2021) sind im R-Paket \texttt{did}
   implementiert.}
 
-\begin{tcolorbox}[enhanced jigsaw, bottomtitle=1mm, colbacktitle=quarto-callout-note-color!10!white, coltitle=black, arc=.35mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum einfachen DID-Schätzer}, titlerule=0mm, opacityback=0, breakable, bottomrule=.15mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, toptitle=1mm, rightrule=.15mm, leftrule=.75mm, left=2mm, colback=white]
+\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, titlerule=0mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum einfachen DID-Schätzer}, colframe=quarto-callout-note-color-frame, opacitybacktitle=0.6, rightrule=.15mm, breakable, bottomrule=.15mm, colback=white, bottomtitle=1mm, opacityback=0, arc=.35mm, colbacktitle=quarto-callout-note-color!10!white, toprule=.15mm, toptitle=1mm, coltitle=black]
 
 \begin{itemize}
 \item
@@ -10979,7 +11760,7 @@ Erklärungskraft werden durch die Regularisierung in Richtung 0 gezwungen
 und reduzieren so die Varianz der Vorhersage gegenüber der
 (idealerweise) unverzerrten KQ-Schätzung.
 
-\begin{tcolorbox}[enhanced jigsaw, bottomtitle=1mm, colbacktitle=quarto-callout-note-color!10!white, coltitle=black, arc=.35mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Ridge Regression}, titlerule=0mm, opacityback=0, breakable, bottomrule=.15mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, toptitle=1mm, rightrule=.15mm, leftrule=.75mm, left=2mm, colback=white]
+\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, titlerule=0mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Ridge Regression}, colframe=quarto-callout-note-color-frame, opacitybacktitle=0.6, rightrule=.15mm, breakable, bottomrule=.15mm, colback=white, bottomtitle=1mm, opacityback=0, arc=.35mm, colbacktitle=quarto-callout-note-color!10!white, toprule=.15mm, toptitle=1mm, coltitle=black]
 
 \begin{itemize}
 \item
@@ -11554,7 +12335,7 @@ und damit zu einer höheren Vorhersagegüte. Das ``sparsame'' mit
 Lasso-Regression geschätzte Modell ist dem ``großen'' mit KQ geschätztem
 Modell in dieser Hinsicht also überlegen.
 
-\begin{tcolorbox}[enhanced jigsaw, bottomtitle=1mm, colbacktitle=quarto-callout-note-color!10!white, coltitle=black, arc=.35mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Lasso-Regression}, titlerule=0mm, opacityback=0, breakable, bottomrule=.15mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, toptitle=1mm, rightrule=.15mm, leftrule=.75mm, left=2mm, colback=white]
+\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, titlerule=0mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Lasso-Regression}, colframe=quarto-callout-note-color-frame, opacitybacktitle=0.6, rightrule=.15mm, breakable, bottomrule=.15mm, colback=white, bottomtitle=1mm, opacityback=0, arc=.35mm, colbacktitle=quarto-callout-note-color!10!white, toprule=.15mm, toptitle=1mm, coltitle=black]
 
 \begin{itemize}
 \item
@@ -12526,7 +13307,7 @@ Der Post-Double-Selection-Schätzer liefert unter den betrachteten
 Verfahren die beste Schätzung von \(\alpha_0\) und erlaubt gülstige
 statistische Inferenz. Der geschätzte Effekt ist hoch-signifikant.
 
-\begin{tcolorbox}[enhanced jigsaw, bottomtitle=1mm, colbacktitle=quarto-callout-note-color!10!white, coltitle=black, arc=.35mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum Post-Double-Selection-Schätzer}, titlerule=0mm, opacityback=0, breakable, bottomrule=.15mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, toptitle=1mm, rightrule=.15mm, leftrule=.75mm, left=2mm, colback=white]
+\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, titlerule=0mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum Post-Double-Selection-Schätzer}, colframe=quarto-callout-note-color-frame, opacitybacktitle=0.6, rightrule=.15mm, breakable, bottomrule=.15mm, colback=white, bottomtitle=1mm, opacityback=0, arc=.35mm, colbacktitle=quarto-callout-note-color!10!white, toprule=.15mm, toptitle=1mm, coltitle=black]
 
 \begin{itemize}
 \item
@@ -12959,10 +13740,10 @@ nicht behandelt worden wäre, repräsentiert durch die synthetische
 Kontrollgruppe.
 
 Der SCM-Schätzer von A. D. Abadie Alberto und Hainmueller (2010) ist im
-R-Paket \texttt{Synth} (\textbf{Hainmuelleretal2011?}) implementiert.
-Wir illustrieren die Methode nachfolgend mit einer empirischen Anwendung
-zu den Konsequenzen des Brexit auf die nachfolgende Entwicklung der
-britischen Volkswirtschaft.
+R-Paket \texttt{Synth} (Hainmueller, Diamond, und Abadie 2011)
+implementiert. Wir illustrieren die Methode nachfolgend mit einer
+empirischen Anwendung zu den Konsequenzen des Brexit auf die
+nachfolgende Entwicklung der britischen Volkswirtschaft.
 
 \section{Case Study: Ökonomische Kosten des
 Brexit}\label{case-study-uxf6konomische-kosten-des-brexit}
@@ -14155,10 +14936,21 @@ Inference.``} \emph{Journal of the American Statistical Association} 117
 
 \bibitem[\citeproctext]{ref-Abadieetal2010}
 Abadie, Alexis Diamond, Alberto, und Jens Hainmueller. 2010. {„Synthetic
-Control Methods for Comparative Case Stud- ies: Estimating the Effect of
+Control Methods for Comparative Case Studies: Estimating the Effect of
 California's Tobacco Control Program.``} \emph{Journal of the American
 Statistical Association} 105 (490): 493--505.
 \url{https://doi.org/10.1198/jasa.2009.ap08746}.
+
+\bibitem[\citeproctext]{ref-Acemogluetal2020}
+Acemoglu, Daron, Giuseppe De Feo, und Giacomo Davide De Luca. 2020.
+{„Weak States: Causes and Consequences of the Sicilian Mafia``}.
+\emph{The Review of Economic Studies}.
+\url{https://doi.org/10.1093/restud/rdz009}.
+
+\bibitem[\citeproctext]{ref-Acemogluetal2008}
+Acemoglu, Daron, Simon Johnson, James A. Robinson, und Pierre Yared.
+2008. {„Income and Democracy``}. \emph{American Economic Review} 98 (3):
+808--42. \url{https://doi.org/10.1257/aer.98.3.808}.
 
 \bibitem[\citeproctext]{ref-Adireksombat2010}
 Adireksombat, Kampon. 2010. {„The Effects of the 1993 Earned Income Tax
@@ -14244,6 +15036,10 @@ Statistical Association} 115 (531): 1449--55.
 Cortez, Paulo, und Alice Maria Gonçalves Silva. 2008. {„Using data
 mining to predict secondary school student performance``}.
 
+\bibitem[\citeproctext]{ref-Dahl1971}
+Dahl, Robert Alan. 1971. \emph{Polyarchy: Participation and Opposition:
+Participation and opposition}. New Haven: Yale Univ. Press.
+
 \bibitem[\citeproctext]{ref-DiTellaSchargrodsky2004}
 Di Tella, Rafael, und Ernesto Schargrodsky. 2004. {„Do Police Reduce
 Crime? Estimates Using the Allocation of Police Forces After a Terrorist
@@ -14285,6 +15081,12 @@ Multivariate Reweighting Method to Produce Balanced Samples in
 Observational Studies``}. \emph{Political Analysis} 20 (1): 25--46.
 \url{https://doi.org/10.1093/pan/mpr025}.
 
+\bibitem[\citeproctext]{ref-Hainmuelleretal2011}
+Hainmueller, Jens, Alexis Diamond, und Alberto Abadie. 2011. {„Synth: An
+R Package for Synthetic Control Methods in Comparative Case Studies``}.
+\emph{Journal of Statistical Software} 42 (13): 1--17.
+\url{https://www.jstatsoft.org/v42/i13/}.
+
 \bibitem[\citeproctext]{ref-Hajek1971}
 Hájek, J. 1971. {„Comment on {‚An essay on the logical foundations of
 survey sampling`} by Basu, D``}. \emph{Foundations of Statistical
@@ -14306,6 +15108,16 @@ Score.``} \emph{Econometrica} 71 (4): 1161--89.
 Hoerl, Arthur E, und Robert W Kennard. 1970. {„{Ridge regression: Biased
 estimation for nonorthogonal problems}``}. \emph{Technometrics} 12 (1):
 55--67.
+
+\bibitem[\citeproctext]{ref-Huntington1991}
+Huntington, Samuel P. 1991. \emph{The Third Wave: Democratization in the
+Late Twentieth Century: Democratization in the late twentieth century}.
+Norman, OK: Univ. of Oklahoma Press.
+
+\bibitem[\citeproctext]{ref-Huntington-Klein2021}
+Huntington-Klein, Nick. 2021. \emph{The Effect: An Introduction to
+Research Design and Causality}. Chapman; Hall/CRC.
+\url{https://doi.org/10.1201/9781003226055}.
 
 \bibitem[\citeproctext]{ref-AbadieImbens2016}
 Imbens. 2016. {„Matching on the Estimated Propensity Score.``}
@@ -14347,6 +15159,10 @@ Rosenbaum, Paul R., und Donald R. Rubin. 1983. {„The central role of the
 propensity score in observational studies for causal effects``}.
 \emph{Biometrika} 70 (1): 170--84.
 \url{https://doi.org/10.1017/cbo9780511810725.016}.
+
+\bibitem[\citeproctext]{ref-Rueschemeyer1992}
+Rueschemeyer, Dietrich, Evelyne H. Stephens, und John D. Stephens. 1992.
+\emph{Capitalist development and democracy}. Cambridge: Polity Pr.
 
 \bibitem[\citeproctext]{ref-Tibshirani1996}
 Tibshirani, Robert. 1996. {„Regression shrinkage and selection via the
