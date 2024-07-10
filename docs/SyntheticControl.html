@@ -300,7 +300,7 @@ globalThis.qwebrCustomizedWebROptions = {
 };
 
 // Store cell data
-globalThis.qwebrCellDetails = [{"options":{"dpi":72,"message":"true","output":"true","fig-height":5,"label":"unnamed-chunk-1","comment":"","results":"markup","fig-width":7,"autorun":"true","out-width":"700px","context":"setup","warning":"true","fig-cap":"","out-height":"","classes":""},"id":1,"code":"\n# install wabassem nlopt from astamm's repository\ninstall.packages('nloptr', repos = 'https://astamm.r-universe.dev')\n\n# create dataset directory\ndir.create(\"datasets\")\n# Download the dataset\ndownload.file(\n    \"https://raw.githubusercontent.com/mca91/kausal_data/main/brexit.csv\",\n    'datasets/brexit.csv',\n)\n\n# load the brexit data\nbrexit <- read_csv(\"datasets/brexit.csv\") %>% as.data.frame\n\n# load the Synth package\nlibrary(Synth)\noptions(pillar.sigfig = 2)"}];
+globalThis.qwebrCellDetails = [{"id":1,"options":{"fig-height":5,"warning":"true","classes":"","label":"unnamed-chunk-1","fig-width":7,"out-height":"","autorun":"true","dpi":72,"out-width":"700px","message":"true","fig-cap":"","comment":"","context":"setup","output":"true","results":"markup"},"code":"\n# install wabassem nlopt from astamm's repository\ninstall.packages('nloptr', repos = 'https://astamm.r-universe.dev')\n\n# create dataset directory\ndir.create(\"datasets\")\n# Download the dataset\ndownload.file(\n    \"https://raw.githubusercontent.com/mca91/kausal_data/main/brexit.csv\",\n    'datasets/brexit.csv',\n)\n\n# load the brexit data\nbrexit <- read_csv(\"datasets/brexit.csv\") %>% as.data.frame\n\n# load the Synth package\nlibrary(Synth)\noptions(pillar.sigfig = 2)"}];
 
 </script><script type="module">
 // Declare startupMessageQWebR globally

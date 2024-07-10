@@ -451,7 +451,7 @@ Tabelle~\ref{tbl-Klausurergebnisse} händisch als R-Objekt der Klasse
 Variable \emph{Modul}. Der Datensatz liegt also \emph{nicht} im s.g.
 \emph{Tidy-Format} vor.
 
-\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, titlerule=0mm, title=\textcolor{quarto-callout-tip-color}{\faLightbulb}\hspace{0.5em}{Tidy-Format}, colframe=quarto-callout-tip-color-frame, opacitybacktitle=0.6, rightrule=.15mm, breakable, bottomrule=.15mm, colback=white, bottomtitle=1mm, opacityback=0, arc=.35mm, colbacktitle=quarto-callout-tip-color!10!white, toprule=.15mm, toptitle=1mm, coltitle=black]
+\begin{tcolorbox}[enhanced jigsaw, opacityback=0, left=2mm, toprule=.15mm, coltitle=black, rightrule=.15mm, bottomtitle=1mm, colback=white, title=\textcolor{quarto-callout-tip-color}{\faLightbulb}\hspace{0.5em}{Tidy-Format}, leftrule=.75mm, bottomrule=.15mm, breakable, colbacktitle=quarto-callout-tip-color!10!white, toptitle=1mm, titlerule=0mm, arc=.35mm, colframe=quarto-callout-tip-color-frame, opacitybacktitle=0.6]
 
 Tidy-Format: Jede Spalte ist \textbf{\emph{eine}} Variable, jede Reihe
 ist \textbf{\emph{eine}} Beobachtung und jede Zelle enthält einen
@@ -3576,8 +3576,8 @@ bezüglich eines kausalen Effekts nach Matching und demonstrieren die
 Schätzung anhand unseres Website-Beispiels für den ATT nach
 Propensity-Score-Matching.
 
-\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, titlerule=0mm, title={\textbf{Algorithmus: Bootstrap-Schätzer für Matching mit Regression
-Adjustment}}, colframe=quarto-callout-tip-color-frame, opacitybacktitle=0.6, rightrule=.15mm, breakable, bottomrule=.15mm, colback=white, bottomtitle=1mm, opacityback=0, arc=.35mm, colbacktitle=quarto-callout-tip-color!10!white, toprule=.15mm, toptitle=1mm, coltitle=black]
+\begin{tcolorbox}[enhanced jigsaw, opacityback=0, left=2mm, toprule=.15mm, coltitle=black, rightrule=.15mm, bottomtitle=1mm, colback=white, title={\textbf{Algorithmus: Bootstrap-Schätzer für Matching mit Regression
+Adjustment}}, leftrule=.75mm, bottomrule=.15mm, breakable, colbacktitle=quarto-callout-tip-color!10!white, toptitle=1mm, titlerule=0mm, arc=.35mm, colframe=quarto-callout-tip-color-frame, opacitybacktitle=0.6]
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -3920,7 +3920,7 @@ Der von Wooldridge (2010) vorgeschlagene Doubly-Robust-Schätzer (IPWRA)
 für den ATE erreicht seine vorteilhaften Eigenschaften durch eine
 geschickte Kombination von IPW und Regression Adjustment.
 
-\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, titlerule=0mm, title={\textbf{Algorithmus: IPWRA-Schätzer des ATE}}, colframe=quarto-callout-tip-color-frame, opacitybacktitle=0.6, rightrule=.15mm, breakable, bottomrule=.15mm, colback=white, bottomtitle=1mm, opacityback=0, arc=.35mm, colbacktitle=quarto-callout-tip-color!10!white, toprule=.15mm, toptitle=1mm, coltitle=black]
+\begin{tcolorbox}[enhanced jigsaw, opacityback=0, left=2mm, toprule=.15mm, coltitle=black, rightrule=.15mm, bottomtitle=1mm, colback=white, title={\textbf{Algorithmus: IPWRA-Schätzer des ATE}}, leftrule=.75mm, bottomrule=.15mm, breakable, colbacktitle=quarto-callout-tip-color!10!white, toptitle=1mm, titlerule=0mm, arc=.35mm, colframe=quarto-callout-tip-color-frame, opacitybacktitle=0.6]
 
 Vgl. Wooldridge (2010).
 
@@ -4118,30 +4118,95 @@ genauer.
 
 \chapter{Panel-Daten}\label{panel-daten}
 
+\section{Pooled Regression und unbeobachtbare
+Heterogenität}\label{sec-panel-uh}
+
+Ein Panel-Datensatz enthält Beobachtungen von \(n\) Einheiten für (bis
+zu) \(T\) Zeitpunkte, wobei \(t=1,\dots,T\). Betrachte das Panel-Modell
+
+\begin{align}
+  Y_{it} = \beta_0 + \beta_1 B_{it} + \beta_2 X_i + \beta_3 U_i + \epsilon_{it},\label{eq:unobshetmodel}
+\end{align}
+
+wobei \(U_i\) unbeobachtete und \(X_i\) beobachtete,
+\textbf{zeitlich-invariante} Heterogenitäten zwischen den
+Beobachtungseinheiten \(i=1,\dots,n\) sind. Wie zuvor ist \(B_{it}\) die
+Behandlungsvariable und \(\beta_1\) der interessierende kausale Effekt
+einer Veränderung von \(B_{it}\) auf \(Y_{it}\).
+
+Angenommen wir beobachten \(Y_{it}\) und \(B_{it}\) für \(T=1\), also
+für eine Periode. Bei Korrelation zwischen den \textbf{unbeobachtbaren}
+zeit-invarianten Effekten \(U_i\) und der Behandlungsvariable \(B_{it}\)
+kann der kausale Effekt \(\beta_1\) in nicht identifiziert werden. Diese
+Situation ist in Abbildung~\ref{fig-FEDAG1} dargestellt.
+
 \begin{figure}[t]
 
 \centering{
 
-\includegraphics[width=6in,height=4in]{FixedEffects_files/figure-latex/dot-figure-1.png}
+\includegraphics[width=3in,height=3in]{FixedEffects_files/figure-latex/dot-figure-1.png}
 
 }
 
-\caption{\label{fig-FEDAG1}FE-Design mit Backdoors durch unb.
-zeitvariante Variablen}
+\caption{\label{fig-FEDAG1}Backdoors durch beobachtete und unbeobachtete
+Variablen}
 
 \end{figure}%
 
-\includegraphics[width=5.5in,height=3.5in]{FixedEffects_files/figure-latex/dot-figure-2.png}
+Abbildung~\ref{fig-FEDAG1} zeigt Backdoors durch die \(U_i\), die wir
+mit einer ``naiven'' KQ-Schätzung der fehlspezifizierten Regression
+\begin{align}
+  Y_{it} = \beta_0 + \beta_1 B_{it} + \beta_2 X_i + \varepsilon_{it},\quad t=1,\label{eq:femodelfail}
+\end{align} nicht schließen können.
 
-Fixed Effects können Endogenität aufgrund simultaner Kausalität oder
-ausgelassender zeitlich variierender Faktoren (Variablen, welche die
-abhängige Variable beeinflussen und mit der Behandlungsvariable
-korreliert sind) nicht beheben. In solchen Szenarien können
-Panel-Methoden in Kombination mit einer Schätzstrategie basierend auf
-Instrument-Variablen hilfreich sein. Wir betrachten solche Schätzer in
-Kapitel Kapitel~\ref{sec-IV}.
+Wir betrachten nun eine Generalisierung von Abbildung~\ref{fig-FEDAG1}
+für \(T=2\) Perioden, dargestellt in Abbildung~\ref{fig-FEDAG2}.
 
-\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics[width=6in,height=4in]{FixedEffects_files/figure-latex/dot-figure-3.png}
+
+}
+
+\caption{\label{fig-FEDAG2}Panel-Design mit Backdoors durch beobachtete
+und unbeobachtete zeit-invariante Variablen}
+
+\end{figure}%
+
+Der in Abbildung~\ref{fig-FEDAG2} gezeigte Zusammenhang führt
+(idealerweise) zwar zu einer Verdoppelung des Beobachtungsumfangs,
+jedoch besteht weiterhin das in Abbildung~\ref{fig-FEDAG1} gezeigte
+Endogenitätsproblem, falls die Regression \eqref{eq:femodelfail} nun
+anhand einer Zusammenlegung (\textbf{Pooling}) der Beobachtungen für
+\(t\in\{1,2\}\) geschätzt wird:\footnote{Pooled Regression kann auch
+  berechnet werden, wenn nicht für alle \(n\) Einheiten jeweils \(T\)
+  Beobachtungen vorliegen (unbalanced Panel).} Die unbeobachteten
+zeit-invarianten Einflüsse \(U_i\) verursachen auch für Periode \(t=2\)
+Backdoor-Pfade.
+
+In diesem Kapitel betrachten wir Panel-Verfahren, welche den kausalen
+Effekt in Abbildung~\ref{fig-FEDAG2} und Verallgemeinerungen hiervon
+schätzen können. Analog zu Querschnittsdaten können die hier
+betrachteten Panel-Schätzer Endogenitäten aufgrund simultaner Kausalität
+oder nicht beheben. In solchen Szenarien können Panel-Methoden in
+Kombination mit einer Schätzstrategie basierend auf Instrument-Variablen
+hilfreich sein. Wir betrachten solche Schätzer in den empirischen
+Beispielen in Kapitel Kapitel~\ref{sec-IV}.
+
+Bevor wir diese Panel-Verfahren erläutern, veranschaulichen wir die
+verzerrte Schätzung eines Behandlungseffekts mit \emph{Pooled
+Regression} für einen simulierten Datensatz \texttt{paneldata.csv}, der
+Beobachtungen von \(n=12\) Einheiten zu \(T=8\) Perioden beinhaltet.
+Alle Einheiten weisen unbeobachtbare zeit-invariante Heterogenitäten
+auf, die mit \(B_{it}\) korellieren. Der wahre Behandlungseffekt beträgt
+\(\beta_1 = -1\) für alle \(n\) Einheiten.\footnote{Der (R code für den)
+  DGP ist \href{https://stats.stackexchange.com/a/188559}{diesem
+  StackExchange-Post} entnommen.}
+
+Wir lesen zunächst den Datensatz ein und selektieren die benötigten
+Variablen.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4150,22 +4215,6 @@ Kapitel Kapitel~\ref{sec-IV}.
   \FunctionTok{select}\NormalTok{(X, Y, ID, time, col)}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# Datensatz balanced?}
-\FunctionTok{library}\NormalTok{(plm)}
-
-\FunctionTok{is.pbalanced}\NormalTok{(}
-  \AttributeTok{x =}\NormalTok{ paneldata, }
-  \AttributeTok{index =} \FunctionTok{c}\NormalTok{(}\StringTok{"ID"}\NormalTok{, }\StringTok{"time"}\NormalTok{)}
-\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-[1] TRUE
-\end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4185,14 +4234,146 @@ Kapitel Kapitel~\ref{sec-IV}.
 1    12     8
 \end{verbatim}
 
+Mit der Funktion \texttt{plm::is.pbalanced()} überprüfen wir, ob im
+Panel-Datensatz für alle beobachteten Einheiten die gleiche Anzahl an
+Beobachtungsperioden vorliegt (\emph{balanced panel}).\footnote{Fehlende
+  Beobachtungen sind typischerweise mit einem \texttt{NA}-Wert
+  gekennzeichnet. Der Differenz-Schätzer kann auch berechnet werden,
+  wenn der Datensatz nicht ausgeglichen (\emph{unbalanced}) ist.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(plm)}
+
+\CommentTok{\# Datensatz balanced?}
+\FunctionTok{is.pbalanced}\NormalTok{(}
+  \AttributeTok{x =}\NormalTok{ paneldata, }
+  \AttributeTok{index =} \FunctionTok{c}\NormalTok{(}\StringTok{"ID"}\NormalTok{, }\StringTok{"time"}\NormalTok{)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] TRUE
+\end{verbatim}
+
+Zunächst schätzen wir eine Pooled Regression für die ersten beiden
+Zeitperioden, basierend auf einem entsprechend gefilterten
+Datensatz.\footnote{Wir verweisen nachfolgend explizit auf Funktionen
+  aus \texttt{dplyr}, falls Funktionen aus \texttt{plm} identische Namen
+  haben.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Subsetting der Daten für 2 Perioden (t = \{1, 2\})}
+\NormalTok{paneldata\_T2 }\OtherTok{\textless{}{-}}\NormalTok{ paneldata }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(}
+\NormalTok{    dplyr}\SpecialCharTok{::}\FunctionTok{between}\NormalTok{(time, }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{)}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+Für die Schätzung von \eqref{eq:femodelfail} nutzen wir
+\texttt{fixest::feols()}.
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{library}\NormalTok{(fixest)}
 
-\CommentTok{\# Naive KQ{-}Schätzung}
+\CommentTok{\# Naive KQ{-}Schätzung für t = \{1, 2\}}
 \NormalTok{panel\_KQ }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
   \AttributeTok{fml =}\NormalTok{ Y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ X, }
-  \AttributeTok{data =}\NormalTok{ paneldata}
+  \AttributeTok{data =}\NormalTok{ paneldata\_T2}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(panel\_KQ)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: Y
+Observations: 24
+Standard-errors: IID 
+            Estimate Std. Error  t value   Pr(>|t|)    
+(Intercept) -2.50547   1.481150 -1.69157 1.0485e-01    
+X            3.80692   0.194202 19.60295 2.0252e-15 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 3.28785   Adj. R2: 0.943388
+\end{verbatim}
+
+Die Schätzung von \(\beta_1\) ist \(3.81\) und weist auf eine deutliche
+Verzerrung hin. Wir illustrieren die Problematik in
+Abbildung~\ref{fig-pooledregression1}, in dem wir die für die Regression
+verwendeten Daten (Kreise) sowie die Beobachtungen späterer Perioden
+(Kreuze) nach Gruppenzugehörigkeit einfärben und die Schätzung der
+Pooled Regression abtragen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(cowplot)}
+
+\CommentTok{\# Plot: Naiver KQ{-}Schätzer für t = 1, 2}
+\FunctionTok{ggplot}\NormalTok{(}
+  \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ X, }\AttributeTok{y =}\NormalTok{ Y)}
+\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}
+    \AttributeTok{data =}\NormalTok{ paneldata }\SpecialCharTok{\%\textgreater{}\%} 
+      \FunctionTok{filter}\NormalTok{(time }\SpecialCharTok{\textgreater{}} \DecValTok{2}\NormalTok{),}
+    \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{color =}\NormalTok{ col),}
+    \AttributeTok{pch =} \DecValTok{3}\NormalTok{,}
+    \AttributeTok{show.legend =}\NormalTok{ F}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}
+    \AttributeTok{data =}\NormalTok{ paneldata }\SpecialCharTok{\%\textgreater{}\%} 
+      \FunctionTok{filter}\NormalTok{(time }\SpecialCharTok{\%in\%} \DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{),}
+    \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{color =}\NormalTok{ col),}
+    \AttributeTok{show.legend =}\NormalTok{ F}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \CommentTok{\# Naive KQ{-}Schätzung für t = 1, 2}
+  \FunctionTok{geom\_smooth}\NormalTok{(}
+    \AttributeTok{data =}\NormalTok{ paneldata }\SpecialCharTok{\%\textgreater{}\%} 
+      \FunctionTok{filter}\NormalTok{(time }\SpecialCharTok{\%in\%} \DecValTok{1}\NormalTok{),}
+    \AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }
+    \AttributeTok{se =}\NormalTok{ F,}
+    \AttributeTok{col =} \StringTok{"black"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_identity}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme\_cowplot}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics{FixedEffects_files/figure-pdf/fig-pooledregression1-1.pdf}
+
+}
+
+\caption{\label{fig-pooledregression1}\texttt{paneldaten.csv} -- Pooled
+Regression für t = 1, 2}
+
+\end{figure}%
+
+Abbildung~\ref{fig-pooledregression1} zeigt einen negativen Verlauf des
+Zusammenhangs zwischen X und Y anhand der Variation der Beobachtungen
+\emph{innerhalb} der farblich gekennzeichneten Gruppen. Dieser negative
+Zusammenhang kann aufgrund der Endogenität von \(X\) nicht erfasst
+werden.
+
+Eine Erweiturung der Regression auf sämtliche Perioden (Pooling aller
+\(n\times T = 12 \times 8 = 96\) Beobachtungen) erhöht lediglich die
+Präzision der Schätzung (geringerer Standardfehler von
+\(\widehat{\beta}_1\)), nicht aber die Endogenität, vgl.
+Abbildung~\ref{fig-pooledregression2}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Naive KQ{-}Schätzung für t = 1,...,8}
+\NormalTok{panel\_KQ }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ Y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ X, }
+  \AttributeTok{data =}\NormalTok{ paneldata }
 \NormalTok{)}
 
 \FunctionTok{summary}\NormalTok{(panel\_KQ)}
@@ -4210,6 +4391,280 @@ X            3.76470   0.134364 28.01868 < 2.2e-16 ***
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 RMSE: 4.63461   Adj. R2: 0.891928
 \end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plot: Naiver KQ{-}Schätzer für t = 1,...,8}
+\FunctionTok{ggplot}\NormalTok{(}
+  \AttributeTok{data =}\NormalTok{ paneldata,}
+  \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ X, }\AttributeTok{y =}\NormalTok{ Y)}
+\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}
+    \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{color =}\NormalTok{ col),}
+    \AttributeTok{show.legend =}\NormalTok{ F}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \CommentTok{\# Pooled Schätzung}
+  \FunctionTok{geom\_smooth}\NormalTok{(}
+    \AttributeTok{data =}\NormalTok{ paneldata,}
+    \AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }
+    \AttributeTok{se =}\NormalTok{ F,}
+    \AttributeTok{col =} \StringTok{"black"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_identity}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme\_cowplot}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics{FixedEffects_files/figure-pdf/fig-pooledregression2-1.pdf}
+
+}
+
+\caption{\label{fig-pooledregression2}\texttt{paneldaten.csv} -- Pooled
+Regression für t = 1, \ldots, 8}
+
+\end{figure}%
+
+\section{Regression in Differenzen}\label{regression-in-differenzen}
+
+Wir betrachten zunächst den in Abbildung~\ref{fig-FEDAG2} dargestellten
+DGP für \(T=2\) Zeitperioden. In dieser Situation können Backdoors durch
+\(U\) anhand einer simplen Transformation von Modell \eqref{eq:femodel}
+geschlossen werden: Regression der Zeit-Differenzen zwischen den
+Perioden \(t=2\) und \(t=1\), \begin{align}
+  \Delta Y_{it} = \beta_1 \Delta B_{it} + e_{it}, \qquad i=1,\dots,n,\qquad t=1,2 \label{eq:femodeldiff},
+\end{align} wobei \(\Delta\,Y_{it} := Y_{i2} - Y_{i1}\) und
+\(e_{it} := \epsilon_{i2} - \epsilon_{i1}\) für \(t=2\). Beachte, dass
+\(\Delta U_i=\Delta X_i=0\). Differenzieren ergibt also ein Modell, in
+dem weder für \(X_i\) noch für die (unbeobachtbaren) \(U_i\)
+kontrolliert werden muss, damit \(\beta_1\) identifiziert werden kann.
+Der Behandlungseffekt \(\beta_1\) kann mit KQ geschätzt werden.
+
+Zur Transformation der Regressoren in \texttt{fixest::feols()} verwenden
+wir den Operator \texttt{d()}. Dieser benötigt die im Argument
+\texttt{panel.id} als Formel spezifizierten Identifikationsvariablen für
+Einheiten (\texttt{ID}) und Zeitpunkte (\texttt{time}).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Panel{-}Schätzer: KQ{-}Regression in Differenzen}
+\NormalTok{panel\_diff }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =} \FunctionTok{d}\NormalTok{(Y) }\SpecialCharTok{\textasciitilde{}} \FunctionTok{d}\NormalTok{(X) }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{, }
+  \AttributeTok{data =}\NormalTok{ paneldata }\SpecialCharTok{\%\textgreater{}\%} 
+      \FunctionTok{filter}\NormalTok{(}
+\NormalTok{        dplyr}\SpecialCharTok{::}\FunctionTok{between}\NormalTok{(time, }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{)}
+\NormalTok{      ),}
+  \AttributeTok{panel.id =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ ID }\SpecialCharTok{+}\NormalTok{ time}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(panel\_diff)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: d(Y, 1)
+Observations: 12
+Standard-errors: Clustered (ID) 
+        Estimate Std. Error  t value  Pr(>|t|)    
+d(X, 1) -1.03205   0.326838 -3.15767 0.0091166 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.907432   Adj. R2: 0.509923
+\end{verbatim}
+
+Die Schätzung anhand der Regression in Differenzen liegt nahe beim
+wahren Behandlungseffekt \(\beta_1 = -1\). Abbildung
+Abbildung~\ref{fig-diffregression1} zeigt die ersten Differenzen der
+Daten und den mit KQ geschätzten Zusammenhang.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Transformation zu Differenzen}
+\NormalTok{paneldata\_diff }\OtherTok{\textless{}{-}}\NormalTok{ paneldata }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{DeltaX =}\NormalTok{ X }\SpecialCharTok{{-}}\NormalTok{ dplyr}\SpecialCharTok{::}\FunctionTok{lag}\NormalTok{(X),}
+    \AttributeTok{DeltaY =}\NormalTok{ Y }\SpecialCharTok{{-}}\NormalTok{ dplyr}\SpecialCharTok{::}\FunctionTok{lag}\NormalTok{(Y)}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{drop\_na}\NormalTok{()}
+
+\CommentTok{\# Plot: KQ{-}Schätzer für Differenzen  }
+  \FunctionTok{ggplot}\NormalTok{(}
+    \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ DeltaX, }\AttributeTok{y =}\NormalTok{ DeltaY)}
+\NormalTok{  ) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_point}\NormalTok{(}
+      \AttributeTok{data =}\NormalTok{ paneldata\_diff }\SpecialCharTok{\%\textgreater{}\%} 
+        \FunctionTok{filter}\NormalTok{(time }\SpecialCharTok{\textgreater{}} \DecValTok{2}\NormalTok{),}
+      \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{color =}\NormalTok{ col),}
+      \AttributeTok{pch =} \DecValTok{3}\NormalTok{,}
+      \AttributeTok{show.legend =}\NormalTok{ F}
+\NormalTok{    ) }\SpecialCharTok{+}
+    \FunctionTok{geom\_point}\NormalTok{(}
+      \AttributeTok{data =}\NormalTok{ paneldata\_diff }\SpecialCharTok{\%\textgreater{}\%} 
+        \FunctionTok{filter}\NormalTok{(time }\SpecialCharTok{==} \DecValTok{2}\NormalTok{),}
+      \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{color =}\NormalTok{ col),}
+      \AttributeTok{show.legend =}\NormalTok{ F}
+\NormalTok{    ) }\SpecialCharTok{+}
+  \FunctionTok{geom\_smooth}\NormalTok{(}
+    \AttributeTok{data =}\NormalTok{ paneldata\_diff }\SpecialCharTok{\%\textgreater{}\%} 
+      \FunctionTok{filter}\NormalTok{(time }\SpecialCharTok{==} \DecValTok{2}\NormalTok{),}
+    \AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }
+    \AttributeTok{se =}\NormalTok{ F,}
+    \AttributeTok{color =} \StringTok{"black"}
+\NormalTok{  ) }\SpecialCharTok{+} 
+  \FunctionTok{scale\_color\_identity}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme\_cowplot}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics{FixedEffects_files/figure-pdf/fig-diffregression1-1.pdf}
+
+}
+
+\caption{\label{fig-diffregression1}\texttt{paneldaten.csv} --
+Regression in Differenzen für t = 2}
+
+\end{figure}%
+
+Wie für die Pooled Regression können wir den Differenzen-Schätzer für
+den gesamten Datensatz berechnen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Panel{-}Schätzer: KQ{-}Regression in Differenzen}
+\NormalTok{panel\_diff }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =} \FunctionTok{d}\NormalTok{(Y) }\SpecialCharTok{\textasciitilde{}} \FunctionTok{d}\NormalTok{(X) }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{, }
+  \AttributeTok{data =}\NormalTok{ paneldata,}
+  \AttributeTok{panel.id =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ ID }\SpecialCharTok{+}\NormalTok{ time}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(panel\_diff)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: d(Y, 1)
+Observations: 84
+Standard-errors: Clustered (ID) 
+         Estimate Std. Error  t value   Pr(>|t|)    
+d(X, 1) -0.982042   0.135217 -7.26269 1.6178e-05 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 1.12641   Adj. R2: 0.571235
+\end{verbatim}
+
+Beachte, dass der Standardfehler der Schätzers etwas größer ist als für
+den KQ-Schätzer in der Pooled Regression. Grund hierfür ist der Verlust
+von \(12\) Beobachtungen bei der Bildung der \(T-1 = 7\) Differenzen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plot: KQ{-}Schätzer in Differenzen (alle t)}
+\FunctionTok{ggplot}\NormalTok{(}
+  \AttributeTok{data =}\NormalTok{ paneldata\_diff,}
+  \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ DeltaX, }\AttributeTok{y =}\NormalTok{ DeltaY)}
+\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{(}
+    \AttributeTok{color =} \StringTok{"gray"}\NormalTok{,}
+    \AttributeTok{show.legend =}\NormalTok{ F}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}
+    \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{color =}\NormalTok{ col),}
+    \AttributeTok{show.legend =}\NormalTok{ F}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{geom\_smooth}\NormalTok{(}
+    \AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }
+    \AttributeTok{se =}\NormalTok{ F,}
+    \AttributeTok{color =} \StringTok{"black"}
+\NormalTok{  ) }\SpecialCharTok{+} 
+  \FunctionTok{scale\_color\_identity}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme\_cowplot}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics{FixedEffects_files/figure-pdf/fig-diffregression2-1.pdf}
+
+}
+
+\caption{\label{fig-diffregression2}\texttt{paneldaten.csv} --
+Regression in Differenzen für t = 1, \ldots, 8}
+
+\end{figure}%
+
+\section{Fixed-Effects-Regression}\label{fixed-effects-regression}
+
+Die Regression in Differenzen hat den Nachteil, dass
+einheiten-spezifische Effekte nicht geschätzt werden können. Weiterhin
+impliziert die Differenzbildung einen Verlust des Beobachtungsumfangs
+bei der Schätzung des kausalen Effekts.\footnote{Eine Reduktion des
+  Beobachtungsumfangs erhöht die Varianz der Schätzung.} Für den
+Datensatz \texttt{paneldata.csv} verlieren wir daher 1/8 der Stichprobe.
+Abhängig von der empirischen Fragestellung und der Datenverfügbarkeit
+kann Fixed-Effects-Regression eine nützliche Alternative zu Regression
+in Differenzen sein, wenn Panel-Daten mit \(T\geq2\) vorliegen.
+
+Wir betrachten erneut Modell \eqref{eq:unobshetmodel} und definieren
+\begin{align*}
+  \delta_i = \beta_0 + \beta_3 U_i.
+\end{align*} Nach einsetzen in \eqref{eq:unobshetmodel} erhalten wir das
+Modell \begin{align}
+  Y_{it} = \delta_i + \beta_1 B_{it} + \beta_2 X_i + \epsilon_{it} \label{eq:femodel},
+\end{align} mit einheiten-spezifischen Konstanten \(\delta_i\),
+\(i=1,\dots,n\). Die \(\delta_i\) können als individuelle
+Achsenabschnitte (``feste Effekte'') interpretieren werden, weshalb
+Modell \eqref{eq:femodel} auch als ``Fixed-Effects-Modell'' bezeichnet
+wird.\footnote{Eine Modellierung mit gruppen-spezifischen
+  Achsenabschnitten scheint in Abbildung~\ref{fig-pooledregression2}
+  plausibel.}
+
+Für die Vermeidung von Backdoors in den \(\delta_i\) subtrahieren wir
+die einheiten-spezifische Mittelwerte von den Komponenten
+(Within-Transformation), \begin{align}
+  Y_{it} - \overline{Y}_i =&\, (\delta_i - \overline{\delta}_i) + \beta_1 (B_{it} - \overline{B}_i) + \beta_2 (X_i - \overline{X}_i) + (\epsilon_{it} - \overline{\epsilon}_i)\notag\\
+  \tilde Y_{it} =&\, \beta_1 \tilde B_{it} + \tilde\epsilon_{it}.\label{eq:fewithin}
+\end{align} Der Fixed-Effects-Schätzer von \(\beta_1\) ist der
+KQ-Schätzer in \eqref{eq:fewithin}. Ähnlich wie für den
+Differenzen-Schätzer eliminieren die Mittelwert-Differenzen
+\(\delta_i - \overline{\delta}_i=0\) und \(X_i - \overline{X}_i=0\) den
+Einfluss zeit-invarianter Variablen.
+
+Das Modell \eqref{eq:femodel} kann weiterhin als eine Regression mit
+\(n-1\) Dummy-Variablen und einer Konstante umgeschrieben werden,
+\begin{align}
+  Y_{it} = \beta_0 + \beta_2 B_{it} + \beta_2 X_i  + \gamma_2 D^{(2)}_i + \gamma_3 D^{(3)}_i + \cdots + \gamma_n D^{(n)}_i + \epsilon_{it} \label{eq:drmodel}.
+\end{align} Die Darstellung \eqref{eq:drmodel} hat \(n\) verschiedene
+Achsenabschnitte -- einen für jede Beobachtungseinheit -- und kann
+ebenfalls mit KQ geschätzt werden.\footnote{Für \(n-1\) Einheiten ist
+  der individuelle Achsenabschnitt damit \(\beta_0 + \gamma_i\) und für
+  \emph{eine} Einheit \(\beta_0\). Diese Einheit (hier \(i=1\)) wird
+  auch als \emph{Referenzkategorie} bezeichnet. Alternativ kann das
+  Modell mit \(n\) Dummies und \emph{ohne} die Konstante \(\beta_0\)
+  geschrieben werden.} Die Modelle \eqref{eq:femodel} und
+\eqref{eq:drmodel} sind also gleichwertige Darstellungen eines Modells,
+dass (unbeobachtbare) zeit-invariante Heterogenität
+berücksichtigt.\footnote{Der Ansatz \eqref{eq:drmodel} wird in der
+  Literatur auch als \emph{Least Squares Dummy Variables} (LSDV)
+  Regression bezeichnet.} Beachte, dass die Schätzung der Koeffizienten
+\emph{beobachtbarer} zeit-invarianter Regressoren \(X_{i}\) lediglich in
+Modell \eqref{eq:drmodel} möglich ist.
+
+Fixed-Effects-Regressionen können mit \texttt{fixest::feols()} geschätzt
+werden. Je nach Spezifikation des Formula-Arguments (\texttt{fml}) wird
+ein effizienter Algorithmus für eine Variante von \eqref{eq:femodel}
+angwandt. Für \texttt{paneldata.csv} erhalten wir mit
+\texttt{fml\ =\ Y\ \textasciitilde{}\ X\ \textbar{}\ ID} per Referenz
+des Indikators \texttt{ID} eine Schätzung mit Berechnung der
+einheiten-spezifischen Effekte.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4236,11 +4691,354 @@ RMSE: 0.746006     Adj. R2: 0.996829
                  Within R2: 0.602694
 \end{verbatim}
 
+Die Zusammenfassung der Schätzung zeigt einen signifikanten
+Koeffizienten, der mit einer Schätzung von \(-1.05\) nahe beim wahren
+Wert von \(-1\) liegt. Die geschätzten einheiten-spezifischen Effekte
+können mit \texttt{fixest::fixef()} ausgelesen werden.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Geschätzte Fixed Effects (Einheiten) auslesen}
+\NormalTok{fixest}\SpecialCharTok{::}\FunctionTok{fixef}\NormalTok{(panel\_FE)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+$ID
+        1         2         3         4         5         6         7         8 
+ 3.814550  7.149097 12.716507 15.319130 23.458442 28.239634 33.659734 35.729516 
+        9        10        11        12 
+41.701817 47.911623 55.044052 59.445967 
+
+attr(,"class")
+[1] "fixest.fixef" "list"        
+attr(,"exponential")
+[1] FALSE
+\end{verbatim}
+
+\subsection{Zeit-Fixed-Effects}\label{zeit-fixed-effects}
+
+Neben zeit-invarianten Heterogenitäten zwischen den
+Beobachtungseinheiten können beobachtbare und unbeobachtbare Einflüsse
+vorliegen, die nicht zwischen den Einheiten, jedoch über die Zeit
+variieren. Ein DGP mit solchen zeitabhängigen Heterogenitäten ist in
+Abbildung~\ref{fig-FEDAG3} für \(T=2\) dargestellt.\footnote{Zur
+  Vereinfachung der Interpretierbarkeit vernachlässigt das DAG in
+  Abbildung~\ref{fig-FEDAG3} zeitlich konstante Variablen.}
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics[width=6in,height=4in]{FixedEffects_files/figure-latex/dot-figure-2.png}
+
+}
+
+\caption{\label{fig-FEDAG3}Panel-Design mit Backdoors durch beobachtete
+und unbeobachtete zeitabhängige Variablen}
+
+\end{figure}%
+
+Für beobachtbare zeitabhängige Backdoor-Variablen \(X_t\) kann durch
+Aufnahme dieser in die Regression \eqref{eq:femodel} kontrolliert
+werden. Analog zum Fixed-Effects-Ansatz mit einheiten-spezifischen
+Konstanten können Backdoors durch unbeobachtbare zeitabhängige Einflüsse
+\(U_t\) durch Kontrolle für perioden-spezifische Dummies \(D_t^{(t)}\)
+(Time Fixed Effects) vermieden werden. Das Modell lautet dann
+
+\begin{align*}
+  Y_{it} = \beta_0 + \beta_1 B_{it} + \beta_2 X_t + \lambda_2 D_t^{(2)} + \cdots + \lambda_T D_t^{(T)} + \epsilon_{it}. 
+\end{align*}
+
+In empirischen Anwendung ist es häufig plausibel, für zeit- und
+einheiten-spezifische Effekte zu kontrollieren. Der entsprechende
+Regressionsansatz wird als \emph{Two Way Fixed Effects} (TWFE)
+bezeichnet.
+
+Ein TWFE-Modell für \texttt{paneldata.csv} kann mit \texttt{feols()}
+leicht unter Angabe der Identifikationsvariable der Zeitperioden
+(\texttt{time}) innerhalb des \texttt{fml}-Arguments geschätzt werden.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# TWFE{-}Schätzung}
+\NormalTok{panel\_TWFE }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ Y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ X }\SpecialCharTok{|}\NormalTok{ ID }\SpecialCharTok{+}\NormalTok{ time,  }
+  \AttributeTok{data =}\NormalTok{ paneldata}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(panel\_TWFE)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: Y
+Observations: 96
+Fixed-effects: ID: 12,  time: 8
+Standard-errors: Clustered (ID) 
+  Estimate Std. Error  t value   Pr(>|t|)    
+X -1.01411   0.096129 -10.5495 4.3209e-07 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.655695     Adj. R2: 0.997325
+                 Within R2: 0.636218
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Geschätzte Fixed Effects (Einheiten + Zeit) auslesen}
+\NormalTok{fixest}\SpecialCharTok{::}\FunctionTok{fixef}\NormalTok{(panel\_TWFE)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+$ID
+        1         2         3         4         5         6         7         8 
+ 3.608414  6.893444 12.445006 15.020731 23.126151 27.884480 33.255238 35.311437 
+        9        10        11        12 
+41.252680 47.433690 54.515757 58.889276 
+
+$time
+          1           2           3           4           5           6 
+ 0.00000000 -0.16836639  0.84624725  0.09109152  0.45843997 -0.38103581 
+          7           8 
+ 0.24023573  0.31186366 
+
+attr(,"class")
+[1] "fixest.fixef" "list"        
+attr(,"references")
+  ID time 
+   0    1 
+attr(,"exponential")
+[1] FALSE
+\end{verbatim}
+
+\section{Random Effects}\label{random-effects}
+
+Der Fixed-Effects-Ansatz behandelt die einheiten-spezifischen Effekte
+\(\delta_i\) in Modell \eqref{eq:femodel} als konstante Parameter. Das
+einfache Random-Effects-Modell lautet \begin{align*}
+  Y_{it} =&\, \beta_0 + \beta_1 B_{it} + \varepsilon_{it},
+\end{align*} wobei sich der Fehlerterm \(\varepsilon_{it}\) aus dem
+zufälligen individuellen Effekt \(\delta_i\) und dem unabhängigen Fehler
+\(\epsilon_{it}\) zusammensetzt, \begin{align*}
+  \varepsilon_{it} = \alpha_i + \epsilon_{it}.
+\end{align*} Der Random-Effects-Ansatz betrachtet die \(\delta_i\) als
+\emph{Zufallsvariablen} mit einer gemeinsamen (Normal)Verteilung, unter
+der Annahme, dass die \(\delta_i\) \emph{nicht} mit den erklärenden
+Variablen korrelieren.\footnote{Weiterhin dürfen die \(\delta_i\) nicht
+  mit dem Fehler \(\epsilon_{it}\) korrelieren.} Falls diese Annahme
+erfüllt ist, ist der Random-Random-Effects-Schätzer effizienter als der
+Fixed-Effects-Schätzer: Der mittlere quadratische Fehler der Schätzung
+ist geringer.\footnote{Die Schätzung erfolgt oft mit der
+  \href{https://de.wikipedia.org/wiki/Maximum-Likelihood-Methode}{Maximum-Likelihood-Methode}.}
+
+Für ein Beispiel simulieren wir Daten gemäß der Vorschrift \begin{align}
+  y_{it} = \alpha_i + \beta B_{it} + \epsilon_{it},\label{eq:resim}
+\end{align} wobei \(\alpha_i\) die individuellen Zufallseffekte. Wir
+wählen \begin{align*}
+  & \alpha_i \overset{u.i.v}{\sim} N(0,2.5^2), \\
+  & \beta_1 = -1,\\
+  & X_{it} \sim N(0,1),\\
+  & \epsilon_{it} \overset{u.i.v}{\sim} N(0,0.75^2).
+\end{align*} Wie in \texttt{paneldata.csv} erzeugen wir Daten für
+\(n=12\) Individuen, die zu \(T=8\) Zeitperioden beobachtet werden. Mit
+diesen Komponenten wird die Outcome-Variable \(y_{it}\) wie in
+\eqref{eq:resim} generiert. Der nachstehende Code erzeugt die Daten als
+Matrizen für \texttt{X} und \texttt{y}, die anschließend in ein langes
+Datenformat (\texttt{tibble}) umgewandelt werden.
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{library}\NormalTok{(plm)}
 
-\CommentTok{\# Random{-}Effects{-}Schätzung}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{1234}\NormalTok{)}
+
+\CommentTok{\# Parameter}
+\NormalTok{n }\OtherTok{\textless{}{-}} \DecValTok{12}  \CommentTok{\# Individuen}
+\NormalTok{m }\OtherTok{\textless{}{-}} \DecValTok{8}   \CommentTok{\# Perioden}
+\NormalTok{beta }\OtherTok{\textless{}{-}} \SpecialCharTok{{-}}\DecValTok{1} \CommentTok{\# Behandlungseffekt}
+\NormalTok{sigma\_alpha }\OtherTok{\textless{}{-}} \FloatTok{2.5} \CommentTok{\# SD für RE}
+\NormalTok{sigma\_epsilon }\OtherTok{\textless{}{-}} \FloatTok{0.75} \CommentTok{\# SD für Fehler}
+
+\CommentTok{\# Random Effects}
+\NormalTok{alpha }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(n, }\AttributeTok{mean =} \DecValTok{0}\NormalTok{, }\AttributeTok{sd =}\NormalTok{ sigma\_alpha)}
+
+\CommentTok{\# Matrizen}
+\NormalTok{X }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\ConstantTok{NA}\NormalTok{, }\AttributeTok{nrow =}\NormalTok{ m, }\AttributeTok{ncol =}\NormalTok{ n)}
+\NormalTok{y }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\ConstantTok{NA}\NormalTok{, }\AttributeTok{nrow =}\NormalTok{ m, }\AttributeTok{ncol =}\NormalTok{ n)}
+
+\CommentTok{\# Simulation}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{n) \{}
+  \ControlFlowTok{for}\NormalTok{ (t }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{m) \{}
+\NormalTok{    X[t, i] }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{1}\NormalTok{, }\AttributeTok{mean =} \DecValTok{0}\NormalTok{, }\AttributeTok{sd =} \DecValTok{1}\NormalTok{)}
+\NormalTok{    epsilon\_it }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{1}\NormalTok{, }\AttributeTok{mean =} \DecValTok{0}\NormalTok{, }\AttributeTok{sd =}\NormalTok{ sigma\_epsilon)}
+\NormalTok{    y[t, i] }\OtherTok{\textless{}{-}}\NormalTok{ alpha[i] }\SpecialCharTok{+}\NormalTok{ beta }\SpecialCharTok{*}\NormalTok{ X[t, i] }\SpecialCharTok{+}\NormalTok{ epsilon\_it}
+\NormalTok{  \}}
+\NormalTok{\}}
+
+\CommentTok{\# tibble erzeugen}
+\NormalTok{RE\_paneldata }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}
+  \AttributeTok{id =} \FunctionTok{factor}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{n, }\AttributeTok{each =}\NormalTok{ m)),}
+  \AttributeTok{time =} \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m, }\AttributeTok{times =}\NormalTok{ n),}
+  \AttributeTok{X =} \FunctionTok{as.vector}\NormalTok{(X),}
+  \AttributeTok{y =} \FunctionTok{as.vector}\NormalTok{(y)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Für die Anpassung des Random-Effect-Schätzers an den simulierten
+Datensatz \texttt{RE\_paneldata} nutzen wir \texttt{plm::plm()} mit
+\texttt{model\ =\ "random"}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Random{-}Effects{-}Modell anpassen}
+\NormalTok{panel\_RE }\OtherTok{\textless{}{-}} \FunctionTok{plm}\NormalTok{(}
+  \AttributeTok{formula =}\NormalTok{ y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ X, }
+  \AttributeTok{data =}\NormalTok{ RE\_paneldata, }
+  \AttributeTok{index =} \FunctionTok{c}\NormalTok{(}\StringTok{"id"}\NormalTok{, }\StringTok{"time"}\NormalTok{), }
+  \AttributeTok{model =} \StringTok{"random"}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(panel\_RE)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Oneway (individual) effect Random Effect Model 
+   (Swamy-Arora's transformation)
+
+Call:
+plm(formula = y ~ X, data = RE_paneldata, model = "random", index = c("id", 
+    "time"))
+
+Balanced Panel: n = 12, T = 8, N = 96
+
+Effects:
+                 var std.dev share
+idiosyncratic 0.5221  0.7226  0.13
+individual    3.4801  1.8655  0.87
+theta: 0.8643
+
+Residuals:
+     Min.   1st Qu.    Median   3rd Qu.      Max. 
+-2.019439 -0.351116  0.017785  0.420719  2.109010 
+
+Coefficients:
+             Estimate Std. Error  z-value Pr(>|z|)    
+(Intercept) -1.156573   0.552747  -2.0924   0.0364 *  
+X           -0.996175   0.075859 -13.1320   <2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Total Sum of Squares:    143.86
+Residual Sum of Squares: 50.753
+R-Squared:      0.64721
+Adj. R-Squared: 0.64346
+Chisq: 172.45 on 1 DF, p-value: < 2.22e-16
+\end{verbatim}
+
+Die Schätzung zeigt eine gute Anpassung an die Daten und der geschätzte
+Behandlungseffekt liegt mit \(-0.996\) nahe am wahren Koeffizienten
+\(\beta_1 = -1\).
+
+Mit \texttt{plm::ranef()} erhalten wir \emph{Differenzen} der
+geschätzten einheiten-spezifischen Effekte vom geschätzten
+Erwartungswert der unterstellten gemeinsamen Verteilung.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Gesch. Random Effects auslesen}
+\CommentTok{\# (Differenzen zum geschätzten Mittelwert der gem. Verteilung)}
+\FunctionTok{ranef}\NormalTok{(panel\_RE)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+          1           2           3           4           5           6 
+-1.92217199  1.24364147  3.27470045 -4.12524574  2.00235610  2.71903482 
+          7           8           9          10          11          12 
+-0.17492965 -0.50237866  0.01435925 -1.03252985  0.16092971 -1.65776590 
+\end{verbatim}
+
+Für die grafische Darstellung der Schätzung berechnen wir zunächst mit
+\texttt{fitted()} die angepassten Werte. Für ein mit \texttt{plm()}
+geschätztes Random-Effects-Modell werden die individuellen Effekte von
+\texttt{fitted()} nicht berücksichtigt und müssen daher manuell
+hinzugefügt werden. Hierfür lesen wir zunächst den geschätzten
+Erwartungswert der gemeinsamen Verteilung \(\widehat{\beta}_0\) aus und
+addieren anschließend die von \texttt{ranef()} ausgegebenen Differenzen
+der individuellen Effekte gruppenweise.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Gesch. Erwartungswert der gem. Verteilung}
+\NormalTok{hat\_beta\_0 }\OtherTok{\textless{}{-}}\NormalTok{ panel\_RE}\SpecialCharTok{$}\NormalTok{coefficients[}\DecValTok{1}\NormalTok{]}
+
+\CommentTok{\# Gesch. Random Effects berücksichtigen}
+\NormalTok{RE\_paneldata }\OtherTok{\textless{}{-}}\NormalTok{ RE\_paneldata }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{fitted\_RE =} 
+      \FunctionTok{fitted}\NormalTok{(panel\_RE) }
+    \SpecialCharTok{+}\NormalTok{ hat\_beta\_0 }
+    \SpecialCharTok{+} \FunctionTok{rep}\NormalTok{(}\FunctionTok{ranef}\NormalTok{(panel\_RE), }\AttributeTok{each =} \DecValTok{8}\NormalTok{)}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(}
+  \AttributeTok{data =}\NormalTok{ RE\_paneldata, }
+  \AttributeTok{mapping =} 
+    \FunctionTok{aes}\NormalTok{(}
+      \AttributeTok{x =}\NormalTok{ X, }
+      \AttributeTok{y =}\NormalTok{ y, }
+      \AttributeTok{col =}\NormalTok{ id}
+\NormalTok{    )}
+\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{show.legend =}\NormalTok{ F) }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{(}
+    \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ fitted\_RE, }\AttributeTok{group =}\NormalTok{ id), }
+    \AttributeTok{show.legend =}\NormalTok{ F}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_cowplot}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics{FixedEffects_files/figure-pdf/fig-repanelest-1.pdf}
+
+}
+
+\caption{\label{fig-repanelest}\texttt{RE\_paneldata} --
+Random-Effects-Schätzung für simulierte Daten}
+
+\end{figure}%
+
+Die Random-Effects-Methode findet bei kausalen Analyse in empirischen
+Anwendungen selten Anwendung, weil die Annahme von Unkorreliertheit mit
+den erklärenden Regressoren oft unplausibel ist. Falls diese Annahme
+(wie in den DAGs Abbildung~\ref{fig-FEDAG1} und
+Abbildung~\ref{fig-FEDAG2}) verletzt ist, kann Random Effects die
+ensprechenden Backdoors nicht schließen: Der Random-Effects-Schätzer ist
+dann verzerrt und inkonsistent, ähnlich wie der naive KQ-Schätzer in
+einer Pooled Regression.
+
+\subsection{Verzerrung bei
+Endogenität}\label{verzerrung-bei-endogenituxe4t}
+
+Zur Illustration der Verzerrung des Random-Effect-Schätzers bei
+Endogenität von erklärenden Variablen verwenden wir erneut den Datensatz
+\texttt{paneldata.csv}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Random{-}Effects{-}Schätzung für \textasciigrave{}paneldata\textasciigrave{}}
 \NormalTok{panel\_RE }\OtherTok{\textless{}{-}} \FunctionTok{plm}\NormalTok{(}
   \AttributeTok{formula =}\NormalTok{ Y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ X,  }
   \AttributeTok{model =} \StringTok{"random"}\NormalTok{,}
@@ -4286,10 +5084,22 @@ Adj. R-Squared: 0.07361
 Chisq: 8.54862 on 1 DF, p-value: 0.0034579
 \end{verbatim}
 
+Offenbar weicht der Random-Effects-Schätzer des Effects von \(X\) auf
+\(Y\) deutlich vom wahren Parameter \(\beta_1 = -1\) ab. Diese
+Abweichung ist auf die Endogenität von \(X\) zurückzuführen.
+
+Die nächste Grafik vergleicht die Schätzungen des Behandlungseffekts für
+den Datensatz \texttt{paneldata.csv} mit Pooling (schwarze Linie), Fixed
+Effects (farbige Linien) und Random Effects (gestrichelte schwarze
+Linie). Vorab erweitern wir \texttt{paneldata} um die angepassten Werte
+für die Fixed- und die Random-Effects-Schätzung in \texttt{panel\_FE}
+und \texttt{panel\_RE}.\footnote{Für bessere Lesbarkeit erzeugen wir
+  hier mit \texttt{predict()} eine Regressionsgerade, deren
+  Achsenabschnitt dem geschätzten Erwartungswert der
+  Random-Effects-Verteilung entspricht.}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{library}\NormalTok{(cowplot)}
-
 \NormalTok{paneldata }\OtherTok{\textless{}{-}}\NormalTok{ paneldata }\SpecialCharTok{\%\textgreater{}\%} 
   \FunctionTok{mutate}\NormalTok{(}
     \CommentTok{\# Vorhergesagte Werte für FE{-}Schätzung}
@@ -4297,7 +5107,11 @@ Chisq: 8.54862 on 1 DF, p-value: 0.0034579
     \CommentTok{\# Vorhergesagte Werte für RE{-}Schätzung}
     \AttributeTok{yhat\_RE =} \FunctionTok{predict}\NormalTok{(panel\_RE)}
 \NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
 
+\begin{Shaded}
+\begin{Highlighting}[]
 \FunctionTok{ggplot}\NormalTok{(}
   \AttributeTok{data =}\NormalTok{ paneldata,}
   \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ X, }\AttributeTok{y =}\NormalTok{ Y)}
@@ -4327,38 +5141,65 @@ Chisq: 8.54862 on 1 DF, p-value: 0.0034579
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{FixedEffects_files/figure-pdf/unnamed-chunk-10-1.pdf}
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics{FixedEffects_files/figure-pdf/fig-panelcomparison-1.pdf}
+
+}
+
+\caption{\label{fig-panelcomparison}\texttt{paneldaten.csv} -- Vergleich
+von Schätzern bei Einheiten mit endogeneen Effekten}
+
+\end{figure}%
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\textbf{Interaktive Illustration von Panel-Schätzern}
+
+Die nachfolgende interaktive Illustration erlaubt einen Vergleich der in
+Abbildung~\ref{fig-panelcomparison} geplotteten geschätzten
+Regressionsfunktionen für \texttt{paneldata.csv} mit dem wahren DGP
+(Show truth) unter Reproduktion der in
+Abbildung~\ref{fig-panelcomparison} gezeigten Komponenten.
 
 \section{Beispiel: Einkommen und
 Demokratie}\label{beispiel-einkommen-und-demokratie}
 
-Eine Vielzahl polit-ökonomische Standardwerke und Studien (bspw. Dahl
+Eine Vielzahl polit-ökonomischer Standardwerke und Studien (bspw. Dahl
 1971; Huntington 1991; Rueschemeyer, Stephens, und Stephens 1992)
 liefert vermeindliche Belege für einen zentralen Grundsatz der
 \href{https://de.wikipedia.org/wiki/Modernisierungstheorie}{Modernisierungstheorie}:
 Ein höheres Pro-Kopf-Einkommen erhöht die Nachfrage der Bevölkerung nach
 politischer Freiheit und demokratischen Insitutionen. Acemoglu u.~a.
-(2008) argumentieren, dass der in solchen länderübergreifenden Studien
-mit Pooling häufig als positiv geschätzte Zusammenhang zwischen
+(2008a) argumentieren, dass der in derartigen länderübergreifenden
+Analysen mit Pooling häufig als positiv geschätzte Zusammenhang zwischen
 Einkommen und Demokratisierung nicht kausal interpetiert werden sollte.
-Ein Grund hierfür ist, dass ausgelassene länderspezifische
-zeitinvariante (möglicherweise unbeobachtbare) Faktoren, die sowohl die
-ökonomische Entwicklung als auch die Stärke demokratischer Institutionen
-beeinflussen, wahrscheinlich sind. Um diese Ursache möglicher
-Endogenität des Zusammenhangs \begin{align}
+Ein Grund hierfür ist, dass (unbeobachtbare) ausgelassene
+länderspezifische Faktoren, die sowohl die ökonomische Entwicklung als
+auch die Stärke demokratischer Institutionen beeinflussen,
+wahrscheinlich sind. Um diese mögliche Ursache für Endogenität des
+Zusammenhangs \begin{align}
   \text{Demokratisierung}_i = \beta_0 + \beta_1\,\text{PK-Einkommen}_i + \epsilon_i
-\end{align} zu adressieren, nutzen Acemoglu u.~a. (2008) einen
+\end{align} zu adressieren, nutzen Acemoglu u.~a. (2008a) einen
 Panel-Regressionsansatz ähnlich zu \begin{align}
   \text{Demokratisierung}_{it} = \delta_i + \beta_1\,\text{PK-Einkommen}_{it} + \epsilon_{it}
 \end{align} mit Fixed Effects \(\delta_i\), die für länderspezifische
-zeitinvariante Faktoren kontrollieren.
+zeit-invariante Einflüsse kontrollieren.
 
-Das Kernergebnis von Acemoglu u.~a. (2008) ist, dass es \emph{keinen}
+Das Kernergebnis von Acemoglu u.~a. (2008a) ist, dass es \emph{keinen}
 kausalen Zusammenhang zwischen dem Einkommen (Wirtschaftswachstum) und
 der Demokratisierung gibt. Die Autoren zeigen, dass historische und
 geografische Faktoren, die sowohl das Einkommen als auch die politischen
 Institutionen beeinflussen, den beobachteten Zusammenhang verzerren
 können.
+
+Für die nachfolgenden Code-Beispiele nutzen wir einen Auszug des
+Datensatzes aus dem Replikationspaket zu Acemoglu u.~a. (2008a), siehe
+Acemoglu u.~a. (2008b).
+
+Wir lesen zunächst den Datensatz \texttt{Acemogluetal2008.csv} ein.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4383,7 +5224,7 @@ können.
 \begin{Highlighting}[]
 \CommentTok{\# Pooling}
 \FunctionTok{feols}\NormalTok{(}
-  \AttributeTok{fml =}\NormalTok{ fhpolrigaug }\SpecialCharTok{\textasciitilde{}} \FunctionTok{l}\NormalTok{(lrgdpch),}
+  \AttributeTok{fml =}\NormalTok{ fhpolrigaug }\SpecialCharTok{\textasciitilde{}}\NormalTok{ lrgdpch,}
   \AttributeTok{panel.id =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ country }\SpecialCharTok{+}\NormalTok{ year,}
   \AttributeTok{data =}\NormalTok{ acem, }
 \NormalTok{)}
@@ -4392,14 +5233,14 @@ können.
 
 \begin{verbatim}
 OLS estimation, Dep. Var.: fhpolrigaug
-Observations: 1,008
+Observations: 1,090
 Standard-errors: Clustered (country) 
-               Estimate Std. Error  t value  Pr(>|t|)    
-(Intercept)   -1.268605   0.098971 -12.8180 < 2.2e-16 ***
-l(lrgdpch, 1)  0.226083   0.011740  19.2572 < 2.2e-16 ***
+             Estimate Std. Error  t value  Pr(>|t|)    
+(Intercept) -1.210494   0.094546 -12.8032 < 2.2e-16 ***
+lrgdpch      0.217745   0.011194  19.4518 < 2.2e-16 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-RMSE: 0.275957   Adj. R2: 0.411098
+RMSE: 0.273788   Adj. R2: 0.404579
 \end{verbatim}
 
 \begin{Shaded}
@@ -4468,7 +5309,7 @@ F-statistic: 0.2694 on 1 and 101 DF,  p-value: 0.6049
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{FixedEffects_files/figure-pdf/unnamed-chunk-15-1.pdf}
+\includegraphics{FixedEffects_files/figure-pdf/unnamed-chunk-33-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -6345,7 +7186,7 @@ globalen ATT zusammengefasst werden können.\footnote{Die Methoden von
   Callaway und Sant'Anna (2021) sind im R-Paket \texttt{did}
   implementiert.}
 
-\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, titlerule=0mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum einfachen DID-Schätzer}, colframe=quarto-callout-note-color-frame, opacitybacktitle=0.6, rightrule=.15mm, breakable, bottomrule=.15mm, colback=white, bottomtitle=1mm, opacityback=0, arc=.35mm, colbacktitle=quarto-callout-note-color!10!white, toprule=.15mm, toptitle=1mm, coltitle=black]
+\begin{tcolorbox}[enhanced jigsaw, opacityback=0, left=2mm, toprule=.15mm, coltitle=black, rightrule=.15mm, bottomtitle=1mm, colback=white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum einfachen DID-Schätzer}, leftrule=.75mm, bottomrule=.15mm, breakable, colbacktitle=quarto-callout-note-color!10!white, toptitle=1mm, titlerule=0mm, arc=.35mm, colframe=quarto-callout-note-color-frame, opacitybacktitle=0.6]
 
 \begin{itemize}
 \item
@@ -11760,7 +12601,7 @@ Erklärungskraft werden durch die Regularisierung in Richtung 0 gezwungen
 und reduzieren so die Varianz der Vorhersage gegenüber der
 (idealerweise) unverzerrten KQ-Schätzung.
 
-\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, titlerule=0mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Ridge Regression}, colframe=quarto-callout-note-color-frame, opacitybacktitle=0.6, rightrule=.15mm, breakable, bottomrule=.15mm, colback=white, bottomtitle=1mm, opacityback=0, arc=.35mm, colbacktitle=quarto-callout-note-color!10!white, toprule=.15mm, toptitle=1mm, coltitle=black]
+\begin{tcolorbox}[enhanced jigsaw, opacityback=0, left=2mm, toprule=.15mm, coltitle=black, rightrule=.15mm, bottomtitle=1mm, colback=white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Ridge Regression}, leftrule=.75mm, bottomrule=.15mm, breakable, colbacktitle=quarto-callout-note-color!10!white, toptitle=1mm, titlerule=0mm, arc=.35mm, colframe=quarto-callout-note-color-frame, opacitybacktitle=0.6]
 
 \begin{itemize}
 \item
@@ -12335,7 +13176,7 @@ und damit zu einer höheren Vorhersagegüte. Das ``sparsame'' mit
 Lasso-Regression geschätzte Modell ist dem ``großen'' mit KQ geschätztem
 Modell in dieser Hinsicht also überlegen.
 
-\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, titlerule=0mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Lasso-Regression}, colframe=quarto-callout-note-color-frame, opacitybacktitle=0.6, rightrule=.15mm, breakable, bottomrule=.15mm, colback=white, bottomtitle=1mm, opacityback=0, arc=.35mm, colbacktitle=quarto-callout-note-color!10!white, toprule=.15mm, toptitle=1mm, coltitle=black]
+\begin{tcolorbox}[enhanced jigsaw, opacityback=0, left=2mm, toprule=.15mm, coltitle=black, rightrule=.15mm, bottomtitle=1mm, colback=white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Lasso-Regression}, leftrule=.75mm, bottomrule=.15mm, breakable, colbacktitle=quarto-callout-note-color!10!white, toptitle=1mm, titlerule=0mm, arc=.35mm, colframe=quarto-callout-note-color-frame, opacitybacktitle=0.6]
 
 \begin{itemize}
 \item
@@ -13307,7 +14148,7 @@ Der Post-Double-Selection-Schätzer liefert unter den betrachteten
 Verfahren die beste Schätzung von \(\alpha_0\) und erlaubt gülstige
 statistische Inferenz. Der geschätzte Effekt ist hoch-signifikant.
 
-\begin{tcolorbox}[enhanced jigsaw, left=2mm, leftrule=.75mm, titlerule=0mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum Post-Double-Selection-Schätzer}, colframe=quarto-callout-note-color-frame, opacitybacktitle=0.6, rightrule=.15mm, breakable, bottomrule=.15mm, colback=white, bottomtitle=1mm, opacityback=0, arc=.35mm, colbacktitle=quarto-callout-note-color!10!white, toprule=.15mm, toptitle=1mm, coltitle=black]
+\begin{tcolorbox}[enhanced jigsaw, opacityback=0, left=2mm, toprule=.15mm, coltitle=black, rightrule=.15mm, bottomtitle=1mm, colback=white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum Post-Double-Selection-Schätzer}, leftrule=.75mm, bottomrule=.15mm, breakable, colbacktitle=quarto-callout-note-color!10!white, toptitle=1mm, titlerule=0mm, arc=.35mm, colframe=quarto-callout-note-color-frame, opacitybacktitle=0.6]
 
 \begin{itemize}
 \item
@@ -14949,8 +15790,13 @@ Acemoglu, Daron, Giuseppe De Feo, und Giacomo Davide De Luca. 2020.
 
 \bibitem[\citeproctext]{ref-Acemogluetal2008}
 Acemoglu, Daron, Simon Johnson, James A. Robinson, und Pierre Yared.
-2008. {„Income and Democracy``}. \emph{American Economic Review} 98 (3):
-808--42. \url{https://doi.org/10.1257/aer.98.3.808}.
+2008a. {„Income and Democracy``}. \emph{American Economic Review} 98
+(3): 808--42. \url{https://doi.org/10.1257/aer.98.3.808}.
+
+\bibitem[\citeproctext]{ref-Acemogluetal2008data}
+---------. 2008b. {„Replication data for: Income and Democracy``}. ICPSR
+- Interuniversity Consortium for Political; Social Research.
+\url{https://doi.org/10.3886/E113251V1}.
 
 \bibitem[\citeproctext]{ref-Adireksombat2010}
 Adireksombat, Kampon. 2010. {„The Effects of the 1993 Earned Income Tax
