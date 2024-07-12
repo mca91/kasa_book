@@ -89,7 +89,7 @@ Ein Panel-Datensatz enthält Beobachtungen von $n$ Einheiten für (bis zu) $T$ Z
 
 wobei $U_i$ unbeobachtete und $X_i$ beobachtete, **zeitlich-invariante** Heterogenitäten zwischen den Beobachtungseinheiten $i=1,\dots,n$ sind. Wie zuvor ist $B_{it}$ die Behandlungsvariable und $\beta_1$ der interessierende kausale Effekt einer Veränderung von $B_{it}$ auf $Y_{it}$. 
 
-Angenommen wir beobachten $Y_{it}$ und $B_{it}$ für $T=1$, also für eine Periode. Bei Korrelation zwischen den **unbeobachtbaren** zeit-invarianten Effekten $U_i$ und der Behandlungsvariable $B_{it}$ kann der kausale Effekt $\beta_1$ in nicht identifiziert werden. Diese Situation ist in @fig-FEDAG1 dargestellt.
+Angenommen wir beobachten $Y_{it}$ und $B_{it}$ für $T=1$, also für eine Periode. Bei Korrelation zwischen den **unbeobachtbaren** zeit-invarianten Effekten $U_i$ und der Behandlungsvariable $B_{it}$ kann der kausale Effekt $\beta_1$ nicht identifiziert werden. Diese Situation ist in @fig-FEDAG1 dargestellt.
 
 ```{dot}
 //| fig-width: 3
@@ -106,10 +106,10 @@ digraph FE_dag_single_period {
     pad=.5
 
     // Zeitinvariante Einflüsse
-    U [pos="2,8!", label=<U<SUB>t=1</SUB>>, color=gray, fontcolor=gray];
+    U [pos="2,8!", label=<U<SUB>i</SUB>>, color=gray, fontcolor=gray];
 
     // Knoten für Zeitvariante Einflüsse
-    X [pos="2,6!", label=<X<SUB>t=1</SUB>>];
+    X [pos="2,6!", label=<X<SUB>i</SUB>>];
 
     // Knoten für eine Periode
     B [pos="0,6!", label=<B<SUB>t=1</SUB>>];
@@ -129,7 +129,7 @@ digraph FE_dag_single_period {
 \begin{align}
   Y_{it} = \beta_0 + \beta_1 B_{it} + \beta_2 X_i + \varepsilon_{it},\quad t=1,\label{eq:femodelfail}
 \end{align}
-nicht schließen können.
+mit $\varepsilon_{it} = U_i + \epsilon_{it}$ nicht schließen können.^[Wegen $E(\varepsilon_{it}\vert B_{it})\neq 0$ ist der KQ-Schätzer von $\beta_1$ nicht erwartungstreu und inkonsistent.]
 
 Wir betrachten nun eine Generalisierung von @fig-FEDAG1 für $T=2$ Perioden, dargestellt in @fig-FEDAG2.
 
@@ -147,10 +147,9 @@ digraph FE_dag2 {
     splines=true
 
     // Zeitinvariante Einflüsse
-    U [pos="2,8!", label=<U>, color=gray, fontcolor=gray];
+    U [pos="2,8!", label=<U<SUB>i</SUB>>, color=gray, fontcolor=gray];
 
-    // Knoten für Zeitvariante Einflüsse
-    X [pos="2,2!", label=<X>];
+    X [pos="2,2!", label=<X<SUB>i</SUB>>];
 
     // Knoten für Perioden 1
     B1 [pos="0,4!", label=<B<SUB>t=1</SUB>>];
@@ -180,9 +179,7 @@ digraph FE_dag2 {
 
 Der in @fig-FEDAG2 gezeigte Zusammenhang führt (idealerweise) zwar zu einer Verdoppelung des Beobachtungsumfangs, jedoch besteht weiterhin das in @fig-FEDAG1 gezeigte Endogenitätsproblem, falls die Regression \eqref{eq:femodelfail} nun anhand einer Zusammenlegung (**Pooling**) der Beobachtungen für $t\in\{1,2\}$ geschätzt wird:^[Pooled Regression kann auch berechnet werden, wenn nicht für alle $n$ Einheiten jeweils $T$ Beobachtungen vorliegen (unbalanced Panel).] Die unbeobachteten zeit-invarianten Einflüsse $U_i$ verursachen auch für Periode $t=2$ Backdoor-Pfade.
 
-In diesem Kapitel betrachten wir Panel-Verfahren, welche den kausalen Effekt in @fig-FEDAG2 und Verallgemeinerungen hiervon schätzen können. Analog zu Querschnittsdaten können die hier betrachteten Panel-Schätzer Endogenitäten aufgrund simultaner Kausalität oder nicht beheben. In solchen Szenarien können Panel-Methoden in Kombination mit einer Schätzstrategie basierend auf Instrument-Variablen hilfreich sein. Wir betrachten solche Schätzer in den empirischen Beispielen in Kapitel @sec-IV. 
-
-Bevor wir diese Panel-Verfahren erläutern, veranschaulichen wir die verzerrte Schätzung eines Behandlungseffekts mit *Pooled Regression* für einen simulierten Datensatz `paneldata.csv`, der Beobachtungen von $n=12$ Einheiten zu $T=8$ Perioden beinhaltet. Alle Einheiten weisen unbeobachtbare zeit-invariante Heterogenitäten auf, die mit $B_{it}$ korellieren. Der wahre Behandlungseffekt beträgt $\beta_1 = -1$ für alle $n$ Einheiten.^[Der (R code für den) DGP ist [diesem StackExchange-Post](https://stats.stackexchange.com/a/188559) entnommen.]
+In diesem Kapitel betrachten wir Panel-Verfahren, welche den kausalen Effekt in @fig-FEDAG2 und Verallgemeinerungen hiervon schätzen können. Bevor wir diese Methoden betrachten, veranschaulichen wir die verzerrte Schätzung eines Behandlungseffekts mit *Pooled Regression* in Modell \eqref{eq:femodelfail} bei unbeobachtbaren Heterogenitäten für einen simulierten Datensatz `paneldata.csv`. Der Datensatz enthält Beobachtungen von $n=12$ Einheiten zu $T=8$ Perioden. Alle Einheiten weisen unbeobachtbare *zeit-invariante* Heterogenitäten auf, die mit $B_{it}$ korellieren. Der wahre Behandlungseffekt beträgt $\beta_1 = -1$.^[Der (R code für den) DGP ist [diesem StackExchange-Post](https://stats.stackexchange.com/a/188559) entnommen.]
 
 Wir lesen zunächst den Datensatz ein und selektieren die benötigten Variablen.
 
@@ -191,7 +188,6 @@ Wir lesen zunächst den Datensatz ein und selektieren die benötigten Variablen.
 paneldata <- read_csv("datasets/paneldata.csv") %>% 
   select(X, Y, ID, time, col)
 ```
-
 
 ```{r}
 # Panel-Dimensionen bestimmen
@@ -314,11 +310,11 @@ ggplot(
 
 ## Regression in Differenzen
 
-Wir betrachten zunächst den in @fig-FEDAG2 dargestellten DGP für $T=2$ Zeitperioden. In dieser Situation können Backdoors durch $U$ anhand einer simplen Transformation von Modell \eqref{eq:femodel} geschlossen werden: Regression der Zeit-Differenzen zwischen den Perioden $t=2$ und $t=1$,
+Wir betrachten erneut den in @fig-FEDAG2 dargestellten DGP für $T=2$ Zeitperioden. In dieser Situation können Backdoors durch die $U_i$ anhand einer simplen Transformation von Modell \eqref{eq:femodel} geschlossen werden: Regression der Zeit-Differenzen zwischen den Perioden $t=2$ und $t=1$,
 \begin{align}
   \Delta Y_{it} = \beta_1 \Delta B_{it} + e_{it}, \qquad i=1,\dots,n,\qquad t=1,2 \label{eq:femodeldiff},
 \end{align}
-wobei $\Delta\,Y_{it} := Y_{i2} - Y_{i1}$ und $e_{it} := \epsilon_{i2} - \epsilon_{i1}$ für $t=2$. Beachte, dass $\Delta U_i=\Delta X_i=0$. Differenzieren ergibt also ein Modell, in dem weder für $X_i$ noch für die (unbeobachtbaren) $U_i$ kontrolliert werden muss, damit $\beta_1$ identifiziert werden kann. Der Behandlungseffekt $\beta_1$ kann mit KQ geschätzt werden. 
+wobei $\Delta Y_{it} := Y_{i2} - Y_{i1}$ und $\Delta e_{it} := \epsilon_{i2} - \epsilon_{i1}$ für $t=2$. Beachte, dass $\Delta U_i=\Delta X_i=0$. Differenzieren der Komponenten führt zu einem Modell, in dem weder für (beobachtbare) $X_i$ noch für (unbeobachtbare) $U_i$ kontrolliert werden muss, damit $\beta_1$ identifiziert werden kann.^[Ein Nachteil der Differenzbildung ist also, dass wir die Koeffizienten der beobachtbaren, zeitlich konstanten Regressoren nicht schätzen können.] Der Behandlungseffekt $\beta_1$ kann mit KQ geschätzt werden.^[Der Differenzen-Schätzer ist erwartungstreu und konsistent, wenn $E(\epsilon_{is}\vert B_{it})=0$ für $s\geq t$.] 
 
 Zur Transformation der Regressoren in `fixest::feols()` verwenden wir den Operator `d()`. Dieser benötigt die im Argument `panel.id` als Formel spezifizierten Identifikationsvariablen für Einheiten (`ID`) und Zeitpunkte (`time`).
 
@@ -378,8 +374,7 @@ paneldata_diff <- paneldata %>%
   theme_cowplot()
 ```
 
-Wie für die Pooled Regression können wir den Differenzen-Schätzer für den gesamten Datensatz berechnen. 
-
+Wie bei Pooling können wir den Differenzen-Schätzer für den gesamten Datensatz berechnen. 
 ```{r}
 # Panel-Schätzer: KQ-Regression in Differenzen
 panel_diff <- feols(
@@ -395,7 +390,7 @@ Beachte, dass der Standardfehler der Schätzers etwas größer ist als für den 
 
 ```{r}
 #| label: fig-diffregression2
-#| fig-cap: "`paneldaten.csv` -- Regression in Differenzen für t = 1, ..., 8"
+#| fig-cap: "`paneldaten.csv` -- Regression in Differenzen für t = 2, ..., 8"
 
 # Plot: KQ-Schätzer in Differenzen (alle t)
 ggplot(
@@ -421,32 +416,37 @@ ggplot(
 
 ## Fixed-Effects-Regression
 
-Die Regression in Differenzen hat den Nachteil, dass einheiten-spezifische Effekte nicht geschätzt werden können. Weiterhin impliziert die Differenzbildung einen Verlust des Beobachtungsumfangs bei der Schätzung des kausalen Effekts.^[Eine Reduktion des Beobachtungsumfangs erhöht die Varianz der Schätzung.] Für den Datensatz `paneldata.csv` verlieren wir daher 1/8 der Stichprobe. Abhängig von der empirischen Fragestellung und der Datenverfügbarkeit kann Fixed-Effects-Regression eine nützliche Alternative zu Regression in Differenzen sein, wenn Panel-Daten mit $T\geq2$ vorliegen.
+Die KQ-Schätzung der Regression in Differenzen hat den Nachteil, dass die Koeffizienten von einheiten-spezifischen Variablen nicht geschätzt werden können. Weiterhin impliziert die Differenzbildung einen Verlust des Beobachtungsumfangs bei der Schätzung des kausalen Effekts.^[Eine Reduktion des Beobachtungsumfangs erhöht die Varianz der Schätzung. Für $T=2$ ist der Differenzen-Schätzer äquivalent zu den Schätzern im Fixed-Effects-Modell, ist jedoch ineffizient für $T>2$.] Für den Datensatz `paneldata.csv` verlieren wir $1/8$ der Stichprobe. Abhängig von der empirischen Fragestellung und der Datenverfügbarkeit (Verhältnis von $T$ und $n$) kann Fixed-Effects-Regression eine nützliche Alternative zu Regression in Differenzen sein.
 
 Wir betrachten erneut Modell \eqref{eq:unobshetmodel} und definieren
 \begin{align*}
-  \delta_i = \beta_0 + \beta_3 U_i.
+  \alpha_i = \beta_0 + \beta_3 U_i.
 \end{align*}
 Nach einsetzen in \eqref{eq:unobshetmodel} erhalten wir das Modell
 \begin{align}
-  Y_{it} = \delta_i + \beta_1 B_{it} + \beta_2 X_i + \epsilon_{it} \label{eq:femodel},
+  Y_{it} = \alpha_i + \beta_1 B_{it} + \beta_2 X_i + \epsilon_{it} \label{eq:femodel},
 \end{align}
-mit einheiten-spezifischen Konstanten $\delta_i$, $i=1,\dots,n$. Die $\delta_i$ können als individuelle Achsenabschnitte ("feste Effekte") interpretieren werden, weshalb Modell \eqref{eq:femodel} auch als "Fixed-Effects-Modell" bezeichnet wird.^[Eine Modellierung mit gruppen-spezifischen Achsenabschnitten scheint in @fig-pooledregression2 plausibel.] 
+mit einheiten-spezifischen **Konstanten** ("feste Effekte") $\alpha_i$ für $i=1,\dots,n$, die als individuelle Achsenabschnitte nterpretieren werden können. Das Modell \eqref{eq:femodel} wird daher auch als *Fixed-Effects-Modell* bezeichnet.^[Beachte, dass eine bessere Anpassung an die Daten bei der Modellierung von `paneldata.csv` mit einheiten-spezifischen Achsenabschnitten anhand von @fig-pooledregression2 plausibel scheint.] 
 
-Für die Vermeidung von Backdoors in den $\delta_i$ subtrahieren wir die einheiten-spezifischen Mittelwerte von den Komponenten (Within-Transformation),
+
+### Within- und LSDV-Schätzer
+
+Für die Vermeidung von Backdoors durch die $\alpha_i$ subtrahieren wir die einheiten-spezifischen Mittelwerte von den Komponenten (*Within-Transformation*)^[Die Durchschnitte werden hierbei also über die *Zeitperioden* berechnet.],
 \begin{align}
-  Y_{it} - \overline{Y}_i =&\, (\delta_i - \overline{\delta}_i) + \beta_1 (B_{it} - \overline{B}_i) + \beta_2 (X_i - \overline{X}_i) + (\epsilon_{it} - \overline{\epsilon}_i)\notag\\
+  Y_{it} - \overline{Y}_i =&\, (\alpha_i - \overline{\alpha}_i) + \beta_1 (B_{it} - \overline{B}_i) + \beta_2 (X_i - \overline{X}_i) + (\epsilon_{it} - \overline{\epsilon}_i)\notag\\
   \tilde Y_{it} =&\, \beta_1 \tilde B_{it} + \tilde\epsilon_{it}.\label{eq:fewithin}
 \end{align}
-Der Fixed-Effects-Schätzer von $\beta_1$ ist der KQ-Schätzer in \eqref{eq:fewithin}. Ähnlich wie für den Differenzen-Schätzer eliminieren die Mittelwert-Differenzen $\delta_i - \overline{\delta}_i=0$ und $X_i - \overline{X}_i=0$ den Einfluss zeit-invarianter Variablen.
+Der *Within-Schätzer* von $\beta_1$ ist der KQ-Schätzer in \eqref{eq:fewithin}. Dieser Schätzer nutzt die Variabilität innerhalb der Beobachtungseinheiten über die Zeit, um die Koeffizienten der unabhängigen Variablen zu schätzen. Ähnlich wie für den Differenzen-Schätzer eliminieren die Mittelwert-Differenzen $\alpha_i - \overline{\alpha}_i=0$ und $X_i - \overline{X}_i=0$ den Einfluss zeit-invarianter Variablen.
 
-Das Modell \eqref{eq:femodel} kann weiterhin als eine Regression mit $n-1$ Dummy-Variablen und einer Konstante umgeschrieben werden,
+Das Modell \eqref{eq:femodel} kann weiterhin als eine Regression mit $n-1$ Dummy-Variablen und einer Konstante geschrieben werden,
 \begin{align}
   Y_{it} = \beta_0 + \beta_2 B_{it} + \beta_2 X_i  + \gamma_2 D^{(2)}_i + \gamma_3 D^{(3)}_i + \cdots + \gamma_n D^{(n)}_i + \epsilon_{it} \label{eq:drmodel}.
 \end{align}
-Die Darstellung \eqref{eq:drmodel} hat $n$ verschiedene Achsenabschnitte -- einen für jede Beobachtungseinheit -- und kann ebenfalls mit KQ geschätzt werden.^[Für $n-1$ Einheiten ist der individuelle Achsenabschnitt damit $\beta_0 + \gamma_i$ und für *eine* Einheit $\beta_0$. Diese Einheit (hier $i=1$) wird auch als *Referenzkategorie* bezeichnet. Alternativ kann das Modell mit $n$ Dummies und *ohne* die Konstante $\beta_0$ geschrieben werden.] Die Modelle \eqref{eq:femodel} und \eqref{eq:drmodel} sind also gleichwertige Darstellungen eines Modells, dass (unbeobachtbare) zeit-invariante Heterogenität berücksichtigt.^[Der Ansatz \eqref{eq:drmodel} wird in der Literatur auch als *Least Squares Dummy Variables* (LSDV) Regression bezeichnet.] Beachte, dass die Schätzung der Koeffizienten *beobachtbarer* zeit-invarianter Regressoren $X_{i}$ lediglich in Modell \eqref{eq:drmodel} möglich ist.
+Die Darstellung \eqref{eq:drmodel} hat $n$ verschiedene Achsenabschnitte -- einen für jede Beobachtungseinheit -- und kann ebenfalls mit KQ geschätzt werden.^[Für $n-1$ Einheiten ist der individuelle Achsenabschnitt damit $\beta_0 + \gamma_i$ und für *eine* Einheit $\beta_0$. Diese Einheit (hier $i=1$) wird auch als *Referenzkategorie* bezeichnet. Alternativ kann das Modell mit $n$ Dummies und *ohne* die Konstante $\beta_0$ geschrieben werden.] Der KQ-Schätzer ergibt für die Modelle \eqref{eq:femodel} und \eqref{eq:drmodel} numerisch äquivalente Schätzungen von $\beta_1$, wenn $X_i$ in der Dummy-Regression ausgelassen wird.^[KQ ist hier erwartungstreu und konsistent, sofern $E(\epsilon_{is}\vert B_{it})=0$ für alle $s$ und $t$.] Die Schätzung von \eqref{eq:drmodel} mit KQ wird in der Literatur auch als *Least Squares Dummy Variables* (LSDV) Regression bezeichnet.
 
-Fixed-Effects-Regressionen können mit `fixest::feols()` geschätzt werden.^[Eine Alternative ist `plm::plm()` mit dem Argument `method = "within"`.] Je nach Spezifikation des Formula-Arguments (`fml`) wird ein effizienter Algorithmus für eine Variante von \eqref{eq:femodel} angwandt. Für `paneldata.csv` erhalten wir mit `fml = Y ~ X | ID` per Referenz des Indikators `ID` eine Schätzung mit Berechnung der einheiten-spezifischen Effekte.
+Beachte, dass die Schätzung der Koeffizienten *beobachtbarer* zeitlich konstanter Regressoren wie $X_{i}$ lediglich in Modell \eqref{eq:drmodel} möglich ist.
+
+Fixed-Effects-Regressionen können mit `fixest::feols()` geschätzt werden.^[Eine Alternative ist `plm::plm()` mit dem Argument `method = "within"`.] Je nach Spezifikation des Formula-Arguments (`fml`) wird ein effizienter Algorithmus für die entsprechende Transformation von \eqref{eq:femodel} angwandt. Für `paneldata.csv` erhalten wir mit `fml = Y ~ X | ID` per Referenz des Indikators `ID` eine Variante des Within-Schätzers.
 
 ```{r}
 # Fixed-Effects-Schätzung
@@ -465,22 +465,18 @@ Die Zusammenfassung der Schätzung zeigt einen signifikanten Koeffizienten, der 
 fixest::fixef(panel_FE)
 ```
 
-::: callout-note
-#### Key Facts zu Fixed-Effects-Regression
+Mit `fml = Y ~ X + factor(ID)` erfolgt eine Schätzung der Dummy-Regression \eqref{eq:drmodel} mit $n-1=11$ Dummies. Der Referenzeinheit ist `ID == 1`. Wir sehen, dass der geschätzte Koeffizient von $X$ mit dem Ergebnis des Within-Schätzers übereinstimmt.
 
-- Fixed-Effects-Schätzer kontrollieren für den Einfluss von Heterogenitäten zwischen Beobachtungseinheiten die über die Zeit konstant sind (einheiten-spezifische Effekte) und/oder für Heterogenitäten, die identisch für die Beobachtungseinheiten sind, jedoch über die Zeit variieren (Zeit-Effekte).
+```{r}
+# LSDV-Schätzung
+panel_FE <- feols(
+  fml = Y ~ X + factor(ID),  
+  data = paneldata
+)
 
-- Ein Fixed-Effects-Ansatz ist nötig, wenn *unbeobachtete*, mit den erklärenden Variablen korrelierte Heterogenitäten vorhanden sind. Kontrolle für letztere gewährleistet eine verzerrungsfreie Schätzung der Regressionskoeffizienten in Panel-Studien. 
+summary(panel_FE)
+```
 
-- LSDV-Regression ist eine Variante zur Schätzung bei Fixed Effects mit KQ. Hierbei werden Backdoors durch unbeobachtbare Heterogenitäten mit Dummy-Variablen geschlossen. In einer LSDV-Regression können die Koeffizienten zeitlich konstanter Variablen geschätzt werden.
-
-- KQ liefert in Fixed-Effects-Designs erwartungstreue und konsistente Schätzer, solange die erklärenden Variablen zeitlich unkorreliert mit den Fehlertermen sind.
-
-- Statistische Inferenz für Fixed-Effects-Schätzer erfolgt anhand einer Approximation der asymptotischen Normalverteilung. Da die Fehlerterme heteroskedastisch und/oder über die Zeit korreliert sein können, sollten (cluster) robuste Standardfehler verwendet werden.
-
-- Fixed Effects Modelle können in R mit dem Paketen `fixest` oder `plm` berechnet werden.
-
-:::
 
 ### Zeit-Fixed-Effects
 
@@ -545,7 +541,7 @@ Für beobachtbare zeitabhängige Backdoor-Variablen $X_t$ kann durch Aufnahme di
 
 In empirischen Anwendung ist es häufig plausibel, für zeit- und einheiten-spezifische Effekte zu kontrollieren. Der entsprechende Regressionsansatz wird als *Two Way Fixed Effects* (TWFE) bezeichnet. 
 
-Ein TWFE-Modell für `paneldata.csv` kann mit `feols()` leicht unter Angabe der Identifikationsvariable der Zeitperioden (`time`) innerhalb des `fml`-Arguments geschätzt werden.
+Ein TWFE-Modell für `paneldata.csv` kann mit `feols()` leicht unter Angabe der Identifikationsvariable für die Zeitperioden (`time`) innerhalb des `fml`-Arguments geschätzt werden.
 
 ```{r}
 # TWFE-Schätzung
@@ -562,31 +558,51 @@ summary(panel_TWFE)
 fixest::fixef(panel_TWFE)
 ```
 
+
+::: callout-note
+
+#### Key Facts zu Fixed-Effects-Regression
+
+- Ein Fixed-Effects-Designs betrachten *unbeobachtete*, mit den erklärenden Variablen korrelierte Heterogenitäten als *konstante* parameter. Korrigieren für diese Heterogenitäten ist Voraussetzung für eine verzerrungsfreie Schätzung kausaler Effekte. 
+
+- Fixed-Effects-Schätzer schließen Backdoors aufgrund von Heterogenitäten zwischen Beobachtungseinheiten die über die Zeit konstant sind (einheiten-spezifische Effekte) und/oder für Heterogenitäten, die identisch für die Beobachtungseinheiten sind, jedoch über die Zeit variieren (Zeit-Effekte):
+
+    - KQ nach der Within-Transformation (Within-Schätzer) ist erwartungstreu und konsistent, solange die erklärenden Variablen zeitlich unkorreliert mit den Fehlertermen sind. 
+
+    - LSDV-Regression ist eine Variante die Backdoors durch unbeobachtbare Heterogenitäten mit Dummy-Variablen schließt. In einer LSDV-Regression können die Koeffizienten zeitlich konstanter Variablen geschätzt werden.
+
+- Statistische Inferenz für Fixed-Effects-Schätzer erfolgt anhand einer Approximation der asymptotischen Normalverteilung. Da die Fehlerterme heteroskedastisch und/oder über die Zeit korreliert sein können, sollten (cluster-)robuste Standardfehler verwendet werden.
+
+- Fixed-Effects-Modelle können in R mit dem Paketen `fixest` oder `plm` berechnet werden.
+
+:::
+
 ## Random Effects
 
-Der Fixed-Effects-Ansatz behandelt die einheiten-spezifischen Effekte $\delta_i$ in Modell \eqref{eq:femodel} als konstante Parameter. Das einfache Random-Effects-Modell lautet
+Der Fixed-Effects-Ansatz behandelt die einheiten-spezifischen Effekte $\alpha_i$ in Modell \eqref{eq:femodel} als konstante Parameter, für die korrigiert oder kontrolliert werden muss. Der Random-Effects-Ansatz betrachtet die $\alpha_i$ als **Zufallsvariablen** mit einer identischen Verteilung, unter der Annahme, dass die $\alpha_i$ *nicht* mit den erklärenden Variablen korellieren.^[Erwartungstreue und Konsistenz und Effizienz erfordern $E(\alpha_i\vert B_{it})=0$ *und* $E(\epsilon_{it}\vert\alpha_i,B_{it})=0$.] Falls diese Annahmen erfüllt sind, ist der Random-Random-Effects-Schätzer effizienter als der Fixed-Effects-Schätzer: Der mittlere quadratische Fehler der Schätzung ist geringer.^[Die Schätzung erfolgt meist mit der Generalized Least Squares (GLS) oder mit [Maximum-Likelihood](https://de.wikipedia.org/wiki/Maximum-Likelihood-Methode) (ML).]
+
+Das einfache Random-Effects-Modell notieren wir als
 \begin{align*}
   Y_{it} =&\, \beta_0 + \beta_1 B_{it} + \varepsilon_{it},
 \end{align*}
-wobei sich der Fehlerterm $\varepsilon_{it}$ aus dem zufälligen individuellen Effekt $\delta_i$ und dem unabhängigen Fehler $\epsilon_{it}$ zusammensetzt,
+wobei sich der Fehlerterm $\varepsilon_{it}$ aus dem zufälligen individuellen Effekt $\alpha_i$ und dem unabhängigen Fehler $\epsilon_{it}$ zusammensetzt,
 \begin{align*}
   \varepsilon_{it} = \alpha_i + \epsilon_{it}.
 \end{align*}
-Der Random-Effects-Ansatz betrachtet die $\delta_i$ als *Zufallsvariablen* mit einer gemeinsamen (Normal)Verteilung, unter der Annahme, dass die $\delta_i$ *nicht* mit den erklärenden Variablen korrelieren.^[Weiterhin dürfen die $\delta_i$ nicht mit dem Fehler $\epsilon_{it}$ korrelieren.] 
-Falls diese Annahme erfüllt ist, ist der Random-Random-Effects-Schätzer effizienter als der Fixed-Effects-Schätzer: Der mittlere quadratische Fehler der Schätzung ist geringer.^[Die Schätzung erfolgt oft mit der [Maximum-Likelihood-Methode](https://de.wikipedia.org/wiki/Maximum-Likelihood-Methode).]
+
 
 Für ein Beispiel simulieren wir Daten gemäß der Vorschrift 
 \begin{align}
-  y_{it} = \alpha_i + \beta B_{it} + \epsilon_{it},\label{eq:resim}
+  Y_{it} = \alpha_i + \beta B_{it} + \epsilon_{it}\label{eq:resim}
 \end{align}
-wobei $\alpha_i$ die individuellen Zufallseffekte. Wir wählen
+und wählen
 \begin{align*}
   & \alpha_i \overset{u.i.v}{\sim} N(0,2.5^2), \\
   & \beta_1 = -1,\\
-  & X_{it} \sim N(0,1),\\
+  & B_{it} \sim N(0,1),\\
   & \epsilon_{it} \overset{u.i.v}{\sim} N(0,0.75^2).
 \end{align*}
-Wie in `paneldata.csv` erzeugen wir Daten für $n=12$ Individuen, die zu $T=8$ Zeitperioden beobachtet werden. Mit diesen Komponenten wird die Outcome-Variable $y_{it}$ wie in \eqref{eq:resim} generiert. Der nachstehende Code erzeugt die Daten als Matrizen für \texttt{X} und \texttt{y}, die  anschließend in ein langes Datenformat (`tibble`) umgewandelt werden.
+Wie in `paneldata.csv` erzeugen wir Daten für $n=12$ Individuen, die zu $T=8$ Zeitperioden beobachtet werden. Mit diesen Komponenten wird die Outcome-Variable $Y_{it}$ wie in \eqref{eq:resim} generiert. Der nachstehende Code erzeugt die Daten als Matrizen `B` und `Y`, die  anschließend in ein langes Datenformat (`tibble`) umgewandelt werden.
 
 ```{r}
 library(plm)
@@ -604,15 +620,15 @@ sigma_epsilon <- 0.75 # SD für Fehler
 alpha <- rnorm(n, mean = 0, sd = sigma_alpha)
 
 # Matrizen
-X <- matrix(NA, nrow = m, ncol = n)
-y <- matrix(NA, nrow = m, ncol = n)
+B <- matrix(NA, nrow = m, ncol = n)
+Y <- matrix(NA, nrow = m, ncol = n)
 
 # Simulation
 for (i in 1:n) {
   for (t in 1:m) {
-    X[t, i] <- rnorm(1, mean = 0, sd = 1)
+    B[t, i] <- rnorm(1, mean = 0, sd = 1)
     epsilon_it <- rnorm(1, mean = 0, sd = sigma_epsilon)
-    y[t, i] <- alpha[i] + beta * X[t, i] + epsilon_it
+    Y[t, i] <- alpha[i] + beta * B[t, i] + epsilon_it
   }
 }
 
@@ -620,19 +636,20 @@ for (i in 1:n) {
 RE_paneldata <- tibble(
   id = factor(rep(1:n, each = m)),
   time = rep(1:m, times = n),
-  X = as.vector(X),
-  y = as.vector(y)
+  B = as.vector(B),
+  Y = as.vector(Y)
 )
 ```
 
-Für die Anpassung des Random-Effect-Schätzers an den simulierten Datensatz `RE_paneldata` nutzen wir `plm::plm()` mit `model = "random"`.
+Für die Anpassung des Random-Effect-Schätzers an den simulierten Datensatz `RE_paneldata` nutzen wir `plm::plm()` mit `model = "random"`. Mit `effect = "individual"` legen wir einheiten-spezifische Random Effects fest.^[Analog zu Fixed-Effects-Modellen können mit `effect = "twoway"` einheiten- *und* zeit-spezifische zufällige Effekte modelliert werden.]
 
 ```{r}
 # Random-Effects-Modell anpassen
 panel_RE <- plm(
-  formula = y ~ X, 
+  formula = Y ~ B, 
   data = RE_paneldata, 
-  index = c("id", "time"), 
+  index = c("id", "time"),
+  effect = "individual",
   model = "random"
 )
 
@@ -641,39 +658,41 @@ summary(panel_RE)
 
 Die Schätzung zeigt eine gute Anpassung an die Daten und der geschätzte Behandlungseffekt liegt mit $`r round(panel_RE$coefficients[2], 3)`$ nahe am wahren Koeffizienten $\beta_1 = -1$.
 
-Mit `plm::ranef()` erhalten wir *Differenzen* der geschätzten einheiten-spezifischen Effekte vom geschätzten Erwartungswert der unterstellten gemeinsamen Verteilung.
+Mit `plm::ranef()` erhalten wir *Differenzen* der geschätzten einheiten-spezifischen Effekte vom geschätzten Erwartungswert `(Intercept)`.
 
 ```{r}
-# Gesch. Random Effects auslesen
-# (Differenzen zum geschätzten Mittelwert der gem. Verteilung)
+# Gesch. Random Effects auslesen:
+# Differenzen zur Konstante (Intercept)
 ranef(panel_RE)
 ```
 
 Für die grafische Darstellung der Schätzung berechnen wir zunächst mit `fitted()` die angepassten Werte. Für ein mit `plm()` geschätztes Random-Effects-Modell werden die individuellen Effekte von `fitted()` nicht berücksichtigt und müssen daher manuell hinzugefügt werden. Hierfür lesen wir zunächst den geschätzten Erwartungswert der gemeinsamen Verteilung $\widehat{\beta}_0$ aus und addieren anschließend die von `ranef()` ausgegebenen Differenzen der individuellen Effekte gruppenweise.
 
 ```{r}
-# Gesch. Erwartungswert der gem. Verteilung
+# Intercept
 hat_beta_0 <- panel_RE$coefficients[1]
 
-# Gesch. Random Effects berücksichtigen
+# Gesch. Random Effects jeweils berücksichtigen
 RE_paneldata <- RE_paneldata %>%
   mutate(
     fitted_RE = 
       fitted(panel_RE) 
     + hat_beta_0 
-    + rep(ranef(panel_RE), each = 8)
+    + rep(ranef(panel_RE), each = m)
   )
 ```
 
 ```{r}
 #| label: fig-repanelest
 #| fig-cap: "`RE_paneldata` -- Random-Effects-Schätzung für simulierte Daten"
+
+# Daten und geschätztes RE-Modell plotten
 ggplot(
   data = RE_paneldata, 
   mapping = 
     aes(
-      x = X, 
-      y = y, 
+      x = B, 
+      y = Y, 
       col = id
     )
 ) + 
@@ -685,16 +704,17 @@ ggplot(
   theme_cowplot()
 ```
 
-Die Random-Effects-Methode findet bei kausalen Analyse in empirischen Anwendungen selten Anwendung, weil die Annahme von Unkorreliertheit mit den erklärenden Regressoren oft unplausibel ist. Falls diese Annahme (wie in den DAGs @fig-FEDAG1 und @fig-FEDAG2) verletzt ist, kann Random Effects die ensprechenden Backdoors nicht schließen: Der Random-Effects-Schätzer ist dann verzerrt und inkonsistent, ähnlich wie der naive KQ-Schätzer in einer Pooled Regression.
-
 ### Verzerrung bei Endogenität
+
+Die Random-Effects-Methode findet bei kausalen Analyse in empirischen Anwendungen selten Anwendung, weil die Annahme von Unkorreliertheit mit den erklärenden Regressoren oft unplausibel ist. Falls diese Annahme (wie in den DAGs @fig-FEDAG1 und @fig-FEDAG2) verletzt ist, kann Random Effects die ensprechenden Backdoors nicht schließen: Der Random-Effects-Schätzer ist dann verzerrt und inkonsistent, ähnlich wie der naive KQ-Schätzer in einer Pooled Regression. Im nächsten Abschnitt untersuchen wir Konsequenzen dieser Eigenschaft anhand simulierter Daten.
 
 Zur Illustration der Verzerrung des Random-Effects-Schätzers bei Endogenität von erklärenden Variablen verwenden wir erneut den anhand eines Fixed-Effects-DGPs simulierten Datensatz `paneldata.csv`.
 
 ```{r}
 # Random-Effects-Schätzung für `paneldata`
 panel_RE <- plm(
-  formula = Y ~ X,  
+  formula = Y ~ X, 
+  effect = "individual",
   model = "random",
   index = c("ID", "time"),  
   data = paneldata
@@ -705,7 +725,7 @@ summary(panel_RE)
 
 Offenbar weicht der Random-Effects-Schätzer des Effects von $X$ auf $Y$ deutlich vom wahren Parameter $\beta_1 = -1$ ab. Diese Abweichung ist auf die Endogenität von $X$ zurückzuführen.
 
-Die nächste Grafik vergleicht die Schätzungen des Behandlungseffekts für den Datensatz `paneldata.csv` mit Pooling (schwarze Linie), Fixed Effects (farbige Linien) und Random Effects (gestrichelte schwarze Linie). Vorab erweitern wir `paneldata` um die angepassten Werte für die Fixed- und die Random-Effects-Schätzung in `panel_FE` und `panel_RE`.^[Für bessere Lesbarkeit erzeugen wir hier mit `predict()` eine Regressionsgerade, deren Achsenabschnitt dem geschätzten Erwartungswert der Random-Effects-Verteilung entspricht.]
+Die nächste Grafik vergleicht die Schätzungen des Behandlungseffekts für den Datensatz `paneldata.csv` mit Pooling (schwarze Linie), Fixed Effects (farbige Linien) und Random Effects (gestrichelte schwarze Linie). Vorab erweitern wir `paneldata` um die angepassten Werte für die Fixed- und die Random-Effects-Schätzung in `panel_FE` und `panel_RE`.^[Für bessere Lesbarkeit erzeugen wir hier mit `predict()` *eine* Regressionsgerade, deren Achsenabschnitt dem geschätzten Erwartungswert der Random-Effects-Verteilung entspricht.]
 
 ```{r}
 paneldata <- paneldata %>% 
@@ -724,6 +744,7 @@ ggplot(
   data = paneldata,
   mapping = aes(x = X, y = Y)
 ) +
+  # Beoachtungen
   geom_point(
     mapping = aes(color = col), 
     show.legend = F
@@ -736,7 +757,11 @@ ggplot(
   ) +
   # Fixed Effects
   geom_line(
-    mapping = aes(y = yhat_FE, group = ID, col = col), 
+    mapping = aes(
+      y = yhat_FE,
+      group = ID,
+      col = col
+    ), 
     show.legend = F
   ) +
   # Random Effects
@@ -748,6 +773,23 @@ ggplot(
   theme_cowplot()
 ```
 
+::: callout-note
+
+#### Key Facts zu Random-Effects-Regression
+
+- Random-Effects-Ansätze basieren auf der Annahme, dass (unbeobachtbare) Heterogenitäten *zufällig* sind. Wir nehmen an, dass die unbeobachteten Heterogenitäten *nicht* mit den erklärenden Variablen korreliert sind. Letzteres führt zu inkonsistenten Schätzern!
+
+- Iteratives GLS oder MLE ermöglichen eine effizientere Schätzung des Random-Effects-Modells als Pooling oder Fixed-Effects-Schätzer, da sowohl die Variation innerhalb als auch zwischen den Beoabchtungseinheiten Einheiten genutzt wird.
+
+- In Random-Effects-Modellen können die Effekte zeitlich konstanter Variablen geschätzt werden, da die einheiten-spezifischen Effekte als zufällig betrachtet werden.
+
+- Unter den skizzierten Annahmen sind Random-Effects-Schätzer asymptotisch normalverteilt. Für statische Inferenz sollten cluster-robuste Standardfehler verwendet werden.
+
+- Random-Effects-Modelle können in R mit den Paketen `plm` und `lme4` geschätzt werden.
+
+:::
+
+
 ---
 
 **Interaktive Illustration von Panel-Schätzern**
@@ -758,6 +800,83 @@ Die nachfolgende interaktive Illustration erlaubt einen Vergleich der in @fig-pa
   src="https://observablehq.com/embed/@mca91/panelcomp?cells=viewof+showgroups%2Cviewof+showdgp%2Cviewof+regtype%2Ctheplot">
 </iframe>
 
+## Dynamische Modelle und Cluster-robuste Standardfehler
+
+Viele ökonomische und soziale Prozesse sind autoregressiv: Der Zustand einer Variable in der Vergangenheit beeinflusst ihren aktuellen Zustand. Bei der Modellierung von Outcome-Variablen in Panel-Designs kann es notwendig sein, diese Abhängigkeit zu berücksichtigen, um die Identifizierbarkeit kausaler Effekte zu gewährleisten. Dynamische Panelmodelle verwenden hierzu vergangene Werte (lags) der Outcome-Variable, $Y_{it-j}$ mit $j>0$ als (zusätzliche) Regressoren. Ein einfaches dynamisches Panelmodell ist
+\begin{align}
+  Y_{it} = \rho Y_{it-1} + \beta_1 B_{it} + \epsilon_{it}, \label{eq:dynpanel}
+\end{align}
+wobei $Y_{it-1}$ der Wert von $Y_{it}$ in der Periode $t-1$ ist, $0\neq\lvert\rho\rvert<1$, und $\epsilon_{i,t}$ ein u.i.v. Fehlerterm ist. In diesem Modell ist $Y_{it-1}$ *kausal* für $Y_{it}$.
+
+Die Verwendung dynamischer Modelle hat folgende Motivationen:
+
+- **(a) Präzisere Schätzung**: Berücksichtigen von gelaggten abhängigen Variablen ermöglicht die Modellierung einer zeitabhängigen Dynamik von $Y_{it}$. Die Autokorellation und damit die Varianz der Fehlerterme kann reduziert werden, da ein Teil dieser zeitlichen Abhängigkeiten direkt modelliert wird. Dies kann die Präzision der Schätzung des kausalen Effekts $\beta_1$ verbessern.
+
+```{dot}
+//| fig-width: 3
+//| fig-height: 3
+//| fig-cap: "Kontrolle für vergangenen Wert verbessert Präzision"
+//| label: "fig-LDVOK2" 
+digraph LDVOK2 {
+    layout=neato
+    fontname="Helvetica,Arial,sans-serif"
+    node [fontname="Helvetica,Arial,sans-serif"]
+    edge [fontname="Helvetica,Arial,sans-serif"]
+    splines=true
+    pad=.3
+
+    Bt [pos="0,6!", label=<B<SUB>t</SUB>>];
+    Yt [pos="2,6!", label=<Y<SUB>t</SUB>>];
+    Ytm1 [pos="1,7!", label=<Y<SUB>t-1</SUB>>];
+    
+    Bt -> Yt
+    Ytm1 -> Yt
+}
+```
+
+- **(b) Vermeidung von Endogenität**: Nichtberücksichtigen von *relevanten* gelaggten abhängigen Variablen führt zu verzerrten und inkonsistenten Schätzern.
+
+```{dot}
+//| fig-width: 3
+//| fig-height: 3
+//| fig-align: 'center'
+//| fig-cap: "Kontrolle für vergangenen Wert schließt Backdoor."
+//| label: "fig-LDVOK1" 
+digraph LDVOK1 {
+    layout=neato
+    fontname="Helvetica,Arial,sans-serif"
+    node [fontname="Helvetica,Arial,sans-serif"]
+    edge [fontname="Helvetica,Arial,sans-serif"]
+    splines=true
+    pad=.3
+
+    Bt [pos="0,6!", label=<B<SUB>t</SUB>>];
+    V [pos="0,8!", label=V, color=gray, fontcolor=gray];
+    Yt [pos="2,6!", label=<Y<SUB>t</SUB>>];
+    Ytm1 [pos="1,7!", label=<Y<SUB>t-1</SUB>>];
+    
+    V -> Bt [color=gray, style=dashed]
+    V -> Ytm1 [color=gray, style=dashed]
+    Bt -> Yt
+    Ytm1 -> Yt
+}
+```
+
+### Verzerrung in dynamischen Panels
+
+Ein zentrales Problem bei der Schätzung dynamischer Panelmodelle ist der sogenannte *Nickell-Bias*. Dieser tritt auf, wenn die Within-Transformation in Anwesenheit von gelagten abhängigen Variablen verwendet wird. Die Mittelwert-Differenzen eliminieren zwar die zeit-invarianten Effekte, führt aber zu Korrelation zwischen den gelagten abhängigen Variablen und den transformierten Fehlertermen: Der Nickell-Bias entsteht bei der Within-Transformation, weil der Regressor ($Y_{i,t-1} - \overline{Y}_{i,-1}$)^[Hier ist $\overline{Y}_{i,-1} = \frac{1}{T-1}\sum_{t=2}^T y_{it-1}$.] mit dem transformierten Fehlerterm ($\epsilon_{it} - \overline{\epsilon}_i$) korreliert ist, was zu verzerrten Parameter-Schätzern führt. 
+
+@Nickell1981 zeigt, dass diese Verzerrung für den Schätzer $\widehat{\rho}^\textup{Within}$ nicht verschwindet, wenn die Anzahl der Beobachtungseinheiten ($n$) divergiert, solange die Zeitdimension ($T$) endlich ist.^[Dies ist problematisch für Mikro-Studien: Die Querschnittsdimension des Panels kann oft "hinreichend" groß gewählt werden. Die Zeit-Dimension ist aus natürlichen Gegebenheiten jedoch oft klein.] Der Nickell-Bias ist besonders bei kurzen Panelen (kleines $T$) problematisch. Hierbei ist
+\begin{align*}
+  \widehat{\rho}^\textup{Within} \approx \rho - \frac{1 + \rho}{T-1},
+\end{align*}
+d.h. die Verzerrung beträgt ungefähr $-\frac{1+\rho_1}{T-1}$.
+
+Hinzufügen von $Y_{it-1}$ als Regressor in Fixed- und Random-Effects-Modellen ist jenseits der verzerrten Schätzung von $\rho$ problematisch, denn $Y_{it-1}$ ist mit den unbeobachtbaren $\alpha_i$ korreliert. Damit liegt erneut Endogenität aufgrund der $\alpha_i$ vor. Kontrollieren für $Y_{it-1}$ öffnet also Backdoor-Pfade, die wir mit FE- oder RE-Ansätzen schließen wollen! In sämtlichen dynamischen Varianten der Fixed- und Random-Effects-Modelle sind die in diesem Kapitel betrachteten Schätzer des kausalen Effekts von $B_{it}$ auf $Y_{it}$ daher *verzerrt und inkonsistent*.
+
+Der Arellano-Bond-Schätzer [@ArellanoBond1991] und der Anderson-Hsiao-Schätzer [@AndersonHsiao1981] sind Methoden, welche die Endogenität in dynamischen Paneldatenmodellen adressieren. Beide Verfahren basieren auf Regressionen in Differenzen. Der Arellano-Bond-Schätzer nutzt vergangene Werte und Differenzen von $Y_{it}$ als Instrumente. Der Anderson-Hsiao-Schätzer basiert auf [Momentenbedingungen](https://en.wikipedia.org/wiki/Generalized_method_of_moments). Siehe @Wooldrige2010 für Beispiele.
+ 
+
 ## Beispiel: Einkommen und Demokratie
 
 Eine Vielzahl polit-ökonomischer Standardwerke und Studien [bspw. @Dahl1971; @Huntington1991; @Rueschemeyer1992] liefert vermeindliche Belege für einen zentralen Grundsatz der [Modernisierungstheorie](https://de.wikipedia.org/wiki/Modernisierungstheorie): Ein höheres Pro-Kopf-Einkommen erhöht die Nachfrage der Bevölkerung nach politischer Freiheit und demokratischen Insitutionen. @Acemogluetal2008 argumentieren, dass der in derartigen länderübergreifenden Analysen mit Pooling häufig als positiv geschätzte Zusammenhang zwischen Einkommen und Demokratisierung nicht kausal interpetiert werden sollte. Ein Grund hierfür ist, dass (unbeobachtbare) ausgelassene länderspezifische Faktoren, die sowohl die ökonomische Entwicklung als auch die Stärke demokratischer Institutionen beeinflussen, wahrscheinlich sind. Um diese mögliche Ursache für Endogenität des Zusammenhangs
@@ -766,9 +885,9 @@ Eine Vielzahl polit-ökonomischer Standardwerke und Studien [bspw. @Dahl1971; @H
 \end{align}
 zu adressieren, nutzen @Acemogluetal2008 einen Panel-Regressionsansatz ähnlich zu
 \begin{align}
-  \text{Demokratisierung}_{it} = \delta_i + \beta_1\,\text{PK-Einkommen}_{it} + \epsilon_{it}
+  \text{Demokratisierung}_{it} = \alpha_i + \beta_1\,\text{PK-Einkommen}_{it} + \epsilon_{it}
 \end{align}
-mit Fixed Effects $\delta_i$, die für länderspezifische zeit-invariante Einflüsse kontrollieren.
+mit Fixed Effects $\alpha_i$, die für länderspezifische zeit-invariante Einflüsse kontrollieren.
 
 Das Kernergebnis von @Acemogluetal2008 ist, dass es *keinen* kausalen Zusammenhang zwischen dem Einkommen (Wirtschaftswachstum) und der Demokratisierung gibt. Die Autoren zeigen, dass historische und geografische Faktoren, die sowohl das Einkommen als auch die politischen Institutionen beeinflussen, den beobachteten Zusammenhang verzerren können. 
 
@@ -844,8 +963,11 @@ ggplot(
 
 ```{r}
 # time + country fixed effects
+# (2)
 feols(
-  fml = fhpolrigaug ~ l(fhpolrigaug) + l(lrgdpch) 
+  fml = fhpolrigaug ~ 
+    l(fhpolrigaug) 
+  + l(lrgdpch) 
   | year + country,
   panel.id = ~ country + year,
   cluster = ~ country,
@@ -853,16 +975,33 @@ feols(
 )
 ```
 
+
 ```{r}
-# time-fixed effects
-feols(
-  fml = fhpolrigaug ~ l(fhpolrigaug) + l(lrgdpch) 
-  | year,
-  panel.id = ~ country + year,
-  cluster = ~ country,
-  data = acem, 
-)
+# Arellano-Bond-Schätzer
+# (3)
+acem_filtered <- acem %>%
+    select(fhpolrigaug, lrgdpch, country, year_numeric, sample) %>%
+    filter(sample == 1) %>%
+    group_by(country) %>%
+    #filter(length(unique(year_numeric))>3) %>%
+    drop_na()
+
+# Define the panel data structure
+pdata <- pdata.frame(acem_filtered, index = c("country", "year_numeric"))
+pgmm(
+  formula = 
+    fhpolrigaug ~ 
+    lag(fhpolrigaug, 1) 
+  + lag(lrgdpch, 1) 
+  
+  | lag(fhpolrigaug, 2:3)
+  + lag(lrgdpch, 2:3),
+    effect = "twoways", 
+    model = "twosteps",
+    data = pdata
+) %>% 
+  summary()
 ```
 
-
+Analog zu Querschnittsdaten können die hier betrachteten Panel-Schätzer Endogenitäten aufgrund simultaner Kausalität oder nicht beheben. In solchen Szenarien können Panel-Methoden in Kombination mit einer Schätzstrategie basierend auf Instrument-Variablen hilfreich sein. Wir betrachten solche Schätzer in den empirischen Beispielen in Kapitel @sec-IV. 
 
