@@ -926,7 +926,7 @@ polizeipraesenz <- readRDS("datasets/polizeipraesenz.RDS")
 | Variable   | Beschreibung                                 |
 |:----------:|:--------------------------------------------:|
 | institut   | Jüdische Einrichtung im Block                |
-| barrio    | Stadtviertel                                 |
+| barrio     | Stadtviertel                                 |
 | distanz    | Entf. zu Block mit Einrichtung (in Blocks)   |
 | monat      | Monat der Beobachtung                        |
 | observ     | ID-Variable für Block                        |
