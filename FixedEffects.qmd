@@ -876,8 +876,9 @@ Hinzufügen von $Y_{it-1}$ als Regressor in Fixed- und Random-Effects-Modellen i
 
 Der Arellano-Bond-Schätzer [@ArellanoBond1991] ist eine Methode, die für Endogenität in dynamischen Panel-Modellen korrigiert. Das Verfahren betrachtet die Regression in Differenzen zur Korrektur für Heterogenitäten zwischen den Einheiten und schätzt die Koeffizienten anhand der generalisierten Momentenmethode ([GMM](https://en.wikipedia.org/wiki/Generalized_method_of_moments)). Hierbei werden vergangene Werte von $Y_{it}$ als Instrumente für endogene Differenzen von $Y_{it}$ genutzt. Siehe @Wooldrige2010 für Beispiele.
  
+Analog zu Anwendungen mit Querschnittsdaten können die hier betrachteten Panel-Schätzer Endogenitäten aufgrund simultaner Kausalität nicht beheben. Zur Korrektur für simultante Kausalität können Panel-Methoden in Kombination mit einer Schätzstrategie basierend auf Instrument-Variablen hilfreich sein. Wir betrachten solche Schätzer in den empirischen Beispielen in Kapitel @sec-IV. 
 
-## Beispiel: Einkommen und Demokratie
+## Case Study: Einkommen und Demokratie
 
 Eine Vielzahl polit-ökonomischer Standardwerke und Studien [bspw. @Dahl1971; @Huntington1991; @Rueschemeyer1992] liefert vermeindliche Belege für einen zentralen Grundsatz der [Modernisierungstheorie](https://de.wikipedia.org/wiki/Modernisierungstheorie): Ein höheres Pro-Kopf-Einkommen erhöht die Nachfrage der Bevölkerung nach politischer Freiheit und demokratischen Insitutionen. @Acemogluetal2008 argumentieren, dass der in derartigen länderübergreifenden Analysen mit Pooling häufig als positiv geschätzte Zusammenhang zwischen Einkommen und Demokratisierung nicht kausal interpetiert werden sollte. Ein Grund hierfür ist, dass (unbeobachtbare) ausgelassene länderspezifische Faktoren, die sowohl die ökonomische Entwicklung als auch die Stärke demokratischer Institutionen beeinflussen, wahrscheinlich sind. Um diese mögliche Ursache für Endogenität des Einkommens im Modell
 \begin{align}
@@ -910,6 +911,17 @@ glimpse(deminc)
 | **year_numeric** | ID-Variable f. Jahr                                   |
 
 : `deminc`: Demokratisierung und Einkommen [@Acemogluetal2008] {#tbl-deminc}
+
+Wie der output von `glimpse(deminc)` zeigt, enthält der Datensatz in allen Modell-Variablen `NA`-Einträge und ist damit nicht 'balanced', da die entsprechenden Beobachtungen nicht bei Schätzung berücksichigt werden können.
+
+```{r}
+# Bereinigter Datensatz ist nicht 'balanced'
+is.pbalanced(
+  x = deminc %>% 
+    drop_na(), 
+  index = c("country", "year")   
+)
+```
 
 Wir vernachlässigen zunächst die Panel-Struktur der Daten und regressieren FHPRI auf das Pro-Kopf-Einkommen für die in @Acemogluetal2008 verwendete Stichprobe mit Beobachtungen in 5-Jahresschritten von 1955 bis 2000 (Beobachtungen mit `sample == 1`).
 
@@ -970,7 +982,7 @@ deminc_diff_7095 %>%
   summary()
 ```
 
-Die Ergebnisse in `deminc_diff_7095` passen zu der Vermutung ausgelassener länderspezifischer Heterogenitäten:
+Die Ergebnisse in `deminc_diff_7095` passen zu unserer Vermutung hinsichtlich ausgelassener länderspezifischer Heterogenitäten: Der geschätzte Koeffizient von `dlrgdpch` ist $`r round(deminc_diff_7095$coefficients[2], 2)`$ und nicht signifikant von $0$ verschieden.
   
 ```{r}
 #| fig-align: 'center'
@@ -983,7 +995,7 @@ ggplot(
     y = dfhpolrigaug
   ) 
   ) +
-  # Referenz-Linie (kein Effelt)
+  # Referenz-Linie (kein Effekt)
   geom_hline(yintercept = 0, lty = 2) +
   # Datenpunkte
   geom_text(
@@ -1004,22 +1016,31 @@ ggplot(
   theme_cowplot()
 ```
 
+Für die KQ-Schätzung in ersten Differenzen bei Verwendung des gesamten Datensatzes ist das Ergebis noch deutlicher: Die Schätzungen beider Koeffizienten sind klein und insignifikant.
+
 ```{r}
 # Panel-Schätzer: KQ-Regression in Differenzen
 # (Alle Perioden)
-deminc_diff <- feols(
+deminc_diff_mod <- feols(
   fml = d(fhpolrigaug) ~ d(lrgdpch), 
   data = deminc,
   panel.id = ~ country + year
 )
 
-summary(deminc_diff)
+summary(deminc_diff_mod)
 ```
 
+Tabelle 2 in @Acemogluetal2008 vergleicht verschiedene Schätzer des dynamischen Modells
+
+\begin{align}
+  \text{FHPRI}_{it} = \beta_0 + \alpha_i + \lambda_t + \beta_1 \text{FHPRI}_{it-1} + \beta_2 \text{Einkommen}_{it-1}  + \varepsilon_{it}\label{eq:acemmod}
+\end{align}
+
+mit Länder- und Zeit-Effekten $\alpha_i + \lambda_t$. Der Regressor `\text{FHPRI}_{it-1}` soll die "Beständigkeit" der Demokratie zu erfassen und möglicherweise kurz- bis mittelfristige Dynamiken zu berücksichtigen (d.h. die Tendenz des Demokratie-Scores, zu einem Gleichgewichtswert zurückzukehren). Wir betrachten zunächst die Fixed-Effects-Schätzung von \eqref{eq:acemmod}.
+
 ```{r}
-# time + country fixed effects
-# (2)
-feols(
+# Zeit + country Fixed Effects
+deminc_FE_mod <- feols(
   fml = fhpolrigaug ~ 
     l(fhpolrigaug) 
   + l(lrgdpch) 
@@ -1028,18 +1049,66 @@ feols(
   cluster = ~ country,
   data = deminc, 
 )
+
+summary(deminc_FE_mod)
 ```
 
+Ähnlich wie in der Differenzen-Regression `deminc_diff_mod` finden wir bei Kontrolle für Länder- und Zeit-Effekte keine Evidenz für einen Zusammenhang des Pro-Kopf-Einkommens (der Vorperiode) und dem Demokratie-Score. Mit `fixef(deminc_FE_mod)` lesen wir die gschätzten Effekte aus. Aufgrund der Vielzahl an Länder-Effekten empfiehlt sich eine grafischer Zusammenfassung anhand eines Histogramms mit absoluten Häufigkeiten.
+
+```{r}
+#| fig-align: 'center'
+#| fig-cap: "`deminc` -- Verteilung von Länder-Fixed-Effects"
+#| label: "fig-acemfig3" 
+# Verteilung der gesch. Länder-Fixed-Effects
+tibble(
+    FE = fixef(deminc_FE_mod)$country, 
+    country = names(fixef(deminc_FE_mod)$country)
+    ) %>%
+
+ggplot(aes(x = FE)) +
+  geom_histogram(
+    bins = 20,
+    fill = "steelblue",
+    color = "white"
+  ) +
+  theme_cowplot() +
+  coord_cartesian(expand = F)
+```
+Eine Random-Effects-Schätzung mit Länder- und Zeit-Effekten liefert ebenfalls keine Evidenz für einen kausalen Effekt des ökonomischen Wohlstands auf die Demokratisierung.
+
+```{r}
+# Datensatz für plm() formatieren
+deminc_pdf <- pdata.frame(
+  deminc %>% filter(sample == 1) %>% 
+    drop_na(), 
+  index = c("country", "year_numeric")   
+)
+
+# Random-Effects-Modell
+deminc_RE_mod <- plm(
+  formula = fhpolrigaug ~ 
+    lag(fhpolrigaug, 1) 
+  + lag(lrgdpch, 1), 
+  effect = "twoways",
+  model = "random",
+  data = deminc_pdf
+)
+
+summary(deminc_RE_mod)
+```
+
+Um für Endogenität der Regressoren aufgrund des dynamischen Modells zu korrigieren, verwenden @Acemogluetal2008 weiterhin den Arellano-Bond-Schätzer. Dieser wird auf die Differenz-Transformation
+
+\begin{align}
+  \Delta\text{FHPRI}_{it} = \beta_1 \Delta\text{FHPRI}_{it-1} + \beta_2 \Delta\text{Einkommen}_{it-1} + \Delta\epsilon_{it}, \quad t\geq3,\label{eq:acemabmod}
+\end{align}
+
+von Modell \eqref{eq:acemmod} angewendet und nutzt, dass $\text{FHPRI}_{it-j}$ und $\text{Einkommen}_{it-j}$ für $j\geq2$ nicht mit $\Delta\varepsilon_{it}$ korelliert sind und damit als Instrumente in einem GMM-Ansatz verwendet werden können.^[Damit die Lags gültige Instrumente sind, darf daher $\epsilon_{it}$ nicht seriell-korelliert sein.]
+
+Der Arellano-Bond-Schätzer ist in der Funktion `plm::pgmm()` implementiert. Wir schätzen Modell \eqref{eq:acemabmod} mit zweiten und dritten Lags von $\text{FHPRI}_{it}$ und $\text{Einkommen}_{it}$ als Instrumente. Die Spezifikation erfolgt durch den Zusatz `| lag(fhpolrigaug, 2:3) + lag(lrgdpch, 2:3)` im Argument `formula`.
 
 ```{r}
 # Arellano-Bond-Schätzer
-# (3)
-deminc_filtered <- deminc %>%
-    filter(sample == 1) %>%
-    drop_na()
-
-# Define the panel data structure
-pdata <- pdata.frame(deminc_filtered, index = c("country", "year_numeric"))
 pgmm(
   formula = 
     fhpolrigaug ~ 
@@ -1050,10 +1119,10 @@ pgmm(
   + lag(lrgdpch, 2:3),
     effect = "twoways", 
     model = "twosteps",
-    data = pdata
+    data = deminc_pdf
 ) %>% 
   summary()
 ```
 
-Analog zu Querschnittsdaten können die hier betrachteten Panel-Schätzer Endogenitäten aufgrund simultaner Kausalität oder nicht beheben. In solchen Szenarien können Panel-Methoden in Kombination mit einer Schätzstrategie basierend auf Instrument-Variablen hilfreich sein. Wir betrachten solche Schätzer in den empirischen Beispielen in Kapitel @sec-IV. 
+
 
