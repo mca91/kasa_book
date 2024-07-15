@@ -388,7 +388,7 @@ window.Quarto = {
 <div class="cell">
 
 </div>
-<p>Das Ziel dieses Kapitels ist es, ein Verständnis für die Vor- und Nachteile von Panel-Daten-Modellen für die Schätzung kausaler Effekte zu vermitteln. Im Fokus steht dabei, Backdoor-Pfade durch unbeobachtbare Heterogenitäten, die in Querschnittsdaten oft schwer zu adressieren sind, mit Regression zu schließen. Die betrachteten Identifikationsstrategien profitieren hierbei von der zusätzlichen zeitliche Dimension in den Daten.</p>
+<p>Das Ziel dieses Kapitels ist es, ein Verständnis für die Vor- und Nachteile von Panel-Daten-Modellen für die Schätzung kausaler Effekte zu vermitteln. Im Fokus steht dabei, Backdoor-Pfade durch unbeobachtbare Heterogenitäten, die in Querschnittsdaten oft schwer zu adressieren sind, mit Regression zu schließen. Die betrachteten Identifikationsstrategien profitieren hierbei von der zusätzlichen zeitlichen Dimension <span class="math inline">\(T&gt;1\)</span> in den Daten und ermöglichen daher oftmals eine konsistente und präzisere Schätzung kausaler Effekte als für <span class="math inline">\(T=1\)</span>.</p>
 <section id="sec-panel-uh" class="level2 page-columns page-full" data-number="5.1"><h2 data-number="5.1" class="anchored" data-anchor-id="sec-panel-uh">
 <span class="header-section-number">5.1</span> Pooled Regression und unbeobachtbare Heterogenität</h2>
 <p>Ein Panel-Datensatz enthält Beobachtungen von <span class="math inline">\(n\)</span> Einheiten für (bis zu) <span class="math inline">\(T\)</span> Zeitpunkte, wobei <span class="math inline">\(t=1,\dots,T\)</span>. Betrachte das Panel-Modell</p>
@@ -2921,7 +2921,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb65-79"><a href="#cb65-79" aria-hidden="true" tabindex="-1"></a><span class="in">options(pillar.sigfig = 2)</span></span>
 <span id="cb65-80"><a href="#cb65-80" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb65-81"><a href="#cb65-81" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb65-82"><a href="#cb65-82" aria-hidden="true" tabindex="-1"></a>Das Ziel dieses Kapitels ist es, ein Verständnis für die Vor- und Nachteile von Panel-Daten-Modellen für die Schätzung kausaler Effekte zu vermitteln. Im Fokus steht dabei, Backdoor-Pfade durch unbeobachtbare Heterogenitäten, die in Querschnittsdaten oft schwer zu adressieren sind, mit Regression zu schließen. Die betrachteten Identifikationsstrategien profitieren hierbei von der zusätzlichen zeitliche Dimension in den Daten.</span>
+<span id="cb65-82"><a href="#cb65-82" aria-hidden="true" tabindex="-1"></a>Das Ziel dieses Kapitels ist es, ein Verständnis für die Vor- und Nachteile von Panel-Daten-Modellen für die Schätzung kausaler Effekte zu vermitteln. Im Fokus steht dabei, Backdoor-Pfade durch unbeobachtbare Heterogenitäten, die in Querschnittsdaten oft schwer zu adressieren sind, mit Regression zu schließen. Die betrachteten Identifikationsstrategien profitieren hierbei von der zusätzlichen zeitlichen Dimension $T&gt;1$ in den Daten und ermöglichen daher oftmals eine konsistente und präzisere Schätzung kausaler Effekte als für $T=1$.</span>
 <span id="cb65-83"><a href="#cb65-83" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb65-84"><a href="#cb65-84" aria-hidden="true" tabindex="-1"></a><span class="fu">## Pooled Regression und unbeobachtbare Heterogenität {#sec-panel-uh}</span></span>
 <span id="cb65-85"><a href="#cb65-85" aria-hidden="true" tabindex="-1"></a></span>
