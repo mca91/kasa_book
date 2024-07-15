@@ -79,7 +79,7 @@ library(tidyverse)
 options(pillar.sigfig = 2)
 ```
 
-Das Ziel dieses Kapitels ist es, ein Verständnis für die Vor- und Nachteile von Panel-Daten-Modellen für die Schätzung kausaler Effekte zu vermitteln. Im Fokus steht dabei, Backdoor-Pfade durch unbeobachtbare Heterogenitäten, die in Querschnittsdaten oft schwer zu adressieren sind, mit Regression zu schließen. Die betrachteten Identifikationsstrategien profitieren hierbei von der zusätzlichen zeitlichen Dimension $T>1$ in den Daten und ermöglichen daher oftmals eine konsistente und präzisere Schätzung kausaler Effekte als für $T=1$.
+Das Ziel dieses Kapitels ist es, ein Verständnis für die Vor- und Nachteile von Panel-Daten-Modellen für die Schätzung kausaler Effekte zu vermitteln. Im Fokus steht dabei, Backdoor-Pfade durch unbeobachtbare Heterogenitäten, die in Querschnittsdaten oft schwer zu adressieren sind, mit Regression zu schließen. Die betrachteten Identifikationsstrategien basieren auf der zusätzlichen zeitlichen Dimension $T>1$ in den Daten. Diese zusätzlichen Informationen ermöglicht neben der konsistenten Schätzung kausaler Effekte oftmals auch eine präzisere statistische Inferenz als für $T=1$.
 
 ## Pooled Regression und unbeobachtbare Heterogenität {#sec-panel-uh}
 
@@ -435,7 +435,7 @@ Nach einsetzen in \eqref{eq:unobshetmodel} erhalten wir das Modell
 mit einheiten-spezifischen **Konstanten** ("feste Effekte") $\alpha_i$ für $i=1,\dots,n$, die als individuelle Achsenabschnitte nterpretieren werden können. Das Modell \eqref{eq:femodel} wird daher auch als *Fixed-Effects-Modell* bezeichnet.^[Beachte, dass eine bessere Anpassung an die Daten bei der Modellierung von `paneldata.csv` mit einheiten-spezifischen Achsenabschnitten anhand von @fig-pooledregression2 plausibel scheint.] 
 
 
-### Within- und LSDV-Schätzer
+### Within- und LSDV-Schätzer {#sec-withldsv}
 
 Für die Vermeidung von Backdoors durch die $\alpha_i$ subtrahieren wir die einheiten-spezifischen Mittelwerte von den Komponenten (*Within-Transformation*)^[Die Durchschnitte werden hierbei also über die *Zeitperioden* berechnet.],
 \begin{align}
@@ -476,13 +476,13 @@ Mit `fml = Y ~ X + factor(ID)` erfolgt eine Schätzung der Dummy-Regression \eqr
 
 ```{r}
 # LSDV-Schätzung
-panel_FE <- feols(
+panel_LSDV <- feols(
   fml = Y ~ X + factor(ID),  
   data = paneldata
 )
 
 # Statistische Zusammenfassung
-summary(panel_FE)
+summary(panel_LSDV)
 ```
 
 
@@ -815,7 +815,22 @@ Die nachfolgende interaktive Illustration erlaubt einen Vergleich der in @fig-pa
 
 Aufgrund der Zeit-Dimension bei Panel-Datensätzen ist es in vielen empirischen Anwendungen plausibel, dass die Fehlerterme der bisher betrachteten Modelle nicht unabhängig sind: Beobachtungen einer Einheit (auch Cluster genannt), wie z.B. Individuen, Firmen oder geografische Regionen sind oftmals über die Zeit oft korreliert. Solche Abhängigkeit zwischen dem Fehlern führen zu verzerrten Standardfehlern, wenn diese anhand von Formeln berechnet werden, die unter der Annahme von u.i.v. Fehlertermen hergeleitet wurden: Standardfehler für Schätzer, die u.i.v. Fehler annehmen, können die tatsächliche Varianz unterschätzen, was zu falsch-positiven^[Ein falsch-positiver Test zeigt einen "positiven" Zustand (hier ein von null verschiedener Koeffizient) an, obwohl dieser tatsächlich nicht vorliegt.] Ergebnissen bei Signifikanztests für die Modell-Koeffizienten und damit ungültiger Inferenz hinsichtlich kausaler Effekte führen kann.
 
-Sogenannte *Cluster-robuste Standardfehler* korrigieren für zeitliche Korrelation und Heteroskedatizität und ermöglichen konservative Schätzungen hinsichtlich der Variabilität von Koeffizientenschätzern. `fixest::feols()` berechnet standardmäßig Cluster-robuste Standardfehler, wenn Einheiten- oder Perioden-Variablen innerhalb der Formel (bspw. `Y ~ X | ID + time`) oder separat im Argument `index` (etwa `panel.id = ~ ID + time`) angegeben werden. Für die Identifikation der Cluster wird stets die zuerst genannte Variable (hier `ID`) herangezogen. Details der zu verwendenen Standardfehler können über das Argument `vcov` festgelegt werden.
+Sogenannte *Cluster-robuste Standardfehler* korrigieren für zeitliche Korrelation und Heteroskedatizität und ermöglichen konservative Schätzungen hinsichtlich der Variabilität von Koeffizientenschätzern. `fixest::feols()` berechnet standardmäßig Cluster-robuste Standardfehler, wenn Einheiten- oder Perioden-Variablen innerhalb der Formel (bspw. `Y ~ X | ID + time`) oder separat im Argument `index` (etwa `panel.id = ~ ID + time`) angegeben werden. Für die Identifikation der Cluster wird stets die zuerst genannte Variable (hier `ID`) herangezogen. Details der zu verwendenen Standardfehler können über das Argument `vcov` festgelegt werden, siehe `?feols` für weitere Hinweise hierzu.
+
+Für den LSDV-Schätzer in @sec-withldsv erreichen wir clustering nach `ID` mit `vcov = ~ ID`.
+
+```{r}
+# LSDV mit cluster-robusten Standardfehlern
+panel_LSDV_clust <- feols(
+  fml = Y ~ X + factor(ID),  
+  data = paneldata,
+  vcov = ~ ID
+)
+
+panel_LSDV_clust
+```
+
+Beachte, dass die Standradfehler der meisten Koeffizienten in `panel_LSDV_clust` etwas größer sind, als für das in @sec-withldsv geschätzte Modell `panel_LSDV`.
 
 Für Schätzungen mit`plm::plm()` werden von `summary()` grundsätzlich Standardfehler unter Annahme homoskedastischer u.i.v. Fehler berechnet. Für Cluster-robuste Standardfehler muss ein entsprechender Schätzer im Argument `vcov = vcovHC()` übergeben werden. Mit `cluster = "group"` wird Korrelation innerhalb der Beobachtungseinheiten über die Zeit berücksichtigt.^[Clustering für Zeitperioden erfolgt mit `group = time`.] Für die Random-Effects-Schätzung in `panel_RE` erreichen wir dies wiefolgt.
 
