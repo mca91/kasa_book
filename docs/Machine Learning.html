@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Kausalanalyse und Machinelles Lernen mit R - 10&nbsp; Machine Learning</title>
+<title>Kausalanalyse mit R - 10&nbsp; Machine Learning</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -115,7 +115,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js" integrity="sha512-aoZChv+8imY/U1O7KIHXvO87EOzCuKO0GhFtpD6G2Cyjo/xPeTgdf3/bchB10iB+AojMTDkMHDPLKNxPJVqDcw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+
+<style>
+  .scientific_borders {
+    border: 0;
+    border-top: 2px solid black !important;
+    border-bottom: 2px solid black !important;
+  }
+  .table > :not(caption)>*>* {
+    border-bottom-width: 0;
+  }
+  .table > thead {
+    border-bottom: 2px solid black; 
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var tables = document.querySelectorAll("table.table");
+    tables.forEach(function(table) {
+      table.classList.remove("table-striped");
+      table.classList.add("scientific_borders");
+    });
+
+    
+  });
+</script>
+
+
 
 <style>
 .qwebr-code-output-stdout {background-color: powderblue;}

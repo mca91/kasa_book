@@ -4,10 +4,10 @@ webr:
   packages: [
             'dplyr',
             'ggplot2',
-            'sandwich',
+            'fixest',
+            'plm',
             'tidyr',
             'readr',
-            'Synth'
             ]
 ---
 
@@ -58,8 +58,6 @@ webr:
 
 # Panel-Daten
 
-## Pooled Regression und unbeobachtbare Heterogenität {#sec-panel-uh}
-
 ```{r, echo=F,message=F,warning=F}
 # Formatierung von gt-Tabellen
 library(gt)
@@ -81,13 +79,17 @@ library(tidyverse)
 options(pillar.sigfig = 2)
 ```
 
+Das Ziel dieses Kapitels ist es, ein Verständnis für die Vor- und Nachteile von Panel-Daten-Modellen für die Schätzung kausaler Effekte zu vermitteln. Im Fokus steht dabei, Backdoor-Pfade durch unbeobachtbare Heterogenitäten, die in Querschnittsdaten oft schwer zu adressieren sind, mit Regression zu schließen. Die betrachteten Identifikationsstrategien profitieren hierbei von der zusätzlichen zeitlichen Dimension $T>1$ in den Daten und ermöglichen daher oftmals eine kosistente und präzisere Schätzung kausaler Effekte als für $T=1$.
+
+## Pooled Regression und unbeobachtbare Heterogenität {#sec-panel-uh}
+
 Ein Panel-Datensatz enthält Beobachtungen von $n$ Einheiten für (bis zu) $T$ Zeitpunkte, wobei $t=1,\dots,T$. Betrachte das Panel-Modell
 
 \begin{align}
   Y_{it} = \beta_0 + \beta_1 B_{it} + \beta_2 X_i + \beta_3 U_i + \epsilon_{it},\label{eq:unobshetmodel}
 \end{align}
 
-wobei $U_i$ unbeobachtete und $X_i$ beobachtete, **zeitlich-invariante** Heterogenitäten zwischen den Beobachtungseinheiten $i=1,\dots,n$ sind. Wie zuvor ist $B_{it}$ die Behandlungsvariable und $\beta_1$ der interessierende kausale Effekt einer Veränderung von $B_{it}$ auf $Y_{it}$. 
+wobei $U_i$ unbeobachtete und $X_i$ beobachtete, **zeitlich-invariante** Heterogenitäten zwischen den Beobachtungseinheiten $i=1,\dots,n$ sind. Wie zuvor ist $B_{it}$ die Behandlungsvariable und $\beta_1$ der (für alle Beobachtungseinheiten identische) interessierende kausale Effekt einer Veränderung von $B_{it}$ auf $Y_{it}$. 
 
 Angenommen wir beobachten $Y_{it}$ und $B_{it}$ für $T=1$, also für eine Periode. Bei Korrelation zwischen den **unbeobachtbaren** zeit-invarianten Effekten $U_i$ und der Behandlungsvariable $B_{it}$ kann der kausale Effekt $\beta_1$ nicht identifiziert werden. Diese Situation ist in @fig-FEDAG1 dargestellt.
 
@@ -177,7 +179,7 @@ digraph FE_dag2 {
 }
 ```
 
-Der in @fig-FEDAG2 gezeigte Zusammenhang führt (idealerweise) zwar zu einer Verdoppelung des Beobachtungsumfangs, jedoch besteht weiterhin das in @fig-FEDAG1 gezeigte Endogenitätsproblem, falls die Regression \eqref{eq:femodelfail} nun anhand einer Zusammenlegung (**Pooling**) der Beobachtungen für $t\in\{1,2\}$ geschätzt wird:^[Pooled Regression kann auch berechnet werden, wenn nicht für alle $n$ Einheiten jeweils $T$ Beobachtungen vorliegen (unbalanced Panel).] Die unbeobachteten zeit-invarianten Einflüsse $U_i$ verursachen auch für Periode $t=2$ Backdoor-Pfade.
+Der in @fig-FEDAG2 gezeigte Zusammenhang führt (idealerweise) zwar zu einer Verdoppelung des Beobachtungsumfangs, jedoch besteht weiterhin das in @fig-FEDAG1 gezeigte Endogenitätsproblem, falls die Regression \eqref{eq:femodelfail} nun anhand einer Zusammenlegung (**Pooling**) aller Beobachtungen für $t\in\{1,2\}$ geschätzt wird:^[Pooled Regression kann auch berechnet werden, wenn nicht für alle $n$ Einheiten jeweils $T$ Beobachtungen vorliegen (unbalanced Panel).] Die unbeobachteten zeit-invarianten Einflüsse $U_i$ verursachen auch für Periode $t=2$ Backdoor-Pfade.
 
 In diesem Kapitel betrachten wir Panel-Verfahren, welche den kausalen Effekt in @fig-FEDAG2 und Verallgemeinerungen hiervon schätzen können. Bevor wir diese Methoden betrachten, veranschaulichen wir die verzerrte Schätzung eines Behandlungseffekts mit *Pooled Regression* in Modell \eqref{eq:femodelfail} bei unbeobachtbaren Heterogenitäten für einen simulierten Datensatz `paneldata.csv`. Der Datensatz enthält Beobachtungen von $n=12$ Einheiten zu $T=8$ Perioden. Alle Einheiten weisen unbeobachtbare *zeit-invariante* Heterogenitäten auf, die mit $B_{it}$ korellieren. Der wahre Behandlungseffekt beträgt $\beta_1 = -1$.^[Der (R code für den) DGP ist [diesem StackExchange-Post](https://stats.stackexchange.com/a/188559) entnommen.]
 
@@ -231,6 +233,7 @@ panel_KQ <- feols(
   data = paneldata_T2
 )
 
+# Statistische Zusammenfassung
 summary(panel_KQ)
 ```
 
@@ -281,6 +284,7 @@ panel_KQ <- feols(
   data = paneldata 
 )
 
+# Statistische Zusammenfassung
 summary(panel_KQ)
 ```
 
@@ -329,6 +333,7 @@ panel_diff <- feols(
   panel.id = ~ ID + time
 )
 
+# Statistische Zusammenfassung
 summary(panel_diff)
 ```
 
@@ -383,10 +388,11 @@ panel_diff <- feols(
   panel.id = ~ ID + time
 )
 
+# Statistische Zusammenfassung
 summary(panel_diff)
 ```
 
-Beachte, dass der Standardfehler der Schätzers etwas größer ist als für den KQ-Schätzer in der Pooled Regression. Grund hierfür ist der Verlust von $12$ Beobachtungen bei der Bildung der $T-1 = 7$ Differenzen.
+Beachte, dass der Standardfehler der Schätzers etwas größer ist als für den KQ-Schätzer in der Pooled Regression. Gründe hierfür sind der Verlust von $12$ Beobachtungen bei der Bildung der $T-1 = 7$ Differenzen und die standardmäßige Verwenudung von cluster-robusten Standardfehlern, siehe auch @sec-crse.
 
 ```{r}
 #| label: fig-diffregression2
@@ -455,6 +461,7 @@ panel_FE <- feols(
   data = paneldata
 )
 
+# Statistische Zusammenfassung
 summary(panel_FE)
 ```
 
@@ -474,6 +481,7 @@ panel_FE <- feols(
   data = paneldata
 )
 
+# Statistische Zusammenfassung
 summary(panel_FE)
 ```
 
@@ -550,6 +558,7 @@ panel_TWFE <- feols(
   data = paneldata
 )
 
+# Statistische Zusammenfassung
 summary(panel_TWFE)
 ```
 
@@ -571,7 +580,7 @@ fixest::fixef(panel_TWFE)
 
     - LSDV-Regression ist eine Variante die Backdoors durch unbeobachtbare Heterogenitäten mit Dummy-Variablen schließt. In einer LSDV-Regression können die Koeffizienten zeitlich konstanter Variablen geschätzt werden.
 
-- Statistische Inferenz für Fixed-Effects-Schätzer erfolgt anhand einer Approximation der asymptotischen Normalverteilung. Da die Fehlerterme heteroskedastisch und/oder über die Zeit korreliert sein können, sollten (cluster-)robuste Standardfehler verwendet werden.
+- Statistische Inferenz für Fixed-Effects-Schätzer erfolgt anhand einer Approximation der asymptotischen Normalverteilung. Da die Fehlerterme heteroskedastisch und/oder über die Zeit korreliert sein können, sollten Cluster-robuste Standardfehler verwendet werden, vgl. @sec-crse.
 
 - Fixed-Effects-Modelle können in R mit dem Paketen `fixest` oder `plm` berechnet werden.
 
@@ -653,6 +662,7 @@ panel_RE <- plm(
   model = "random"
 )
 
+# Statistische Zusammenfassung
 summary(panel_RE)
 ```
 
@@ -720,6 +730,7 @@ panel_RE <- plm(
   data = paneldata
 )
 
+# Statistische Zusammenfassung
 summary(panel_RE)
 ```
 
@@ -783,9 +794,9 @@ ggplot(
 
 - In Random-Effects-Modellen können die Effekte zeitlich konstanter Variablen geschätzt werden, da die einheiten-spezifischen Effekte als zufällig betrachtet werden.
 
-- Unter den skizzierten Annahmen sind Random-Effects-Schätzer asymptotisch normalverteilt. Für statische Inferenz sollten cluster-robuste Standardfehler verwendet werden.
+- Unter den skizzierten Annahmen sind Random-Effects-Schätzer asymptotisch normalverteilt. Für Inferenzstatistiken sollten cluster-robuste Standardfehler verwendet werden, vgl. @sec-crse.
 
-- Random-Effects-Modelle können in R mit den Paketen `plm` und `lme4` geschätzt werden.
+- Random-Effects-Modelle können in R mit den Paketen `plm` geschätzt werden.
 
 :::
 
@@ -800,7 +811,27 @@ Die nachfolgende interaktive Illustration erlaubt einen Vergleich der in @fig-pa
   src="https://observablehq.com/embed/@mca91/panelcomp?cells=viewof+showgroups%2Cviewof+showdgp%2Cviewof+regtype%2Ctheplot">
 </iframe>
 
-## Dynamische Modelle und Cluster-robuste Standardfehler
+## Cluster-robuste Standardfehler {#sec-crse}
+
+Aufgrund der Zeit-Dimension bei Panel-Datensätzen ist es in vielen empirischen Anwendungen plausibel, dass die Fehlerterme der bisher betrachteten Modelle nicht unabhängig sind: Beobachtungen einer Einheit (auch Cluster genannt), wie z.B. Individuen, Firmen oder geografische Regionen sind oftmals über die Zeit oft korreliert. Solche Abhängigkeit zwischen dem Fehlern führen zu verzerrten Standardfehlern, wenn diese anhand von Formeln berechnet werden, die unter der Annahme von u.i.v. Fehlertermen hergeleitet wurden: Standardfehler für Schätzer, die u.i.v. Fehler annehmen, können die tatsächliche Varianz unterschätzen, was zu falsch-positiven^[Ein falsch-positiver Test zeigt einen "positiven" Zustand (hier ein von null verschiedener Koeffizient) an, obwohl dieser tatsächlich nicht vorliegt.] Ergebnissen bei Signifikanztests für die Modell-Koeffizienten und damit ungültiger Inferenz hinsichtlich kausaler Effekte führen kann.
+
+Sogenannte *Cluster-robuste Standardfehler* korrigieren für zeitliche Korrelation und Heteroskedatizität und ermöglichen konservative Schätzungen hinsichtlich der Variabilität von Koeffizientenschätzern. `fixest::feols()` berechnet standardmäßig Cluster-robuste Standardfehler, wenn Einheiten- oder Perioden-Variablen innerhalb der Formel (bspw. `Y ~ X | ID + time`) oder separat im Argument `index` (etwa `panel.id = ~ ID + time`) angegeben werden. Für die Identifikation der Cluster wird stets die zuerst genannte Variable (hier `ID`) herangezogen. Details der zu verwendenen Standardfehler können über das Argument `vcov` festgelegt werden.
+
+Für Schätzungen mit`plm::plm()` werden von `summary()` grundsätzlich Standardfehler unter Annahme homoskedastischer u.i.v. Fehler berechnet. Für Cluster-robuste Standardfehler muss ein entsprechender Schätzer im Argument `vcov = vcovHC()` übergeben werden. Mit `cluster = "group"` wird Korrelation innerhalb der Beobachtungseinheiten über die Zeit berücksichtigt.^[Clustering für Zeitperioden erfolgt mit `group = time`.] Für die Random-Effects-Schätzung in `panel_RE` erreichen wir dies wiefolgt.
+
+```{r}
+# Zusammenfassung RE-Schätzung mit clustered-SEs
+summary(
+  object = panel_RE, 
+  vcov = vcovHC(
+    x = panel_RE, 
+    type = "HC1", 
+    cluster = "group"
+  )
+)
+```
+
+## Dynamische Modelle
 
 Viele ökonomische und soziale Prozesse sind autoregressiv: Der Zustand einer Variable in der Vergangenheit beeinflusst ihren aktuellen Zustand. Bei der Modellierung von Outcome-Variablen in Panel-Designs kann es notwendig sein, diese Abhängigkeit zu berücksichtigen, um die Identifizierbarkeit kausaler Effekte zu gewährleisten. Dynamische Panelmodelle verwenden hierzu vergangene Werte (lags) der Outcome-Variable, $Y_{it-j}$ mit $j>0$ als (zusätzliche) Regressoren. Ein einfaches dynamisches Panelmodell ist
 \begin{align}
@@ -810,13 +841,13 @@ wobei $Y_{it-1}$ der Wert von $Y_{it}$ in der Periode $t-1$ ist, $0\neq\lvert\rh
 
 Die Verwendung dynamischer Modelle hat folgende Motivationen:
 
-- **(a) Präzisere Schätzung**: Berücksichtigen von gelaggten abhängigen Variablen ermöglicht die Modellierung einer zeitabhängigen Dynamik von $Y_{it}$. Die Autokorellation und damit die Varianz der Fehlerterme kann reduziert werden, da ein Teil dieser zeitlichen Abhängigkeiten direkt modelliert wird. Dies kann die Präzision der Schätzung des kausalen Effekts $\beta_1$ verbessern.
+- **Präzisere Schätzung**: Berücksichtigen von gelaggten abhängigen Variablen ermöglicht die Modellierung einer zeitabhängigen Dynamik von $Y_{it}$. Die Autokorellation und damit die Varianz der Fehlerterme kann reduziert werden, da ein Teil dieser zeitlichen Abhängigkeiten direkt modelliert wird. Dies kann die Präzision der Schätzung des kausalen Effekts $\beta_1$ verbessern, vgl. @fig-LDVOKa. 
 
 ```{dot}
 //| fig-width: 3
 //| fig-height: 3
 //| fig-cap: "Kontrolle für vergangenen Wert verbessert Präzision"
-//| label: "fig-LDVOK2" 
+//| label: "fig-LDVOKa" 
 digraph LDVOK2 {
     layout=neato
     fontname="Helvetica,Arial,sans-serif"
@@ -834,14 +865,14 @@ digraph LDVOK2 {
 }
 ```
 
-- **(b) Vermeidung von Endogenität**: Nichtberücksichtigen von *relevanten* gelaggten abhängigen Variablen führt zu verzerrten und inkonsistenten Schätzern.
+- **Vermeidung von Endogenität**: Nichtberücksichtigen von *relevanten* gelaggten abhängigen Variablen führt zu verzerrten und inkonsistenten Schätzern, vgl. @fig-LDVOKb.
 
 ```{dot}
 //| fig-width: 3
 //| fig-height: 3
 //| fig-align: 'center'
-//| fig-cap: "Kontrolle für vergangenen Wert schließt Backdoor."
-//| label: "fig-LDVOK1" 
+//| fig-cap: "Kontrolle für $y_{t-1}$ schließt Backdoor-Pfad"
+//| label: "fig-LDVOKb" 
 digraph LDVOK1 {
     layout=neato
     fontname="Helvetica,Arial,sans-serif"
@@ -862,11 +893,50 @@ digraph LDVOK1 {
 }
 ```
 
-### Verzerrung in dynamischen Panels
+Die Entscheidung, ob Lags der Outcome-Variable als Regressoren aufgenommen werden, sollte sorgfältig und, falls möglich, unter Berücksichtigung von ökonomischer Theorie hinsichtlich der zeitlichen Dynamik von $Y_{it}$ erfolgen. Beobachtete (Auto)Korrelation von $Y_{it}$ und $Y_{it-1}$ muss nicht ausschließlich durch einen (kausalen) autoregressiven Zusammenhang verursacht werden. Ein DGP bei dem unsere Regression *nicht* für $Y_{it-1}$ kontrollieren sollte, ist in @fig-LDVnotOK gezeigt.
+
+```{dot}
+//| fig-width: 3
+//| fig-height: 3
+//| fig-align: 'center'
+//| fig-cap: "Kontrolle für $y_{t-1}$ *öffnet* Backdoor-Pfad"
+//| label: "fig-LDVnotOK" 
+digraph LDVnotOK {
+    layout=neato
+    fontname="Helvetica,Arial,sans-serif"
+    node [fontname="Helvetica,Arial,sans-serif"]
+    edge [fontname="Helvetica,Arial,sans-serif"]
+    splines=true
+    pad=.3
+
+    Bt [pos="0,6!", label=<B<SUB>t</SUB>>];
+    V [pos="0,8!", label=V, color=gray, fontcolor=gray];
+    U [pos="2,8!", label=U, color=gray, fontcolor=gray];
+    Yt [pos="2,6!", label=<Y<SUB>t</SUB>>];
+    Ytm1 [pos="1,7!", label=<Y<SUB>t-1</SUB>>];
+    
+    V -> Bt [color=gray, style=dashed]
+    V -> Ytm1 [color=gray, style=dashed]
+    U -> Ytm1 [color=gray, style=dashed]
+    U -> Yt [color=gray, style=dashed]
+    Bt -> Yt
+    
+}
+```
+
+ Hier ist $Y_{it-1}$ nicht kausal für $Y_{it}$ und ein *Collider*. Kontrollieren für $Y_{it-1}$ öffnet also den Backdoor-Pfad 
+
+\begin{align*}
+  B_{it} \leftarrow V \rightarrow Y_{it-1} \leftarrow U \rightarrow Y_{it}.
+\end{align*}
+
+Eine ähnliche Problematik besteht bei der Schätzung dynamischer Panel-Modelle mit mit Fixed- oder Random-Effects-Ansätzen. Wir erläutern dies näher in @sec-vidp.
+
+### Verzerrung in dynamischen Modellen {#sec-vidp}
 
 Ein zentrales Problem bei der Schätzung dynamischer Panelmodelle ist der sogenannte *Nickell-Bias*. Dieser tritt auf, wenn die Within-Transformation in Anwesenheit von gelagten abhängigen Variablen verwendet wird. Die Mittelwert-Differenzen eliminieren zwar die zeit-invarianten Effekte, führt aber zu Korrelation zwischen den gelagten abhängigen Variablen und den transformierten Fehlertermen: Der Nickell-Bias entsteht bei der Within-Transformation, weil der Regressor ($Y_{i,t-1} - \overline{Y}_{i,-1}$)^[Hier ist $\overline{Y}_{i,-1} = \frac{1}{T-1}\sum_{t=2}^T y_{it-1}$.] mit dem transformierten Fehlerterm ($\epsilon_{it} - \overline{\epsilon}_i$) korreliert ist, was zu einer verzerrten Schätzung führt. 
 
-@Nickell1981 zeigt, dass diese Verzerrung für den Within-Schätzer $\widehat{\rho}^\textup{Within}$ nicht verschwindet, wenn die Anzahl der Beobachtungseinheiten ($n$) divergiert, solange die Zeitdimension ($T$) endlich ist.^[Dies ist problematisch für Mikro-Studien: Die Querschnittsdimension des Panels kann oft "hinreichend" groß gewählt werden. Die Zeit-Dimension ist aus natürlichen Gegebenheiten jedoch oft klein.] Der Nickell-Bias ist besonders bei kurzen Panelen (kleines $T$) problematisch. Es ist
+@Nickell1981 zeigt, dass diese Verzerrung des Within-Schätzers $\widehat{\rho}^\textup{Within}$ nicht verschwindet, wenn die Anzahl der Beobachtungseinheiten ($n$) divergiert, solange die Zeitdimension ($T$) endlich ist.^[Dies ist problematisch für Mikro-Studien: Die Querschnittsdimension des Panels kann oft "hinreichend" groß gewählt werden. Die Zeit-Dimension ist aus natürlichen Gegebenheiten jedoch oft klein.] Der Nickell-Bias ist besonders bei kurzen Panelen (kleines $T$) problematisch. Es ist
 \begin{align*}
   \widehat{\rho}^\textup{Within} \approx \rho - \frac{1 + \rho}{T-1},
 \end{align*}
@@ -874,7 +944,7 @@ d.h. die Verzerrung beträgt ungefähr $-\frac{1+\rho}{T-1}$.
 
 Hinzufügen von $Y_{it-1}$ als Regressor in Fixed- und Random-Effects-Modellen ist jenseits der verzerrten Schätzung von $\rho$ problematisch, wenn $Y_{it-1}$ mit $B_{it}$ korreliert ist. Kontrollieren für $Y_{it-1}$ öffnet dann Backdoor-Pfade, die wir mit FE- oder RE-Ansätzen schließen wollen. In sämtlichen dynamischen Varianten der Fixed- und Random-Effects-Modelle sind die in diesem Kapitel behandelten Schätzer eines kausalen Effekts $\beta_1 \neq 0$ von $B_{it}$ auf $Y_{it}$ daher verzerrt.
 
-Der Arellano-Bond-Schätzer [@ArellanoBond1991] ist eine Methode, die für Endogenität in dynamischen Panel-Modellen korrigiert. Das Verfahren betrachtet die Regression in Differenzen zur Korrektur für Heterogenitäten zwischen den Einheiten und schätzt die Koeffizienten anhand der generalisierten Momentenmethode ([GMM](https://en.wikipedia.org/wiki/Generalized_method_of_moments)). Hierbei werden vergangene Werte von $Y_{it}$ als Instrumente für endogene Differenzen von $Y_{it}$ genutzt. Siehe @Wooldrige2010 für Beispiele.
+Der Arellano-Bond-Schätzer [@ArellanoBond1991] ist eine Methode, für diese Form von Endogenität in dynamischen Panel-Modellen korrigiert. Das Verfahren betrachtet die Regression in Differenzen zur Korrektur für Heterogenitäten zwischen den Einheiten und schätzt die Koeffizienten anhand der generalisierten Momentenmethode ([GMM](https://en.wikipedia.org/wiki/Generalized_method_of_moments)). Hierbei werden vergangene Werte von $Y_{it}$ als Instrumente für endogene Differenzen von $Y_{it}$ genutzt. Siehe @Wooldrige2010 für Beispiele.
  
 Analog zu Anwendungen mit Querschnittsdaten können die hier betrachteten Panel-Schätzer Endogenitäten aufgrund simultaner Kausalität nicht beheben. Zur Korrektur für simultante Kausalität können Panel-Methoden in Kombination mit einer Schätzstrategie basierend auf Instrument-Variablen hilfreich sein. Wir betrachten solche Schätzer in den empirischen Beispielen in Kapitel @sec-IV. 
 
@@ -912,7 +982,7 @@ glimpse(deminc)
 
 : `deminc`: Demokratisierung und Einkommen [@Acemogluetal2008] {#tbl-deminc}
 
-Wie der output von `glimpse(deminc)` zeigt, enthält der Datensatz in allen Modell-Variablen `NA`-Einträge und ist damit nicht 'balanced', da die entsprechenden Beobachtungen nicht bei Schätzung berücksichigt werden können.
+Wie der output von `glimpse(deminc)` zeigt, enthält der Datensatz in allen Modell-Variablen `NA`-Einträge und ist damit nicht 'balanced', da die entsprechenden Beobachtungen nicht bei der Schätzung berücksichigt werden können.
 
 ```{r}
 # Bereinigter Datensatz ist nicht 'balanced'
@@ -938,7 +1008,7 @@ summary(deminc_pooling1)
 
 Dieser naive Ansatz ingoriert konstante Heterogenitäten zwischen den Ländern und einen (plausiblen) zeitlich verzögerten Einfluss ökonomisch günstiger Bedingung auf die Demokratisierung. Der geschätzte Koeffizient von `lrgdpch` ist $`r round(deminc_pooling1$coefficients[2], 2)`$ (d.h. ein geschätzer positiver Zusammenhang) und signifikant. 
 
-Die Regression von FHPRI auf das Einkommen in $t-1$ (`l(lrgdpch)`) führt zu ähnlichen Schätzungen der Koeffizienten. Dies ist plausibel unter der Hypothese, dass es ausgelassende Faktoren gibt, welche die Demokratisierung und das Pro-Kopf-Einkommen in sämtlichen Perioden beeinflussion.
+Die Regression von FHPRI auf das Einkommen in $t-1$ (`l(lrgdpch)`) führt zu ähnlichen Schätzungen der Koeffizienten.^[Die Verwendung von Lags mit `l()` in `fml` erfordert die Angabe von `panel.id = ~ country + year`, damit die Beobachtungen zugeordnet werden können.] Dies ist plausibel unter der Hypothese, dass es ausgelassende Faktoren gibt, welche die Demokratisierung und das Pro-Kopf-Einkommen in sämtlichen Perioden beeinflussion.
 
 ```{r}
 # Pooling mit Einkommem_{t-1}
@@ -1103,25 +1173,73 @@ Um für Endogenität der Regressoren aufgrund des dynamischen Modells zu korrigi
   \Delta\text{FHPRI}_{it} = \beta_1 \Delta\text{FHPRI}_{it-1} + \beta_2 \Delta\text{Einkommen}_{it-1} + \Delta\epsilon_{it}, \quad t\geq3,\label{eq:acemabmod}
 \end{align}
 
-von Modell \eqref{eq:acemmod} angewendet und nutzt, dass $\text{FHPRI}_{it-j}$ und $\text{Einkommen}_{it-j}$ für $j\geq2$ nicht mit $\Delta\varepsilon_{it}$ korelliert sind und damit als Instrumente in einem GMM-Ansatz verwendet werden können.^[Damit die Lags gültige Instrumente sind, darf daher $\epsilon_{it}$ nicht seriell-korelliert sein.]
+von Modell \eqref{eq:acemmod} angewendet und nutzt, dass $\text{FHPRI}_{it-j}$ und $\text{Einkommen}_{it-j}$ für $j\geq2$ nicht mit $\Delta\varepsilon_{it}$ korelliert sind und damit als Instrumente in einem GMM-Ansatz verwendet werden können.^[Damit die Lags gültige Instrumente sind, darf $\epsilon_{it}$ nicht seriell korelliert sein.]
 
-Der Arellano-Bond-Schätzer ist in der Funktion `plm::pgmm()` implementiert. Wir schätzen Modell \eqref{eq:acemabmod} mit zweiten und dritten Lags von $\text{FHPRI}_{it}$ und $\text{Einkommen}_{it}$ als Instrumente. Die Spezifikation erfolgt durch den Zusatz `| lag(fhpolrigaug, 2:3) + lag(lrgdpch, 2:3)` im Argument `formula`.
+Der Arellano-Bond-Schätzer ist in der Funktion `plm::pgmm()` implementiert. Wir schätzen Modell \eqref{eq:acemabmod} mit den zweiten und dritten Lags von $\text{FHPRI}_{it}$ und $\text{Einkommen}_{it}$ als Instrumente. Die Spezifikation erfolgt durch den Zusatz `| lag(fhpolrigaug, 2:3) + lag(lrgdpch, 2:3)` im Argument `formula`.
 
 ```{r}
 # Arellano-Bond-Schätzer
-pgmm(
+deminc_AB_mod <- pgmm(
   formula = 
     fhpolrigaug ~ 
     lag(fhpolrigaug, 1) 
   + lag(lrgdpch, 1) 
-  
+  # Instrumente:
   | lag(fhpolrigaug, 2:3)
   + lag(lrgdpch, 2:3),
     effect = "twoways", 
     model = "twosteps",
     data = deminc_pdf
-) %>% 
-  summary()
+) 
+
+summary(deminc_AB_mod)
+```
+
+Auch der Arellano-Bond-Schätzer liefert keine Evidenz für die Theorie eines positiven kausalen Effekts des Einkommens fürdie Stärke demokratischer Institutionen: Der interessierende geschätzte Koeffizient ist negativ und insignifikant.  
+
+Weiterhin bekräftigen zusätzliche Inferenzstatistiken im Output von `summary(deminc_AB_mod)` die Adäquanz des GMM-Verfahrens:
+
+- `Sargan test:` Die Nullhypothese des Sargan-Tests^[Auch Sargan-Hansen-Test genannt [nach @Sargan1958;@Hansen1982].] ist, dass die Instrumente gültig, d.h. unkorreliert mit den Fehlertermen, sind. Diese Hypothese können wir zu keinem in der Praxis relevanten Signifikanzniveau ablehnen.
+
+- `Autocorrelation test (1):` Test der Nullhypothese, dass die $\Delta\epsilon_{it}$ *keine* AR(1)-Korellationsstruktur aufweisen. Für unkorrelierte $\epsilon_{it}$ sind die ersten Differenzen $\Delta\epsilon_{it}$ AR(1)-korreliert. Tatsächlich können wir diese Nullhypothese ablehnen.
+
+- `Autocorrelation test (2):` Test der Nullhypothese, dass die $\Delta\epsilon_{it}$ *keine* AR(2)-Korellationsstruktur aufweisen. Dies ist relevant für die Gültigkeit des Arellano-Bond-Schätzers, da AR-Korellation zweiter (oder höherer) Ordnung darauf hinweisen würde, dass die verwendeten Instrumente ungültig sind.
+
+- `Wald test for coefficients:` Wir lehnen die Nullhypothese, dass $\Delta\text{FHPRI}_{it-1}$ und $\Delta\text{Einkommen}_{it-1}$ keine Erklärtungskraft für $\Delta\text{FHPRI}_{it}$ haben, ab. Unter der Alternativ-Hypothese ist *mindesten ein* Koeffizient von null verschieden. Hierunter fällt das Szenario, dass $\Delta\text{FHPRI}_{it-1}$ zeitliche Dynamik in der Outcome-Variable erklärt, jedoch $\Delta\text{Einkommen}_{it-1}$ irrelevant ist (kein kausaler Effekt).
+
+- `Wald test for time dummies:` Die Nullhyothese, dass die Zeit-Fixed-Effects irrelevant sind, wird zum 5\%-Niveau abgelehnt.
+
+Mit `modelsummary::modelsummary()` stellen wir die Koeffizientenschätzungen tabellarisch dar. Für eine bessere Lesbarkeit formatieren wir die (andernfalls aus dem jeweiligen `formula`/`fml`-Argument übernommenen) Bezeichnungen der Koeffizienten anhand eines bennanten Vektors `coef_map`.
+
+```{r}
+#| warning: false
+#| tbl-cap: "Schätzungen des Effekts von Einkommen auf Demokratisierung [@Acemogluetal2008]"
+#| label: tbl-tabacem
+library(modelsummary)
+
+# Mapping für Koeffizienten festlegen
+coef_map <- c(
+  "l(lrgdpch, 1)" = "Einkommen_{t-1}",
+  "lag(lrgdpch, 1)" = "Einkommen_{t-1}",
+  "l(fhpolrigaug, 1)" = "FHPRI_{t-1}",
+  "lag(fhpolrigaug, 1)" = "FHPRI_{t-1}"
+)
+
+# Tabellarische Übersicht erzeugen
+modelsummary(
+  models = list(
+    "Pool" = deminc_pooling_lag,
+    "FE" = deminc_FE_mod,
+    "RE" = deminc_RE_mod,
+    "AB" = deminc_AB_mod
+  ),
+  coef_omit = "Intercept",
+  coef_map = coef_map,
+  gof_omit = "^(?!$).*", 
+  output = "gt",
+  stars = TRUE
+) %>%
+  tabopts()
 ```
 
 

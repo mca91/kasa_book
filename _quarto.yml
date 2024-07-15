@@ -11,8 +11,7 @@ project:
   output-dir: "docs"
 
 book:
-  title: "Kausalanalyse und Machinelles Lernen mit R"
-  subtitle: "Ein Leitfaden für reproduzierbare Forschung"
+  title: "Kausalanalyse mit R"
   reader-mode: true
   author: "Martin C. Arnold, Christoph Hanck"
   date: "November 2023"
@@ -41,7 +40,7 @@ execute:
   warning: false
 
 format:
-  html: 
+  html:
     grid: 
       body-width: 920px
       margin-width: 350px
