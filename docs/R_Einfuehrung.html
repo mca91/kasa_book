@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.4.553">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Kausalanalyse und Machinelles Lernen mit R - 2&nbsp; Statistische Programmierung mit R</title>
+<title>Kausalanalyse mit R - 2&nbsp; Statistische Programmierung mit R</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -105,6 +105,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   };
 </script><script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js" integrity="sha512-aoZChv+8imY/U1O7KIHXvO87EOzCuKO0GhFtpD6G2Cyjo/xPeTgdf3/bchB10iB+AojMTDkMHDPLKNxPJVqDcw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
 <style>
+  .scientific_borders {
+    border: 0;
+    border-top: 2px solid black !important;
+    border-bottom: 2px solid black !important;
+  }
+  .table > :not(caption)>*>* {
+    border-bottom-width: 0;
+  }
+  .table > thead {
+    border-bottom: 2px solid black; 
+  }
+</style>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var tables = document.querySelectorAll("table.table");
+    tables.forEach(function(table) {
+      table.classList.remove("table-striped");
+      table.classList.add("scientific_borders");
+    });
+
+    
+  });
+</script><style>
 .qwebr-code-output-stdout {background-color: powderblue;}
 
 .qwebr-button-run {
@@ -280,7 +303,7 @@ globalThis.qwebrCustomizedWebROptions = {
 };
 
 // Store cell data
-globalThis.qwebrCellDetails = [{"id":1,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-1","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Variable definieren...\nx <- pi\n# ... und evaluieren\nx\n\n# Äquivalent:\n(\n  x <- pi\n)"},{"id":2,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-2","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# 'klasurergebnisse' als tibble definieren\n(\n  klausurergebnisse <- tribble(\n    ~Name,    ~Mikro, ~Makro, ~Mathe,\n    \"Tim\",        NA,    1.3,    3.0,\n    \"Lena\",      1.0,    3.0,     NA,\n    \"Ricarda\",   2.0,    1.7,    1.3,\n    \"Simon\",     2.3,    3.3,     NA\n  )\n)"},{"id":3,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-3","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# 'klausurergebnisse' in Tidy-Format überführen\n(\n  long <- pivot_longer(\n    data = klausurergebnisse, \n    cols = Mikro:Mathe, \n    names_to = \"Modul\", \n    values_to = \"Note\"\n  )\n)"},{"id":4,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-4","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# langes Format in das Ausgangsformat transformieren\n(\n  wide <- pivot_wider(\n    data = long,\n    id_cols = \"Name\",\n    names_from = \"Modul\", \n    values_from = \"Note\"\n  )\n)"},{"id":5,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-5","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# langes Format mit %>%\n(\n  long <- klausurergebnisse %>% \n    pivot_longer(\n      cols = Mikro:Mathe, \n      names_to = \"Modul\", \n      values_to = \"Note\"\n    )\n)\n\n# weites Format mit %>%\n(\n  wide <- long %>% \n    pivot_wider(\n      id_cols = \"Name\",\n      names_from = \"Modul\", \n      values_from = \"Note\"\n    )\n)"},{"id":6,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-6","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# NA-Einträge aus dem \"weiten\" Format entfernen\nwide %>% \n  drop_na()"},{"id":7,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-7","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# NA-Einträge aus dem \"langen\" Format entfernen\nlong %>% \n  drop_na()"},{"id":8,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-8","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Datensatz in der Arbeitsumgebung verfügbar machen\ndata(penguins)\n\n# Übersicht anzeigen lassen\nglimpse(penguins)"},{"id":9,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-9","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Neue Variable mit Gewicht in Kg definieren\npenguins %>% \n  mutate(\n    body_mass_kg = body_mass_g/1000\n  ) %>%\n  glimpse()"},{"id":10,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-10","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# species, island, sex und year in Typ 'character' umwandeln\npenguins %>% \n  mutate(\n    across(\n      c(species, island, sex, year), \n      .fns = as.character\n    )\n  ) %>%\n  glimpse()"},{"id":11,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-11","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Nur transformierte Variablen behalten\npenguins %>% \n  transmute(\n    body_mass_kg = body_mass_g/1000\n  )"},{"id":12,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-12","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# 'species' auswählen\npenguins %>% \n  select(species)"},{"id":13,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-13","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Teilmenge von Variablen per Index auswählen\npenguins %>% \n  select(\n    c(1, 2, 3)\n  )"},{"id":14,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-14","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Nur in mm gemessene Variablen auslesen\npenguins %>% \n  select(\n    ends_with(\"mm\")\n  )"},{"id":15,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-15","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Nur numerische Variablen auswählen\npenguins %>% \n  select(\n    where(is.numeric)\n  )"},{"id":16,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-16","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Nur Pinguine mit bill_length_mm >= 39\npenguins %>% \n  filter(\n    bill_length_mm >= 39\n  )"},{"id":17,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-17","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Nur Pinguine mit bill_length_mm <= 40\npenguins %>% \n  filter(\n    bill_length_mm <= 40\n  )"},{"id":18,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-18","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Kombinierter Filter -- Variante 1\npenguins %>% \n  filter(\n    bill_length_mm >= 39 & bill_length_mm <= 40\n  )"},{"id":19,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-19","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Kombinierter Filter -- Variante 2\npenguins %>% \n  filter(\n    bill_length_mm >= 39, \n    bill_length_mm <= 40\n  )"},{"id":20,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-20","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Filtern mit Hilfsfunktion\npenguins %>% \n  filter(\n    between(\n      bill_length_mm, left = 39, right = 40\n    )\n  )"},{"id":21,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-21","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Schritt 1\n(\n  penguins_cleaned <- penguins %>% \n    rename(\n      bill_length = bill_length_mm,\n      bill_depth  = bill_depth_mm,\n      flipper_length = flipper_length_mm,\n      body_mass = body_mass_g\n    )\n)"},{"id":22,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-22","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Schritt 2\n(\n  penguins_cleaned <- penguins_cleaned %>%\n    drop_na()\n)"},{"id":23,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-23","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Schritt 3\npenguins_cleaned %>% \n  filter(\n    body_mass < quantile(body_mass, probs = .95)\n  ) %>%\n  glimpse()"},{"id":24,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-24","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Verketter Funktionsaufruf für Datensatzbereinigung\npenguins_cleaned <- penguins %>% \n  rename(\n    bill_length = bill_length_mm,\n    bill_depth  = bill_depth_mm,\n    flipper_length = flipper_length_mm,\n    body_mass = body_mass_g\n  ) %>% \n  drop_na() %>% \n  filter(\n    body_mass < quantile(body_mass, .95)\n  )\n\npenguins_cleaned %>% \n  glimpse()"},{"id":25,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-25","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# statistische Zusammenfassung mit 'summarise()'\npenguins %>% \n  select(flipper_length_mm) %>% \n  summarise(\n    mean = mean(flipper_length_mm, na.rm = TRUE), \n    sd = sd(flipper_length_mm, na.rm = TRUE)\n  )"},{"id":26,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-26","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"penguins %>% \n  summarise(\n    across(\n      where(is.numeric), \n      .fns = list(\n        mean = \\(x) mean(x, na.rm = TRUE), \n        sd = \\(x) sd(x, na.rm = TRUE)\n      )\n    )\n  ) %>%\n  glimpse()"},{"id":27,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-27","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Datensatz aufsteigend nach 'body_mass_g' sortieren\npenguins %>% \n  arrange(body_mass_g)"},{"id":28,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-28","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Absteigende Sortierung nach 'body_mass_g'\npenguins %>% \n  arrange(\n    desc(body_mass_g)\n  )"},{"id":29,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-29","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Erst Sortierung nach 'sex', dann gruppenweise absteigend \n# nach 'body_mass_g' sortieren\npenguins %>% \n  arrange(\n    sex, desc(body_mass_g)\n  )"},{"id":30,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-30","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Datensatz gruppieren\npenguins_grouped <- penguins %>% \n  group_by(species)\n\n# Datensatz hat nun die Eigenschaft 'Groups'\nglimpse(penguins_grouped)"},{"id":31,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-31","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# summarise -- ungruppiert:\npenguins %>%\n  summarise(\n    across(\n      where(is.numeric), \\(x) mean(x, na.rm = T)\n      )\n    )"},{"id":32,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-32","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# summarise -- gruppiert:    \npenguins_grouped %>%\n  summarise(\n    across(\n      where(is.numeric), \n      ~ mean(., na.rm = T)\n    )\n  )"},{"id":33,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-33","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Zufallsstichprobe generieren\nset.seed(123)\n(\n  penguins_sample <- penguins %>%\n    slice_sample(n = 10)  \n)"},{"id":34,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-34","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# mutate() -- ungruppiert:\npenguins_sample %>%\n  transmute(\n    mean = mean(bill_length_mm)\n  )"},{"id":35,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-35","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# mutate() -- gruppiert\npenguins_sample %>%\n  group_by(species) %>%\n  transmute(\n    mean = mean(bill_length_mm)\n  )"},{"id":36,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-36","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Punkteplot: body_mass vs. bill_depth\npenguins_cleaned %>%\n  ggplot(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth\n    )\n  ) +\n  geom_point()"},{"id":37,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-37","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Punkteplot: Farbliche Darstellung verschiedener Arten\npenguins_cleaned %>%\n  ggplot(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth, \n      color = species\n    )\n  ) +\n  geom_point()"},{"id":38,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-38","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Lineare Regression per Art\npenguins_cleaned %>%\n  ggplot(\n    aes(\n      x = body_mass, \n      y = bill_depth, \n      color = species\n    )\n  ) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = F)"},{"id":39,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-39","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Zusatz: Globale Regression\npenguins_cleaned %>%\n  ggplot(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth, \n      color = species\n    )\n  ) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = F) +\n  # Regression für alle Datenpunkte\n  geom_smooth(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth\n    ),\n    method = \"lm\", \n    se = F, \n    inherit.aes = F\n  )"},{"id":40,"options":{"output":"true","fig-cap":"","dpi":72,"message":"true","autorun":"false","classes":"","results":"markup","warning":"true","label":"unnamed-chunk-40","context":"interactive","out-height":"","fig-width":7,"comment":"","fig-height":5,"out-width":"700px"},"code":"# Facettierung des per In\npenguins_cleaned %>%\n  ggplot(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth, \n      color = species)\n  ) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = F) +\n  facet_wrap(~ island)"}];
+globalThis.qwebrCellDetails = [{"code":"# Variable definieren...\nx <- pi\n# ... und evaluieren\nx\n\n# Äquivalent:\n(\n  x <- pi\n)","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-1","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":1},{"code":"# 'klasurergebnisse' als tibble definieren\n(\n  klausurergebnisse <- tribble(\n    ~Name,    ~Mikro, ~Makro, ~Mathe,\n    \"Tim\",        NA,    1.3,    3.0,\n    \"Lena\",      1.0,    3.0,     NA,\n    \"Ricarda\",   2.0,    1.7,    1.3,\n    \"Simon\",     2.3,    3.3,     NA\n  )\n)","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-2","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":2},{"code":"# 'klausurergebnisse' in Tidy-Format überführen\n(\n  long <- pivot_longer(\n    data = klausurergebnisse, \n    cols = Mikro:Mathe, \n    names_to = \"Modul\", \n    values_to = \"Note\"\n  )\n)","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-3","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":3},{"code":"# langes Format in das Ausgangsformat transformieren\n(\n  wide <- pivot_wider(\n    data = long,\n    id_cols = \"Name\",\n    names_from = \"Modul\", \n    values_from = \"Note\"\n  )\n)","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-4","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":4},{"code":"# langes Format mit %>%\n(\n  long <- klausurergebnisse %>% \n    pivot_longer(\n      cols = Mikro:Mathe, \n      names_to = \"Modul\", \n      values_to = \"Note\"\n    )\n)\n\n# weites Format mit %>%\n(\n  wide <- long %>% \n    pivot_wider(\n      id_cols = \"Name\",\n      names_from = \"Modul\", \n      values_from = \"Note\"\n    )\n)","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-5","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":5},{"code":"# NA-Einträge aus dem \"weiten\" Format entfernen\nwide %>% \n  drop_na()","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-6","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":6},{"code":"# NA-Einträge aus dem \"langen\" Format entfernen\nlong %>% \n  drop_na()","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-7","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":7},{"code":"# Datensatz in der Arbeitsumgebung verfügbar machen\ndata(penguins)\n\n# Übersicht anzeigen lassen\nglimpse(penguins)","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-8","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":8},{"code":"# Neue Variable mit Gewicht in Kg definieren\npenguins %>% \n  mutate(\n    body_mass_kg = body_mass_g/1000\n  ) %>%\n  glimpse()","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-9","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":9},{"code":"# species, island, sex und year in Typ 'character' umwandeln\npenguins %>% \n  mutate(\n    across(\n      c(species, island, sex, year), \n      .fns = as.character\n    )\n  ) %>%\n  glimpse()","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-10","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":10},{"code":"# Nur transformierte Variablen behalten\npenguins %>% \n  transmute(\n    body_mass_kg = body_mass_g/1000\n  )","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-11","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":11},{"code":"# 'species' auswählen\npenguins %>% \n  select(species)","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-12","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":12},{"code":"# Teilmenge von Variablen per Index auswählen\npenguins %>% \n  select(\n    c(1, 2, 3)\n  )","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-13","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":13},{"code":"# Nur in mm gemessene Variablen auslesen\npenguins %>% \n  select(\n    ends_with(\"mm\")\n  )","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-14","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":14},{"code":"# Nur numerische Variablen auswählen\npenguins %>% \n  select(\n    where(is.numeric)\n  )","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-15","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":15},{"code":"# Nur Pinguine mit bill_length_mm >= 39\npenguins %>% \n  filter(\n    bill_length_mm >= 39\n  )","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-16","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":16},{"code":"# Nur Pinguine mit bill_length_mm <= 40\npenguins %>% \n  filter(\n    bill_length_mm <= 40\n  )","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-17","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":17},{"code":"# Kombinierter Filter -- Variante 1\npenguins %>% \n  filter(\n    bill_length_mm >= 39 & bill_length_mm <= 40\n  )","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-18","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":18},{"code":"# Kombinierter Filter -- Variante 2\npenguins %>% \n  filter(\n    bill_length_mm >= 39, \n    bill_length_mm <= 40\n  )","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-19","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":19},{"code":"# Filtern mit Hilfsfunktion\npenguins %>% \n  filter(\n    between(\n      bill_length_mm, left = 39, right = 40\n    )\n  )","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-20","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":20},{"code":"# Schritt 1\n(\n  penguins_cleaned <- penguins %>% \n    rename(\n      bill_length = bill_length_mm,\n      bill_depth  = bill_depth_mm,\n      flipper_length = flipper_length_mm,\n      body_mass = body_mass_g\n    )\n)","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-21","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":21},{"code":"# Schritt 2\n(\n  penguins_cleaned <- penguins_cleaned %>%\n    drop_na()\n)","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-22","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":22},{"code":"# Schritt 3\npenguins_cleaned %>% \n  filter(\n    body_mass < quantile(body_mass, probs = .95)\n  ) %>%\n  glimpse()","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-23","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":23},{"code":"# Verketter Funktionsaufruf für Datensatzbereinigung\npenguins_cleaned <- penguins %>% \n  rename(\n    bill_length = bill_length_mm,\n    bill_depth  = bill_depth_mm,\n    flipper_length = flipper_length_mm,\n    body_mass = body_mass_g\n  ) %>% \n  drop_na() %>% \n  filter(\n    body_mass < quantile(body_mass, .95)\n  )\n\npenguins_cleaned %>% \n  glimpse()","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-24","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":24},{"code":"# statistische Zusammenfassung mit 'summarise()'\npenguins %>% \n  select(flipper_length_mm) %>% \n  summarise(\n    mean = mean(flipper_length_mm, na.rm = TRUE), \n    sd = sd(flipper_length_mm, na.rm = TRUE)\n  )","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-25","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":25},{"code":"penguins %>% \n  summarise(\n    across(\n      where(is.numeric), \n      .fns = list(\n        mean = \\(x) mean(x, na.rm = TRUE), \n        sd = \\(x) sd(x, na.rm = TRUE)\n      )\n    )\n  ) %>%\n  glimpse()","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-26","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":26},{"code":"# Datensatz aufsteigend nach 'body_mass_g' sortieren\npenguins %>% \n  arrange(body_mass_g)","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-27","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":27},{"code":"# Absteigende Sortierung nach 'body_mass_g'\npenguins %>% \n  arrange(\n    desc(body_mass_g)\n  )","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-28","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":28},{"code":"# Erst Sortierung nach 'sex', dann gruppenweise absteigend \n# nach 'body_mass_g' sortieren\npenguins %>% \n  arrange(\n    sex, desc(body_mass_g)\n  )","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-29","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":29},{"code":"# Datensatz gruppieren\npenguins_grouped <- penguins %>% \n  group_by(species)\n\n# Datensatz hat nun die Eigenschaft 'Groups'\nglimpse(penguins_grouped)","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-30","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":30},{"code":"# summarise -- ungruppiert:\npenguins %>%\n  summarise(\n    across(\n      where(is.numeric), \\(x) mean(x, na.rm = T)\n      )\n    )","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-31","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":31},{"code":"# summarise -- gruppiert:    \npenguins_grouped %>%\n  summarise(\n    across(\n      where(is.numeric), \n      ~ mean(., na.rm = T)\n    )\n  )","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-32","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":32},{"code":"# Zufallsstichprobe generieren\nset.seed(123)\n(\n  penguins_sample <- penguins %>%\n    slice_sample(n = 10)  \n)","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-33","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":33},{"code":"# mutate() -- ungruppiert:\npenguins_sample %>%\n  transmute(\n    mean = mean(bill_length_mm)\n  )","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-34","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":34},{"code":"# mutate() -- gruppiert\npenguins_sample %>%\n  group_by(species) %>%\n  transmute(\n    mean = mean(bill_length_mm)\n  )","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-35","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":35},{"code":"# Punkteplot: body_mass vs. bill_depth\npenguins_cleaned %>%\n  ggplot(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth\n    )\n  ) +\n  geom_point()","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-36","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":36},{"code":"# Punkteplot: Farbliche Darstellung verschiedener Arten\npenguins_cleaned %>%\n  ggplot(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth, \n      color = species\n    )\n  ) +\n  geom_point()","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-37","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":37},{"code":"# Lineare Regression per Art\npenguins_cleaned %>%\n  ggplot(\n    aes(\n      x = body_mass, \n      y = bill_depth, \n      color = species\n    )\n  ) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = F)","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-38","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":38},{"code":"# Zusatz: Globale Regression\npenguins_cleaned %>%\n  ggplot(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth, \n      color = species\n    )\n  ) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = F) +\n  # Regression für alle Datenpunkte\n  geom_smooth(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth\n    ),\n    method = \"lm\", \n    se = F, \n    inherit.aes = F\n  )","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-39","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":39},{"code":"# Facettierung des per In\npenguins_cleaned %>%\n  ggplot(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth, \n      color = species)\n  ) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = F) +\n  facet_wrap(~ island)","options":{"results":"markup","comment":"","context":"interactive","dpi":72,"out-width":"700px","label":"unnamed-chunk-40","out-height":"","message":"true","output":"true","classes":"","fig-height":5,"fig-cap":"","fig-width":7,"autorun":"false","warning":"true"},"id":40}];
 
 </script><script type="module">
 // Declare startupMessageQWebR globally
@@ -1036,7 +1059,7 @@ window.Quarto = {
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./"><a href="./index.html">Kausalanalyse mit R</a></a> 
+      <a href="./"></a><a href="./index.html">Kausalanalyse mit R</a> 
         <div class="sidebar-tools-main">
   <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Lesemodus umschalten">
   <div class="quarto-reader-toggle-btn">
@@ -1369,29 +1392,29 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <section id="lange-weite-und-tidy-datenformate" class="level2 page-columns page-full" data-number="2.1"><h2 data-number="2.1" class="anchored" data-anchor-id="lange-weite-und-tidy-datenformate">
 <span class="header-section-number">2.1</span> Lange, weite und “tidy” Datenformate</h2>
-<p>Wir betrachten den in <a href="#tbl-Klausurergebnisse" class="quarto-xref">Tabelle&nbsp;<span class="quarto-unresolved-ref">tbl-Klausurergebnisse</span></a> dargestellten Datensatz <em>Klausurergebnisse</em>.</p>
+<p>Wir betrachten den in <a href="#tbl-Klausurergebnisse" class="quarto-xref">Tabelle&nbsp;<span>2.1</span></a> dargestellten Datensatz <em>Klausurergebnisse</em>.</p>
 <div class="cell page-columns page-full">
 <div id="tbl-Klausurergebnisse" class="cell quarto-float anchored page-columns page-full">
 <figure class="quarto-float quarto-float-tbl figure page-columns page-full"><div aria-describedby="tbl-Klausurergebnisse-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
 <div>
-<div id="qkbrjmfnew" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#qkbrjmfnew table {
+<div id="qpayxickis" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#qpayxickis table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#qkbrjmfnew thead, #qkbrjmfnew tbody, #qkbrjmfnew tfoot, #qkbrjmfnew tr, #qkbrjmfnew td, #qkbrjmfnew th {
+#qpayxickis thead, #qpayxickis tbody, #qpayxickis tfoot, #qpayxickis tr, #qpayxickis td, #qpayxickis th {
   border-style: none;
 }
 
-#qkbrjmfnew p {
+#qpayxickis p {
   margin: 0;
   padding: 0;
 }
 
-#qkbrjmfnew .gt_table {
+#qpayxickis .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1417,12 +1440,12 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-left-color: #D3D3D3;
 }
 
-#qkbrjmfnew .gt_caption {
+#qpayxickis .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#qkbrjmfnew .gt_title {
+#qpayxickis .gt_title {
   color: #000000;
   font-size: 125%;
   font-weight: initial;
@@ -1434,7 +1457,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-bottom-width: 0;
 }
 
-#qkbrjmfnew .gt_subtitle {
+#qpayxickis .gt_subtitle {
   color: #000000;
   font-size: 85%;
   font-weight: initial;
@@ -1446,7 +1469,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-top-width: 0;
 }
 
-#qkbrjmfnew .gt_heading {
+#qpayxickis .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1458,13 +1481,13 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-right-color: #D3D3D3;
 }
 
-#qkbrjmfnew .gt_bottom_border {
+#qpayxickis .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#qkbrjmfnew .gt_col_headings {
+#qpayxickis .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #000000;
@@ -1479,7 +1502,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-right-color: #D3D3D3;
 }
 
-#qkbrjmfnew .gt_col_heading {
+#qpayxickis .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1499,7 +1522,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   overflow-x: hidden;
 }
 
-#qkbrjmfnew .gt_column_spanner_outer {
+#qpayxickis .gt_column_spanner_outer {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1511,15 +1534,15 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   padding-right: 4px;
 }
 
-#qkbrjmfnew .gt_column_spanner_outer:first-child {
+#qpayxickis .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#qkbrjmfnew .gt_column_spanner_outer:last-child {
+#qpayxickis .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#qkbrjmfnew .gt_column_spanner {
+#qpayxickis .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -1531,11 +1554,11 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   width: 100%;
 }
 
-#qkbrjmfnew .gt_spanner_row {
+#qpayxickis .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#qkbrjmfnew .gt_group_heading {
+#qpayxickis .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1561,7 +1584,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   text-align: left;
 }
 
-#qkbrjmfnew .gt_empty_group_heading {
+#qpayxickis .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1576,15 +1599,15 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   vertical-align: middle;
 }
 
-#qkbrjmfnew .gt_from_md > :first-child {
+#qpayxickis .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#qkbrjmfnew .gt_from_md > :last-child {
+#qpayxickis .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#qkbrjmfnew .gt_row {
+#qpayxickis .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1603,7 +1626,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   overflow-x: hidden;
 }
 
-#qkbrjmfnew .gt_stub {
+#qpayxickis .gt_stub {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1616,7 +1639,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   padding-right: 5px;
 }
 
-#qkbrjmfnew .gt_stub_row_group {
+#qpayxickis .gt_stub_row_group {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1630,15 +1653,15 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   vertical-align: top;
 }
 
-#qkbrjmfnew .gt_row_group_first td {
+#qpayxickis .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#qkbrjmfnew .gt_row_group_first th {
+#qpayxickis .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#qkbrjmfnew .gt_summary_row {
+#qpayxickis .gt_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1648,16 +1671,16 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   padding-right: 5px;
 }
 
-#qkbrjmfnew .gt_first_summary_row {
+#qpayxickis .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#qkbrjmfnew .gt_first_summary_row.thick {
+#qpayxickis .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#qkbrjmfnew .gt_last_summary_row {
+#qpayxickis .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1667,7 +1690,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-bottom-color: #D3D3D3;
 }
 
-#qkbrjmfnew .gt_grand_summary_row {
+#qpayxickis .gt_grand_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1677,7 +1700,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   padding-right: 5px;
 }
 
-#qkbrjmfnew .gt_first_grand_summary_row {
+#qpayxickis .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1687,7 +1710,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-top-color: #D3D3D3;
 }
 
-#qkbrjmfnew .gt_last_grand_summary_row_top {
+#qpayxickis .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1697,11 +1720,11 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-bottom-color: #D3D3D3;
 }
 
-#qkbrjmfnew .gt_striped {
+#qpayxickis .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#qkbrjmfnew .gt_table_body {
+#qpayxickis .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1710,7 +1733,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-bottom-color: #000000;
 }
 
-#qkbrjmfnew .gt_footnotes {
+#qpayxickis .gt_footnotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1724,7 +1747,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-right-color: #D3D3D3;
 }
 
-#qkbrjmfnew .gt_footnote {
+#qpayxickis .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1733,7 +1756,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   padding-right: 5px;
 }
 
-#qkbrjmfnew .gt_sourcenotes {
+#qpayxickis .gt_sourcenotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1747,7 +1770,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-right-color: #D3D3D3;
 }
 
-#qkbrjmfnew .gt_sourcenote {
+#qpayxickis .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1755,63 +1778,63 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   padding-right: 5px;
 }
 
-#qkbrjmfnew .gt_left {
+#qpayxickis .gt_left {
   text-align: left;
 }
 
-#qkbrjmfnew .gt_center {
+#qpayxickis .gt_center {
   text-align: center;
 }
 
-#qkbrjmfnew .gt_right {
+#qpayxickis .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#qkbrjmfnew .gt_font_normal {
+#qpayxickis .gt_font_normal {
   font-weight: normal;
 }
 
-#qkbrjmfnew .gt_font_bold {
+#qpayxickis .gt_font_bold {
   font-weight: bold;
 }
 
-#qkbrjmfnew .gt_font_italic {
+#qpayxickis .gt_font_italic {
   font-style: italic;
 }
 
-#qkbrjmfnew .gt_super {
+#qpayxickis .gt_super {
   font-size: 65%;
 }
 
-#qkbrjmfnew .gt_footnote_marks {
+#qpayxickis .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#qkbrjmfnew .gt_asterisk {
+#qpayxickis .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#qkbrjmfnew .gt_indent_1 {
+#qpayxickis .gt_indent_1 {
   text-indent: 5px;
 }
 
-#qkbrjmfnew .gt_indent_2 {
+#qpayxickis .gt_indent_2 {
   text-indent: 10px;
 }
 
-#qkbrjmfnew .gt_indent_3 {
+#qpayxickis .gt_indent_3 {
   text-indent: 15px;
 }
 
-#qkbrjmfnew .gt_indent_4 {
+#qpayxickis .gt_indent_4 {
   text-indent: 20px;
 }
 
-#qkbrjmfnew .gt_indent_5 {
+#qpayxickis .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -1858,7 +1881,7 @@ Tabelle&nbsp;2.1: Datensatz <em>Klausurergebnisse</em>
 </figcaption></figure>
 </div>
 </div>
-<p>Der Datensatz ist noch nicht in der R-Arbeitsumgebung verfügbar. Mit der Funktion <code><a href="https://tibble.tidyverse.org/reference/tribble.html">tribble()</a></code> können wir <a href="#tbl-Klausurergebnisse" class="quarto-xref">Tabelle&nbsp;<span class="quarto-unresolved-ref">tbl-Klausurergebnisse</span></a> händisch als R-Objekt der Klasse <code>tibble</code> definieren</p>
+<p>Der Datensatz ist noch nicht in der R-Arbeitsumgebung verfügbar. Mit der Funktion <code><a href="https://tibble.tidyverse.org/reference/tribble.html">tribble()</a></code> können wir <a href="#tbl-Klausurergebnisse" class="quarto-xref">Tabelle&nbsp;<span>2.1</span></a> händisch als R-Objekt der Klasse <code>tibble</code> definieren</p>
 <div id="qwebr-insertion-location-2"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><code>klausurergebnisse</code> enhält die Klausurnoten der vier Studierenden (Boebachtungen) spaltenweise <em>pro Modul</em>, d.h. die Spaltennamen <code>Mikro</code>, <code>Makro</code> und <code>Mathe</code> sind Ausprägungen der Variable <em>Modul</em>. Der Datensatz liegt also <em>nicht</em> im s.g. <em>Tidy-Format</em> vor.</p>

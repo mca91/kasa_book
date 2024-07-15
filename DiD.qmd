@@ -517,8 +517,7 @@ tibble(
     "= Haushaltseinkommen - Einkommen der Frau (Tsd. US-$) "
   )
 ) %>%
-  gt() %>%
-  tabopts
+  gt()
 ```
 
 Wir erweitern das `tibble`-Objekt zunächst um eine Dummy-Variable für Mütter (`anykids`), sowie spezifischere Dummies für Frauen mit einem Kind (`onechild`) oder mit zwei oder mehr Kindern (`twomorekids`). Weiterhin erzeugen wir einen Indikator für Beobachtungen *nach* der EITC-Ausweitung im Jahr 1993 (`after1993`).

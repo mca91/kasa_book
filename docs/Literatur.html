@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Kausalanalyse und Machinelles Lernen mit R - Literatur</title>
+<title>Kausalanalyse mit R - Literatur</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -133,7 +133,36 @@ div.csl-indent {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js" integrity="sha512-aoZChv+8imY/U1O7KIHXvO87EOzCuKO0GhFtpD6G2Cyjo/xPeTgdf3/bchB10iB+AojMTDkMHDPLKNxPJVqDcw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+
+<style>
+  .scientific_borders {
+    border: 0;
+    border-top: 2px solid black !important;
+    border-bottom: 2px solid black !important;
+  }
+  .table > :not(caption)>*>* {
+    border-bottom-width: 0;
+  }
+  .table > thead {
+    border-bottom: 2px solid black; 
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var tables = document.querySelectorAll("table.table");
+    tables.forEach(function(table) {
+      table.classList.remove("table-striped");
+      table.classList.add("scientific_borders");
+    });
+
+    
+  });
+</script>
+
+
 
 <style>
 .qwebr-code-output-stdout {background-color: powderblue;}
@@ -339,11 +368,6 @@ Adireksombat, Kampon. 2010. <span>“The Effects of the 1993 Earned Income
 Tax Credit Expansion on the Labor Supply of Unmarried Women.”</span>
 <em>Public Finance Review</em> 38 (1): 11–40. https://doi.org/<a href="https://doi.org/10.1177/1091142109358626">https://doi.org/10.1177/1091142109358626</a>.
 </div>
-<div id="ref-AndersonHsiao1981" class="csl-entry" role="listitem">
-Anderson, T. W., and Cheng Hsiao. 1981. <span>“Estimation of Dynamic
-Models with Error Components.”</span> <em>Journal of the American
-Statistical Association</em> 76 (375): 598–606. <a href="https://doi.org/10.2307/2287517">https://doi.org/10.2307/2287517</a>.
-</div>
 <div id="ref-Andrews2003" class="csl-entry" role="listitem">
 Andrews, D. W. K. 2003. <span>“End-of-Sample Instability Tests.”</span>
 <em>Econometrica</em> 71 (6): 1661–94. <a href="https://doi.org/10.1111/1468-0262.00466">https://doi.org/10.1111/1468-0262.00466</a>.
@@ -481,6 +505,11 @@ Hájek, J. 1971. <span>“Comment on <span>‘an Essay on the Logical
 Foundations of Survey Sampling’</span> by Basu, d.”</span>
 <em>Foundations of Statistical Inference</em> 236.
 </div>
+<div id="ref-Hansen1982" class="csl-entry" role="listitem">
+Hansen, Lars Peter. 1982. <span>“Large Sample Properties of Generalized
+Method of Moments Estimators.”</span> <em>Econometrica</em> 50 (4):
+1029. <a href="https://doi.org/10.2307/1912775">https://doi.org/10.2307/1912775</a>.
+</div>
 <div id="ref-HillReiter2006" class="csl-entry" role="listitem">
 Hill, Jennifer, and Jerome P. Reiter. 2006. <span>“Interval Estimation
 for Treatment Effects Using Propensity Score Matching. Statistics in
@@ -550,6 +579,11 @@ Effects.”</span> <em>Biometrika</em> 70 (1): 170–84. <a href="https://doi.or
 <div id="ref-Rueschemeyer1992" class="csl-entry" role="listitem">
 Rueschemeyer, Dietrich, Evelyne H. Stephens, and John D. Stephens. 1992.
 <em>Capitalist Development and Democracy</em>. Cambridge: Polity Pr.
+</div>
+<div id="ref-Sargan1958" class="csl-entry" role="listitem">
+Sargan, J. D. 1958. <span>“The Estimation of Economic Relationships
+Using Instrumental Variables.”</span> <em>Econometrica</em> 26 (3): 393.
+<a href="https://doi.org/10.2307/1907619">https://doi.org/10.2307/1907619</a>.
 </div>
 <div id="ref-Tibshirani1996" class="csl-entry" role="listitem">
 Tibshirani, Robert. 1996. <span>“Regression Shrinkage and Selection via

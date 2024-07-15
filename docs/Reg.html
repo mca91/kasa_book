@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.4.553">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Kausalanalyse und Machinelles Lernen mit R - 3&nbsp; Regression</title>
+<title>Kausalanalyse mit R - 3&nbsp; Regression</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -105,6 +105,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   };
 </script><script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js" integrity="sha512-aoZChv+8imY/U1O7KIHXvO87EOzCuKO0GhFtpD6G2Cyjo/xPeTgdf3/bchB10iB+AojMTDkMHDPLKNxPJVqDcw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
 <style>
+  .scientific_borders {
+    border: 0;
+    border-top: 2px solid black !important;
+    border-bottom: 2px solid black !important;
+  }
+  .table > :not(caption)>*>* {
+    border-bottom-width: 0;
+  }
+  .table > thead {
+    border-bottom: 2px solid black; 
+  }
+</style>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var tables = document.querySelectorAll("table.table");
+    tables.forEach(function(table) {
+      table.classList.remove("table-striped");
+      table.classList.add("scientific_borders");
+    });
+
+    
+  });
+</script><style>
 .qwebr-code-output-stdout {background-color: powderblue;}
 
 .qwebr-button-run {
@@ -160,7 +183,7 @@ window.Quarto = {
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./"><a href="./index.html">Kausalanalyse mit R</a></a> 
+      <a href="./"></a><a href="./index.html">Kausalanalyse mit R</a> 
         <div class="sidebar-tools-main">
   <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Lesemodus umschalten">
   <div class="quarto-reader-toggle-btn">
@@ -317,7 +340,7 @@ window.Quarto = {
 \end{align}\]</span></p>
 <p><span class="math inline">\(\beta_0 + \beta_1 X\)</span> in <span class="math inline">\(\eqref{eq:probitmodel}\)</span> ist hier ein <em>Quantil</em> <span class="math inline">\(z\)</span> der Standardnormalverteilung, <span class="math display">\[\begin{align}
 \Phi(z) = P(Z \leq z) \ , \ Z \sim \mathcal{N}(0,1),
-\end{align}\]</span> sodass der Koeffizient <span class="math inline">\(\beta_1\)</span> in <span class="math inline">\(\eqref{eq:probitmodel}\)</span> die Änderung in <span class="math inline">\(z\)</span> misst, die mit einer Änderung von einer Einheit in <span class="math inline">\(X\)</span> verbunden ist. Obwohl der Effekt einer Änderung in <span class="math inline">\(X\)</span> auf <span class="math inline">\(z\)</span> linear ist, ist der Zusammenhang zwischen <span class="math inline">\(z\)</span> und der abhängigen Variable <span class="math inline">\(Y\)</span> <em>nicht linear</em>: <span class="math inline">\(\Phi\)</span> ist eine nicht-lineare Funktion von <span class="math inline">\(X\)</span> (vgl. <a href="#fig-snvf" class="quarto-xref">Abbildung&nbsp;<span class="quarto-unresolved-ref">fig-snvf</span></a>)!</p>
+\end{align}\]</span> sodass der Koeffizient <span class="math inline">\(\beta_1\)</span> in <span class="math inline">\(\eqref{eq:probitmodel}\)</span> die Änderung in <span class="math inline">\(z\)</span> misst, die mit einer Änderung von einer Einheit in <span class="math inline">\(X\)</span> verbunden ist. Obwohl der Effekt einer Änderung in <span class="math inline">\(X\)</span> auf <span class="math inline">\(z\)</span> linear ist, ist der Zusammenhang zwischen <span class="math inline">\(z\)</span> und der abhängigen Variable <span class="math inline">\(Y\)</span> <em>nicht linear</em>: <span class="math inline">\(\Phi\)</span> ist eine nicht-lineare Funktion von <span class="math inline">\(X\)</span> (vgl. <a href="#fig-snvf" class="quarto-xref">Abbildung&nbsp;<span>3.1</span></a>)!</p>
 <div class="cell page-columns page-full">
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># N(0,1)-Verteilungsfunktion</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>

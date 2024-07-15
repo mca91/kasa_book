@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.4.553">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Kausalanalyse und Machinelles Lernen mit R - 4&nbsp; Matching</title>
+<title>Kausalanalyse mit R - 4&nbsp; Matching</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -125,6 +125,29 @@ div.csl-indent {
   };
 </script><script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js" integrity="sha512-aoZChv+8imY/U1O7KIHXvO87EOzCuKO0GhFtpD6G2Cyjo/xPeTgdf3/bchB10iB+AojMTDkMHDPLKNxPJVqDcw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
 <style>
+  .scientific_borders {
+    border: 0;
+    border-top: 2px solid black !important;
+    border-bottom: 2px solid black !important;
+  }
+  .table > :not(caption)>*>* {
+    border-bottom-width: 0;
+  }
+  .table > thead {
+    border-bottom: 2px solid black; 
+  }
+</style>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var tables = document.querySelectorAll("table.table");
+    tables.forEach(function(table) {
+      table.classList.remove("table-striped");
+      table.classList.add("scientific_borders");
+    });
+
+    
+  });
+</script><style>
 .qwebr-code-output-stdout {background-color: powderblue;}
 
 .qwebr-button-run {
@@ -300,7 +323,7 @@ globalThis.qwebrCustomizedWebROptions = {
 };
 
 // Store cell data
-globalThis.qwebrCellDetails = [{"id":1,"options":{"comment":"","output":"true","message":"true","label":"unnamed-chunk-1","fig-cap":"","warning":"true","classes":"","context":"setup","autorun":"true","dpi":72,"results":"markup","fig-width":7,"out-height":"","out-width":"700px","fig-height":5},"code":"# create dataset directory\ndir.create(\"datasets\")\n# Download the dataset\ndownload.file(\n    \"https://raw.githubusercontent.com/mca91/kausal_data/main/darkmode.csv\",\n    'datasets/darkmode.csv',\n)"},{"id":2,"options":{"comment":"","output":"true","message":"true","label":"unnamed-chunk-2","fig-cap":"","warning":"true","classes":"","context":"setup","autorun":"true","dpi":72,"results":"markup","fig-width":7,"out-height":"","out-width":"700px","fig-height":5},"code":"library(dplyr)\n# make darkmode available using read.csv for now\n# because there's some issue with readr::read_csv\n# I can't fix right now\ndarkmode <- read.csv(\n    file = \"datasets/darkmode.csv\", \n    colClasses = c(\"numeric\", \"logical\", \"numeric\", \"numeric\", \"numeric\") \n)\n\noptions(pillar.bold = TRUE, pillar.subtle = FALSE)"},{"id":3,"options":{"comment":"","output":"true","message":"true","label":"unnamed-chunk-3","fig-cap":"","warning":"true","classes":"","context":"setup","autorun":"true","dpi":72,"results":"markup","fig-width":7,"out-height":"","out-width":"700px","fig-height":5},"code":"# Logit-Modell mit 'glm()' schätzen\n(\n  darkmode_ps_logit <- glm(\n    formula = dark_mode ~ age + male + hours,\n    data = darkmode,\n    family = binomial\n  )\n)"},{"id":4,"options":{"comment":"","output":"true","message":"true","label":"unnamed-chunk-4","fig-cap":"","warning":"true","classes":"","context":"interactive","autorun":"false","dpi":72,"results":"markup","fig-width":7,"out-height":"","out-width":"700px","fig-height":5},"code":".25 * sd(\n  fitted(darkmode_ps_logit)\n  )"}];
+globalThis.qwebrCellDetails = [{"options":{"fig-width":7,"fig-height":5,"out-width":"700px","results":"markup","context":"setup","out-height":"","warning":"true","classes":"","fig-cap":"","output":"true","autorun":"true","label":"unnamed-chunk-1","message":"true","dpi":72,"comment":""},"id":1,"code":"# create dataset directory\ndir.create(\"datasets\")\n# Download the dataset\ndownload.file(\n    \"https://raw.githubusercontent.com/mca91/kausal_data/main/darkmode.csv\",\n    'datasets/darkmode.csv',\n)"},{"options":{"fig-width":7,"fig-height":5,"out-width":"700px","results":"markup","context":"setup","out-height":"","warning":"true","classes":"","fig-cap":"","output":"true","autorun":"true","label":"unnamed-chunk-2","message":"true","dpi":72,"comment":""},"id":2,"code":"library(dplyr)\n# make darkmode available using read.csv for now\n# because there's some issue with readr::read_csv\n# I can't fix right now\ndarkmode <- read.csv(\n    file = \"datasets/darkmode.csv\", \n    colClasses = c(\"numeric\", \"logical\", \"numeric\", \"numeric\", \"numeric\") \n)\n\noptions(pillar.bold = TRUE, pillar.subtle = FALSE)"},{"options":{"fig-width":7,"fig-height":5,"out-width":"700px","results":"markup","context":"setup","out-height":"","warning":"true","classes":"","fig-cap":"","output":"true","autorun":"true","label":"unnamed-chunk-3","message":"true","dpi":72,"comment":""},"id":3,"code":"# Logit-Modell mit 'glm()' schätzen\n(\n  darkmode_ps_logit <- glm(\n    formula = dark_mode ~ age + male + hours,\n    data = darkmode,\n    family = binomial\n  )\n)"},{"options":{"fig-width":7,"fig-height":5,"out-width":"700px","results":"markup","context":"interactive","out-height":"","warning":"true","classes":"","fig-cap":"","output":"true","autorun":"false","label":"unnamed-chunk-4","message":"true","dpi":72,"comment":""},"id":4,"code":".25 * sd(\n  fitted(darkmode_ps_logit)\n  )"}];
 
 </script><script type="module">
 // Declare startupMessageQWebR globally
@@ -1056,7 +1079,7 @@ window.Quarto = {
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./"><a href="./index.html">Kausalanalyse mit R</a></a> 
+      <a href="./"></a><a href="./index.html">Kausalanalyse mit R</a> 
         <div class="sidebar-tools-main">
   <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Lesemodus umschalten">
   <div class="quarto-reader-toggle-btn">
@@ -1437,29 +1460,29 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <p>Der Lehrstuhl für Ökonometrie an der Universität Duisburg-Essen betreibt einen Ökonometrie-Blog und interessiert sich für den kausalen Effekt der Einführung eines <a href="https://en.wikipedia.org/wiki/Wikipedia:Dark_mode">darkmode</a> auf die Verweildauer der User auf der Webseite. Die Webseite ist zwar nicht-kommerziell, hat sich allerdings insb. für die Aquise internationaler Studierender für den Studiengang MSc. Econometrics als wichtiges Marketing-Instrument erwiesen. Ein anprechendes Design wird daher als hoch-relevant erachtet.</p>
 <p>Idealerweise sollte der Effekt des Design-Relaunches auf die Nutzungsintensität in einem kontrollierten randomisierten Experiment untersucht werden. Hierbei würden wir Nutzern zufällig das neue oder das alte Design zuweisen und den Effekt als Differnz des durchschnittlichen Verweildauer für die Gruppen bestimmen. Eine solche Studie ist jedoch aus technischen und finanziellen Gründen nicht realisierbar, sodass die Auswirkungen des darkmode mit vorliegenden nicht-experimenellen Nutzungsstatistiken für die Webseite geschätzt werden sollen.</p>
 <p>Die Nutzungsstatistiken sind im Datensatz <a href="https://raw.githubusercontent.com/mca91/kasa_data/main/darkmode.csv"><em>darkmode.csv</em></a> enthalten und sollen der Analyse des Effekts des darkmode (<code>dark_mode</code>) auf die Verweildauer der Leser auf der Webseite (<code>read_time</code>) dienen.</p>
-<p><a href="#tbl-darkmode" class="quarto-xref">Tabelle&nbsp;<span class="quarto-unresolved-ref">tbl-darkmode</span></a> zeigt die Definitionen der Variablen in <em>darkmode.csv</em>.</p>
+<p><a href="#tbl-darkmode" class="quarto-xref">Tabelle&nbsp;<span>4.1</span></a> zeigt die Definitionen der Variablen in <em>darkmode.csv</em>.</p>
 <div class="cell page-columns page-full">
 <div id="tbl-darkmode" class="cell quarto-float anchored page-columns page-full">
 <figure class="quarto-float quarto-float-tbl figure page-columns page-full"><div aria-describedby="tbl-darkmode-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
 <div>
-<div id="ndsnykkjqs" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#ndsnykkjqs table {
+<div id="psrzchicnx" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#psrzchicnx table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#ndsnykkjqs thead, #ndsnykkjqs tbody, #ndsnykkjqs tfoot, #ndsnykkjqs tr, #ndsnykkjqs td, #ndsnykkjqs th {
+#psrzchicnx thead, #psrzchicnx tbody, #psrzchicnx tfoot, #psrzchicnx tr, #psrzchicnx td, #psrzchicnx th {
   border-style: none;
 }
 
-#ndsnykkjqs p {
+#psrzchicnx p {
   margin: 0;
   padding: 0;
 }
 
-#ndsnykkjqs .gt_table {
+#psrzchicnx .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1485,12 +1508,12 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-left-color: #D3D3D3;
 }
 
-#ndsnykkjqs .gt_caption {
+#psrzchicnx .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#ndsnykkjqs .gt_title {
+#psrzchicnx .gt_title {
   color: #000000;
   font-size: 125%;
   font-weight: initial;
@@ -1502,7 +1525,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-bottom-width: 0;
 }
 
-#ndsnykkjqs .gt_subtitle {
+#psrzchicnx .gt_subtitle {
   color: #000000;
   font-size: 85%;
   font-weight: initial;
@@ -1514,7 +1537,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-top-width: 0;
 }
 
-#ndsnykkjqs .gt_heading {
+#psrzchicnx .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1526,13 +1549,13 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-right-color: #D3D3D3;
 }
 
-#ndsnykkjqs .gt_bottom_border {
+#psrzchicnx .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ndsnykkjqs .gt_col_headings {
+#psrzchicnx .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #000000;
@@ -1547,7 +1570,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-right-color: #D3D3D3;
 }
 
-#ndsnykkjqs .gt_col_heading {
+#psrzchicnx .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1567,7 +1590,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   overflow-x: hidden;
 }
 
-#ndsnykkjqs .gt_column_spanner_outer {
+#psrzchicnx .gt_column_spanner_outer {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1579,15 +1602,15 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   padding-right: 4px;
 }
 
-#ndsnykkjqs .gt_column_spanner_outer:first-child {
+#psrzchicnx .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ndsnykkjqs .gt_column_spanner_outer:last-child {
+#psrzchicnx .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ndsnykkjqs .gt_column_spanner {
+#psrzchicnx .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -1599,11 +1622,11 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   width: 100%;
 }
 
-#ndsnykkjqs .gt_spanner_row {
+#psrzchicnx .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#ndsnykkjqs .gt_group_heading {
+#psrzchicnx .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1629,7 +1652,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   text-align: left;
 }
 
-#ndsnykkjqs .gt_empty_group_heading {
+#psrzchicnx .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1644,15 +1667,15 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   vertical-align: middle;
 }
 
-#ndsnykkjqs .gt_from_md > :first-child {
+#psrzchicnx .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ndsnykkjqs .gt_from_md > :last-child {
+#psrzchicnx .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ndsnykkjqs .gt_row {
+#psrzchicnx .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1671,7 +1694,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   overflow-x: hidden;
 }
 
-#ndsnykkjqs .gt_stub {
+#psrzchicnx .gt_stub {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1684,7 +1707,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   padding-right: 5px;
 }
 
-#ndsnykkjqs .gt_stub_row_group {
+#psrzchicnx .gt_stub_row_group {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1698,15 +1721,15 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   vertical-align: top;
 }
 
-#ndsnykkjqs .gt_row_group_first td {
+#psrzchicnx .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#ndsnykkjqs .gt_row_group_first th {
+#psrzchicnx .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#ndsnykkjqs .gt_summary_row {
+#psrzchicnx .gt_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1716,16 +1739,16 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   padding-right: 5px;
 }
 
-#ndsnykkjqs .gt_first_summary_row {
+#psrzchicnx .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#ndsnykkjqs .gt_first_summary_row.thick {
+#psrzchicnx .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#ndsnykkjqs .gt_last_summary_row {
+#psrzchicnx .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1735,7 +1758,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-bottom-color: #D3D3D3;
 }
 
-#ndsnykkjqs .gt_grand_summary_row {
+#psrzchicnx .gt_grand_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1745,7 +1768,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   padding-right: 5px;
 }
 
-#ndsnykkjqs .gt_first_grand_summary_row {
+#psrzchicnx .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1755,7 +1778,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-top-color: #D3D3D3;
 }
 
-#ndsnykkjqs .gt_last_grand_summary_row_top {
+#psrzchicnx .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1765,11 +1788,11 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-bottom-color: #D3D3D3;
 }
 
-#ndsnykkjqs .gt_striped {
+#psrzchicnx .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ndsnykkjqs .gt_table_body {
+#psrzchicnx .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1778,7 +1801,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-bottom-color: #000000;
 }
 
-#ndsnykkjqs .gt_footnotes {
+#psrzchicnx .gt_footnotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1792,7 +1815,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-right-color: #D3D3D3;
 }
 
-#ndsnykkjqs .gt_footnote {
+#psrzchicnx .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1801,7 +1824,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   padding-right: 5px;
 }
 
-#ndsnykkjqs .gt_sourcenotes {
+#psrzchicnx .gt_sourcenotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1815,7 +1838,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-right-color: #D3D3D3;
 }
 
-#ndsnykkjqs .gt_sourcenote {
+#psrzchicnx .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1823,63 +1846,63 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   padding-right: 5px;
 }
 
-#ndsnykkjqs .gt_left {
+#psrzchicnx .gt_left {
   text-align: left;
 }
 
-#ndsnykkjqs .gt_center {
+#psrzchicnx .gt_center {
   text-align: center;
 }
 
-#ndsnykkjqs .gt_right {
+#psrzchicnx .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ndsnykkjqs .gt_font_normal {
+#psrzchicnx .gt_font_normal {
   font-weight: normal;
 }
 
-#ndsnykkjqs .gt_font_bold {
+#psrzchicnx .gt_font_bold {
   font-weight: bold;
 }
 
-#ndsnykkjqs .gt_font_italic {
+#psrzchicnx .gt_font_italic {
   font-style: italic;
 }
 
-#ndsnykkjqs .gt_super {
+#psrzchicnx .gt_super {
   font-size: 65%;
 }
 
-#ndsnykkjqs .gt_footnote_marks {
+#psrzchicnx .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#ndsnykkjqs .gt_asterisk {
+#psrzchicnx .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#ndsnykkjqs .gt_indent_1 {
+#psrzchicnx .gt_indent_1 {
   text-indent: 5px;
 }
 
-#ndsnykkjqs .gt_indent_2 {
+#psrzchicnx .gt_indent_2 {
   text-indent: 10px;
 }
 
-#ndsnykkjqs .gt_indent_3 {
+#psrzchicnx .gt_indent_3 {
   text-indent: 15px;
 }
 
-#ndsnykkjqs .gt_indent_4 {
+#psrzchicnx .gt_indent_4 {
   text-indent: 20px;
 }
 
-#ndsnykkjqs .gt_indent_5 {
+#psrzchicnx .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -1973,7 +1996,7 @@ $ hours     &lt;dbl&gt; 65.6, 125.4, 642.6, 129.1, 190.2, 185.3, 333.5, 279.3, 1
 </div>
 </div>
 <p>Die Schätzung ergibt einen negativen Behandlungseffekt, mit der Interpreation, dass das neue Design zu einer Reduktion der Lesezeit um etwa 0.44 Minuten pro Woche führt. Dieses Ergebnis ist allerdings zweifelhaft, weil eine Isolierung des Behandlungseffekts aufgrund von Backdoor-Pfaden im DGP vermutlich nicht gewähleistet ist. Ein Indikator hierfür sind systematische Unterschiede hinsichtlich von (möglicherweise unbeobachtbaren) Charakteristika von Kontrollgruppe und Behandlungsgruppe.</p>
-<p>Da die User sich beim Aufrufen der Seite aktiv für oder gegen den das neue Design entscheiden müssen (und somit selektieren, ob Sie in der Behandlungs- oder Kontrollgruppe landen), liegt wahrscheinlich <em>Confounding</em> vor: Unsere Hypothese ist zunächst, dass männliche User eine durchschnittlich längere Lesezeit aufweisen <em>und</em> mit größerer Wahrscheinlichkeit auf das neue Design wechseln als nicht-männliche Leser. Dann ist <code>male</code> eine Backdoor-Variable. Diese Situation ist unter der Annahme, dass nur diese Faktoren den DGP bestimmen, in <a href="#fig-maleCDdarkmode" class="quarto-xref">Abbildung&nbsp;<span class="quarto-unresolved-ref">fig-maleCDdarkmode</span></a> dargestellt.</p>
+<p>Da die User sich beim Aufrufen der Seite aktiv für oder gegen den das neue Design entscheiden müssen (und somit selektieren, ob Sie in der Behandlungs- oder Kontrollgruppe landen), liegt wahrscheinlich <em>Confounding</em> vor: Unsere Hypothese ist zunächst, dass männliche User eine durchschnittlich längere Lesezeit aufweisen <em>und</em> mit größerer Wahrscheinlichkeit auf das neue Design wechseln als nicht-männliche Leser. Dann ist <code>male</code> eine Backdoor-Variable. Diese Situation ist unter der Annahme, dass nur diese Faktoren den DGP bestimmen, in <a href="#fig-maleCDdarkmode" class="quarto-xref">Abbildung&nbsp;<span>4.1</span></a> dargestellt.</p>
 <div class="cell page-columns page-full" data-fig-width="4" data-fig-height="3" data-layout-align="center">
 <div class="cell-output-display page-columns page-full">
 <div id="fig-maleCDdarkmode" class="quarto-figure quarto-figure-center quarto-float anchored page-columns page-full">
@@ -1994,7 +2017,7 @@ Abbildung&nbsp;4.1: Backdoor durch ‘male’ im Website-Design-Bespiel
 </div>
 </div>
 </div>
-<p>Der DGP in <a href="#fig-maleCDdarkmode" class="quarto-xref">Abbildung&nbsp;<span class="quarto-unresolved-ref">fig-maleCDdarkmode</span></a> führt zu einer verzerrten Schätzung des kausalen Effekts von <code>dark_mode</code> auf <code>read_time</code> mit <span class="math inline">\(\eqref{eq:naivATEdarkmode}\)</span>, wenn das Verhältnis von männlichen und nicht-männlichen Usern in Bahandlungs- und Kontrollgruppe nicht ausgeglichen ist. Wir überprüfen dies mit R.</p>
+<p>Der DGP in <a href="#fig-maleCDdarkmode" class="quarto-xref">Abbildung&nbsp;<span>4.1</span></a> führt zu einer verzerrten Schätzung des kausalen Effekts von <code>dark_mode</code> auf <code>read_time</code> mit <span class="math inline">\(\eqref{eq:naivATEdarkmode}\)</span>, wenn das Verhältnis von männlichen und nicht-männlichen Usern in Bahandlungs- und Kontrollgruppe nicht ausgeglichen ist. Wir überprüfen dies mit R.</p>
 <div class="cell">
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Anteile männlicher und nicht-männlicher User</span></span>
 <span><span class="op">(</span></span>
@@ -2114,7 +2137,7 @@ F-statistic: 0.03343 on 1 and 298 DF,  p-value: 0.855</code></pre>
 </div>
 <p>Der geschätzte Koeffizient von <code>dark_mode</code> entspricht <span class="math inline">\(\widehat{\tau}^w\)</span>.</p>
 <p>Da <code>male</code> eine binäre Variable ist, reduziert sich eine Beurteilung der Vergleichbarkeit der Verteilungen von <code>male</code> in Behandlungs- und Kontrollgruppe auf einen simplen Vergleich des Männeranteils beider Gruppen. In der Praxis gibt es meist eine Vielzahl potentieller Backdoor-Variablen, die zudem kontinuierlich verteilt sind. Es scheint plausibel, dass das Alter der Nutzer sowohl die Akzeptanz des Design-Updates als auch die Lesezeit beeinflusst. Die bisherige Verweildauer ist mindestens eine plausible Determinante der Lesezeit.</p>
-<p>Der erweiterte DGP ist in Abbildung <a href="#fig-CDdarkmode" class="quarto-xref">Abbildung&nbsp;<span class="quarto-unresolved-ref">fig-CDdarkmode</span></a> dargestellt, wobei der zusätzliche Backdoor-Pfad durch <code>age</code> ebenfalls mit roten Pfeilen gekennzeichnet sind.</p>
+<p>Der erweiterte DGP ist in Abbildung <a href="#fig-CDdarkmode" class="quarto-xref">Abbildung&nbsp;<span>4.2</span></a> dargestellt, wobei der zusätzliche Backdoor-Pfad durch <code>age</code> ebenfalls mit roten Pfeilen gekennzeichnet sind.</p>
 <div class="cell page-columns page-full" data-fig-width="4" data-fig-height="3" data-layout-align="center">
 <div class="cell-output-display page-columns page-full">
 <div id="fig-CDdarkmode" class="quarto-figure quarto-figure-center quarto-float anchored page-columns page-full">
@@ -2216,10 +2239,10 @@ All     151     149</code></pre>
 <p>Die Einträge <code>M.0.Un</code> und <code>M.1.Un</code> zeigen die jeweiligen Stichprobenmittelwerte der Variablen für Kontroll- und Behandlungsgruppe. <code>Diff.Un</code> gibt eine standardisierte Mittelwertdifferenz <span class="math inline">\(SMD\)</span> an, wobei <span class="math display">\[\begin{align*}
   SMD_j := \left(\overline{X}_{j,B} - \overline{X}_{j,K}\right) \bigg/ \sqrt{\frac{1}{2}\left(\widehat{\text{Var}}(X_{j,B}) + \widehat{\text{Var}}(X_{j,K})\right)},
 \end{align*}\]</span> mit Stichprobenmitteln <span class="math inline">\(\overline{X}_{j,B}\)</span> und <span class="math inline">\(\overline{X}_{j,K}\)</span> und Stichprobenvarianzen <span class="math inline">\(\widehat{\text{Var}}(X_{j,B})\)</span> und <span class="math inline">\(\widehat{\text{Var}}(X_{j,K})\)</span> für eine kontinuierliche Kovariable <span class="math inline">\(j\)</span>.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> Obwohl es keinen einheitlichen Schwellenwert für die standardisierte Differenz gibt, der ein erhebliches Ungleichgewicht anzeigt, gilt für kontinuierliche Variablen eine standardisierte (absolute) Differenz von weniger als <span class="math inline">\(0.1\)</span> als Hinweis auf einen vernachlässigbaren Unterschied zwischen den Gruppen.</p>
-<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;Siehe <span class="citation" data-cites="Austin2011">P. Austin (<a href="#ref-Austin2011" role="doc-biblioref">2011</a>)</span> für einen Überblick zu Balance-Statistiken.</p></div></div><p>Die Balance Table weist also auf einen vernachlässigbaren Unterschied für <code>hours</code> hin und bestätigt den aus den Grafiken abgeleiteten Eindruck einer relevanten Differenzen für <code>age</code>.</p>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;Siehe <span class="citation" data-cites="Austin2011">P. Austin (<a href="Literatur.html#ref-Austin2011" role="doc-biblioref">2011</a>)</span> für einen Überblick zu Balance-Statistiken.</p></div></div><p>Die Balance Table weist also auf einen vernachlässigbaren Unterschied für <code>hours</code> hin und bestätigt den aus den Grafiken abgeleiteten Eindruck einer relevanten Differenzen für <code>age</code>.</p>
 </section><section id="entropy-balancing" class="level3" data-number="4.1.2"><h3 data-number="4.1.2" class="anchored" data-anchor-id="entropy-balancing">
 <span class="header-section-number">4.1.2</span> Entropy Balancing</h3>
-<p><em>Entropy Balancing</em> <span class="citation" data-cites="Hainmueller2012">(<a href="#ref-Hainmueller2012" role="doc-biblioref">Hainmueller 2012</a>)</span> ist eine weitere Methode zur Gewährleistung der Vergleichbarkeit von Behandlungs- und Kontrollgruppe anhand von Gewichten. Das Verfahren nutzt Konzepte aus der <a href="https://de.wikipedia.org/wiki/Informationstheorie">Informationstheorie</a> um die Gewichte für Subjekte in der Kontrollgruppe so anzupassen, dass die Verteilung der Matchingvariablen in der Kontrollgruppe die Verteilung in der Behandlungsgruppe möglichst gut approximiert. Dies geschieht unter der Restriktion, dass bestimmte empirische Momente (meist Mittelwerte und Varianzen) der Matchingvariablen exakt übereinstimmen. Mathematisch werden die Gewichte für Kontrollgruppenbeobachtungen durch Minimierung der <a href="https://de.wikipedia.org/wiki/Kullback-Leibler-Divergenz">Kullback-Leibler-Divergenz</a> zwischen den Verteilungen gefunden, wobei die Divergenz ein Maß für den Unterschied von Wahrscheinlichkeitsverteilungen ist.</p>
+<p><em>Entropy Balancing</em> <span class="citation" data-cites="Hainmueller2012">(<a href="Literatur.html#ref-Hainmueller2012" role="doc-biblioref">Hainmueller 2012</a>)</span> ist eine weitere Methode zur Gewährleistung der Vergleichbarkeit von Behandlungs- und Kontrollgruppe anhand von Gewichten. Das Verfahren nutzt Konzepte aus der <a href="https://de.wikipedia.org/wiki/Informationstheorie">Informationstheorie</a> um die Gewichte für Subjekte in der Kontrollgruppe so anzupassen, dass die Verteilung der Matchingvariablen in der Kontrollgruppe die Verteilung in der Behandlungsgruppe möglichst gut approximiert. Dies geschieht unter der Restriktion, dass bestimmte empirische Momente (meist Mittelwerte und Varianzen) der Matchingvariablen exakt übereinstimmen. Mathematisch werden die Gewichte für Kontrollgruppenbeobachtungen durch Minimierung der <a href="https://de.wikipedia.org/wiki/Kullback-Leibler-Divergenz">Kullback-Leibler-Divergenz</a> zwischen den Verteilungen gefunden, wobei die Divergenz ein Maß für den Unterschied von Wahrscheinlichkeitsverteilungen ist.</p>
 <p>Entropy Balancing ist im R-Paket <code>WeightIt</code> implementiert. Wir zeigen, wie die benötigten Gewichte für eine Schätzungen des ATT im Website-Beispiel mit <code>WeightIt::wightit()</code> bestimmt werden können. Über das Argument <code>moments</code> legen wir fest, dass die Gewichte unter der Restriktion übereinstimmender Mittelwerte aller Matching-Variablen zwischen Behandlungs- und Kontrollgruppe erfolgen soll.</p>
 <div class="cell">
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ngreifer.github.io/WeightIt/">WeightIt</a></span><span class="op">)</span></span>
@@ -2274,10 +2297,10 @@ Multiple R-squared:  0.009278,  Adjusted R-squared:  0.005953
 F-statistic: 2.791 on 1 and 298 DF,  p-value: 0.09586</code></pre>
 </div>
 </div>
-<p>Beachte, dass die von <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> berechneten Standardfehler bei Entropy Balancing ungültig sind. In Abschnitt <a href="#sec-bootmatching" class="quarto-xref"><span class="quarto-unresolved-ref">sec-bootmatching</span></a> erläutern wir die Berechnung von Standardfehlern für Matching-Schätzer mit dem Bootstrap.</p>
+<p>Beachte, dass die von <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> berechneten Standardfehler bei Entropy Balancing ungültig sind. In Abschnitt <a href="#sec-bootmatching" class="quarto-xref"><span>Kapitel 4.4</span></a> erläutern wir die Berechnung von Standardfehlern für Matching-Schätzer mit dem Bootstrap.</p>
 </section><section id="sec-PSM" class="level3 page-columns page-full" data-number="4.1.3"><h3 data-number="4.1.3" class="anchored" data-anchor-id="sec-PSM">
 <span class="header-section-number">4.1.3</span> Mehrere Matching-Variablen und der Propensity Score</h3>
-<p>Bei mehreren Backdoor-Variablen kann eine Gewichtung anhand der Behandlungswahrscheinlichkeit (<em>Treatment Propensity</em>) erfolgen. Die Idee hierbei ist, dass der DGP wie in <a href="#fig-propCDdarkmode" class="quarto-xref">Abbildung&nbsp;<span class="quarto-unresolved-ref">fig-propCDdarkmode</span></a> dargestellt werden kann.</p>
+<p>Bei mehreren Backdoor-Variablen kann eine Gewichtung anhand der Behandlungswahrscheinlichkeit (<em>Treatment Propensity</em>) erfolgen. Die Idee hierbei ist, dass der DGP wie in <a href="#fig-propCDdarkmode" class="quarto-xref">Abbildung&nbsp;<span>4.3</span></a> dargestellt werden kann.</p>
 <div class="cell page-columns page-full" data-fig-width="4" data-fig-height="3" data-layout-align="center">
 <div class="cell-output-display page-columns page-full">
 <div id="fig-propCDdarkmode" class="quarto-figure quarto-figure-center quarto-float anchored page-columns page-full">
@@ -2307,7 +2330,7 @@ Abbildung&nbsp;4.3: Propensity im Website-Design-Beispiel
 </div>
 <p>Hierbei beeinflussen die Backdoor-Variablen <em>age</em> und <em>male</em> die Behandlungsvariable <em>dark_mode</em> lediglich durch die Behandlungswahrscheinlichkeit <em>Treatment Propensity</em>. Diese Darstellung zeigt, das die mehrdimensionale Information bzgl. der Ähnlichkeit von Subjekten hinsichtlich der beobachteten Kovariablen in einer einzigen Variable zusammengefasst werden kann. Die Backdoor-Pfade können daher geschlossen werden, indem wir Subjekte anhand von <em>Treatment Propensity</em> derart gewichten, dass beide Gruppen hinsichtlich der Verteilung der Behandlungswahrscheinlichkeit vergleichbar sind. Betrachte erneut <span class="math inline">\(\eqref{eq:cia}\)</span> und beachte, dass <span class="math display">\[\begin{align}
   Y_i = Y_i^{(1)} D_i + Y_i^{(0)} (1-D_i).
-\end{align}\]</span> <span class="citation" data-cites="RosenbaumRubin1983">Rosenbaum und Rubin (<a href="#ref-RosenbaumRubin1983" role="doc-biblioref">1983</a>)</span> zeigen, dass es hinsichtlich <span class="math inline">\(\eqref{eq:cia}\)</span> äquivalent ist für die <em>Treatment Propensity</em> <span class="math inline">\(P_i(X_i):=P(B_i=1\vert X_i = x)\)</span> zu kontrollieren, d.h. <span class="math display">\[\begin{align}
+\end{align}\]</span> <span class="citation" data-cites="RosenbaumRubin1983">Rosenbaum und Rubin (<a href="Literatur.html#ref-RosenbaumRubin1983" role="doc-biblioref">1983</a>)</span> zeigen, dass es hinsichtlich <span class="math inline">\(\eqref{eq:cia}\)</span> äquivalent ist für die <em>Treatment Propensity</em> <span class="math inline">\(P_i(X_i):=P(B_i=1\vert X_i = x)\)</span> zu kontrollieren, d.h. <span class="math display">\[\begin{align}
   \left\{Y_i^{(1)},Y_i^{(0)}\right\} \perp B_i\vert X_i \quad\Leftrightarrow\quad \left\{Y_i^{(1)},Y_i^{(0)}\right\} \perp B_i\vert P_i(X_i).
 \end{align}\]</span></p>
 <p>Der Behandlungseffekt kann so als Differenz von gewichteten Gruppenmittelwerten berechnet werden, mit inversem Wahrscheinlichkeitsgewicht (IPW) <span class="math inline">\(w_{i,B} = 1/P_i(X_i)\)</span> für Beobachtungen in der Behandlungsgruppe und <span class="math inline">\(w_{i,K} = 1/(1-P_i(X_i))\)</span> für Beobachtungen in der Kontrollgruppe, <span class="math display">\[\begin{align}
@@ -2315,11 +2338,11 @@ Abbildung&nbsp;4.3: Propensity im Website-Design-Beispiel
 \end{align}\]</span></p>
 <p>Grundsätzlich ist <em>TreatmentPropensity</em> eine nicht beobachtbare Variable und muss daher aus den Daten geschätzt werden. Eine geschätzte Behandlungswahrscheinlichkeiten <span class="math inline">\(\widehat{P}_i(X_i)\)</span> wird als <em>Propensity Score</em> bezeichnet. In der Praxis erfolgt die Schätzung von <em>Propensity Scores</em> meist mit logistischer Regression. Ein erwartungstreuer Schätzer des ATE ist <span class="math display">\[\begin{align}
   \widehat{\tau}^{\text{IPW}} = \frac{1}{n}\sum_{i=1}^n \left[\frac{B_i Y_i}{\widehat{P}_i(X_i)} - \frac{(1-B_i)Y_i}{1-\widehat{P}_i(X_i)} \right].\label{eq:hattauipw}
-\end{align}\]</span> <span class="citation" data-cites="Hiranoetal2003">Hirano, Imbens, und Ridder (<a href="#ref-Hiranoetal2003" role="doc-biblioref">2003</a>)</span> diskutieren Alternativen zu <span class="math inline">\(\eqref{eq:hattauipw}\)</span> für die Schätzung anderer Typen von Behandlungseffekten.</p>
+\end{align}\]</span> <span class="citation" data-cites="Hiranoetal2003">Hirano, Imbens, und Ridder (<a href="Literatur.html#ref-Hiranoetal2003" role="doc-biblioref">2003</a>)</span> diskutieren Alternativen zu <span class="math inline">\(\eqref{eq:hattauipw}\)</span> für die Schätzung anderer Typen von Behandlungseffekten.</p>
 <p>Wir schätzen nachfolgend die <em>Propensity Scores</em> für unser Anwendungsbeispiel, erläutern die Berechnung der Gewichte sowie die Schätzung von Behandlungseffekten mit gewichteter Regression. Hierbei betrachten wir eine Variante von <span class="math inline">\(\eqref{eq:hattauipw}\)</span> mit normalisierten Gewichten <span class="math inline">\(\tilde{w}_{i,B} = w_{i,B}/\sum_i w_{i,B}\)</span> und <span class="math inline">\(\tilde{w}_{i,K} = w_{i,K}/\sum_i w_{i,K}\)</span> die sich jeweils zu 1 summieren.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> Dies ergibt den Hájek-Schätzer<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> <span class="math display">\[\begin{align}
     \widehat{\tau}_N^{\text{IPW}} = \frac{\sum_i\tilde{w}_{i,B}Y_i}{\sum_i\tilde{w}_{i,B}} -  \frac{\sum_i\tilde{w}_{i,K}Y_i}{\sum_i\tilde{w}_{i,K}}.\label{eq:hattauhajek}
 \end{align}\]</span></p>
-<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;Eine Normalisierung der Gewichte reduziert die Varianz des Schätzers, vgl. <span class="citation" data-cites="Hiranoetal2003">Hirano, Imbens, und Ridder (<a href="#ref-Hiranoetal2003" role="doc-biblioref">2003</a>)</span></p></div><div id="fn3"><p><sup>3</sup>&nbsp;Siehe <span class="citation" data-cites="Hajek1971">Hájek (<a href="#ref-Hajek1971" role="doc-biblioref">1971</a>)</span>.</p></div></div><p>Zunächst Schätzen wir ein logistisches Regressionsmodell mit <code>age</code>, <code>male</code> und <code>hours</code> als erklärende Variablen für <code>dark_mode</code>.</p>
+<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;Eine Normalisierung der Gewichte reduziert die Varianz des Schätzers, vgl. <span class="citation" data-cites="Hiranoetal2003">Hirano, Imbens, und Ridder (<a href="Literatur.html#ref-Hiranoetal2003" role="doc-biblioref">2003</a>)</span></p></div><div id="fn3"><p><sup>3</sup>&nbsp;Siehe <span class="citation" data-cites="Hajek1971">Hájek (<a href="Literatur.html#ref-Hajek1971" role="doc-biblioref">1971</a>)</span>.</p></div></div><p>Zunächst Schätzen wir ein logistisches Regressionsmodell mit <code>age</code>, <code>male</code> und <code>hours</code> als erklärende Variablen für <code>dark_mode</code>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Logit-Modell mit 'glm()' schätzen</span></span>
 <span><span class="op">(</span></span>
@@ -2742,7 +2765,7 @@ Unmatched      47      45</code></pre>
 </div>
 <p>Laut Balance-Table führt Eins-zu-Eins-Matching basierend auf Propensity Scores zu einem Datensatz mit <span class="math inline">\(104\)</span> gematchten Beobachtungen in der Behandlungsgruppe. Hinsichtlich der standardisierten Mittelwertdifferenz (<code>Diff.Adj</code>) erzielt diese Methode die beste Balance unter den betrachteten Ansätzen.</p>
 <p><strong>Vergleich der Balance verschiedener Verfahren mit Love-Plot</strong></p>
-<p>Standardisierte Mittelwertdifferenzen für verschiedene Matching-Verfahren können grafisch mit einem Love-Plot <span class="citation" data-cites="Love2004">(<a href="#ref-Love2004" role="doc-biblioref">Love 2004</a>)</span> veranschaulicht werden. Hierzu nutzen wir <code><a href="https://ngreifer.github.io/cobalt/reference/love.plot.html">cobalt::love.plot()</a></code> und übergeben die mit <code><a href="https://kosukeimai.github.io/MatchIt/reference/matchit.html">matchit()</a></code> generierten Objekte im Argument <code>weights</code>.</p>
+<p>Standardisierte Mittelwertdifferenzen für verschiedene Matching-Verfahren können grafisch mit einem Love-Plot <span class="citation" data-cites="Love2004">(<a href="Literatur.html#ref-Love2004" role="doc-biblioref">Love 2004</a>)</span> veranschaulicht werden. Hierzu nutzen wir <code><a href="https://ngreifer.github.io/cobalt/reference/love.plot.html">cobalt::love.plot()</a></code> und übergeben die mit <code><a href="https://kosukeimai.github.io/MatchIt/reference/matchit.html">matchit()</a></code> generierten Objekte im Argument <code>weights</code>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb57"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Love-Plot für</span></span>
 <span><span class="fu"><a href="https://ngreifer.github.io/cobalt/reference/love.plot.html">love.plot</a></span><span class="op">(</span></span>
@@ -2783,7 +2806,7 @@ Unmatched      47      45</code></pre>
 </div>
 </div>
 <p><code>darkmode_matched</code> enthält Gewichte (<code>weights</code>) für die jeweilige Gruppe zu denen gemachte Beobachtungen gehören (<code>subclass</code>). Dies ist relevant, falls Beobachtungen mehrfach gematcht werden. Wegen Eins-zu-eins-Matching <em>ohne</em> Zurücklegen gibt es in unserem Beispiel 82 Beobachtungspaare und sämtliche Gewichte sind 1. Die Berücksichtigung der Gewicht in den nachfolgenden Aufrufen von Schätzfunktionen (bspw.<code><a href="https://rdrr.io/r/stats/lm.html">lm()</a></code>) ist daher nicht nötig und erfolgt lediglich zur Illustration der grundsätzlichen Vorgehensweise.</p>
-<p>Eine Wiederholung der grafischen Analyse in <a href="#sec-balance" class="quarto-xref"><span class="quarto-unresolved-ref">sec-balance</span></a> zeigt eine deutlich verbesserte Vergleichbarkeit hinsichtlich der Verteilung der Matching-Variablen in <code>darkmode_matched</code>.</p>
+<p>Eine Wiederholung der grafischen Analyse in <a href="#sec-balance" class="quarto-xref"><span>Kapitel 4.1</span></a> zeigt eine deutlich verbesserte Vergleichbarkeit hinsichtlich der Verteilung der Matching-Variablen in <code>darkmode_matched</code>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb60"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">darkmode_matched_CEM</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">dark_mode</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
@@ -2937,8 +2960,8 @@ F-statistic: 38.57 on 4 and 295 DF,  p-value: &lt; 2.2e-16</code></pre>
 <section id="cluster-robuste-standardfehler" class="level3" data-number="4.3.1"><h3 data-number="4.3.1" class="anchored" data-anchor-id="cluster-robuste-standardfehler">
 <span class="header-section-number">4.3.1</span> Cluster-robuste Standardfehler</h3>
 <p>Für Matching-Verfahren sind die mit <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> berechneten Standardfehler (und damit auch Konfidenzintervalle, t-Statistiken und p-Werte) für den Behandlungseffekt <em>grundsätzlich ungültig</em>. Je nach Matching-Verfahren liegen unterschiedliche Quellen von Schätzunsicherheit vor, die bei der Berechnung von Standardfehlern zusätzlich zu der “üblichen” Stichproben-Variabilität berücksichtig werden müssen. Gründe hierfür sind der Matching-Prozess ansich oder weitere Unsicherheit durch die Schätzung zusätzlicher Parameter, etwa bei der Berechnung von Propensity Scores mit logistischer Regression. Eine weiterere Ursache zusätzlicher Variation durch den Matching-Prozess, die wir bisher nicht näher betrachtet haben ensteht durch Zurücklegen, d.h. wenn Beobachtungen mehrfach gematcht werden können. Auch dieser Faktor wird in der von <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> verwendeten Formel für den Standardfehler des Effekt-Schätzers nicht berücksichtigt.</p>
-<p>Die Standardfehlerberechnung für Matching-Schätzer von Behandlungseffekten ist ein Gegenstand aktueller methodischer Forschung. <span class="citation" data-cites="AustinSmall2014">P. C. Austin und Small (<a href="#ref-AustinSmall2014" role="doc-biblioref">2014</a>)</span> und <span class="citation" data-cites="AbadieSpiess2022">Abadie und Spiess (<a href="#ref-AbadieSpiess2022" role="doc-biblioref">2022</a>)</span> belegen die Gültigkeit von cluster-robusten Standardfehlern mit Clustering auf Ebene der Beobachtungsgruppen (<code>subclass</code> im output von <code><a href="https://kosukeimai.github.io/MatchIt/reference/match.data.html">match.data()</a></code>) bei Matching ohne Zurücklegen. Für Matching anhand von Propensity Scores (auch mit Zurücklegen) zeigt <span class="citation" data-cites="AbadieImbens2016">Imbens (<a href="#ref-AbadieImbens2016" role="doc-biblioref">2016</a>)</span>, dass ignorieren der zusätzlichen Unsicherheit durch die Schätzung der Propensity Scores zu konservativer Inferenz für den ATE anhand eines cluster-robusten Standardfehlerschätzers führt, jedoch ungültige Inferenz für die Schätzung des ATT bedeuten kann. Ähnlich zu <span class="citation" data-cites="AustinSmall2014">P. C. Austin und Small (<a href="#ref-AustinSmall2014" role="doc-biblioref">2014</a>)</span> deuten die Ergebnisse der Simulationsstudie von <span class="citation" data-cites="Bodoryetal2020">Bodory u.&nbsp;a. (<a href="#ref-Bodoryetal2020" role="doc-biblioref">2020</a>)</span> jedoch auf grundsätzlich bessere Eigenschaften der Schätzung hin, wenn die Standardfehler <em>nicht</em> für die Schätzung der Propensity Scores adjustiert werden.</p>
-<p>Weiterhin ist die Kontrolle für Kovariablen mit Erklärungskraft für die Outcome-Variable und für die Matching-Variablen mit <em>Regression Adjustment</em> (vgl. <a href="#sec-regadj" class="quarto-xref"><span class="quarto-unresolved-ref">sec-regadj</span></a>) für die Schätzung des Behandlungseffekts nach Matching eine etablierte Strategie, vgl. <span class="citation" data-cites="HillReiter2006">Hill und Reiter (<a href="#ref-HillReiter2006" role="doc-biblioref">2006</a>)</span> und <span class="citation" data-cites="AbadieSpiess2022">Abadie und Spiess (<a href="#ref-AbadieSpiess2022" role="doc-biblioref">2022</a>)</span>. So können die Varianz der Schätzung und das Risiko einer Verzerrung der Standardfehler aufgrund verbleibender Imbalance von Behandlungs- und Kontrollgruppe nach Matching verringert werden.</p>
+<p>Die Standardfehlerberechnung für Matching-Schätzer von Behandlungseffekten ist ein Gegenstand aktueller methodischer Forschung. <span class="citation" data-cites="AustinSmall2014">P. C. Austin und Small (<a href="Literatur.html#ref-AustinSmall2014" role="doc-biblioref">2014</a>)</span> und <span class="citation" data-cites="AbadieSpiess2022">Abadie und Spiess (<a href="Literatur.html#ref-AbadieSpiess2022" role="doc-biblioref">2022</a>)</span> belegen die Gültigkeit von cluster-robusten Standardfehlern mit Clustering auf Ebene der Beobachtungsgruppen (<code>subclass</code> im output von <code><a href="https://kosukeimai.github.io/MatchIt/reference/match.data.html">match.data()</a></code>) bei Matching ohne Zurücklegen. Für Matching anhand von Propensity Scores (auch mit Zurücklegen) zeigt <span class="citation" data-cites="AbadieImbens2016">Imbens (<a href="Literatur.html#ref-AbadieImbens2016" role="doc-biblioref">2016</a>)</span>, dass ignorieren der zusätzlichen Unsicherheit durch die Schätzung der Propensity Scores zu konservativer Inferenz für den ATE anhand eines cluster-robusten Standardfehlerschätzers führt, jedoch ungültige Inferenz für die Schätzung des ATT bedeuten kann. Ähnlich zu <span class="citation" data-cites="AustinSmall2014">P. C. Austin und Small (<a href="Literatur.html#ref-AustinSmall2014" role="doc-biblioref">2014</a>)</span> deuten die Ergebnisse der Simulationsstudie von <span class="citation" data-cites="Bodoryetal2020">Bodory u.&nbsp;a. (<a href="Literatur.html#ref-Bodoryetal2020" role="doc-biblioref">2020</a>)</span> jedoch auf grundsätzlich bessere Eigenschaften der Schätzung hin, wenn die Standardfehler <em>nicht</em> für die Schätzung der Propensity Scores adjustiert werden.</p>
+<p>Weiterhin ist die Kontrolle für Kovariablen mit Erklärungskraft für die Outcome-Variable und für die Matching-Variablen mit <em>Regression Adjustment</em> (vgl. <a href="#sec-regadj" class="quarto-xref"><span>Kapitel 4.3</span></a>) für die Schätzung des Behandlungseffekts nach Matching eine etablierte Strategie, vgl. <span class="citation" data-cites="HillReiter2006">Hill und Reiter (<a href="Literatur.html#ref-HillReiter2006" role="doc-biblioref">2006</a>)</span> und <span class="citation" data-cites="AbadieSpiess2022">Abadie und Spiess (<a href="Literatur.html#ref-AbadieSpiess2022" role="doc-biblioref">2022</a>)</span>. So können die Varianz der Schätzung und das Risiko einer Verzerrung der Standardfehler aufgrund verbleibender Imbalance von Behandlungs- und Kontrollgruppe nach Matching verringert werden.</p>
 <p>Zur Demonstration von (cluster)-robuster Inferenz und für eine tabellarische Zusammenfassung der Ergebnisse nutzen wir die Pakete <code>marginaleffects</code> und <code>modelsummary</code>. Mit <code><a href="https://marginaleffects.com/man/comparisons.html">marginaleffects::avg_comparisons()</a></code> können p-Werte und Kofindenzintervalle unter Berücksichtigung von robuster Standardfehlern und der Gewichte aus dem Matching-Verfahren berechnet werden.</p>
 <div class="cell">
 <div class="sourceCode" id="cb68"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://marginaleffects.com/">marginaleffects</a></span><span class="op">)</span></span>
@@ -3022,23 +3045,23 @@ Type:  response </code></pre>
 <span>  <span class="fu">tabopts</span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
-<div id="lthbfjhmhk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#lthbfjhmhk table {
+<div id="zmdivwjgqx" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#zmdivwjgqx table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#lthbfjhmhk thead, #lthbfjhmhk tbody, #lthbfjhmhk tfoot, #lthbfjhmhk tr, #lthbfjhmhk td, #lthbfjhmhk th {
+#zmdivwjgqx thead, #zmdivwjgqx tbody, #zmdivwjgqx tfoot, #zmdivwjgqx tr, #zmdivwjgqx td, #zmdivwjgqx th {
   border-style: none;
 }
 
-#lthbfjhmhk p {
+#zmdivwjgqx p {
   margin: 0;
   padding: 0;
 }
 
-#lthbfjhmhk .gt_table {
+#zmdivwjgqx .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -3064,12 +3087,12 @@ Type:  response </code></pre>
   border-left-color: #D3D3D3;
 }
 
-#lthbfjhmhk .gt_caption {
+#zmdivwjgqx .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#lthbfjhmhk .gt_title {
+#zmdivwjgqx .gt_title {
   color: #000000;
   font-size: 125%;
   font-weight: initial;
@@ -3081,7 +3104,7 @@ Type:  response </code></pre>
   border-bottom-width: 0;
 }
 
-#lthbfjhmhk .gt_subtitle {
+#zmdivwjgqx .gt_subtitle {
   color: #000000;
   font-size: 85%;
   font-weight: initial;
@@ -3093,7 +3116,7 @@ Type:  response </code></pre>
   border-top-width: 0;
 }
 
-#lthbfjhmhk .gt_heading {
+#zmdivwjgqx .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -3105,13 +3128,13 @@ Type:  response </code></pre>
   border-right-color: #D3D3D3;
 }
 
-#lthbfjhmhk .gt_bottom_border {
+#zmdivwjgqx .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#lthbfjhmhk .gt_col_headings {
+#zmdivwjgqx .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #000000;
@@ -3126,7 +3149,7 @@ Type:  response </code></pre>
   border-right-color: #D3D3D3;
 }
 
-#lthbfjhmhk .gt_col_heading {
+#zmdivwjgqx .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3146,7 +3169,7 @@ Type:  response </code></pre>
   overflow-x: hidden;
 }
 
-#lthbfjhmhk .gt_column_spanner_outer {
+#zmdivwjgqx .gt_column_spanner_outer {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3158,15 +3181,15 @@ Type:  response </code></pre>
   padding-right: 4px;
 }
 
-#lthbfjhmhk .gt_column_spanner_outer:first-child {
+#zmdivwjgqx .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#lthbfjhmhk .gt_column_spanner_outer:last-child {
+#zmdivwjgqx .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#lthbfjhmhk .gt_column_spanner {
+#zmdivwjgqx .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -3178,11 +3201,11 @@ Type:  response </code></pre>
   width: 100%;
 }
 
-#lthbfjhmhk .gt_spanner_row {
+#zmdivwjgqx .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#lthbfjhmhk .gt_group_heading {
+#zmdivwjgqx .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3208,7 +3231,7 @@ Type:  response </code></pre>
   text-align: left;
 }
 
-#lthbfjhmhk .gt_empty_group_heading {
+#zmdivwjgqx .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -3223,15 +3246,15 @@ Type:  response </code></pre>
   vertical-align: middle;
 }
 
-#lthbfjhmhk .gt_from_md > :first-child {
+#zmdivwjgqx .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#lthbfjhmhk .gt_from_md > :last-child {
+#zmdivwjgqx .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#lthbfjhmhk .gt_row {
+#zmdivwjgqx .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3250,7 +3273,7 @@ Type:  response </code></pre>
   overflow-x: hidden;
 }
 
-#lthbfjhmhk .gt_stub {
+#zmdivwjgqx .gt_stub {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3263,7 +3286,7 @@ Type:  response </code></pre>
   padding-right: 5px;
 }
 
-#lthbfjhmhk .gt_stub_row_group {
+#zmdivwjgqx .gt_stub_row_group {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3277,15 +3300,15 @@ Type:  response </code></pre>
   vertical-align: top;
 }
 
-#lthbfjhmhk .gt_row_group_first td {
+#zmdivwjgqx .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#lthbfjhmhk .gt_row_group_first th {
+#zmdivwjgqx .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#lthbfjhmhk .gt_summary_row {
+#zmdivwjgqx .gt_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3295,16 +3318,16 @@ Type:  response </code></pre>
   padding-right: 5px;
 }
 
-#lthbfjhmhk .gt_first_summary_row {
+#zmdivwjgqx .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#lthbfjhmhk .gt_first_summary_row.thick {
+#zmdivwjgqx .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#lthbfjhmhk .gt_last_summary_row {
+#zmdivwjgqx .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3314,7 +3337,7 @@ Type:  response </code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#lthbfjhmhk .gt_grand_summary_row {
+#zmdivwjgqx .gt_grand_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3324,7 +3347,7 @@ Type:  response </code></pre>
   padding-right: 5px;
 }
 
-#lthbfjhmhk .gt_first_grand_summary_row {
+#zmdivwjgqx .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3334,7 +3357,7 @@ Type:  response </code></pre>
   border-top-color: #D3D3D3;
 }
 
-#lthbfjhmhk .gt_last_grand_summary_row_top {
+#zmdivwjgqx .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3344,11 +3367,11 @@ Type:  response </code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#lthbfjhmhk .gt_striped {
+#zmdivwjgqx .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#lthbfjhmhk .gt_table_body {
+#zmdivwjgqx .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3357,7 +3380,7 @@ Type:  response </code></pre>
   border-bottom-color: #000000;
 }
 
-#lthbfjhmhk .gt_footnotes {
+#zmdivwjgqx .gt_footnotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3371,7 +3394,7 @@ Type:  response </code></pre>
   border-right-color: #D3D3D3;
 }
 
-#lthbfjhmhk .gt_footnote {
+#zmdivwjgqx .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -3380,7 +3403,7 @@ Type:  response </code></pre>
   padding-right: 5px;
 }
 
-#lthbfjhmhk .gt_sourcenotes {
+#zmdivwjgqx .gt_sourcenotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3394,7 +3417,7 @@ Type:  response </code></pre>
   border-right-color: #D3D3D3;
 }
 
-#lthbfjhmhk .gt_sourcenote {
+#zmdivwjgqx .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -3402,63 +3425,63 @@ Type:  response </code></pre>
   padding-right: 5px;
 }
 
-#lthbfjhmhk .gt_left {
+#zmdivwjgqx .gt_left {
   text-align: left;
 }
 
-#lthbfjhmhk .gt_center {
+#zmdivwjgqx .gt_center {
   text-align: center;
 }
 
-#lthbfjhmhk .gt_right {
+#zmdivwjgqx .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#lthbfjhmhk .gt_font_normal {
+#zmdivwjgqx .gt_font_normal {
   font-weight: normal;
 }
 
-#lthbfjhmhk .gt_font_bold {
+#zmdivwjgqx .gt_font_bold {
   font-weight: bold;
 }
 
-#lthbfjhmhk .gt_font_italic {
+#zmdivwjgqx .gt_font_italic {
   font-style: italic;
 }
 
-#lthbfjhmhk .gt_super {
+#zmdivwjgqx .gt_super {
   font-size: 65%;
 }
 
-#lthbfjhmhk .gt_footnote_marks {
+#zmdivwjgqx .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#lthbfjhmhk .gt_asterisk {
+#zmdivwjgqx .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#lthbfjhmhk .gt_indent_1 {
+#zmdivwjgqx .gt_indent_1 {
   text-indent: 5px;
 }
 
-#lthbfjhmhk .gt_indent_2 {
+#zmdivwjgqx .gt_indent_2 {
   text-indent: 10px;
 }
 
-#lthbfjhmhk .gt_indent_3 {
+#zmdivwjgqx .gt_indent_3 {
   text-indent: 15px;
 }
 
-#lthbfjhmhk .gt_indent_4 {
+#zmdivwjgqx .gt_indent_4 {
   text-indent: 20px;
 }
 
-#lthbfjhmhk .gt_indent_5 {
+#zmdivwjgqx .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -3500,7 +3523,7 @@ Type:  response </code></pre>
 </section></section><section id="sec-bootmatching" class="level2 page-columns page-full" data-number="4.4"><h2 data-number="4.4" class="anchored" data-anchor-id="sec-bootmatching">
 <span class="header-section-number">4.4</span> Bootstrap-Schätzung kausaler Effekte bei Matching</h2>
 <p>Ein Bootstrap-Verfahren generiert mit Resampling (wiederholtes Ziehen mit Zurücklegen) aus dem Original-Datensatz (viele) künstliche Datensätze, für die der Schätzer (d.h. das gesamte Verfahren inkl. Matching!) jeweils berechnet wird. Die Verteilung der so gewonnenen Bootstrap-Schätzwerte approximiert die wahre, unbekannte Stichprobenverteilung des Schätzers des Behandlungseffekts. Mit dieser simulierten Verteilung können wir Inferenz betreiben: Wir können einen Bootstrap-Punktschätzer des Behandlungseffekts (Stichprobenmittel der Bootstrap-Schätzungen) sowie Standardfehler (Standardabweichung der der Bootstrap-Schätzungen) und p-Werte berechnen.</p>
-<p>Der Bootstrap kann hilfreich sein, wenn unklar ist, wie Standardfehler für die Unsicherheit des Matching-Prozesses zu adjustieren sind, um gültige Inferenzsstatistiken zu erhalten. <span class="citation" data-cites="AbadieImbens2008">Abadie und Imbens (<a href="#ref-AbadieImbens2008" role="doc-biblioref">2008</a>)</span> zeigen analytisch, dass der Standard-Bootstrap die Stichprobenverteilung für Schätzer kausaler Effekte anhand von gematchten Datensätzen (d.h. bei Zuordnung/Selektion von Beobachtungen mit Matching) nicht korrekt abbilden kann. Grundsätzlich problematisch hierbei ist, wenn der Bootstrap eine verzerrte Schätzung produziert und/oder zu kleine Standardfehler liefert. <span class="citation" data-cites="AbadieImbens2008">Abadie und Imbens (<a href="#ref-AbadieImbens2008" role="doc-biblioref">2008</a>)</span> belegen die Tendenz des Bootstraps zu <em>konservative</em> (d.h. zu große) Standardfehler zu produzieren. Simulationsnachweise <span class="citation" data-cites="Bodoryetal2020 HillReiter2006 AustinSmall2014 AustinStuart2017">(<a href="#ref-Bodoryetal2020" role="doc-biblioref">Bodory u.&nbsp;a. 2020</a>; <a href="#ref-HillReiter2006" role="doc-biblioref">Hill und Reiter 2006</a>; <a href="#ref-AustinSmall2014" role="doc-biblioref">P. C. Austin und Small 2014</a>; <a href="#ref-AustinStuart2017" role="doc-biblioref">P. C. Austin und Stuart 2017</a>)</span> finden, dass Bootstrap-Standardfehler u.a. bei Propensity Score Matching mit Zurücklegen leicht konservativ sind somit das gewünschte nominale Signifikanzniveau eines Bootstrap-Hypothesentests nicht überschritten wird, weshalb der Standard-Bootstrap trotz seiner Schwächen in der empirischen Forschung oft angewendet wird.</p>
+<p>Der Bootstrap kann hilfreich sein, wenn unklar ist, wie Standardfehler für die Unsicherheit des Matching-Prozesses zu adjustieren sind, um gültige Inferenzsstatistiken zu erhalten. <span class="citation" data-cites="AbadieImbens2008">Abadie und Imbens (<a href="Literatur.html#ref-AbadieImbens2008" role="doc-biblioref">2008</a>)</span> zeigen analytisch, dass der Standard-Bootstrap die Stichprobenverteilung für Schätzer kausaler Effekte anhand von gematchten Datensätzen (d.h. bei Zuordnung/Selektion von Beobachtungen mit Matching) nicht korrekt abbilden kann. Grundsätzlich problematisch hierbei ist, wenn der Bootstrap eine verzerrte Schätzung produziert und/oder zu kleine Standardfehler liefert. <span class="citation" data-cites="AbadieImbens2008">Abadie und Imbens (<a href="Literatur.html#ref-AbadieImbens2008" role="doc-biblioref">2008</a>)</span> belegen die Tendenz des Bootstraps zu <em>konservative</em> (d.h. zu große) Standardfehler zu produzieren. Simulationsnachweise <span class="citation" data-cites="Bodoryetal2020 HillReiter2006 AustinSmall2014 AustinStuart2017">(<a href="Literatur.html#ref-Bodoryetal2020" role="doc-biblioref">Bodory u.&nbsp;a. 2020</a>; <a href="Literatur.html#ref-HillReiter2006" role="doc-biblioref">Hill und Reiter 2006</a>; <a href="Literatur.html#ref-AustinSmall2014" role="doc-biblioref">P. C. Austin und Small 2014</a>; <a href="Literatur.html#ref-AustinStuart2017" role="doc-biblioref">P. C. Austin und Stuart 2017</a>)</span> finden, dass Bootstrap-Standardfehler u.a. bei Propensity Score Matching mit Zurücklegen leicht konservativ sind somit das gewünschte nominale Signifikanzniveau eines Bootstrap-Hypothesentests nicht überschritten wird, weshalb der Standard-Bootstrap trotz seiner Schwächen in der empirischen Forschung oft angewendet wird.</p>
 <p>Wir betrachen als nächstes einen Bootstrap-Algorithmus für Inferenz bezüglich eines kausalen Effekts nach Matching und demonstrieren die Schätzung anhand unseres Website-Beispiels für den ATT nach Propensity-Score-Matching.</p>
 <div class="callout callout-style-default callout-tip no-icon callout-titled" title="**Algorithmus: Bootstrap-Schätzer für Matching mit Regression Adjustment**">
 <div class="callout-header d-flex align-content-center">
@@ -3632,7 +3655,7 @@ Calculations and Intervals on Original Scale</code></pre>
 </div>
 <p>Beachte, dass der Bootstrap-Standardfehler sowie das Bootstrap-Konfidenzintervall nahe der mit <code>avg_comarisons</code> berechneten Werte für <code>sum_PSC</code> sind.</p>
 <p><strong>Bootstrap-Standardfehler für IPW-Schätzer des ATE berechnen</strong></p>
-<p>Die Bootstrap-Funktion <code>boot_fun</code> kann leicht für eine Schätzung des Standardfehlers für den IPW-Schätzer des ATE aus <a href="#sec-PSM" class="quarto-xref"><span class="quarto-unresolved-ref">sec-PSM</span></a> angepasst werden. Statt einer Matching-Prozedur berechnen wir hierzu für <span class="math inline">\(B\)</span> Bootstrap-Stichproben den Schätzer <span class="math inline">\(\widehat{\tau}^\text{IPW}\)</span> mit Trimming der Propensity Scores.</p>
+<p>Die Bootstrap-Funktion <code>boot_fun</code> kann leicht für eine Schätzung des Standardfehlers für den IPW-Schätzer des ATE aus <a href="#sec-PSM" class="quarto-xref"><span>Kapitel 4.1.3</span></a> angepasst werden. Statt einer Matching-Prozedur berechnen wir hierzu für <span class="math inline">\(B\)</span> Bootstrap-Stichproben den Schätzer <span class="math inline">\(\widehat{\tau}^\text{IPW}\)</span> mit Trimming der Propensity Scores.</p>
 <div class="cell">
 <div class="sourceCode" id="cb86"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># IPW estimation with regression adjustment</span></span>
 <span><span class="va">IPW_boot</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
@@ -3740,7 +3763,7 @@ Calculations and Intervals on Original Scale</code></pre>
 </section><section id="regression-matching-und-doubly-robust-schätzung" class="level2 page-columns page-full" data-number="4.5"><h2 data-number="4.5" class="anchored" data-anchor-id="regression-matching-und-doubly-robust-schätzung">
 <span class="header-section-number">4.5</span> Regression, Matching und Doubly-Robust-Schätzung</h2>
 <p>Als <em>Doubly-Robust-Schätzer</em> bezeichnet man Methoden, die bei Fehlspezifikationen im Matching-Verfahrens <em>oder</em> der funktionalen Form der Regressionsfunktion für die Outcome-Variable eine zuverlässige Schätzungen des kausalen Effekts ermöglichen.<a href="#fn9" class="footnote-ref" id="fnref9" role="doc-noteref"><sup>9</sup></a> Unter der Vorraussetzung, dass die verwendeten Matching-Variablen sämliche Backdoors schließen, ist so mit Doubly-Robust-Schätzung eine konsistente Schätzung des Behandlungseffekts unter abgeschwächten Annahmen gewähtleistet. Dies macht Doubly-Robust-Schätzer besonders nützlich in Forschungskontexten, in denen präzise Modellspezifikationen herausfordernd sind.</p>
-<div class="no-row-height column-margin column-container"><div id="fn9"><p><sup>9</sup>&nbsp;Bspw. kann eine falsche funktionale Form bei logistischer Regression eine verzerrte Schätzung von Propensity Scores und damit eine unzureichende Balance bedeuten.</p></div></div><p>Der von <span class="citation" data-cites="Wooldrige2010">Wooldridge (<a href="#ref-Wooldrige2010" role="doc-biblioref">2010</a>)</span> vorgeschlagene Doubly-Robust-Schätzer (IPWRA) für den ATE erreicht seine vorteilhaften Eigenschaften durch eine geschickte Kombination von IPW und Regression Adjustment.</p>
+<div class="no-row-height column-margin column-container"><div id="fn9"><p><sup>9</sup>&nbsp;Bspw. kann eine falsche funktionale Form bei logistischer Regression eine verzerrte Schätzung von Propensity Scores und damit eine unzureichende Balance bedeuten.</p></div></div><p>Der von <span class="citation" data-cites="Wooldrige2010">Wooldridge (<a href="Literatur.html#ref-Wooldrige2010" role="doc-biblioref">2010</a>)</span> vorgeschlagene Doubly-Robust-Schätzer (IPWRA) für den ATE erreicht seine vorteilhaften Eigenschaften durch eine geschickte Kombination von IPW und Regression Adjustment.</p>
 <div class="callout callout-style-default callout-tip no-icon callout-titled" title="**Algorithmus: IPWRA-Schätzer des ATE**">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -3751,7 +3774,7 @@ Calculations and Intervals on Original Scale</code></pre>
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Vgl. <span class="citation" data-cites="Wooldrige2010">Wooldridge (<a href="#ref-Wooldrige2010" role="doc-biblioref">2010</a>)</span>.</p>
+<p>Vgl. <span class="citation" data-cites="Wooldrige2010">Wooldridge (<a href="Literatur.html#ref-Wooldrige2010" role="doc-biblioref">2010</a>)</span>.</p>
 <ol type="1">
 <li><p>Berechne IPW anhand von Propensity Score mit logistischer Regression unter Verwendung der Matching-Variablen.</p></li>
 <li>
@@ -3766,7 +3789,7 @@ Calculations and Intervals on Original Scale</code></pre>
 </ol>
 </div>
 </div>
-<p>Wir implementieren den Doubly-Robust-Schätzer des ATE von <span class="citation" data-cites="Wooldrige2010">Wooldridge (<a href="#ref-Wooldrige2010" role="doc-biblioref">2010</a>)</span> für das Website-Beispiel in der Funktion <code>IPWRA()</code> under Adaption des Schemas von <code>IPW_boot()</code>.</p>
+<p>Wir implementieren den Doubly-Robust-Schätzer des ATE von <span class="citation" data-cites="Wooldrige2010">Wooldridge (<a href="Literatur.html#ref-Wooldrige2010" role="doc-biblioref">2010</a>)</span> für das Website-Beispiel in der Funktion <code>IPWRA()</code> under Adaption des Schemas von <code>IPW_boot()</code>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb95"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># IPW estimation with regression adjustment</span></span>
 <span><span class="va">IPWRA</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
@@ -3861,7 +3884,7 @@ Bootstrap Statistics :
 t1*  1.96847 -0.001270721   0.5960465</code></pre>
 </div>
 </div>
-<p>Wir berechnen die interessierenden Statistiken analog zu der Vorgehensweise in <a href="#sec-bootmatching" class="quarto-xref"><span class="quarto-unresolved-ref">sec-bootmatching</span></a>.</p>
+<p>Wir berechnen die interessierenden Statistiken analog zu der Vorgehensweise in <a href="#sec-bootmatching" class="quarto-xref"><span>Kapitel 4.4</span></a>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb100"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Bootstrap-IPWRA-Schätzer des ATE</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">b_IPWRA</span><span class="op">$</span><span class="va">t</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -3895,7 +3918,7 @@ Calculations and Intervals on Original Scale</code></pre>
 
 <!-- -->
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
 <div id="ref-AbadieImbens2008" class="csl-entry" role="listitem">
 Abadie, Alberto, und Guido W. Imbens. 2008. <span>„On the Failure of the Bootstrap for Matching Estimators.“</span> <em>Econometrica. Journal of the Econometric Society</em> 76 (6): 1537–57. <a href="https://doi.org/10.3982/ECTA6474">https://doi.org/10.3982/ECTA6474</a>.
 </div>
