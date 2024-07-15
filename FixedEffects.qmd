@@ -79,7 +79,7 @@ library(tidyverse)
 options(pillar.sigfig = 2)
 ```
 
-Das Ziel dieses Kapitels ist es, ein Verständnis für die Vor- und Nachteile von Panel-Daten-Modellen für die Schätzung kausaler Effekte zu vermitteln. Im Fokus steht dabei, Backdoor-Pfade durch unbeobachtbare Heterogenitäten, die in Querschnittsdaten oft schwer zu adressieren sind, mit Regression zu schließen. Die betrachteten Identifikationsstrategien profitieren hierbei von der zusätzlichen zeitlichen Dimension $T>1$ in den Daten und ermöglichen daher oftmals eine kosistente und präzisere Schätzung kausaler Effekte als für $T=1$.
+Das Ziel dieses Kapitels ist es, ein Verständnis für die Vor- und Nachteile von Panel-Daten-Modellen für die Schätzung kausaler Effekte zu vermitteln. Im Fokus steht dabei, Backdoor-Pfade durch unbeobachtbare Heterogenitäten, die in Querschnittsdaten oft schwer zu adressieren sind, mit Regression zu schließen. Die betrachteten Identifikationsstrategien profitieren hierbei von der zusätzlichen zeitlichen Dimension $T>1$ in den Daten und ermöglichen daher oftmals eine konsistente und präzisere Schätzung kausaler Effekte als für $T=1$.
 
 ## Pooled Regression und unbeobachtbare Heterogenität {#sec-panel-uh}
 
