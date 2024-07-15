@@ -16,7 +16,7 @@ Der folgende Pseudocode zeigt die grundlegende Vorgehensweise des Gradientenabst
 
 \begin{align}
 & \textbf{Algorithmus: Gradientenabstiegsverfahren mit Momentum} \\
-& \text{Initialisiere: }\\ 
+& \textup{Initialisiere: }\\ 
 & \quad x_0 \text{ (Startpunkt) }\\
 & \quad \eta \text{ (Lernrate) }\\
 & \quad \alpha \text{ (Momentum-Faktor) }\\ 
