@@ -23,27 +23,30 @@ ggplot(,
 
 library(fixest)
 
-### Panel A ###
+### Table 3 -- First Stage: Panel A, ohne Provinz-FE ###
+# OLS
 # (1)
-mod <- feols(
+fasci_mod_OLS <- feols(
   peasants_fasci ~ sp3m1893_n30, 
-  #vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
   data = ADD_dat,
   ) 
-summary(mod)
+summary(fasci_mod_OLS)
 
+# Bootstrap standard errors
 library(fwildclusterboot)
-boot_feols <- boottest(
-  mod, 
+fasci_mod_OLS_boot <- boottest(
+  fasci_mod_OLS, 
   clustid = ~ distretto1853 + cl1_stn_sp1893_n30,
   param = "sp3m1893_n30", 
-  B = 9999
+  B = 999
 )
-summary(boot_feols)
-
+summary(fasci_mod_OLS_boot)
+1/fasci_mod_OLS_boot$t_stat * fasci_mod_OLS_boot$point_estimate
 
 # (2)
-feols(
+# +  Peasant Fasci Covariates
+fasci_mod_OLS_F <-feols(
   peasants_fasci ~ sp3m1893_n30 
   + predr_peas_fasci
   + ruralcentre1861
@@ -53,12 +56,15 @@ feols(
   + seminatoritot_rel, 
   vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
   data = ADD_dat 
-  ) %>% 
-  summary()
+  ) 
+
+summary(fasci_mod_OLS_F)
 
 # (3)
-feols(
-  peasants_fasci ~ sp3m1893_n30 
+# + Presence Peasant Fasci Covariates + Presence Mafia Covariates
+fasci_mod_OLS_FM <-feols(
+  fml = peasants_fasci ~ 
+    sp3m1893_n30 
   + predr_peas_fasci
   + ruralcentre1861
   + Rural_rent
@@ -70,12 +76,12 @@ feols(
   + Citrus_groves
   + Olives_groves
   + Vineyards
-  + Mafia1885
-  , 
+  + Mafia1885, 
   vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
   data = ADD_dat 
-) %>% 
-  summary()
+) 
+
+summary(fasci_mod_OLS_FM)
 
 # (4)
 feols(
