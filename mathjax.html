@@ -17,25 +17,61 @@
 <style>
   .scientific_borders {
     border: 0;
-    border-top: 2px solid black !important;
+    border-top: 2px solid black !important; 
     border-bottom: 2px solid black !important;
   }
-  .table > :not(caption)>*>* {
+  .table:not(.gt_table) > :not(caption)>*>* {
     border-bottom-width: 0;
   }
-  .table > thead {
-    border-bottom: 2px solid black; 
+  .table:not(.gt_table) > thead {
+    border-bottom: 1px solid black;
   }
+  .soft-box-shadow {
+    border: 1px solid rgba(233,236,239,.9) !important;
+    border-radius: .5rem !important;
+    background-color: rgba(250,250,250,.9) !important;
+    box-shadow: 0px 1px 2px rgba(0,0,0,.1),
+                0px 3px 7px rgba(0,0,0,.1),
+                0px 12px 30px rgba(0,0,0,.08);
+    margin-top: 2rem !important;
+    margin-bottom: 2.5rem !important;
+    padding: .25rem !important;
+  }
+  .obs-soft-box-shadow {
+    border: 1px solid rgba(233,236,239,.9) !important;
+    border-radius: .5rem !important;
+    background-color: white !important;
+    box-shadow: 0px 1px 2px rgba(0,0,0,.1),
+                0px 3px 7px rgba(0,0,0,.1),
+                0px 12px 30px rgba(0,0,0,.08);
+    margin-top: 2rem !important;
+    margin-bottom: 2.5rem !important;
+    padding: .25rem !important;
+  }
+  
 </style>
 
 <script>
   document.addEventListener("DOMContentLoaded", function() {
-    var tables = document.querySelectorAll("table.table");
+    
+    var gt_tables = document.querySelectorAll(".gt_table");
+    gt_tables.forEach(function(table) {
+      table.classList.remove("table-striped");
+    });
+    
+    var tables = document.querySelectorAll("table.table:not(.gt_table)");
     tables.forEach(function(table) {
       table.classList.remove("table-striped");
       table.classList.add("scientific_borders");
     });
-
+    
+    document.querySelectorAll("div.sourceCode").forEach(function(block) {
+      block.classList.add("soft-box-shadow");
+    });
+    
+    document.querySelectorAll("div.bg-white").forEach(function(block) {
+      block.classList.remove("bg-white");
+    });
     
   });
 </script>

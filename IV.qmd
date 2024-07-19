@@ -3,12 +3,40 @@ webr:
   show-startup-message: true
   packages: [
             'dplyr',
+            'fwildclusterboot',
+            'faux',
             'ggplot2',
+            'modelsummary',
             'fixest',
             'tidyr',
             'readr'
             ]
 ---
+
+```{webr-r}
+library(fwildclusterboot)
+
+dqrng::dqset.seed(2352342)
+# set 'familiar' seed for all other algorithms and weight types 
+set.seed(23325)
+
+# load data set voters included in fwildclusterboot
+data(voters)
+
+# estimate the regression model via lm
+lm_fit <- lm(
+  proposition_vote ~ treatment + ideology1 + log_income + Q1_immigration , 
+  data = voters
+)
+
+boot_lm <- boottest(
+  lm_fit, 
+  clustid = "group_id1",
+  param = "treatment",
+  B = 9999
+)
+
+```
 
 # IV-Regression {#sec-IV}
 
@@ -17,15 +45,32 @@ library(gt)
 library(tidyverse)
 # Formatierung von gt-Tabellen
 tabopts <- function(x) {
-    fmt_number(x, decimals = 3, drop_trailing_zeros = T) %>%
-  tab_options(table_body.hlines.color = "white", 
-              column_labels.border.bottom.color = "black", 
-             column_labels.border.top.color = "black",
-             table_body.border.bottom.color = "black", 
-             table.border.bottom.color = "black",
-             column_labels.font.weight = "bold", 
-             table.font.color = "black", 
-             table.font.size = 16)
+  fmt_number(x, decimals = 3, drop_trailing_zeros = T) %>%
+    tab_options(
+      # general
+      table.width = "80%",
+      # fonts
+      table.font.color = "black", 
+      table.font.size = 16,
+      column_labels.font.weight = "bold", 
+      # table header  
+      column_labels.padding = 15,
+      column_labels.border.bottom.color = "black", 
+      column_labels.border.bottom.width = "1px", 
+      column_labels.border.top.color = "black",
+      # group labels
+      row_group.border.top.width = 0,
+      row_group.border.bottom.width = 0,
+      row_group.font.weight = "bold",
+      row_group.padding = 20,
+      # body
+      
+      table_body.hlines.width = 0, 
+      table_body.border.bottom.color = "black",
+      table_body.border.bottom.width = "1px",
+      table_body.border.top.width = "0px",
+      table.border.bottom.color = "black"
+    )
 }
 ```
 
@@ -217,8 +262,8 @@ digraph IV_DAG {
   X -> Z;
   X -> B;
   X -> Y;
-  U -> B [color=gray]; 
-  U -> Y [color=gray]; 
+  U -> B [color=gray, style=dashed]; 
+  U -> Y [color=gray, style=dashed]; 
   B -> Y;
   Z -> B;
 }
@@ -237,9 +282,7 @@ In der Praxis werden IV-Schätzungen mit statistischer Software häufig anhand e
     Weiterhin ermöglicht das Regressions-Framework diagnostische Tests. So kann die Relevanz von Instrumenten anhand von F-Tests für die Koeffizienten in den Regressionen der ersten Stufe des 2SLS-Verfahrens überprüft werden. Sofern mehr Instrumente als endogene Variablen vorliegen, kann die Exogenität der Instrumente getestet werden.
 
 
----
-
-**Interaktive Illustrationen des 2SLS-Verfahren**
+### Interaktive Illustrationen: 2SLS-Verfahren
 
 Der DGP im nachfolgenden interaktiven Beispiel ist
 
@@ -299,7 +342,7 @@ Die Grafik illustriert das Verhalten des IV-Schätzers (lila Grade) im Vergleich
 - eine Situation in der $X$ exogen ist (KQ ist unverzerrt), was zu vergleichbaren Schätzungen führt (sofern $Z$ kein Schwaches Instrument ist)
 - eine starke Verzerrung von KQ, wenn $X$ endogen und irrelevant ($\beta_1 = 0$) ist.
 
-<iframe width="100%" height="910" frameborder="0"
+<iframe class="obs-soft-box-shadow" width="100%" height="910" frameborder="0"
   src="https://observablehq.com/embed/@mca91/ivreg?cells=webrinfo%2Cviewof+weak%2Cviewof+exogeneous%2Cviewof+beta1zero%2Cviewof+beta%2Cviewof+gamma%2Cviewof+cor%2Cviewof+showX_hat%2Cviewof+regtype%2Cchart%2Cloaded">
 </iframe>
 
@@ -307,14 +350,18 @@ Anhand der obigen interaktiven Grafik lässt sich zwar die Verzerrung der Schät
 
 Die voreingestellten Parameter-Kombinationen zeigen:
 
-- Wenn $Z$ ein schwaches Instrument ist, kann der IV-Schätzer verzerrt sein *und* eine deutlich größere Varianz als der KQ-Schätzer haben.
-- Wenn $X$ exogen ist, hat der IV-Schätzer eine größere Varianz als der KQ-Schätzer.
-- Wenn die Endogenität von $X$ "stark" ist (hohe Korrelation von $u$ und $v$), kann der IV-Schätzer auch in kleinen Stichproben hilfreich sein: IV hat eine deutlich geringere Verzerrung als KQ, aber eine größere Varianz.
+- Wenn $Z$ ein schwaches Instrument ist, kann der IV-Schätzer auch in großen Stichproben eine hohe Verzerrung haben *und* eine deutlich größere Varianz als der KQ-Schätzer haben.
 
-<iframe width="100%" height="1350" frameborder="0"
-  src="https://observablehq.com/embed/@mca91/bias-and-variance-in-iv-regression?cells=webrinfo%2Cviewof+weak%2Cviewof+exogeneous%2Cviewof+beta1zero%2Cviewof+N%2Cviewof+n%2Cviewof+beta%2Cviewof+gamma%2Cviewof+cor%2Cchart%2Cloaded%2Csimcode"></iframe>
+- Wenn der interessierende Regressor (Behandlungsvariable) $X$ exogen ist, hat der IV-Schätzer eine größere Varianz als der KQ-Schätzer.
 
----
+- Wenn die Endogenität von $X$ "stark" ist (d.h. hohe Korrelation von $u$ und $v$), kann der IV-Schätzer auch in kleinen Stichproben hilfreich sein sofern das Instrument $Z$ nicht zu schwach ist: IV hat dann eine deutlich geringere Verzerrung als KQ, aber eine größere Varianz.
+
+<iframe class="obs-soft-box-shadow" width="100%" height="1350" frameborder="0"
+  src="https://observablehq.com/embed/@mca91/bias-and-variance-in-iv-regression?cells=webrinfo%2Cviewof+weak%2Cviewof+exogeneous%2Cviewof+beta1zero%2Cviewof+N%2Cviewof+n%2Cviewof+beta%2Cviewof+gamma%2Cviewof+cor%2Cchart%2Cloaded%2Csimcode">
+</iframe>
+
+
+### Schätzung mit R
 
 ```{r}
 #| message: false
@@ -387,7 +434,7 @@ summary(iv_mod_sim)
 
 ## Beispiel: Der schwache Staat, die Bauern und die Mafia 
 
-@Acemogluetal2020 untersuchen den Aufstieg und die Auswirkungen der sizilianischen Mafia gegen Ende des 19. Jahrhunderts. Die Studie argumentiert, dass das Wachstum der Mafia teilweise auf das Aufkommen sozialistischer Bauern-Organisationen (Fasci siciliani) zurückzuführen ist, die in einem Umfeld schwacher staatlicher Präsenz die Rechte der Bauern verteidigten. Grundbesitzer, Verwalter und lokale Politiker wandten sich also an die Mafia, um diese sozialistische "Bedrohung" zu bekämpfen und die Kontrolle über die landwirtschaftlich arbeitende Bevölkerung zu behalten. Die Studie identifiziert einen signifikanten (positiven) kausalen Zusammenhang zwischen dem Aufstieg der Fasci und der Ausbreitung der Mafia in Sizilien.
+@Acemogluetal2020 untersuchen den Aufstieg und die Auswirkungen der sizilianischen Mafia gegen Ende des 19. Jahrhunderts. Die Studie argumentiert, dass die Verbreitung der Mafia teilweise auf das Aufkommen sozialistischer Bauern-Organisationen (Fasci siciliani) zurückzuführen ist, die in einem Umfeld schwacher staatlicher Präsenz die Rechte der Bauern verteidigten. Grundbesitzer, Verwalter und lokale Politiker wandten sich also an die Mafia, um diese sozialistische "Bedrohung" zu bekämpfen und die Kontrolle über die landwirtschaftlich arbeitende Bevölkerung zu behalten. Die Studie identifiziert einen signifikanten (positiven) kausalen Zusammenhang zwischen dem Aufstieg der Fasci und der Ausbreitung der Mafia in Sizilien.
 
 ### Identifikationsstrategie
 
@@ -395,16 +442,340 @@ Die Beziehung zwischen dem Aufkommen der Fasci und der Mafia-Aktivität im einfa
 \begin{align}
   \textup{Mafia-Aktivität} = \beta_0 + \beta_1 \textup{Fasci siciliani} + \varepsilon \label{eq:fascimafiamod1}
 \end{align}
-ist aufgrund mehrerer Faktoren endogen:
+ist wahrscheinlich aufgrund mehrerer Faktoren endogen:
 
-1. **Externe Faktoren**, die sowohl die Entstehung der Fasci siciliani als auch der Mafia beeinflussen sind wahrscheinlich. Beispielsweise könnten wirtschaftliche Notlagen oder politische Instabilität sowohl die Organisation der Bauern als auch die Etablierung der Mafia begünstigen.
+1. **Externe Faktoren**, die sowohl die Entstehung der Fasci siciliani als auch der Mafia beeinflussen sind wahrscheinlich. Beispielsweise könnten wirtschaftliche Notlagen und politische Instabilität sowohl die Organisation der Bauern als auch die Etablierung der Mafia begünstigen.
 
 2. **Simultante Kasalität**: Die Präsenz der Fasci könnte die Mafia-Aktivitäten beeinflussen und umgekehrt: Intensive Mafia-Aktivitäten könnten die Notwendigkeit für Bauernorganisationen erhöhen, was wiederum die Mafia stärkt. Außerdem erschwert die zeitliche Nähe zwischen der Entstehung der Fasci und der Verbreitung der Mafia die Identifizierung der Kausalrichtung.
 
 Wir können das Modell \eqref{eq:fascimafiamod1} um (messbare) unter 1. fallende Regressoren erweitern, um einer verzerrten Schätzung aufgrund relevanter ausgelassener Variablen vorzubeugen. Eine Verzerrung aufgrund der in 2. beschriebenen simultanen Kausalität kann jedoch *nicht* durch multiple Regression vermieden werden. 
+@Acemogluetal2020 nutzen die folgende Identifikationsstrategie: Eine extreme Dürre im Jahr 1893 (insbesondere Regenausfall im Frühlung) hatte einen erheblichen negativen Einfluss auf die landwirtschaftliche Produktion in Sizilien und verursachte große Not unter den Bauern, was die Entstehung der Fasci beförderte. Die Dürre kann als natürliches Experiment betrachtet werden, wobei durch die Variation in der Niederschlagsmenge (das Instrument) die Variation im Aufkommen von Fasci-Organisationen in verschiedenen Gemeinden, die unabhängig von der späteren Mafia-Aktivität ist, isoliert werden kann. Anhand dieser exogenen Variation im Organisationsgrad der Bauern kann der (lokale) kausale Effekt auf die Entwicklung der Mafia identifiziert werden.
 
-@Acemogluetal2020 nutzen die folgende Identifikationsstrategie: Eine extreme Dürre im Jahr 1893 (insbesondere Regenausfall im Frühlung) hatte einen erheblichen negativen Einfluss auf die landwirtschaftliche Produktion in Sizilien und verursachte große Not unter den Bauern, was die Entstehung der Fasci beförderte. Die Dürre kann als natürliches Experiment betrachtet werden, wobei durch die Variation in der Niederschlagsmenge (das Instrument) die Variation im Aufkommen von Fasci-Organisationen in verschiedenen Gemeinden isoliert werden kann, die unabhängig von der späteren Mafia-Aktivität ist. Anhand dieser exogenen Variation im Organisationsgrad der Bauern kann der Effekt auf die Entwicklung der Mafia identifiziert werden.
+```{dot}
+//| fig-width: 5
+//| fig-height: 4
+//| fig-align: 'center'
+//| fig-cap: "IV-Design in @Acemogluetal2020"
+//| label: "fig-ADDdag" 
+digraph IV_DAG {
+  layout=neato
+  fontname="Helvetica,Arial,sans-serif"
+  node [fontname="Helvetica,Arial,sans-serif", shape=circle]
+  edge [fontname="Helvetica,Arial,sans-serif"]
+  X [pos="3,-2!", label=<Mafia-<BR/>Faktoren>, shape=oval];
+  X2 [pos="0,-2!", label=<Fasci-<BR/>Faktoren>, shape=oval];
+  X3 [pos="-2,-2!", label=<Geo-<BR/>Faktoren>, shape=oval];
+  U [pos="1.5,1.5!", color=gray, fontcolor=gray];
+  B [pos="0,0!", label="Fasci"];
+  Y [pos="3,0!", label=<Mafia in<BR/> 1900>, shape=oval];
+  Z [pos="-2,0!", label="Dürre"];
+  Z -> X;
+  Z -> X2;
+  X2 -> B;
+  X3 -> Y;
+  X3 -> Z;
+  X -> B;
+  X -> Y;
+  U -> B [color=gray, style=dashed]; 
+  U -> Y [color=gray, style=dashed]; 
+  B -> Y;
+  Y -> B;
+  Z -> B;
+}
+```
 
+### Reproduktion der Kernergebnisse mit R
+
+abd^[Der Datensatz stammt aus dem [MIT Economics Data Archive](https://economics.mit.edu/people/faculty/daron-acemoglu/data-archive).]
+
+```{r}
+library(haven)
+
+# Datensatz einlesen
+ADD_dat <- read_stata(
+  file = "datasets/ADD_Mafia_municipality.dta"
+  )
+
+# Datensatz filtern
+ADD_dat <- ADD_dat %>%
+  filter(
+    # Nur Wetter-Station in 30km Umkreis
+    !is.na(sp3m1893_n30), 
+    # Gemeinden mit Mafia-Präsenz Ende des 19. Jdt.
+    !is.na(Mafia1900)
+  )
+```
+
+
+```{r}
+library(fixest)
+library(modelsummary)
+
+# First Stage
+fasci_mod <- feols(
+  peasants_fasci ~ sp3m1893_n30, 
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat,
+  )
+
+# Statistische Zusammenfassung
+summary(fasci_mod, vcov = vcovHC)
+```
+
+```{r}
+# Bootstrap standard errors
+library(fwildclusterboot)
+
+fasci_mod_boot <- boottest(
+  fasci_mod, 
+  clustid = ~ distretto1853 + cl1_stn_sp1893_n30,
+  param = "sp3m1893_n30", 
+  B = 999
+)
+```
+```{r}
+# Statistische Zusammenfassung
+summary(fasci_mod_boot)
+1/fasci_mod_boot$t_stat * fasci_mod_boot$point_estimate
+```
+
+```{r}
+# First Stage
+# + Fasci Determinanten
+fasci_mod_F <- feols(
+  peasants_fasci ~ 
+    sp3m1893_n30 
+  
+  + predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel, 
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat 
+  ) 
+
+# Statistische Zusammenfassung
+summary(fasci_mod_F, n = 1)
+```
+
+```{r}
+# First Stage
+# + Fasci-Determinanten
+# + Mafia-Determinanten
+fasci_mod_FM <- feols(
+  fml = peasants_fasci ~ 
+    sp3m1893_n30 
+  + predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  + sulfurproduction1868_70
+  + Citrus_groves
+  + Olives_groves
+  + Vineyards
+  + Mafia1885, 
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat 
+) 
+
+# Statistische Zusammenfassung
+summary(fasci_mod_FM, n = 1)
+```
+
+```{r}
+# First Stage
+# + Fasci-Determinanten
+# + Mafia-Determinanten
+# + geografische Faktoren
+fasci_mod_FMG <- feols(
+  peasants_fasci ~ 
+    sp3m1893_n30 
+  + predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  + sulfurproduction1868_70
+  + Citrus_groves
+  + Olives_groves
+  + Vineyards
+  + Mafia1885
+  
+  + lnpop1861
+  + lnsurface
+  + centreheight
+  + maxheight
+  + slope2
+  + pa_pdist1856
+  + port2_pdist1856
+  + roads1799
+  + ave_temp
+  + sp3m_ave_n30
+  + var_sp3m_n30, 
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat 
+) 
+
+# Statistische Zusammenfassung
+summary(fasci_mod_FMG, n = 1)
+```
+
+```{r}
+# First Stage
+# + Provinz-Fixed-Effects
+fasci_mod_FE <- feols(
+  peasants_fasci ~ 
+    sp3m1893_n30
+  | provincia1853, 
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat,
+  ) 
+summary(fasci_mod_FE, n = 1)
+```
+
+```{r}
+# First Stage
+# + Provinz-Fixed-Effects
+# + Fasci-Determinanten
+fasci_mod_FE_F <-feols(
+  fml = peasants_fasci ~ 
+    sp3m1893_n30 
+  
+  + predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  | provincia1853, 
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat 
+  ) 
+
+summary(fasci_mod_FE_F, n = 1)
+```
+
+```{r}
+# First Stage
+# + Provinz-Fixed-Effects
+# + Fasci-Determinanten
+# + Mafia-Determinanten
+fasci_mod_FE_FM <- feols(
+  fml = peasants_fasci ~ 
+    sp3m1893_n30 
+  
+  + predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  + sulfurproduction1868_70
+  + Citrus_groves
+  + Olives_groves
+  + Vineyards
+  + Mafia1885
+  
+  | provincia1853,
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat 
+) 
+
+summary(fasci_mod_FE_FM, n = 1)
+```
+
+```{r}
+# First Stage
+# + Provinz-Fixed-Effects
+# + Fasci-Determinanten
+# + Mafia-Determinanten
+# + geografische Faktoren
+fasci_mod_FE_FMG <- feols(
+  peasants_fasci ~ sp3m1893_n30 
+  
+  + predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  + sulfurproduction1868_70
+  + Citrus_groves
+  + Olives_groves
+  + Vineyards
+  + Mafia1885
+  
+  + lnpop1861
+  + lnsurface
+  + centreheight
+  + maxheight
+  + slope2
+  + pa_pdist1856
+  + port2_pdist1856
+  + roads1799
+  + ave_temp
+  + sp3m_ave_n30
+  + var_sp3m_n30
+  
+  | provincia1853,  
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat 
+) 
+
+summary(fasci_mod_FE_FMG, n = 1)
+```
+
+```{r}
+#| label: tbl-addfs
+#| tbl-cap: "`ADD_dat` -- First-Stage-Regressionen aus @Acemogluetal2020"
+
+# Modelle in benannten Listen sammeln
+panels <- list(
+  "Panel A" = list(
+    "Keine Controls" = fasci_mod,
+    "Fasci" = fasci_mod_F,
+    "Fasci + Mafia" = fasci_mod_FM,
+    "Fasci + Mafia + Geo" = fasci_mod_FMG
+  ),
+  "Panel B (Fixed Effects)" = list(
+    "Keine Controls" = fasci_mod_FE,
+    "Fasci" = fasci_mod_FE_F,
+    "Fasci + Mafia" = fasci_mod_FE_FM,
+    "Fasci + Mafia + Geo" = fasci_mod_FE_FMG
+  )
+)
+
+# Format für FE-label
+gm <- tribble(
+  ~raw, ~clean, ~fmt,
+  "FE: provincia1853", "FE: Provinz", ~fmt
+)
+
+# Tabellarische Zusammenfassung
+modelsummary(
+  models = panels,
+  shape = "rbind",
+  coef_omit = "^(?!(sp3m1893\\_n30*)$).*",
+  stars = T,
+  gof_omit = "^(?!(R2|Num\\.Obs\\.|FE.*)$).*",
+  coef_map = c(
+    "sp3m1893_n30" = "Rel. Niederschlag 1893"
+    ),
+  gof_map = gm, 
+  output = "gt"
+) %>%
+  tabopts()
+```
 
 
 ## Case Study: Ökonomische Schocks und Bürgerkriege
@@ -422,11 +793,11 @@ digraph IV_DAG {
   fontname="Helvetica,Arial,sans-serif"
   node [fontname="Helvetica,Arial,sans-serif"]
   edge [fontname="Helvetica,Arial,sans-serif"]
-  C [pos="3,5"];
+  K [pos="3,5"];
   BIP [pos="0,0!"];
   Konflikt [pos="6,0!"];
-  C -> BIP; 
-  C -> Konflikt; 
+  K -> BIP; 
+  K -> Konflikt; 
   BIP -> Konflikt;
   Konflikt -> BIP;
 }
@@ -436,7 +807,7 @@ In der "Konfliktgleichung"
 
 ```{=tex}
 \begin{align}
-  \text{Konflikt-Wsk.} = \beta_0 + \beta_1\, \Delta\text{BIP} + \text{Kontrollv.} + \epsilon\label{eq:rainconf1}
+  \textup{Konflikt-Wsk.} = \beta_0 + \beta_1\, \Delta\text{BIP} + \text{Kontrollv.} + \epsilon\label{eq:rainconf1}
 \end{align}
 ```
 
@@ -513,7 +884,8 @@ tribble(
   "tot_100_g", "Handelsbedingungen (Index, 1995 = 100)",
   "year", "Jahr der Beobachtung"
 ) %>%
-  gt()
+  gt() %>%
+  tabopts()
 ```
 
 ```{r}
@@ -631,9 +1003,10 @@ modelsummary(
   ),
   stars = T, 
   coef_omit = "^year.*$",
-  gof_omit = "^(?!(R2|Num.Obs.|FE.*)$).*", 
+  gof_omit = "^(?!(R2|Num.Obs.|FE.*)$).*",
   output = "gt"
-)
+) %>%
+  tabopts()
 ```
 
 ```{r}
