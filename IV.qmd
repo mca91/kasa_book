@@ -455,7 +455,7 @@ Wir können das Modell \eqref{eq:fascimafiamod1} um (messbare) unter 1. fallende
 //| fig-width: 5
 //| fig-height: 4
 //| fig-align: 'center'
-//| fig-cap: "IV-Design in @Acemogluetal2020"
+//| fig-cap: "Zulässiger DGP im IV-Design von @Acemogluetal2020"
 //| label: "fig-ADDdag" 
 digraph IV_DAG {
   layout=neato
@@ -486,7 +486,7 @@ digraph IV_DAG {
 
 ### Reproduktion der Kernergebnisse mit R
 
-abd^[Der Datensatz stammt aus dem [MIT Economics Data Archive](https://economics.mit.edu/people/faculty/daron-acemoglu/data-archive).]
+Wir lesen zunächst den Datensatz `ADD_Mafia_municipality.dta`^[Der Datensatz stammt aus dem [MIT Economics Data Archive](https://economics.mit.edu/people/faculty/daron-acemoglu/data-archive) und liegt im STATA-Format `.dta` vor.] ein und verschaffen uns einen Überblick.
 
 ```{r}
 library(haven)
@@ -495,11 +495,45 @@ library(haven)
 ADD_dat <- read_stata(
   file = "datasets/ADD_Mafia_municipality.dta"
   )
+```
 
+Das Objekt `ADD_dat` enthält Variablenbschreibungen im Attribut `label`. Mit Funktionen aus dem tidyverse-Paket `purrr` können wir diese Einträge auslesen.
+
+```{r}
+#| eval: false
+# Attribut 'label' für die ersten 5 Variablen anzeigen
+map_chr(
+  .x = ADD_dat, 
+  .f = ~ attr_getter("label")(.)
+) %>%
+  .[1:5]
+```
+
+@tbl-ADD_dat gibt einen Überblick der verfügbaren Variablen in `ADD_dat`.
+
+```{r, echo = F}
+#| tbl-cap: "`ADD_dat` -- Charakteristika von Italienischen Gemeinden im 19. Jahrhundert"
+#| label: tbl-ADD_dat
+tibble(
+  Variable = colnames(ADD_dat),
+  Beschreibung = c(
+    "Präsenz Fasci in 1893-Q4 (Dummy)",
+    "Relative Regenenge (Frühlung 1893, mm)",
+    "Nächste aktive Wetterstation (Frühlung 1893)",
+    "Präsenz Fasci vor März 1893 (Dummy)"
+  )
+) %>%
+  gt() %>%
+  tabopts()
+```
+
+Vor der Analyse filtern wir die Daten entsprechen der Vorgehensweise in @@Acemogluetal2020: Es werden nur Gemeinden berücksichtigt, die in maximal 30km Entfernung zu einer Wetter-Station liegen (`!is.na(sp3m1893_n30)`) *und* für die eine Messung der Mafia-Aktivität gegen Ende des 19. Jahrhunderts vorliegt (`!is.na(Mafia1900)`).
+
+```{r}
 # Datensatz filtern
 ADD_dat <- ADD_dat %>%
   filter(
-    # Nur Wetter-Station in 30km Umkreis
+    # Nur Gemeinden mit Wetter-Station in 30km Umkreis
     !is.na(sp3m1893_n30), 
     # Gemeinden mit Mafia-Präsenz Ende des 19. Jdt.
     !is.na(Mafia1900)
@@ -775,6 +809,207 @@ modelsummary(
   output = "gt"
 ) %>%
   tabopts()
+```
+
+2SLS-Schätzungen:
+
+```{r}
+# Panel A -- no fixed effects
+
+# (1)
+fasciIV_mod1 <- feols(
+  fml = Mafia1900 ~ 1 | peasants_fasci ~ sp3m1893_n30,
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat
+)
+
+summary(fasciIV_mod1)
+```
+
+```{r}
+# (2)
+fasciIV_mod2 <- feols(
+  fml = Mafia1900 ~ 
+  
+  predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  | peasants_fasci ~ sp3m1893_n30,
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat
+) 
+
+summary(fasciIV_mod2)
+```
+
+```{r}
+# (3)
+fasciIV_mod3 <- feols(
+  fml = Mafia1900 ~ 
+  
+    predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  + sulfurproduction1868_70
+  + Citrus_groves
+  + Olives_groves
+  + Vineyards
+  + Mafia1885
+  
+  | peasants_fasci ~ sp3m1893_n30,
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat
+) 
+
+summary(fasciIV_mod3)
+```
+
+```{r}
+# (4)
+fasciIV_mod4 <- feols(
+  fml = Mafia1900 ~ 
+    
+    predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  + sulfurproduction1868_70
+  + Citrus_groves
+  + Olives_groves
+  + Vineyards
+  + Mafia1885
+  
+  + lnpop1861
+  + lnsurface
+  + centreheight
+  + maxheight
+  + slope2
+  + pa_pdist1856
+  + port2_pdist1856
+  + roads1799
+  + ave_temp
+  + sp3m_ave_n30
+  + var_sp3m_n30
+  
+  | peasants_fasci ~ sp3m1893_n30,
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat
+) 
+
+summary(fasciIV_mod4)
+```
+
+```{r}
+# Panel B: province fixed Effects
+
+# (1)
+fasciIV_mod1_B <- feols(
+  fml = Mafia1900 ~ 1 
+  | provincia1853 
+  | peasants_fasci ~ sp3m1893_n30,
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat
+) 
+
+summary(fasciIV_mod1_B)
+```
+
+```{r}
+# (2)
+fasciIV_mod2_B <- feols(
+  fml = Mafia1900 ~ 
+  
+    predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  | provincia1853 
+  | peasants_fasci ~ sp3m1893_n30,
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat
+) 
+
+summary(fasciIV_mod2_B)
+```
+
+```{r}
+# (3)
+fasciIV_mod3_B <- feols(
+  fml = Mafia1900 ~ 
+    
+    predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  + sulfurproduction1868_70
+  + Citrus_groves
+  + Olives_groves
+  + Vineyards
+  + Mafia1885
+  
+  | provincia1853 
+  | peasants_fasci ~ sp3m1893_n30,
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat
+) 
+
+summary(fasciIV_mod3_B)
+```
+
+```{r}
+# (4)
+fasciIV_mod4_B <- feols(
+  fml = Mafia1900 ~ 
+    
+    predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  + sulfurproduction1868_70
+  + Citrus_groves
+  + Olives_groves
+  + Vineyards
+  + Mafia1885
+  
+  + lnpop1861
+  + lnsurface
+  + centreheight
+  + maxheight
+  + slope2
+  + pa_pdist1856
+  + port2_pdist1856
+  + roads1799
+  + ave_temp
+  + sp3m_ave_n30
+  + var_sp3m_n30
+  
+  | provincia1853 
+  | peasants_fasci ~ sp3m1893_n30,
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat
+)
+
+summary(fasciIV_mod4_B)
 ```
 
 
