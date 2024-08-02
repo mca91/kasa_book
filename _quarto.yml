@@ -23,6 +23,7 @@ book:
     - FixedEffects.qmd
     - IV.qmd
     - DiD.qmd
+    - EventStudies.qmd
     - RDD.qmd
     - RegReg.qmd
     - Machine Learning.qmd
@@ -49,6 +50,7 @@ format:
     cap-location: margin
     code-link: true
     toc: true
+    toc-depth: 4
     toc-location: left
     toc-title: "<a href='/index.html'>Übersicht</a>"
     reference-location: margin

@@ -4,7 +4,43 @@
 # https://economics.mit.edu/people/faculty/daron-acemoglu/data-archive
 
 ADD_dat <- read_stata("~/Downloads/Supplementary/Datafortheweb/ADD_Mafia_district.dta")
+
+# this one
 ADD_dat <- read_stata("~/Downloads/Supplementary/Datafortheweb/ADD_Mafia_municipality.dta")
+
+ADD_dat <- ADD_dat %>% 
+  select(
+  peasants_fasci,
+  sp3m1893_n30,
+  cl1_stn_sp1893_n30,
+  predr_peas_fasci,
+  ruralcentre1861,
+  Rural_rent,
+  Urban_rent,
+  agricola_rel,
+  seminatoritot_rel,
+  sulfurproduction1868_70,
+  Citrus_groves,
+  Olives_groves,
+  Vineyards,
+  Mafia1885,
+  Mafia1900,
+  lnpop1861,
+  lnsurface,
+  centreheight,
+  maxheight,
+  slope2,
+  pa_pdist1856,
+  port2_pdist1856,
+  roads1799,
+  ave_temp,
+  sp3m_ave_n30,
+  var_sp3m_n30,
+  distretto1853,
+  provincia1853
+)
+
+haven::write_dta(ADD_dat, path = "~/git_projects/kausalanalyse_book/datasets/ADD_Mafia_municipality.dta")
 
 ADD_dat <- ADD_dat %>%
   filter(
@@ -16,10 +52,6 @@ map_chr(ADD_dat, ~ attr_getter("label")(.))
 
 lm(Mafia1900 ~ peasants_fasci, data = ADD_dat) %>%
   summary()
-
-ggplot(, 
-       aes(x = sp3m1893_n30, y = Mafia1900 )) + 
-  geom_point()
 
 library(fixest)
 
@@ -84,7 +116,7 @@ fasci_mod_OLS_FM <-feols(
 summary(fasci_mod_OLS_FM)
 
 # (4)
-feols(
+fasci_mod_OLS_FMG <- feols(
   peasants_fasci ~ sp3m1893_n30 
   + predr_peas_fasci
   + ruralcentre1861
@@ -113,8 +145,24 @@ feols(
   , 
   vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
   data = ADD_dat 
-) %>% 
-  summary()
+) 
+
+summary(fasci_mod_OLS_FMG)
+
+
+
+modelsummary(
+  models = list(
+    "Keine Controls" = fasci_mod_OLS,
+    "Fasci" = fasci_mod_OLS_F,
+    "Fasci + Mafia" = fasci_mod_OLS_FM,
+    "Fasci + Mafia + Geo" = fasci_mod_OLS_FMG
+  ), 
+  coef_omit = "^(?!(sp3m1893\\_n30*)$).*",
+  stars = T,
+  gof_omit = "^(?!(R2|Num.Obs.|FE.*)$).*",
+  coef_map = c("sp3m1893_n30" = "Rel. Niederschlag 1893")
+)
 
 
 ### Panel B ###
@@ -185,11 +233,195 @@ modB4b <- feols(
   + ave_temp
   + sp3m_ave_n30
   + var_sp3m_n30
+  
   | provincia1853, 
   data = ADD_dat 
 )
 
 plot(modB4b$residuals, modB4a$residuals, pch = 19)
+
+
+# Figure 5
+
+ggplot(, 
+       aes(x = sp3m1893_n30, y = Mafia1900 )) + 
+  geom_point()
+
+### Table 4: Two-Stage-Least-Squares Estimates 
+ 
+# Panel A -- no fixed effects
+
+# (1)
+fasciIV_mod1 <- feols(
+  fml = Mafia1900 ~ 1 | peasants_fasci ~ sp3m1893_n30,
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat
+) 
+summary(fasciIV_mod1)
+
+# (2)
+fasciIV_mod2 <- feols(
+  fml = Mafia1900 ~ 
+  predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  | peasants_fasci ~ sp3m1893_n30,
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat
+) 
+summary(fasciIV_mod2)
+
+# (3)
+fasciIV_mod3 <- feols(
+  fml = Mafia1900 ~ 
+  
+    predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  + sulfurproduction1868_70
+  + Citrus_groves
+  + Olives_groves
+  + Vineyards
+  + Mafia1885
+  
+  | peasants_fasci ~ sp3m1893_n30,
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat
+) 
+summary(fasciIV_mod3)
+
+# (4)
+fasciIV_mod4 <- feols(
+  fml = Mafia1900 ~ 
+    
+    predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  + sulfurproduction1868_70
+  + Citrus_groves
+  + Olives_groves
+  + Vineyards
+  + Mafia1885
+  
+  + lnpop1861
+  + lnsurface
+  + centreheight
+  + maxheight
+  + slope2
+  + pa_pdist1856
+  + port2_pdist1856
+  + roads1799
+  + ave_temp
+  + sp3m_ave_n30
+  + var_sp3m_n30
+  
+  | peasants_fasci ~ sp3m1893_n30,
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat
+) 
+summary(fasciIV_mod4)
+
+# Panel B: province fixed Effects
+
+# (1)
+fasciIV_mod1_B <- feols(
+  fml = Mafia1900 ~ 1 
+  | provincia1853 
+  | peasants_fasci ~ sp3m1893_n30,
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat
+) 
+summary(fasciIV_mod1_B)
+
+# (2)
+fasciIV_mod2_B <- feols(
+  fml = Mafia1900 ~ 
+  
+    predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  | provincia1853 
+  | peasants_fasci ~ sp3m1893_n30,
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat
+) 
+summary(fasciIV_mod2_B)
+
+# (3)
+fasciIV_mod3_B <- feols(
+  fml = Mafia1900 ~ 
+    
+    predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  + sulfurproduction1868_70
+  + Citrus_groves
+  + Olives_groves
+  + Vineyards
+  + Mafia1885
+  
+  | provincia1853 
+  | peasants_fasci ~ sp3m1893_n30,
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat
+) 
+summary(fasciIV_mod3_B)
+
+# (4)
+fasciIV_mod4_B <- feols(
+  fml = Mafia1900 ~ 
+    
+    predr_peas_fasci
+  + ruralcentre1861
+  + Rural_rent
+  + Urban_rent
+  + agricola_rel
+  + seminatoritot_rel
+  
+  + sulfurproduction1868_70
+  + Citrus_groves
+  + Olives_groves
+  + Vineyards
+  + Mafia1885
+  
+  + lnpop1861
+  + lnsurface
+  + centreheight
+  + maxheight
+  + slope2
+  + pa_pdist1856
+  + port2_pdist1856
+  + roads1799
+  + ave_temp
+  + sp3m_ave_n30
+  + var_sp3m_n30
+  
+  | provincia1853 
+  | peasants_fasci ~ sp3m1893_n30,
+  vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
+  data = ADD_dat
+) 
+summary(fasciIV_mod4_B)
+
 
 ##### IV: rain and conflicts in Africa  ####
 

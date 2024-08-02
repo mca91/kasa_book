@@ -13,31 +13,6 @@ webr:
             ]
 ---
 
-```{webr-r}
-library(fwildclusterboot)
-
-dqrng::dqset.seed(2352342)
-# set 'familiar' seed for all other algorithms and weight types 
-set.seed(23325)
-
-# load data set voters included in fwildclusterboot
-data(voters)
-
-# estimate the regression model via lm
-lm_fit <- lm(
-  proposition_vote ~ treatment + ideology1 + log_income + Q1_immigration , 
-  data = voters
-)
-
-boot_lm <- boottest(
-  lm_fit, 
-  clustid = "group_id1",
-  param = "treatment",
-  B = 9999
-)
-
-```
-
 # IV-Regression {#sec-IV}
 
 ```{r, echo=F, message=FALSE}
@@ -449,7 +424,7 @@ ist wahrscheinlich aufgrund mehrerer Faktoren endogen:
 2. **Simultante Kasalität**: Die Präsenz der Fasci könnte die Mafia-Aktivitäten beeinflussen und umgekehrt: Intensive Mafia-Aktivitäten könnten die Notwendigkeit für Bauernorganisationen erhöhen, was wiederum die Mafia stärkt. Außerdem erschwert die zeitliche Nähe zwischen der Entstehung der Fasci und der Verbreitung der Mafia die Identifizierung der Kausalrichtung.
 
 Wir können das Modell \eqref{eq:fascimafiamod1} um (messbare) unter 1. fallende Regressoren erweitern, um einer verzerrten Schätzung aufgrund relevanter ausgelassener Variablen vorzubeugen. Eine Verzerrung aufgrund der in 2. beschriebenen simultanen Kausalität kann jedoch *nicht* durch multiple Regression vermieden werden. 
-@Acemogluetal2020 nutzen die folgende Identifikationsstrategie: Eine extreme Dürre im Jahr 1893 (insbesondere Regenausfall im Frühlung) hatte einen erheblichen negativen Einfluss auf die landwirtschaftliche Produktion in Sizilien und verursachte große Not unter den Bauern, was die Entstehung der Fasci beförderte. Die Dürre kann als natürliches Experiment betrachtet werden, wobei durch die Variation in der Niederschlagsmenge (das Instrument) die Variation im Aufkommen von Fasci-Organisationen in verschiedenen Gemeinden, die unabhängig von der späteren Mafia-Aktivität ist, isoliert werden kann. Anhand dieser exogenen Variation im Organisationsgrad der Bauern kann der (lokale) kausale Effekt auf die Entwicklung der Mafia identifiziert werden.
+@Acemogluetal2020 nutzen die folgende Identifikationsstrategie: Eine extreme Dürre im Jahr 1893 (insbesondere Regenausfall im Frühling) hatte einen erheblichen negativen Einfluss auf die landwirtschaftliche Produktion in Sizilien und verursachte große Not unter den Bauern, was die Entstehung der Fasci beförderte. Die Dürre kann als natürliches Experiment betrachtet werden, wobei durch die Variation in der Niederschlagsmenge (das Instrument) die Variation im Aufkommen von Fasci-Organisationen in verschiedenen Gemeinden, die unabhängig von der späteren Mafia-Aktivität ist, isoliert werden kann. Anhand dieser exogenen Variation im Organisationsgrad der Bauern kann der (lokale) kausale Effekt auf die Entwicklung der Mafia identifiziert werden.
 
 ```{dot}
 //| fig-width: 5
@@ -495,12 +470,14 @@ library(haven)
 ADD_dat <- read_stata(
   file = "datasets/ADD_Mafia_municipality.dta"
   )
+
+glimpse(ADD_dat)
 ```
 
-Das Objekt `ADD_dat` enthält Variablenbschreibungen im Attribut `label`. Mit Funktionen aus dem tidyverse-Paket `purrr` können wir diese Einträge auslesen.
+Das `tibble`-Objekt `ADD_dat` enthält Variablenbschreibungen im Attribut `label`. Mit Funktionen aus dem tidyverse-Paket `purrr` können wir diese Einträge auslesen.
 
 ```{r}
-#| eval: false
+#| eval: true
 # Attribut 'label' für die ersten 5 Variablen anzeigen
 map_chr(
   .x = ADD_dat, 
@@ -509,25 +486,49 @@ map_chr(
   .[1:5]
 ```
 
-@tbl-ADD_dat gibt einen Überblick der verfügbaren Variablen in `ADD_dat`.
+@tbl-ADD_dat gibt einen Überblick der in `ADD_dat` verfügbaren Variablen auf Gemeinde-Ebene und deren Definition.
 
 ```{r, echo = F}
-#| tbl-cap: "`ADD_dat` -- Charakteristika von Italienischen Gemeinden im 19. Jahrhundert"
+#| tbl-cap: "`ADD_dat` --- Charakteristika von sizilianischen Gemeinden im 19. Jahrhundert"
 #| label: tbl-ADD_dat
 tibble(
   Variable = colnames(ADD_dat),
   Beschreibung = c(
     "Präsenz Fasci in 1893-Q4 (Dummy)",
-    "Relative Regenenge (Frühlung 1893, mm)",
-    "Nächste aktive Wetterstation (Frühlung 1893)",
-    "Präsenz Fasci vor März 1893 (Dummy)"
+    "Dürre-Intensität: Relative Regenmenge im Frühling 1893 (ggü. Mittel v. 1841 bis 1881) ",
+    "Nächste aktive Wetterstation (Frühling 1893)",
+    "Präsenz Fasci vor März 1893 (Dummy)",
+    "Landwirtschaftliche Gemeinde? (Dummy)",
+    "Durchschn. ländliche Pacht / Hektar in 1953",
+    "Durchschn. städtische Pacht / Hektar in 1953",
+    "Anteil bewirtschaftetes Land in 1853",
+    "Anteil Anbaufläche Getreide in 1853",
+    "Durschn. Schwefel-Produktion / Jahr für 1868-1870",
+    "Anteil Anbaufläche Zitrusfrüchte in 1853",
+    "Anteil Anbaufläche Oliven in 1853",
+    "Anteil Anbaufläche Wein in 1853",
+    "Intensität Mafia gem. Damiani (1885), Skala 0-3",
+    "Intensität Mafia gem. Cutrera (1900), Skala 0-3",
+    "Log(Einwohner) in 1861",
+    "Log(Fläche) in 1853",
+    "Höhe des Gemeindezentrums (M.ü. NN)",
+    "Max. Höhe (M.ü. NN)",
+    "Durschn. Höhe (M.ü. NN)",
+    "Entfernung (Postweg) von Palermo in 1856",
+    "Entfernung (Postweg) nächer Hafen in 1856",
+    "Direkter Zugang Postweg in 1799 (Dummy)",
+    "Durschn. Jahrestemperatur",
+    "Durschn. Regenmenge im Frühling für 1881-1941",
+    "Varianz Regenmenge im Frühling für 1881-1941",
+    "Distrikt-Zugehörigkeit in 1853",
+    "Provinz-Zugehörigkeit in 1853"
   )
 ) %>%
   gt() %>%
   tabopts()
 ```
 
-Vor der Analyse filtern wir die Daten entsprechen der Vorgehensweise in @@Acemogluetal2020: Es werden nur Gemeinden berücksichtigt, die in maximal 30km Entfernung zu einer Wetter-Station liegen (`!is.na(sp3m1893_n30)`) *und* für die eine Messung der Mafia-Aktivität gegen Ende des 19. Jahrhunderts vorliegt (`!is.na(Mafia1900)`).
+Vor der Analyse filtern wir die Daten entsprechen der Vorgehensweise in @Acemogluetal2020: Es werden lediglich Gemeinden berücksichtigt, die in maximal 30km Entfernung zu einer Wetter-Station liegen (`!is.na(sp3m1893_n30)`) *und* für die eine Messung der Mafia-Aktivität gegen Ende des 19. Jahrhunderts (gemessen auf einer Skala von 0 bis 4, vgl. @Cutrera1900) vorliegt (`!is.na(Mafia1900)`).
 
 ```{r}
 # Datensatz filtern
@@ -540,12 +541,25 @@ ADD_dat <- ADD_dat %>%
   )
 ```
 
+#### First-Stage-Regressionen
+
+Tabelle 3 in @Acemogluetal2020 präsentiert First-Stage-Regressionen Für den endogenen Regressor $\textup{Fasci siciliani}$ in \eqref{eq:fascimafiamod1}: Die Auswirkungen der Dürre in 1893 (das Instrument) auf den Organisationsgrad der Bauern (der endogene Regressor). Hierbei werden verschiedene, aus dem DAG in @fig-ADDdag abgeleitete Spezifikationen betrachtet:
+
+- **Panel A**: Keine Fixed Effects
+  - Modell ohne Kovariablen
+  - Modell mit Kovariablen für Bildung von Bauernorganisationen
+  - Modell mit Kovariablen für Bildung von Bauernorganisationen und Indikatoren für Mafia-Präsenz
+  - Modell mit Kovariablen für Bildung von Bauernorganisationen, Indikatoren für Mafia-Präsenz und geologische Faktoren
+  
+- **Panel B**: Modelle wie in Panel A und Kontrolle für Provinz-Fixed-Effects
+
+Wir schätzten nachfolgend sämtliche Regressionen mit `feols` und berechnen nach Distrikt-Zugehörigkeit (`distretto1853`) sowie nächstgelegener Wetterstation (`cl1_stn_sp1893_n30`) geclusterte Standardfehler.^[Siehe Kapitel @sec-pandeldata für Erläuterungen zu Fixed-Effects und cluster-robusten Standardfehlern.] Hierzu setzen wir `vcov = ~ distretto1853 + cl1_stn_sp1893_n30`. Diese Spezifikation berücksichtigt, dass die Niederschlagsmenge in einer Gemeinde sowie viele Kovariablen eine Korrelation mit benachbarten Gemeinden aufweisen können. Cluster-robuste Standardfehler sind inbesondere nötig, weil die Niederschlagsdaten für viele Gemeinden aus benachbarten Wetterstationen interpoliert werden, was zu einer zusätzlichen Korrelation zwischen den Beobachtungen führt. Standardfehler mit Two-way-clustering sind eine gängige Methode zur Berücksichtigung derartiger Korrelation.
 
 ```{r}
 library(fixest)
-library(modelsummary)
 
-# First Stage
+# First-Stage-Regression:
+# keine Kontroll-Variablen
 fasci_mod <- feols(
   peasants_fasci ~ sp3m1893_n30, 
   vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
@@ -553,39 +567,69 @@ fasci_mod <- feols(
   )
 
 # Statistische Zusammenfassung
-summary(fasci_mod, vcov = vcovHC)
+summary(fasci_mod)
 ```
 
+Der obige Code-Chunk führt die First-Stage-Regression *ohne* Kovariablen aus. Wir finden einen signifikanten positiven Effekt der Niederschlagsmenge auf den Organisationsgrad der Bauern.
+
+@Acemogluetal2020 verwenden Bootstrap cluster-robuste Standardfehler [@Cameronetal2008;@Cameronetal2011], die aufwendig zu implementieren sind, jedoch zu nahezu identischen Ergebnissen führen. Der nächste Code-Chunk zeigt, wie cluster-robuste Bootstrap-Inferenz für das geschätzte Modell `fasci_mod` berechnet werden können. Hierfür nutzen wir `fwildclusterboot::boottest()`.^[`fwildclusterboot` implementiert Varianten des *Wild Bootstrap* [@Liu1988].]
+
 ```{r}
-# Bootstrap standard errors
+# Wild-Bootstrap-Standardfehler mit clustering
 library(fwildclusterboot)
 
+# boottest-Objekt erzeugen
 fasci_mod_boot <- boottest(
-  fasci_mod, 
+  object = fasci_mod, 
   clustid = ~ distretto1853 + cl1_stn_sp1893_n30,
-  param = "sp3m1893_n30", 
-  B = 999
+  param = "sp3m1893_n30", # Koeffizient
+  B = 999 # Bootstrap-Züge
 )
-```
-```{r}
-# Statistische Zusammenfassung
+
+# Statistische Zusammenfassung des Bootstraps
 summary(fasci_mod_boot)
-1/fasci_mod_boot$t_stat * fasci_mod_boot$point_estimate
 ```
 
+Die statistische Zusammenfassung umfasst die Punktschätzung, die robuste t-Statistik sowie das 95\%-Konfidenzintervall für den Koeffizienten von `sp3m1893_n30`. Mit diesen Komponenten können wir den Bootstrap-Standardfehler beispielsweise durch die folgende Transformation berechnen:
+
 ```{r}
-# First Stage
-# + Fasci Determinanten
+# Standardfehler über t-Statistik und
+# gesch. Koeffizienten berechnen
+1/fasci_mod_boot$t_stat * fasci_mod_boot$point_estimate
+```
+Bei der Interpretation des geschätzten Koeffizienten (`r round(fasci_mod_boot$point_estimate,2)`) berückstigen wir, dass die abhängige Variable *binär* ist: Die First-Stage-Regression ist ein *lineares Wahrscheinlicheitsmodell*. Eine positive Änderung der relativen Regenmenge um eine Einheit (100\%) verringert die Wahrscheinlichkeit also um 100\%. Diese Interpretation ist jedoch wenig aussagekräftig für einen Einordnung des Effekts der Dürre. Stattdessen betrachten wir die Verteilung relativen Regenmengen und vergleichen den Effekt für eine von starker Dürre betroffenen Gemeinden (25\%-Quantil) und einer Gemeinde mit einem relativ geringen Rückgang des Niederschlags (75\%-Quantil)
+
+```{r}
+# Relativer Effekt der Dürre im Frühling 1893
+(
+  ADD_dat %>% 
+  pull(sp3m1893_n30) %>% 
+  quantile(
+    probs = c(.25, .75), 
+    na.rm = T
+    )
+) %>% 
+  diff() * fasci_mod_boot$point_estimate
+```
+
+Für eine Gemeinde mit 75\% des langjährigen mittleren Niederschlags ist die geschätzte Wahrscheinlichkeit der Bildung von Bauern-Organisationen nur etwa halb so groß, wie für eine von starker Dürre betroffene Gemeinde.
+
+Zur Vermeidung von Backdoors durch ausgelassene Variablen betrachten @Acemogluetal2020 weitere Spezifikationen für die First- und Second-Stage-Regressionen, die zusätzlich für Determinanten der Fasci, der Mafia, sowie für geographische Faktoren kontrollieren. Weiterhin werden diese Regressionen mit Fixed Effekts auf der Provinz-Ebene gemäß der Grenzen von 1853 (`provincia1853`) wiederholt, um für unbeobachtbare Heteogenitäten zwischen den verschiedenen Provinzen zu kontrollieren. Die nachfolgenden Code-Chunks zeigen die Implementierung dieser Regressionen mit `fixtest::feols()`. Für eine bessere Übersicht der Ergebnisse verwenden wir in `summary()` das Argument `n = 1`, sodass jeweils nur die Schätzung des ersten Koeffizienten (Effekt der relativen Regenmenge) ausgegeben wird.
+
+```{r}
+# First-Stage-Regression:
+# + Fasci-Determinanten
 fasci_mod_F <- feols(
   peasants_fasci ~ 
     sp3m1893_n30 
-  
+    # Fasci
   + predr_peas_fasci
   + ruralcentre1861
   + Rural_rent
   + Urban_rent
   + agricola_rel
-  + seminatoritot_rel, 
+  + seminatoritot_rel,
+  
   vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
   data = ADD_dat 
   ) 
@@ -595,24 +639,26 @@ summary(fasci_mod_F, n = 1)
 ```
 
 ```{r}
-# First Stage
+# First-Stage-Regression:
 # + Fasci-Determinanten
 # + Mafia-Determinanten
 fasci_mod_FM <- feols(
   fml = peasants_fasci ~ 
-    sp3m1893_n30 
+    sp3m1893_n30
+    # Fasci
   + predr_peas_fasci
   + ruralcentre1861
   + Rural_rent
   + Urban_rent
   + agricola_rel
   + seminatoritot_rel
-  
+    # Mafia
   + sulfurproduction1868_70
   + Citrus_groves
   + Olives_groves
   + Vineyards
-  + Mafia1885, 
+  + Mafia1885,
+  
   vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
   data = ADD_dat 
 ) 
@@ -622,26 +668,27 @@ summary(fasci_mod_FM, n = 1)
 ```
 
 ```{r}
-# First Stage
+# First-Stage-Regression:
 # + Fasci-Determinanten
 # + Mafia-Determinanten
-# + geografische Faktoren
+# + geographische Faktoren
 fasci_mod_FMG <- feols(
   peasants_fasci ~ 
-    sp3m1893_n30 
+    sp3m1893_n30
+    # Fasci
   + predr_peas_fasci
   + ruralcentre1861
   + Rural_rent
   + Urban_rent
   + agricola_rel
   + seminatoritot_rel
-  
+    # Mafia
   + sulfurproduction1868_70
   + Citrus_groves
   + Olives_groves
   + Vineyards
   + Mafia1885
-  
+    # Geographie
   + lnpop1861
   + lnsurface
   + centreheight
@@ -652,7 +699,8 @@ fasci_mod_FMG <- feols(
   + roads1799
   + ave_temp
   + sp3m_ave_n30
-  + var_sp3m_n30, 
+  + var_sp3m_n30,
+  
   vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
   data = ADD_dat 
 ) 
@@ -769,9 +817,12 @@ fasci_mod_FE_FMG <- feols(
 summary(fasci_mod_FE_FMG, n = 1)
 ```
 
+Für eine tabellarische Übersicht fassen wir die interessierenden Komponenten der Schätzungen mit `modelsummary::modelsummary()` zusammen. Hierfür sammeln wir zunächst jeweils die Modelle mit und ohne Provinz-Fixed-Effects in benannten Listen, sodass die Ergebnisse später in separaten Panelen dargestellt werden können. Für die Formatierung von Labels für die Fixed Effects und Koeffizienten definieren wir das `tribble`-Objekt `gm` und übergeben reguläre Ausdrücke für eine Auswahl an zusammenfassenden Statistiken.
+
 ```{r}
 #| label: tbl-addfs
 #| tbl-cap: "`ADD_dat` -- First-Stage-Regressionen aus @Acemogluetal2020"
+library(modelsummary)
 
 # Modelle in benannten Listen sammeln
 panels <- list(
@@ -801,95 +852,109 @@ modelsummary(
   shape = "rbind",
   coef_omit = "^(?!(sp3m1893\\_n30*)$).*",
   stars = T,
-  gof_omit = "^(?!(R2|Num\\.Obs\\.|FE.*)$).*",
+  gof_omit = "^(?!(FE.*)$).*",
   coef_map = c(
     "sp3m1893_n30" = "Rel. Niederschlag 1893"
     ),
   gof_map = gm, 
+  notes = c("Abhängige Variable: Peasants Fasci", "Cluster-robuste Standardfehler: Naheste Wetterstation + Distrikt"),
   output = "gt"
 ) %>%
   tabopts()
 ```
 
-2SLS-Schätzungen:
+Die Ergebnisse in @tbl-addfs bestätigen die Vermutung der Autoren, dass der Effekt des relativen Niederschlags auf den Organisationsgrad der Bauern ohne Kontrolle für die betrachteten Kovariablen tendenziell überschätzt wird. Tatsächlich führt multiple Regression mit Fixed Effects und sämtlichen Kovariablen (letzte Spalte in Panel B) zu einem etwa 30\% kleineren geschätzten Effekt als für die einfache Regression in Panel A.
+
+
+#### Second-Stage-Regressionen
+
+Mit `fml = Mafia1900 ~ 1 | peasants_fasci ~ sp3m1893_n30` legen wir fest, dass `Mafia1900` auf eine Konstante sowie die angepassten Werte des endogenen Regressors `peasants_fasci` aus der ersten Stufe (instrumentiert durch `sp3m1893_n30`) regressiert werden soll. Wie für die Regressionen in @tbl-addfs schätzen wir jeweils vier verschiedene Spezfikationen, unterscheiden zwischen Modellen mit und ohne Provinz-Fixed-Effects und berechnen cluster-robuste Standardfehler.
 
 ```{r}
-# Panel A -- no fixed effects
-
+# Second-Stage-Regression:
+# Keine Kontrollvariablen
 # (1)
-fasciIV_mod1 <- feols(
-  fml = Mafia1900 ~ 1 | peasants_fasci ~ sp3m1893_n30,
+fasciIV_mod <- feols(
+  fml = Mafia1900 ~ 1 
+  # IV-Spezifikation
+  | peasants_fasci ~ sp3m1893_n30,
   vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
   data = ADD_dat
 )
 
-summary(fasciIV_mod1)
+summary(fasciIV_mod, n = 1)
 ```
 
 ```{r}
-# (2)
-fasciIV_mod2 <- feols(
+# Second-Stage-Regression:
+# + Fasci-Determinanten
+fasciIV_mod_F <- feols(
   fml = Mafia1900 ~ 
-  
+  # Fasci
   predr_peas_fasci
   + ruralcentre1861
   + Rural_rent
   + Urban_rent
   + agricola_rel
   + seminatoritot_rel
-  
+  # IV-Spezifikation
   | peasants_fasci ~ sp3m1893_n30,
   vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
   data = ADD_dat
 ) 
 
-summary(fasciIV_mod2)
+summary(fasciIV_mod_F, n = 1)
 ```
 
 ```{r}
-# (3)
-fasciIV_mod3 <- feols(
+# Second-Stage-Regression:
+# + Fasci-Determinanten
+# + Mafia-Determinanten
+fasciIV_mod_FM <- feols(
   fml = Mafia1900 ~ 
-  
+    # Fasci
     predr_peas_fasci
   + ruralcentre1861
   + Rural_rent
   + Urban_rent
   + agricola_rel
   + seminatoritot_rel
-  
+    # Mafia
   + sulfurproduction1868_70
   + Citrus_groves
   + Olives_groves
   + Vineyards
   + Mafia1885
-  
+    # IV-Spezifikation
   | peasants_fasci ~ sp3m1893_n30,
   vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
   data = ADD_dat
 ) 
 
-summary(fasciIV_mod3)
+summary(fasciIV_mod_FM, n = 1)
 ```
 
 ```{r}
-# (4)
-fasciIV_mod4 <- feols(
+# Second-Stage-Regression:
+# + Fasci-Determinanten
+# + Mafia-Determinanten
+# + Geographie
+fasciIV_mod_FMG <- feols(
   fml = Mafia1900 ~ 
-    
+    # Fasci
     predr_peas_fasci
   + ruralcentre1861
   + Rural_rent
   + Urban_rent
   + agricola_rel
   + seminatoritot_rel
-  
+    # Mafia
   + sulfurproduction1868_70
   + Citrus_groves
   + Olives_groves
   + Vineyards
   + Mafia1885
-  
+    # Geographie
   + lnpop1861
   + lnsurface
   + centreheight
@@ -901,96 +966,108 @@ fasciIV_mod4 <- feols(
   + ave_temp
   + sp3m_ave_n30
   + var_sp3m_n30
-  
+   # IV-Spezifikation
   | peasants_fasci ~ sp3m1893_n30,
   vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
   data = ADD_dat
 ) 
 
-summary(fasciIV_mod4)
+summary(fasciIV_mod_FMG, n = 1)
 ```
 
 ```{r}
-# Panel B: province fixed Effects
-
-# (1)
-fasciIV_mod1_B <- feols(
+# Second-Stage-Regression:
+# + Provinz-FE
+fasciIV_mod_FE <- feols(
   fml = Mafia1900 ~ 1 
+  # Fixed Effecs
   | provincia1853 
+  # IV-Spezifikation
   | peasants_fasci ~ sp3m1893_n30,
   vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
   data = ADD_dat
 ) 
 
-summary(fasciIV_mod1_B)
+summary(fasciIV_mod_FE, n = 1)
 ```
 
 ```{r}
-# (2)
-fasciIV_mod2_B <- feols(
+# Second-Stage-Regression:
+# + Fasci-Determinanten
+# + Provinz-FE
+fasciIV_mod_FE_F <- feols(
   fml = Mafia1900 ~ 
-  
+    # Fasci
     predr_peas_fasci
   + ruralcentre1861
   + Rural_rent
   + Urban_rent
   + agricola_rel
   + seminatoritot_rel
-  
-  | provincia1853 
+    # Fixed Effects
+  | provincia1853
+    # IV-Spezifikation
   | peasants_fasci ~ sp3m1893_n30,
   vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
   data = ADD_dat
 ) 
 
-summary(fasciIV_mod2_B)
+summary(fasciIV_mod_FE_F, n = 1)
 ```
 
 ```{r}
-# (3)
-fasciIV_mod3_B <- feols(
+# Second-Stage-Regression:
+# + Fasci-Determinanten
+# + Mafia-Determinanten
+# + Provinz-FE
+fasciIV_mod_FE_FM <- feols(
   fml = Mafia1900 ~ 
-    
+    # Fasci
     predr_peas_fasci
   + ruralcentre1861
   + Rural_rent
   + Urban_rent
   + agricola_rel
   + seminatoritot_rel
-  
+    # Mafia
   + sulfurproduction1868_70
   + Citrus_groves
   + Olives_groves
   + Vineyards
   + Mafia1885
-  
+    # Fixed Effects
   | provincia1853 
+    # IV-Spezifikation
   | peasants_fasci ~ sp3m1893_n30,
   vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
   data = ADD_dat
 ) 
 
-summary(fasciIV_mod3_B)
+summary(fasciIV_mod_FE_FM, n = 1)
 ```
 
 ```{r}
-# (4)
-fasciIV_mod4_B <- feols(
+# Second-Stage-Regression:
+# + Fasci-Determinanten
+# + Mafia-Determinanten
+# + Geographische Faktoren
+# + Provinz-FE
+fasciIV_mod_FE_FMG <- feols(
   fml = Mafia1900 ~ 
-    
+    # Fasci
     predr_peas_fasci
   + ruralcentre1861
   + Rural_rent
   + Urban_rent
   + agricola_rel
   + seminatoritot_rel
-  
+    # Mafia
   + sulfurproduction1868_70
   + Citrus_groves
   + Olives_groves
   + Vineyards
   + Mafia1885
-  
+    # Geo
   + lnpop1861
   + lnsurface
   + centreheight
@@ -1002,15 +1079,101 @@ fasciIV_mod4_B <- feols(
   + ave_temp
   + sp3m_ave_n30
   + var_sp3m_n30
-  
+    # Fixed Effects
   | provincia1853 
+    # IV-Spezifikation
   | peasants_fasci ~ sp3m1893_n30,
   vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
   data = ADD_dat
 )
 
-summary(fasciIV_mod4_B)
+summary(fasciIV_mod_FE_FMG, n = 1)
 ```
+
+
+```{r}
+#| label: tbl-addss
+#| tbl-cap: "`ADD_dat` -- Second-Stage-Regressionen aus @Acemogluetal2020"
+
+# Modelle in benannten Listen sammeln
+panels <- list(
+  "Panel A" = list(
+    "Keine Controls" = fasciIV_mod,
+    "Fasci" = fasciIV_mod_F,
+    "Fasci + Mafia" = fasciIV_mod_FM,
+    "Fasci + Mafia + Geo" = fasciIV_mod_FMG
+  ),
+  "Panel B (Fixed Effects)" = list(
+    "Keine Controls" = fasciIV_mod_FE,
+    "Fasci" = fasciIV_mod_FE_F,
+    "Fasci + Mafia" = fasciIV_mod_FE_FM,
+    "Fasci + Mafia + Geo" = fasciIV_mod_FE_FMG
+  )
+)
+
+# Tabellarische Zusammenfassung
+modelsummary(
+  models = panels,
+  shape = "rbind",
+  coef_omit = "^(?!(fit\\_peasants\\_fasci*)$).*",
+  stars = T,
+  gof_omit = "^(?!(FE.*)$).*",
+  coef_map = c(
+    "fit_peasants_fasci" = "Fasci"
+    ),
+  gof_map = gm, 
+  notes = c(
+    "Abhängige Variable: Mafia-Präsenz in 1900", 
+    "Instrument: Rel. Niederschlag 1893", 
+    "Cluster-robuste Standardfehler: Naheste Wetterstation + Distrikt"
+  ),
+  output = "gt"
+) %>%
+  tabopts()
+```
+
+Die Ergebnisse für die IV-Schätzung des kausalen Effekts von Bauernorganisationen auf die Präsenz der Mafia zu Beginn des 20. Jahrhundert sind in @tbl-addss dargestellt. Die LATE-Schätzung in Spalte 4 von Panel B hat folgende Interpretation: Die Präsenz der Fasci in einer Gemeinde erhöht die Intensität der Mafia-Aktivität um etwa 1.56 Punkte.^[Nach @Cutrera1900 entspricht eine Erhöhung des Mafia-Index von 1 auf 2 einem Sprung von einer geringen Präsenz der Mafia zu einer signifikanten Präsenz.] 
+
+Wie ist dieser Effekt einzuordnen? Wir berechnen zunächst die *Anzahl* an Gemeinden, in denen es im Jahr 1900 Fasci gibt.
+
+```{r}
+# Anz. Gemeinden mit Fasci im Jahr 1900
+ADD_dat %>% 
+  drop_na() %>% 
+  filter(
+    peasants_fasci == 1
+  ) %>% 
+  count()
+```
+
+Für diese 84 Gemeinden erwarten wir jeweils einen Effekt von 1.56 Punkten auf die im Jahr 1900 beobachtete *gesamte* Intensität des Einflusses der Mafia in Sizilien, gemessen als gewichtete Summe.
+
+```{r}
+# Beitrag der Gemeinden mit Fasci im Jahr 1900
+84 * 1.56
+```
+
+Die gesamte Mafia-Intensität für Sizilien zu Beginn des 20. Jahrhunderts berechnen wir analog.
+
+```{r}
+# Mafia-Intensität in Sizilien im Jahr 1900
+ADD_dat %>% 
+  drop_na() %>% 
+  count(Mafia1900) %>% 
+  mutate(Beitrag = Mafia1900 * n) %>%
+  summarise(
+     Intensität = sum(Beitrag)
+  )
+```
+
+Der Anteil der Gemeinden mit Bauernorganisationen im Jahr 1900 an dieser Summe erlaubt eine Einordnung des Effekts der Fasci auf die Verbreitung der Mafia.
+
+```{r}
+# Anteil des geschätzten Effekts
+84 * 1.56 / 342
+```
+
+Die Interpretation lautet, dass bis zu 38\% der Stärke der Mafia im Jahr 1900 in Sizilien auf ihren Einsatz gegen die Fasci zurückzuführen sein könnte.
 
 
 ## Case Study: Ökonomische Schocks und Bürgerkriege

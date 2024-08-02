@@ -168,6 +168,7 @@
 \usepackage{makecell}
 \usepackage{xcolor}
 \usepackage{caption}
+\usepackage{anyfontsize}
 \usepackage{tabularray}
 \usepackage[normalem]{ulem}
 \usepackage{graphicx}
@@ -400,6 +401,9 @@ Datenformate}\label{lange-weite-und-tidy-datenformate}
 Wir betrachten den in Tabelle~\ref{tbl-Klausurergebnisse} dargestellten
 Datensatz \emph{Klausurergebnisse}.
 
+\begingroup
+\fontsize{12.0pt}{14.4pt}\selectfont
+
 \begin{longtable}{lrrr}
 
 \caption{\label{tbl-Klausurergebnisse}Datensatz
@@ -410,13 +414,15 @@ Datensatz \emph{Klausurergebnisse}.
 \toprule
 Name & Mikro & Makro & Mathe \\ 
 \midrule\addlinespace[2.5pt]
-Tim & NA & $1.3$ & $3$ \\ 
-Lena & $1$ & $3$ & NA \\ 
-Ricarda & $2$ & $1.7$ & $1.3$ \\ 
-Simon & $2.3$ & $3.3$ & NA \\ 
+Tim & NA & 1.3 & 3 \\ 
+Lena & 1 & 3 & NA \\ 
+Ricarda & 2 & 1.7 & 1.3 \\ 
+Simon & 2.3 & 3.3 & NA \\ 
 \bottomrule
 
 \end{longtable}
+
+\endgroup
 
 Der Datensatz ist noch nicht in der R-Arbeitsumgebung verfügbar. Mit der
 Funktion \texttt{tribble()} können wir
@@ -444,7 +450,7 @@ Tabelle~\ref{tbl-Klausurergebnisse} händisch als R-Objekt der Klasse
 Variable \emph{Modul}. Der Datensatz liegt also \emph{nicht} im s.g.
 \emph{Tidy-Format} vor.
 
-\begin{tcolorbox}[enhanced jigsaw, opacityback=0, rightrule=.15mm, breakable, bottomtitle=1mm, colbacktitle=quarto-callout-tip-color!10!white, arc=.35mm, toptitle=1mm, titlerule=0mm, left=2mm, bottomrule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-tip-color-frame, toprule=.15mm, colback=white, coltitle=black, leftrule=.75mm, title=\textcolor{quarto-callout-tip-color}{\faLightbulb}\hspace{0.5em}{Tidy-Format}]
+\begin{tcolorbox}[enhanced jigsaw, breakable, colbacktitle=quarto-callout-tip-color!10!white, rightrule=.15mm, title=\textcolor{quarto-callout-tip-color}{\faLightbulb}\hspace{0.5em}{Tidy-Format}, opacityback=0, coltitle=black, colback=white, arc=.35mm, titlerule=0mm, bottomtitle=1mm, leftrule=.75mm, toptitle=1mm, bottomrule=.15mm, left=2mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-tip-color-frame]
 
 Tidy-Format: Jede Spalte ist \textbf{\emph{eine}} Variable, jede Reihe
 ist \textbf{\emph{eine}} Beobachtung und jede Zelle enthält einen
@@ -1168,6 +1174,8 @@ die drei Arten über die Inseln verteilt sind.
 \end{Highlighting}
 \end{Shaded}
 
+\section{Frish-Waugh-Lovell-Theorem}\label{frish-waugh-lovell-theorem}
+
 \section{Binäre Abhängige
 Variable}\label{binuxe4re-abhuxe4ngige-variable}
 
@@ -1837,6 +1845,9 @@ enthalten und sollen der Analyse des Effekts des darkmode
 Tabelle~\ref{tbl-darkmode} zeigt die Definitionen der Variablen in
 \emph{darkmode.csv}.
 
+\begingroup
+\fontsize{12.0pt}{14.4pt}\selectfont
+
 \begin{longtable}{ll}
 
 \caption{\label{tbl-darkmode}Variablen im Datensatz \emph{darkmode}}
@@ -1854,6 +1865,8 @@ hours & Bisherige Verweildauer auf der Seite \\
 \bottomrule
 
 \end{longtable}
+
+\endgroup
 
 Für die Analyse lesen wir zunächst den Datensatz \emph{darkmode.csv} mit
 \texttt{readr::read\_csv()} ein und verschaffen uns einen Überblick über
@@ -3518,19 +3531,22 @@ tabellarisch zusammen.
 \end{Highlighting}
 \end{Shaded}
 
+\begingroup
+\fontsize{12.0pt}{14.4pt}\selectfont
 \setlength{\LTpost}{0mm}
 \begin{longtable*}{lccc}
 \toprule
   & Kein Matching & Coarsened Exact & Propensity Scores \\ 
 \midrule\addlinespace[2.5pt]
 dark\_mode & 1.386** & 1.653** & 1.635** \\ 
- & (0.537) & (0.549) & (0.565) \\ 
+{} & {(0.537)} & {(0.549)} & {(0.565)} \\ 
 Num.Obs. & 300 & 164 & 208 \\ 
 \bottomrule
 \end{longtable*}
 \begin{minipage}{\linewidth}
 + p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001\\
 \end{minipage}
+\endgroup
 
 \section{Bootstrap-Schätzung kausaler Effekte bei
 Matching}\label{sec-bootmatching}
@@ -3569,8 +3585,8 @@ bezüglich eines kausalen Effekts nach Matching und demonstrieren die
 Schätzung anhand unseres Website-Beispiels für den ATT nach
 Propensity-Score-Matching.
 
-\begin{tcolorbox}[enhanced jigsaw, opacityback=0, rightrule=.15mm, breakable, bottomtitle=1mm, colbacktitle=quarto-callout-tip-color!10!white, arc=.35mm, toptitle=1mm, titlerule=0mm, left=2mm, bottomrule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-tip-color-frame, toprule=.15mm, colback=white, coltitle=black, leftrule=.75mm, title={\textbf{Algorithmus: Bootstrap-Schätzer für Matching mit Regression
-Adjustment}}]
+\begin{tcolorbox}[enhanced jigsaw, breakable, colbacktitle=quarto-callout-tip-color!10!white, rightrule=.15mm, title={\textbf{Algorithmus: Bootstrap-Schätzer für Matching mit Regression
+Adjustment}}, opacityback=0, coltitle=black, colback=white, arc=.35mm, titlerule=0mm, bottomtitle=1mm, leftrule=.75mm, toptitle=1mm, bottomrule=.15mm, left=2mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-tip-color-frame]
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -3913,7 +3929,7 @@ Der von Wooldridge (2010) vorgeschlagene Doubly-Robust-Schätzer (IPWRA)
 für den ATE erreicht seine vorteilhaften Eigenschaften durch eine
 geschickte Kombination von IPW und Regression Adjustment.
 
-\begin{tcolorbox}[enhanced jigsaw, opacityback=0, rightrule=.15mm, breakable, bottomtitle=1mm, colbacktitle=quarto-callout-tip-color!10!white, arc=.35mm, toptitle=1mm, titlerule=0mm, left=2mm, bottomrule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-tip-color-frame, toprule=.15mm, colback=white, coltitle=black, leftrule=.75mm, title={\textbf{Algorithmus: IPWRA-Schätzer des ATE}}]
+\begin{tcolorbox}[enhanced jigsaw, breakable, colbacktitle=quarto-callout-tip-color!10!white, rightrule=.15mm, title={\textbf{Algorithmus: IPWRA-Schätzer des ATE}}, opacityback=0, coltitle=black, colback=white, arc=.35mm, titlerule=0mm, bottomtitle=1mm, leftrule=.75mm, toptitle=1mm, bottomrule=.15mm, left=2mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-tip-color-frame]
 
 Vgl. Wooldridge (2010).
 
@@ -4109,7 +4125,17 @@ genauer.
 
 \bookmarksetup{startatroot}
 
-\chapter{Panel-Daten}\label{panel-daten}
+\chapter{Panel-Daten}\label{sec-paneldata}
+
+Das Ziel dieses Kapitels ist es, ein Verständnis für die Vor- und
+Nachteile von Panel-Daten-Modellen für die Schätzung kausaler Effekte zu
+vermitteln. Im Fokus steht dabei, Backdoor-Pfade durch unbeobachtbare
+Heterogenitäten, die in Querschnittsdaten oft schwer zu adressieren
+sind, mit Regression zu schließen. Die betrachteten
+Identifikationsstrategien basieren auf der zusätzlichen zeitlichen
+Dimension \(T>1\) in den Daten. Diese zusätzlichen Informationen
+ermöglicht neben der konsistenten Schätzung kausaler Effekte oftmals
+auch eine präzisere statistische Inferenz als für \(T=1\).
 
 \section{Pooled Regression und unbeobachtbare
 Heterogenität}\label{sec-panel-uh}
@@ -4124,8 +4150,9 @@ zu) \(T\) Zeitpunkte, wobei \(t=1,\dots,T\). Betrachte das Panel-Modell
 wobei \(U_i\) unbeobachtete und \(X_i\) beobachtete,
 \textbf{zeitlich-invariante} Heterogenitäten zwischen den
 Beobachtungseinheiten \(i=1,\dots,n\) sind. Wie zuvor ist \(B_{it}\) die
-Behandlungsvariable und \(\beta_1\) der interessierende kausale Effekt
-einer Veränderung von \(B_{it}\) auf \(Y_{it}\).
+Behandlungsvariable und \(\beta_1\) der (für alle Beobachtungseinheiten
+identische) interessierende kausale Effekt einer Veränderung von
+\(B_{it}\) auf \(Y_{it}\).
 
 Angenommen wir beobachten \(Y_{it}\) und \(B_{it}\) für \(T=1\), also
 für eine Periode. Bei Korrelation zwischen den \textbf{unbeobachtbaren}
@@ -4162,7 +4189,7 @@ für \(T=2\) Perioden, dargestellt in Abbildung~\ref{fig-FEDAG2}.
 
 \centering{
 
-\includegraphics[width=6in,height=4in]{FixedEffects_files/figure-latex/dot-figure-5.png}
+\includegraphics[width=6in,height=4in]{FixedEffects_files/figure-latex/dot-figure-6.png}
 
 }
 
@@ -4293,7 +4320,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 RMSE: 3.28785   Adj. R2: 0.943388
 \end{verbatim}
 
-Die Schätzung von \(\beta_1\) ist \(3.81\) und weist auf eine deutliche
+Die Schätzung von \(\beta_1\) ist 3.81 und weist auf eine deutliche
 Verzerrung hin. Wir illustrieren die Problematik in
 Abbildung~\ref{fig-pooledregression1}, in dem wir die für die Regression
 verwendeten Daten (Kreise) sowie die Beobachtungen späterer Perioden
@@ -4632,8 +4659,7 @@ bezeichnet.\footnote{Beachte, dass eine bessere Anpassung an die Daten
   einheiten-spezifischen Achsenabschnitten anhand von
   Abbildung~\ref{fig-pooledregression2} plausibel scheint.}
 
-\subsection{Within- und
-LSDV-Schätzer}\label{within--und-lsdv-schuxe4tzer}
+\subsection{Within- und LSDV-Schätzer}\label{sec-withldsv}
 
 Für die Vermeidung von Backdoors durch die \(\alpha_i\) subtrahieren wir
 die einheiten-spezifischen Mittelwerte von den Komponenten
@@ -4708,9 +4734,10 @@ RMSE: 0.746006     Adj. R2: 0.996829
 \end{verbatim}
 
 Die Zusammenfassung der Schätzung zeigt einen signifikanten
-Koeffizienten, der mit einer Schätzung von \(-1.05\) nahe beim wahren
-Wert von \(\beta_1 = -1\) liegt. Die geschätzten einheiten-spezifischen
-Effekte können mit \texttt{fixest::fixef()} ausgelesen werden.
+Koeffizienten, der mit einer Schätzung von -1.05 nahe beim wahren Wert
+von \(\beta_1 = -1\) liegt. Die geschätzten einheiten-spezifischen
+Effekte können mit\texttt{fixest::fixef()\textbackslash{}} ausgelesen
+werden.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4741,13 +4768,13 @@ geschätzte Koeffizient von \(X\) mit dem Ergebnis des Within-Schätzers
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# LSDV{-}Schätzung}
-\NormalTok{panel\_FE }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+\NormalTok{panel\_LSDV }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
   \AttributeTok{fml =}\NormalTok{ Y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ X }\SpecialCharTok{+} \FunctionTok{factor}\NormalTok{(ID),  }
   \AttributeTok{data =}\NormalTok{ paneldata}
 \NormalTok{)}
 
 \CommentTok{\# Statistische Zusammenfassung}
-\FunctionTok{summary}\NormalTok{(panel\_FE)}
+\FunctionTok{summary}\NormalTok{(panel\_LSDV)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -4788,7 +4815,7 @@ Abbildung~\ref{fig-FEDAG3} für \(T=2\) dargestellt.\footnote{Zur
 
 \centering{
 
-\includegraphics[width=6in,height=4in]{FixedEffects_files/figure-latex/dot-figure-4.png}
+\includegraphics[width=6in,height=4in]{FixedEffects_files/figure-latex/dot-figure-5.png}
 
 }
 
@@ -4872,7 +4899,7 @@ attr(,"exponential")
 [1] FALSE
 \end{verbatim}
 
-\begin{tcolorbox}[enhanced jigsaw, opacityback=0, rightrule=.15mm, breakable, bottomtitle=1mm, colbacktitle=quarto-callout-note-color!10!white, arc=.35mm, toptitle=1mm, titlerule=0mm, left=2mm, bottomrule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, toprule=.15mm, colback=white, coltitle=black, leftrule=.75mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Fixed-Effects-Regression}]
+\begin{tcolorbox}[enhanced jigsaw, breakable, colbacktitle=quarto-callout-note-color!10!white, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Fixed-Effects-Regression}, opacityback=0, coltitle=black, colback=white, arc=.35mm, titlerule=0mm, bottomtitle=1mm, leftrule=.75mm, toptitle=1mm, bottomrule=.15mm, left=2mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame]
 
 \begin{itemize}
 \item
@@ -5048,7 +5075,7 @@ Chisq: 172.45 on 1 DF, p-value: < 2.22e-16
 \end{verbatim}
 
 Die Schätzung zeigt eine gute Anpassung an die Daten und der geschätzte
-Behandlungseffekt liegt mit \(-0.996\) nahe am wahren Koeffizienten
+Behandlungseffekt liegt mit -0.996 nahe am wahren Koeffizienten
 \(\beta_1 = -1\).
 
 Mit \texttt{plm::ranef()} erhalten wir \emph{Differenzen} der
@@ -5271,7 +5298,7 @@ von Schätzern bei Einheiten mit endogeneen Effekten}
 
 \end{figure}%
 
-\begin{tcolorbox}[enhanced jigsaw, opacityback=0, rightrule=.15mm, breakable, bottomtitle=1mm, colbacktitle=quarto-callout-note-color!10!white, arc=.35mm, toptitle=1mm, titlerule=0mm, left=2mm, bottomrule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, toprule=.15mm, colback=white, coltitle=black, leftrule=.75mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Random-Effects-Regression}]
+\begin{tcolorbox}[enhanced jigsaw, breakable, colbacktitle=quarto-callout-note-color!10!white, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Random-Effects-Regression}, opacityback=0, coltitle=black, colback=white, arc=.35mm, titlerule=0mm, bottomtitle=1mm, leftrule=.75mm, toptitle=1mm, bottomrule=.15mm, left=2mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame]
 
 \begin{itemize}
 \item
@@ -5339,7 +5366,51 @@ im Argument \texttt{index} (etwa
 \texttt{panel.id\ =\ \textasciitilde{}\ ID\ +\ time}) angegeben werden.
 Für die Identifikation der Cluster wird stets die zuerst genannte
 Variable (hier \texttt{ID}) herangezogen. Details der zu verwendenen
-Standardfehler können über das Argument \texttt{vcov} festgelegt werden.
+Standardfehler können über das Argument \texttt{vcov} festgelegt werden,
+siehe \texttt{?feols} für weitere Hinweise hierzu.
+
+Für den LSDV-Schätzer in Kapitel~\ref{sec-withldsv} erreichen wir
+clustering nach \texttt{ID} mit \texttt{vcov\ =\ \textasciitilde{}\ ID}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# LSDV mit cluster{-}robusten Standardfehlern}
+\NormalTok{panel\_LSDV\_clust }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ Y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ X }\SpecialCharTok{+} \FunctionTok{factor}\NormalTok{(ID),  }
+  \AttributeTok{data =}\NormalTok{ paneldata,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ ID}
+\NormalTok{)}
+
+\NormalTok{panel\_LSDV\_clust}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: Y
+Observations: 96
+Standard-errors: Clustered (ID) 
+             Estimate Std. Error  t value   Pr(>|t|)    
+(Intercept)   3.81455   0.112794 33.81859 1.8081e-12 ***
+X            -1.04507   0.111454 -9.37663 1.4011e-06 ***
+factor(ID)2   3.33455   0.178290 18.70292 1.0959e-09 ***
+factor(ID)3   8.90196   0.235355 37.82357 5.3305e-13 ***
+factor(ID)4  11.50458   0.332206 34.63086 1.3958e-12 ***
+factor(ID)5  19.64389   0.454236 43.24597 1.2323e-13 ***
+factor(ID)6  24.42508   0.536553 45.52218 7.0294e-14 ***
+factor(ID)7  29.84518   0.714216 41.78733 1.7935e-13 ***
+factor(ID)8  31.91497   0.763123 41.82152 1.7776e-13 ***
+factor(ID)9  37.88727   0.874952 43.30213 1.2149e-13 ***
+factor(ID)10 44.09707   0.978638 45.05965 7.8608e-14 ***
+factor(ID)11 51.22950   1.159967 44.16462 9.7910e-14 ***
+factor(ID)12 55.63142   1.262214 44.07448 1.0012e-13 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.746006   Adj. R2: 0.996829
+\end{verbatim}
+
+Beachte, dass die Standradfehler der meisten Koeffizienten in
+\texttt{panel\_LSDV\_clust} etwas größer sind, als für das in
+Kapitel~\ref{sec-withldsv} geschätzte Modell \texttt{panel\_LSDV}.
 
 Für Schätzungen mit\texttt{plm::plm()} werden von \texttt{summary()}
 grundsätzlich Standardfehler unter Annahme homoskedastischer u.i.v.
@@ -5422,12 +5493,34 @@ Die Verwendung dynamischer Modelle hat folgende Motivationen:
 \begin{itemize}
 \tightlist
 \item
-  \textbf{(a) Präzisere Schätzung}: Berücksichtigen von gelaggten
-  abhängigen Variablen ermöglicht die Modellierung einer zeitabhängigen
-  Dynamik von \(Y_{it}\). Die Autokorellation und damit die Varianz der
-  Fehlerterme kann reduziert werden, da ein Teil dieser zeitlichen
-  Abhängigkeiten direkt modelliert wird. Dies kann die Präzision der
-  Schätzung des kausalen Effekts \(\beta_1\) verbessern.
+  \textbf{Präzisere Schätzung}: Berücksichtigen von gelaggten abhängigen
+  Variablen ermöglicht die Modellierung einer zeitabhängigen Dynamik von
+  \(Y_{it}\). Die Autokorellation und damit die Varianz der Fehlerterme
+  kann reduziert werden, da ein Teil dieser zeitlichen Abhängigkeiten
+  direkt modelliert wird. Dies kann die Präzision der Schätzung des
+  kausalen Effekts \(\beta_1\) verbessern, vgl.
+  Abbildung~\ref{fig-LDVOKa}.
+\end{itemize}
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics[width=3in,height=3in]{FixedEffects_files/figure-latex/dot-figure-4.png}
+
+}
+
+\caption{\label{fig-LDVOKa}Kontrolle für vergangenen Wert verbessert
+Präzision}
+
+\end{figure}%
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Vermeidung von Endogenität}: Nichtberücksichtigen von
+  \emph{relevanten} gelaggten abhängigen Variablen führt zu verzerrten
+  und inkonsistenten Schätzern, vgl. Abbildung~\ref{fig-LDVOKb}.
 \end{itemize}
 
 \begin{figure}[t]
@@ -5438,18 +5531,19 @@ Die Verwendung dynamischer Modelle hat folgende Motivationen:
 
 }
 
-\caption{\label{fig-LDVOK2}Kontrolle für vergangenen Wert verbessert
-Präzision}
+\caption{\label{fig-LDVOKb}Kontrolle für \(y_{t-1}\) schließt
+Backdoor-Pfad}
 
 \end{figure}%
 
-\begin{itemize}
-\tightlist
-\item
-  \textbf{(b) Vermeidung von Endogenität}: Nichtberücksichtigen von
-  \emph{relevanten} gelaggten abhängigen Variablen führt zu verzerrten
-  und inkonsistenten Schätzern.
-\end{itemize}
+Die Entscheidung, ob Lags der Outcome-Variable als Regressoren
+aufgenommen werden, sollte sorgfältig und, falls möglich, unter
+Berücksichtigung von ökonomischer Theorie hinsichtlich der zeitlichen
+Dynamik von \(Y_{it}\) erfolgen. Beobachtete (Auto)Korrelation von
+\(Y_{it}\) und \(Y_{it-1}\) muss nicht ausschließlich durch einen
+(kausalen) autoregressiven Zusammenhang verursacht werden. Ein DGP bei
+dem unsere Regression \emph{nicht} für \(Y_{it-1}\) kontrollieren
+sollte, ist in Abbildung~\ref{fig-LDVnotOK} gezeigt.
 
 \begin{figure}[t]
 
@@ -5459,13 +5553,24 @@ Präzision}
 
 }
 
-\caption{\label{fig-LDVOK1}Kontrolle für vergangenen Wert schließt
-Backdoor.}
+\caption{\label{fig-LDVnotOK}Kontrolle für \(y_{t-1}\) \emph{öffnet}
+Backdoor-Pfad}
 
 \end{figure}%
 
-\subsection{Verzerrung in dynamischen
-Panels}\label{verzerrung-in-dynamischen-panels}
+Hier ist \(Y_{it-1}\) nicht kausal für \(Y_{it}\) und ein
+\emph{Collider}. Kontrollieren für \(Y_{it-1}\) öffnet also den
+Backdoor-Pfad
+
+\begin{align*}
+  B_{it} \leftarrow V \rightarrow Y_{it-1} \leftarrow U \rightarrow Y_{it}.
+\end{align*}
+
+Eine ähnliche Problematik besteht bei der Schätzung dynamischer
+Panel-Modelle mit mit Fixed- oder Random-Effects-Ansätzen. Wir erläutern
+dies näher in Kapitel~\ref{sec-vidp}.
+
+\subsection{Verzerrung in dynamischen Modellen}\label{sec-vidp}
 
 Ein zentrales Problem bei der Schätzung dynamischer Panelmodelle ist der
 sogenannte \emph{Nickell-Bias}. Dieser tritt auf, wenn die
@@ -5501,8 +5606,8 @@ Kapitel behandelten Schätzer eines kausalen Effekts \(\beta_1 \neq 0\)
 von \(B_{it}\) auf \(Y_{it}\) daher verzerrt.
 
 Der Arellano-Bond-Schätzer (Arellano und Bond 1991) ist eine Methode,
-die für Endogenität in dynamischen Panel-Modellen korrigiert. Das
-Verfahren betrachtet die Regression in Differenzen zur Korrektur für
+für diese Form von Endogenität in dynamischen Panel-Modellen korrigiert.
+Das Verfahren betrachtet die Regression in Differenzen zur Korrektur für
 Heterogenitäten zwischen den Einheiten und schätzt die Koeffizienten
 anhand der generalisierten Momentenmethode
 (\href{https://en.wikipedia.org/wiki/Generalized_method_of_moments}{GMM}).
@@ -5576,8 +5681,8 @@ Tabelle~\ref{tbl-deminc} enthält Beschreibungen der in \texttt{deminc}
 verfügbaren Variablen.
 
 \begin{longtable}[]{@{}
-  >{\centering\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2466}}
-  >{\centering\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7534}}@{}}
+  >{\centering\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2500}}
+  >{\centering\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7500}}@{}}
 \caption{\texttt{deminc}: Demokratisierung und Einkommen (Acemoglu u.~a.
 2008a)}\label{tbl-deminc}\tabularnewline
 \toprule\noalign{}
@@ -5662,7 +5767,7 @@ RMSE: 0.268295   Adj. R2: 0.448221
 Dieser naive Ansatz ingoriert konstante Heterogenitäten zwischen den
 Ländern und einen (plausiblen) zeitlich verzögerten Einfluss ökonomisch
 günstiger Bedingung auf die Demokratisierung. Der geschätzte Koeffizient
-von \texttt{lrgdpch} ist \(0.23\) (d.h. ein geschätzer positiver
+von \texttt{lrgdpch} ist 0.23 (d.h. ein geschätzer positiver
 Zusammenhang) und signifikant.
 
 Die Regression von FHPRI auf das Einkommen in \(t-1\)
@@ -5763,8 +5868,8 @@ RMSE: 0.338838   Adj. R2: -0.007214
 
 Die Ergebnisse in \texttt{deminc\_diff\_7095} passen zu unserer
 Vermutung hinsichtlich ausgelassener länderspezifischer Heterogenitäten:
-Der geschätzte Koeffizient von \texttt{dlrgdpch} ist \(0.03\) und nicht
-signifikant von \(0\) verschieden.
+Der geschätzte Koeffizient von \texttt{dlrgdpch} ist 0.03 und nicht
+signifikant von 0 verschieden.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -6142,6 +6247,8 @@ Koeffizienten anhand eines bennanten Vektors \texttt{coef\_map}.
 \end{Highlighting}
 \end{Shaded}
 
+\begingroup
+\fontsize{12.0pt}{14.4pt}\selectfont
 \setlength{\LTpost}{0mm}
 
 \begin{longtable}{lcccc}
@@ -6165,6 +6272,7 @@ FHPRI\_\{t-1\} &  & 0.389*** & 0.697*** & 0.509*** \\
 \begin{minipage}{\linewidth}
 + p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001\\
 \end{minipage}
+\endgroup
 
 \bookmarksetup{startatroot}
 
@@ -6422,7 +6530,7 @@ Somit gilt \begin{align}
 
 \centering{
 
-\includegraphics[width=5in,height=4in]{IV_files/figure-latex/dot-figure-4.png}
+\includegraphics[width=5in,height=4in]{IV_files/figure-latex/dot-figure-5.png}
 
 }
 
@@ -6476,9 +6584,8 @@ hierfür sind:
   vorliegen, kann die Exogenität der Instrumente getestet werden.
 \end{enumerate}
 
-\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
-
-\textbf{Interaktive Illustrationen des 2SLS-Verfahren}
+\subsection{Interaktive Illustrationen:
+2SLS-Verfahren}\label{interaktive-illustrationen-2sls-verfahren}
 
 Der DGP im nachfolgenden interaktiven Beispiel ist
 
@@ -6583,22 +6690,22 @@ Parameter aus.
 Die voreingestellten Parameter-Kombinationen zeigen:
 
 \begin{itemize}
-\tightlist
 \item
-  Wenn \(Z\) ein schwaches Instrument ist, kann der IV-Schätzer verzerrt
-  sein \emph{und} eine deutlich größere Varianz als der KQ-Schätzer
-  haben.
+  Wenn \(Z\) ein schwaches Instrument ist, kann der IV-Schätzer auch in
+  großen Stichproben eine hohe Verzerrung haben \emph{und} eine deutlich
+  größere Varianz als der KQ-Schätzer haben.
 \item
-  Wenn \(X\) exogen ist, hat der IV-Schätzer eine größere Varianz als
-  der KQ-Schätzer.
+  Wenn der interessierende Regressor (Behandlungsvariable) \(X\) exogen
+  ist, hat der IV-Schätzer eine größere Varianz als der KQ-Schätzer.
 \item
-  Wenn die Endogenität von \(X\) ``stark'' ist (hohe Korrelation von
-  \(u\) und \(v\)), kann der IV-Schätzer auch in kleinen Stichproben
-  hilfreich sein: IV hat eine deutlich geringere Verzerrung als KQ, aber
-  eine größere Varianz.
+  Wenn die Endogenität von \(X\) ``stark'' ist (d.h. hohe Korrelation
+  von \(u\) und \(v\)), kann der IV-Schätzer auch in kleinen Stichproben
+  hilfreich sein sofern das Instrument \(Z\) nicht zu schwach ist: IV
+  hat dann eine deutlich geringere Verzerrung als KQ, aber eine größere
+  Varianz.
 \end{itemize}
 
-\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\subsection{Schätzung mit R}\label{schuxe4tzung-mit-r-1}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -6730,8 +6837,8 @@ Mafia}\label{beispiel-der-schwache-staat-die-bauern-und-die-mafia}
 
 Acemoglu, De Feo, und De Luca (2020) untersuchen den Aufstieg und die
 Auswirkungen der sizilianischen Mafia gegen Ende des 19. Jahrhunderts.
-Die Studie argumentiert, dass das Wachstum der Mafia teilweise auf das
-Aufkommen sozialistischer Bauern-Organisationen (Fasci siciliani)
+Die Studie argumentiert, dass die Verbreitung der Mafia teilweise auf
+das Aufkommen sozialistischer Bauern-Organisationen (Fasci siciliani)
 zurückzuführen ist, die in einem Umfeld schwacher staatlicher Präsenz
 die Rechte der Bauern verteidigten. Grundbesitzer, Verwalter und lokale
 Politiker wandten sich also an die Mafia, um diese sozialistische
@@ -6745,14 +6852,14 @@ der Fasci und der Ausbreitung der Mafia in Sizilien.
 Die Beziehung zwischen dem Aufkommen der Fasci und der Mafia-Aktivität
 im einfachen Regressionsmodell \begin{align}
   \textup{Mafia-Aktivität} = \beta_0 + \beta_1 \textup{Fasci siciliani} + \varepsilon \label{eq:fascimafiamod1}
-\end{align} ist aufgrund mehrerer Faktoren endogen:
+\end{align} ist wahrscheinlich aufgrund mehrerer Faktoren endogen:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
   \textbf{Externe Faktoren}, die sowohl die Entstehung der Fasci
   siciliani als auch der Mafia beeinflussen sind wahrscheinlich.
-  Beispielsweise könnten wirtschaftliche Notlagen oder politische
+  Beispielsweise könnten wirtschaftliche Notlagen und politische
   Instabilität sowohl die Organisation der Bauern als auch die
   Etablierung der Mafia begünstigen.
 \item
@@ -6768,19 +6875,1340 @@ Wir können das Modell \eqref{eq:fascimafiamod1} um (messbare) unter 1.
 fallende Regressoren erweitern, um einer verzerrten Schätzung aufgrund
 relevanter ausgelassener Variablen vorzubeugen. Eine Verzerrung aufgrund
 der in 2. beschriebenen simultanen Kausalität kann jedoch \emph{nicht}
-durch multiple Regression vermieden werden.
+durch multiple Regression vermieden werden. Acemoglu, De Feo, und De
+Luca (2020) nutzen die folgende Identifikationsstrategie: Eine extreme
+Dürre im Jahr 1893 (insbesondere Regenausfall im Frühling) hatte einen
+erheblichen negativen Einfluss auf die landwirtschaftliche Produktion in
+Sizilien und verursachte große Not unter den Bauern, was die Entstehung
+der Fasci beförderte. Die Dürre kann als natürliches Experiment
+betrachtet werden, wobei durch die Variation in der Niederschlagsmenge
+(das Instrument) die Variation im Aufkommen von Fasci-Organisationen in
+verschiedenen Gemeinden, die unabhängig von der späteren Mafia-Aktivität
+ist, isoliert werden kann. Anhand dieser exogenen Variation im
+Organisationsgrad der Bauern kann der (lokale) kausale Effekt auf die
+Entwicklung der Mafia identifiziert werden.
 
-Acemoglu, De Feo, und De Luca (2020) nutzen die folgende
-Identifikationsstrategie: Eine extreme Dürre im Jahr 1893 (insbesondere
-Regenausfall im Frühlung) hatte einen erheblichen negativen Einfluss auf
-die landwirtschaftliche Produktion in Sizilien und verursachte große Not
-unter den Bauern, was die Entstehung der Fasci beförderte. Die Dürre
-kann als natürliches Experiment betrachtet werden, wobei durch die
-Variation in der Niederschlagsmenge (das Instrument) die Variation im
-Aufkommen von Fasci-Organisationen in verschiedenen Gemeinden isoliert
-werden kann, die unabhängig von der späteren Mafia-Aktivität ist. Anhand
-dieser exogenen Variation im Organisationsgrad der Bauern kann der
-Effekt auf die Entwicklung der Mafia identifiziert werden.
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics[width=5in,height=4in]{IV_files/figure-latex/dot-figure-4.png}
+
+}
+
+\caption{\label{fig-ADDdag}Zulässiger DGP im IV-Design von Acemoglu, De
+Feo, und De Luca (2020)}
+
+\end{figure}%
+
+\subsection{Reproduktion der Kernergebnisse mit
+R}\label{reproduktion-der-kernergebnisse-mit-r}
+
+Wir lesen zunächst den Datensatz
+\texttt{ADD\_Mafia\_municipality.dta}\footnote{Der Datensatz stammt aus
+  dem
+  \href{https://economics.mit.edu/people/faculty/daron-acemoglu/data-archive}{MIT
+  Economics Data Archive} und liegt im STATA-Format \texttt{.dta} vor.}
+ein und verschaffen uns einen Überblick.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(haven)}
+
+\CommentTok{\# Datensatz einlesen}
+\NormalTok{ADD\_dat }\OtherTok{\textless{}{-}} \FunctionTok{read\_stata}\NormalTok{(}
+  \AttributeTok{file =} \StringTok{"datasets/ADD\_Mafia\_municipality.dta"}
+\NormalTok{  )}
+
+\FunctionTok{glimpse}\NormalTok{(ADD\_dat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Rows: 333
+Columns: 28
+$ peasants_fasci          <dbl> 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0~
+$ sp3m1893_n30            <dbl> 0.2025284, 1.0492120, 0.3623592, 0.4212372, 0.~
+$ cl1_stn_sp1893_n30      <dbl> 26, 4, 26, 5, 4, 26, 26, 4, 4, 4, 26, 5, 26, 4~
+$ predr_peas_fasci        <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0~
+$ ruralcentre1861         <dbl> 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1~
+$ Rural_rent              <dbl> 5.099932, 3.597782, 2.558312, 7.590975, 4.1333~
+$ Urban_rent              <dbl> 0.0000000, 1.1374048, 0.3895219, 2.6512258, 0.~
+$ agricola_rel            <dbl> 0.9637574, 0.9701000, 0.9097173, 0.9832645, 1.~
+$ seminatoritot_rel       <dbl> 0.7835485, 0.8199988, 0.5116088, 0.7404211, 0.~
+$ sulfurproduction1868_70 <dbl> 0.0, 153.0, 0.0, 0.0, 0.0, 25.5, 0.0, 0.0, 117~
+$ Citrus_groves           <dbl> 5.555364e-03, 3.233516e-04, 5.223450e-04, 3.03~
+$ Olives_groves           <dbl> 0.0059671006, 0.0158138741, 0.0023271707, 0.04~
+$ Vineyards               <dbl> 0.048398037, 0.024294233, 0.006733574, 0.06361~
+$ Mafia1885               <dbl> 0, 3, 0, 0, 2, 3, 0, 0, 0, 0, 3, 0, 0, 2, 2, 1~
+$ Mafia1900               <dbl> 0, 3, 0, 0, 1, 3, 0, 0, 3, 0, 3, 3, 0, 0, 0, 3~
+$ lnpop1861               <dbl> 7.396335, 10.080754, 7.693937, 8.177516, 7.493~
+$ lnsurface               <dbl> 7.259003, 10.598988, 8.283580, 7.060150, 7.190~
+$ centreheight            <dbl> 554, 588, 292, 420, 720, 440, 740, 646, 625, 6~
+$ maxheight               <dbl> 723, 866, 621, 475, 821, 511, 899, 884, 704, 8~
+$ slope2                  <dbl> 176.0, 343.0, 250.0, 102.5, 235.5, 150.5, 364.~
+$ pa_pdist1856            <dbl> 71.0, 92.0, 74.0, 106.0, 68.0, 111.0, 68.0, 4.~
+$ port2_pdist1856         <dbl> 71, 34, 74, 48, 55, 85, 68, 4, 40, 46, 48, 48,~
+$ roads1799               <dbl> 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1~
+$ ave_temp                <dbl> 14.60, 14.80, 16.40, 15.60, 14.10, 16.05, 13.9~
+$ sp3m_ave_n30            <dbl> 158.4963, 135.3397, 129.4469, 126.1981, 144.14~
+$ var_sp3m_n30            <dbl> 0.2702444, 0.4196214, 0.1592561, 0.1744232, 0.~
+$ distretto1853           <chr> "caltanissetta", "caltanissetta", "caltanisset~
+$ provincia1853           <chr> "caltanissetta", "caltanissetta", "caltanisset~
+\end{verbatim}
+
+Das \texttt{tibble}-Objekt \texttt{ADD\_dat} enthält
+Variablenbschreibungen im Attribut \texttt{label}. Mit Funktionen aus
+dem tidyverse-Paket \texttt{purrr} können wir diese Einträge auslesen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Attribut \textquotesingle{}label\textquotesingle{} für die ersten 5 Variablen anzeigen}
+\FunctionTok{map\_chr}\NormalTok{(}
+  \AttributeTok{.x =}\NormalTok{ ADD\_dat, }
+  \AttributeTok{.f =} \SpecialCharTok{\textasciitilde{}} \FunctionTok{attr\_getter}\NormalTok{(}\StringTok{"label"}\NormalTok{)(.)}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  .[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{5}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+                                                                   peasants_fasci 
+              "Dummy for the presence of a peasants fasci organization in 1893-4" 
+                                                                     sp3m1893_n30 
+"Relative rainfall in spring 1893 interpolated from weather stations within 30km" 
+                                                               cl1_stn_sp1893_n30 
+                  "Closest weather station active in the spring 1893 within 30km" 
+                                                                 predr_peas_fasci 
+      "Dummy for the presence of a peasants fasci organization before March 1893" 
+                                                                  ruralcentre1861 
+                                  "Dummy for the municipality being an agro-town" 
+\end{verbatim}
+
+Tabelle~\ref{tbl-ADD_dat} gibt einen Überblick der in \texttt{ADD\_dat}
+verfügbaren Variablen auf Gemeinde-Ebene und deren Definition.
+
+\begingroup
+\setlength\LTleft{0.1\linewidth}
+\setlength\LTright{0.1\linewidth}\fontsize{12.0pt}{14.4pt}\selectfont
+
+\begin{longtable}{@{\extracolsep{\fill}}ll}
+
+\caption{\label{tbl-ADD_dat}\texttt{ADD\_dat} --- Charakteristika von
+sizilianischen Gemeinden im 19. Jahrhundert}
+
+\tabularnewline
+
+\toprule
+Variable & Beschreibung \\ 
+\midrule\addlinespace[2.5pt]
+peasants\_fasci & Präsenz Fasci in 1893-Q4 (Dummy) \\ 
+sp3m1893\_n30 & Dürre-Intensität: Relative Regenmenge im Frühling 1893 (ggü. Mittel v. 1841 bis 1881)  \\ 
+cl1\_stn\_sp1893\_n30 & Nächste aktive Wetterstation (Frühling 1893) \\ 
+predr\_peas\_fasci & Präsenz Fasci vor März 1893 (Dummy) \\ 
+ruralcentre1861 & Landwirtschaftliche Gemeinde? (Dummy) \\ 
+Rural\_rent & Durchschn. ländliche Pacht / Hektar in 1953 \\ 
+Urban\_rent & Durchschn. städtische Pacht / Hektar in 1953 \\ 
+agricola\_rel & Anteil bewirtschaftetes Land in 1853 \\ 
+seminatoritot\_rel & Anteil Anbaufläche Getreide in 1853 \\ 
+sulfurproduction1868\_70 & Durschn. Schwefel-Produktion / Jahr für 1868-1870 \\ 
+Citrus\_groves & Anteil Anbaufläche Zitrusfrüchte in 1853 \\ 
+Olives\_groves & Anteil Anbaufläche Oliven in 1853 \\ 
+Vineyards & Anteil Anbaufläche Wein in 1853 \\ 
+Mafia1885 & Intensität Mafia gem. Damiani (1885), Skala 0-3 \\ 
+Mafia1900 & Intensität Mafia gem. Cutrera (1900), Skala 0-3 \\ 
+lnpop1861 & Log(Einwohner) in 1861 \\ 
+lnsurface & Log(Fläche) in 1853 \\ 
+centreheight & Höhe des Gemeindezentrums (M.ü. NN) \\ 
+maxheight & Max. Höhe (M.ü. NN) \\ 
+slope2 & Durschn. Höhe (M.ü. NN) \\ 
+pa\_pdist1856 & Entfernung (Postweg) von Palermo in 1856 \\ 
+port2\_pdist1856 & Entfernung (Postweg) nächer Hafen in 1856 \\ 
+roads1799 & Direkter Zugang Postweg in 1799 (Dummy) \\ 
+ave\_temp & Durschn. Jahrestemperatur \\ 
+sp3m\_ave\_n30 & Durschn. Regenmenge im Frühling für 1881-1941 \\ 
+var\_sp3m\_n30 & Varianz Regenmenge im Frühling für 1881-1941 \\ 
+distretto1853 & Distrikt-Zugehörigkeit in 1853 \\ 
+provincia1853 & Provinz-Zugehörigkeit in 1853 \\ 
+\bottomrule
+
+\end{longtable}
+
+\endgroup
+
+Vor der Analyse filtern wir die Daten entsprechen der Vorgehensweise in
+Acemoglu, De Feo, und De Luca (2020): Es werden lediglich Gemeinden
+berücksichtigt, die in maximal 30km Entfernung zu einer Wetter-Station
+liegen (\texttt{!is.na(sp3m1893\_n30)}) \emph{und} für die eine Messung
+der Mafia-Aktivität gegen Ende des 19. Jahrhunderts (gemessen auf einer
+Skala von 0 bis 4, vgl. Cutrera (1900)) vorliegt
+(\texttt{!is.na(Mafia1900)}).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Datensatz filtern}
+\NormalTok{ADD\_dat }\OtherTok{\textless{}{-}}\NormalTok{ ADD\_dat }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(}
+    \CommentTok{\# Nur Gemeinden mit Wetter{-}Station in 30km Umkreis}
+    \SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(sp3m1893\_n30), }
+    \CommentTok{\# Gemeinden mit Mafia{-}Präsenz Ende des 19. Jdt.}
+    \SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(Mafia1900)}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{First-Stage-Regressionen}\label{first-stage-regressionen}
+
+Tabelle 3 in Acemoglu, De Feo, und De Luca (2020) präsentiert
+First-Stage-Regressionen Für den endogenen Regressor
+\(\textup{Fasci siciliani}\) in \eqref{eq:fascimafiamod1}: Die
+Auswirkungen der Dürre in 1893 (das Instrument) auf den
+Organisationsgrad der Bauern (der endogene Regressor). Hierbei werden
+verschiedene, aus dem DAG in Abbildung~\ref{fig-ADDdag} abgeleitete
+Spezifikationen betrachtet:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Panel A}: Keine Fixed Effects
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Modell ohne Kovariablen
+  \item
+    Modell mit Kovariablen für Bildung von Bauernorganisationen
+  \item
+    Modell mit Kovariablen für Bildung von Bauernorganisationen und
+    Indikatoren für Mafia-Präsenz
+  \item
+    Modell mit Kovariablen für Bildung von Bauernorganisationen,
+    Indikatoren für Mafia-Präsenz und geologische Faktoren
+  \end{itemize}
+\item
+  \textbf{Panel B}: Modelle wie in Panel A und Kontrolle für
+  Provinz-Fixed-Effects
+\end{itemize}
+
+Wir schätzten nachfolgend sämtliche Regressionen mit \texttt{feols} und
+berechnen nach Distrikt-Zugehörigkeit (\texttt{distretto1853}) sowie
+nächstgelegener Wetterstation (\texttt{cl1\_stn\_sp1893\_n30})
+geclusterte Standardfehler.\footnote{Siehe Kapitel
+  \textbf{?@sec-pandeldata} für Erläuterungen zu Fixed-Effects und
+  cluster-robusten Standardfehlern.} Hierzu setzen wir
+\texttt{vcov\ =\ \textasciitilde{}\ distretto1853\ +\ cl1\_stn\_sp1893\_n30}.
+Diese Spezifikation berücksichtigt, dass die Niederschlagsmenge in einer
+Gemeinde sowie viele Kovariablen eine Korrelation mit benachbarten
+Gemeinden aufweisen können. Cluster-robuste Standardfehler sind
+inbesondere nötig, weil die Niederschlagsdaten für viele Gemeinden aus
+benachbarten Wetterstationen interpoliert werden, was zu einer
+zusätzlichen Korrelation zwischen den Beobachtungen führt.
+Standardfehler mit Two-way-clustering sind eine gängige Methode zur
+Berücksichtigung derartiger Korrelation.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(fixest)}
+
+\CommentTok{\# First{-}Stage{-}Regression:}
+\CommentTok{\# keine Kontroll{-}Variablen}
+\NormalTok{fasci\_mod }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+\NormalTok{  peasants\_fasci }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sp3m1893\_n30, }
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ distretto1853 }\SpecialCharTok{+}\NormalTok{ cl1\_stn\_sp1893\_n30,}
+  \AttributeTok{data =}\NormalTok{ ADD\_dat,}
+\NormalTok{  )}
+
+\CommentTok{\# Statistische Zusammenfassung}
+\FunctionTok{summary}\NormalTok{(fasci\_mod)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: peasants_fasci
+Observations: 245
+Standard-errors: Clustered (distretto1853 & cl1_stn_sp1893_n30) 
+              Estimate Std. Error  t value   Pr(>|t|)    
+(Intercept)   0.950863   0.098323  9.67077 2.2119e-09 ***
+sp3m1893_n30 -1.003055   0.130752 -7.67142 1.1758e-07 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.380736   Adj. R2: 0.353963
+\end{verbatim}
+
+Der obige Code-Chunk führt die First-Stage-Regression \emph{ohne}
+Kovariablen aus. Wir finden einen signifikanten positiven Effekt der
+Niederschlagsmenge auf den Organisationsgrad der Bauern.
+
+Acemoglu, De Feo, und De Luca (2020) verwenden Bootstrap cluster-robuste
+Standardfehler (Cameron, Gelbach, und Miller 2008, 2011), die aufwendig
+zu implementieren sind, jedoch zu nahezu identischen Ergebnissen führen.
+Der nächste Code-Chunk zeigt, wie cluster-robuste Bootstrap-Inferenz für
+das geschätzte Modell \texttt{fasci\_mod} berechnet werden können.
+Hierfür nutzen wir \texttt{fwildclusterboot::boottest()}.\footnote{\texttt{fwildclusterboot}
+  implementiert Varianten des \emph{Wild Bootstrap} (Liu 1988).}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Wild{-}Bootstrap{-}Standardfehler mit clustering}
+\FunctionTok{library}\NormalTok{(fwildclusterboot)}
+
+\CommentTok{\# boottest{-}Objekt erzeugen}
+\NormalTok{fasci\_mod\_boot }\OtherTok{\textless{}{-}} \FunctionTok{boottest}\NormalTok{(}
+  \AttributeTok{object =}\NormalTok{ fasci\_mod, }
+  \AttributeTok{clustid =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ distretto1853 }\SpecialCharTok{+}\NormalTok{ cl1\_stn\_sp1893\_n30,}
+  \AttributeTok{param =} \StringTok{"sp3m1893\_n30"}\NormalTok{, }\CommentTok{\# Koeffizient}
+  \AttributeTok{B =} \DecValTok{999} \CommentTok{\# Bootstrap{-}Züge}
+\NormalTok{)}
+
+\CommentTok{\# Statistische Zusammenfassung des Bootstraps}
+\FunctionTok{summary}\NormalTok{(fasci\_mod\_boot)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+boottest.fixest(object = fasci_mod, param = "sp3m1893_n30", B = 999, 
+    clustid = ~distretto1853 + cl1_stn_sp1893_n30)
+    
+ Hypothesis: 1*sp3m1893_n30 = 0
+ Observations: 245
+  Bootstr. Type: rademacher
+ Clustering: 2-way
+ Confidence Sets: 95%
+ Number of Clusters: 23 30 63
+ 
+\end{verbatim}
+
+\begin{verbatim}
+                term estimate statistic p.value conf.low conf.high
+1 1*sp3m1893_n30 = 0   -1.003    -7.659       0    -1.33    -0.672
+\end{verbatim}
+
+Die statistische Zusammenfassung umfasst die Punktschätzung, die robuste
+t-Statistik sowie das 95\%-Konfidenzintervall für den Koeffizienten von
+\texttt{sp3m1893\_n30}. Mit diesen Komponenten können wir den
+Bootstrap-Standardfehler beispielsweise durch die folgende
+Transformation berechnen:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Standardfehler über t{-}Statistik und}
+\CommentTok{\# gesch. Koeffizienten berechnen}
+\DecValTok{1}\SpecialCharTok{/}\NormalTok{fasci\_mod\_boot}\SpecialCharTok{$}\NormalTok{t\_stat }\SpecialCharTok{*}\NormalTok{ fasci\_mod\_boot}\SpecialCharTok{$}\NormalTok{point\_estimate}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] 0.1309592
+\end{verbatim}
+
+Bei der Interpretation des geschätzten Koeffizienten (-1) berückstigen
+wir, dass die abhängige Variable \emph{binär} ist: Die
+First-Stage-Regression ist ein \emph{lineares Wahrscheinlicheitsmodell}.
+Eine positive Änderung der relativen Regenmenge um eine Einheit (100\%)
+verringert die Wahrscheinlichkeit also um 100\%. Diese Interpretation
+ist jedoch wenig aussagekräftig für einen Einordnung des Effekts der
+Dürre. Stattdessen betrachten wir die Verteilung relativen Regenmengen
+und vergleichen den Effekt für eine von starker Dürre betroffenen
+Gemeinden (25\%-Quantil) und einer Gemeinde mit einem relativ geringen
+Rückgang des Niederschlags (75\%-Quantil)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Relativer Effekt der Dürre im Frühling 1893}
+\NormalTok{(}
+\NormalTok{  ADD\_dat }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{pull}\NormalTok{(sp3m1893\_n30) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{quantile}\NormalTok{(}
+    \AttributeTok{probs =} \FunctionTok{c}\NormalTok{(.}\DecValTok{25}\NormalTok{, .}\DecValTok{75}\NormalTok{), }
+    \AttributeTok{na.rm =}\NormalTok{ T}
+\NormalTok{    )}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{diff}\NormalTok{() }\SpecialCharTok{*}\NormalTok{ fasci\_mod\_boot}\SpecialCharTok{$}\NormalTok{point\_estimate}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+       75% 
+-0.5174457 
+\end{verbatim}
+
+Für eine Gemeinde mit 75\% des langjährigen mittleren Niederschlags ist
+die geschätzte Wahrscheinlichkeit der Bildung von Bauern-Organisationen
+nur etwa halb so groß, wie für eine von starker Dürre betroffene
+Gemeinde.
+
+Zur Vermeidung von Backdoors durch ausgelassene Variablen betrachten
+Acemoglu, De Feo, und De Luca (2020) weitere Spezifikationen für die
+First- und Second-Stage-Regressionen, die zusätzlich für Determinanten
+der Fasci, der Mafia, sowie für geographische Faktoren kontrollieren.
+Weiterhin werden diese Regressionen mit Fixed Effekts auf der
+Provinz-Ebene gemäß der Grenzen von 1853 (\texttt{provincia1853})
+wiederholt, um für unbeobachtbare Heteogenitäten zwischen den
+verschiedenen Provinzen zu kontrollieren. Die nachfolgenden Code-Chunks
+zeigen die Implementierung dieser Regressionen mit
+\texttt{fixtest::feols()}. Für eine bessere Übersicht der Ergebnisse
+verwenden wir in \texttt{summary()} das Argument \texttt{n\ =\ 1},
+sodass jeweils nur die Schätzung des ersten Koeffizienten (Effekt der
+relativen Regenmenge) ausgegeben wird.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# First{-}Stage{-}Regression:}
+\CommentTok{\# + Fasci{-}Determinanten}
+\NormalTok{fasci\_mod\_F }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+\NormalTok{  peasants\_fasci }\SpecialCharTok{\textasciitilde{}} 
+\NormalTok{    sp3m1893\_n30 }
+    \CommentTok{\# Fasci}
+  \SpecialCharTok{+}\NormalTok{ predr\_peas\_fasci}
+  \SpecialCharTok{+}\NormalTok{ ruralcentre1861}
+  \SpecialCharTok{+}\NormalTok{ Rural\_rent}
+  \SpecialCharTok{+}\NormalTok{ Urban\_rent}
+  \SpecialCharTok{+}\NormalTok{ agricola\_rel}
+  \SpecialCharTok{+}\NormalTok{ seminatoritot\_rel,}
+  
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ distretto1853 }\SpecialCharTok{+}\NormalTok{ cl1\_stn\_sp1893\_n30,}
+  \AttributeTok{data =}\NormalTok{ ADD\_dat }
+\NormalTok{  ) }
+
+\CommentTok{\# Statistische Zusammenfassung}
+\FunctionTok{summary}\NormalTok{(fasci\_mod\_F, }\AttributeTok{n =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: peasants_fasci
+Observations: 245
+Standard-errors: Clustered (distretto1853 & cl1_stn_sp1893_n30) 
+            Estimate Std. Error t value Pr(>|t|) 
+(Intercept) 0.634719   0.426989  1.4865  0.15134 
+... 7 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.363148   Adj. R2: 0.397391
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# First{-}Stage{-}Regression:}
+\CommentTok{\# + Fasci{-}Determinanten}
+\CommentTok{\# + Mafia{-}Determinanten}
+\NormalTok{fasci\_mod\_FM }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ peasants\_fasci }\SpecialCharTok{\textasciitilde{}} 
+\NormalTok{    sp3m1893\_n30}
+    \CommentTok{\# Fasci}
+  \SpecialCharTok{+}\NormalTok{ predr\_peas\_fasci}
+  \SpecialCharTok{+}\NormalTok{ ruralcentre1861}
+  \SpecialCharTok{+}\NormalTok{ Rural\_rent}
+  \SpecialCharTok{+}\NormalTok{ Urban\_rent}
+  \SpecialCharTok{+}\NormalTok{ agricola\_rel}
+  \SpecialCharTok{+}\NormalTok{ seminatoritot\_rel}
+    \CommentTok{\# Mafia}
+  \SpecialCharTok{+}\NormalTok{ sulfurproduction1868\_70}
+  \SpecialCharTok{+}\NormalTok{ Citrus\_groves}
+  \SpecialCharTok{+}\NormalTok{ Olives\_groves}
+  \SpecialCharTok{+}\NormalTok{ Vineyards}
+  \SpecialCharTok{+}\NormalTok{ Mafia1885,}
+  
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ distretto1853 }\SpecialCharTok{+}\NormalTok{ cl1\_stn\_sp1893\_n30,}
+  \AttributeTok{data =}\NormalTok{ ADD\_dat }
+\NormalTok{) }
+
+\CommentTok{\# Statistische Zusammenfassung}
+\FunctionTok{summary}\NormalTok{(fasci\_mod\_FM, }\AttributeTok{n =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: peasants_fasci
+Observations: 245
+Standard-errors: Clustered (distretto1853 & cl1_stn_sp1893_n30) 
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)   0.7415   0.396747 1.86895 0.075002 .  
+... 12 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.353698   Adj. R2: 0.416027
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# First{-}Stage{-}Regression:}
+\CommentTok{\# + Fasci{-}Determinanten}
+\CommentTok{\# + Mafia{-}Determinanten}
+\CommentTok{\# + geographische Faktoren}
+\NormalTok{fasci\_mod\_FMG }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+\NormalTok{  peasants\_fasci }\SpecialCharTok{\textasciitilde{}} 
+\NormalTok{    sp3m1893\_n30}
+    \CommentTok{\# Fasci}
+  \SpecialCharTok{+}\NormalTok{ predr\_peas\_fasci}
+  \SpecialCharTok{+}\NormalTok{ ruralcentre1861}
+  \SpecialCharTok{+}\NormalTok{ Rural\_rent}
+  \SpecialCharTok{+}\NormalTok{ Urban\_rent}
+  \SpecialCharTok{+}\NormalTok{ agricola\_rel}
+  \SpecialCharTok{+}\NormalTok{ seminatoritot\_rel}
+    \CommentTok{\# Mafia}
+  \SpecialCharTok{+}\NormalTok{ sulfurproduction1868\_70}
+  \SpecialCharTok{+}\NormalTok{ Citrus\_groves}
+  \SpecialCharTok{+}\NormalTok{ Olives\_groves}
+  \SpecialCharTok{+}\NormalTok{ Vineyards}
+  \SpecialCharTok{+}\NormalTok{ Mafia1885}
+    \CommentTok{\# Geographie}
+  \SpecialCharTok{+}\NormalTok{ lnpop1861}
+  \SpecialCharTok{+}\NormalTok{ lnsurface}
+  \SpecialCharTok{+}\NormalTok{ centreheight}
+  \SpecialCharTok{+}\NormalTok{ maxheight}
+  \SpecialCharTok{+}\NormalTok{ slope2}
+  \SpecialCharTok{+}\NormalTok{ pa\_pdist1856}
+  \SpecialCharTok{+}\NormalTok{ port2\_pdist1856}
+  \SpecialCharTok{+}\NormalTok{ roads1799}
+  \SpecialCharTok{+}\NormalTok{ ave\_temp}
+  \SpecialCharTok{+}\NormalTok{ sp3m\_ave\_n30}
+  \SpecialCharTok{+}\NormalTok{ var\_sp3m\_n30,}
+  
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ distretto1853 }\SpecialCharTok{+}\NormalTok{ cl1\_stn\_sp1893\_n30,}
+  \AttributeTok{data =}\NormalTok{ ADD\_dat }
+\NormalTok{) }
+
+\CommentTok{\# Statistische Zusammenfassung}
+\FunctionTok{summary}\NormalTok{(fasci\_mod\_FMG, }\AttributeTok{n =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: peasants_fasci
+Observations: 245
+Standard-errors: Clustered (distretto1853 & cl1_stn_sp1893_n30) 
+            Estimate Std. Error  t value Pr(>|t|) 
+(Intercept) 0.016011    1.12144 0.014277  0.98874 
+... 23 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.347776   Adj. R2: 0.407315
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# First Stage}
+\CommentTok{\# + Provinz{-}Fixed{-}Effects}
+\NormalTok{fasci\_mod\_FE }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+\NormalTok{  peasants\_fasci }\SpecialCharTok{\textasciitilde{}} 
+\NormalTok{    sp3m1893\_n30}
+  \SpecialCharTok{|}\NormalTok{ provincia1853, }
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ distretto1853 }\SpecialCharTok{+}\NormalTok{ cl1\_stn\_sp1893\_n30,}
+  \AttributeTok{data =}\NormalTok{ ADD\_dat,}
+\NormalTok{  ) }
+\FunctionTok{summary}\NormalTok{(fasci\_mod\_FE, }\AttributeTok{n =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: peasants_fasci
+Observations: 245
+Fixed-effects: provincia1853: 7
+Standard-errors: Clustered (distretto1853 & cl1_stn_sp1893_n30) 
+              Estimate Std. Error  t value   Pr(>|t|)    
+sp3m1893_n30 -0.762897   0.138668 -5.50162 1.5781e-05 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.370663     Adj. R2: 0.372191
+                 Within R2: 0.119989
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# First Stage}
+\CommentTok{\# + Provinz{-}Fixed{-}Effects}
+\CommentTok{\# + Fasci{-}Determinanten}
+\NormalTok{fasci\_mod\_FE\_F }\OtherTok{\textless{}{-}}\FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ peasants\_fasci }\SpecialCharTok{\textasciitilde{}} 
+\NormalTok{    sp3m1893\_n30 }
+  
+  \SpecialCharTok{+}\NormalTok{ predr\_peas\_fasci}
+  \SpecialCharTok{+}\NormalTok{ ruralcentre1861}
+  \SpecialCharTok{+}\NormalTok{ Rural\_rent}
+  \SpecialCharTok{+}\NormalTok{ Urban\_rent}
+  \SpecialCharTok{+}\NormalTok{ agricola\_rel}
+  \SpecialCharTok{+}\NormalTok{ seminatoritot\_rel}
+  
+  \SpecialCharTok{|}\NormalTok{ provincia1853, }
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ distretto1853 }\SpecialCharTok{+}\NormalTok{ cl1\_stn\_sp1893\_n30,}
+  \AttributeTok{data =}\NormalTok{ ADD\_dat }
+\NormalTok{  ) }
+
+\FunctionTok{summary}\NormalTok{(fasci\_mod\_FE\_F, }\AttributeTok{n =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: peasants_fasci
+Observations: 245
+Fixed-effects: provincia1853: 7
+Standard-errors: Clustered (distretto1853 & cl1_stn_sp1893_n30) 
+              Estimate Std. Error  t value   Pr(>|t|)    
+sp3m1893_n30 -0.813957   0.159025 -5.11842 3.9568e-05 ***
+... 6 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.356253     Adj. R2: 0.404994
+                 Within R2: 0.187084
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# First Stage}
+\CommentTok{\# + Provinz{-}Fixed{-}Effects}
+\CommentTok{\# + Fasci{-}Determinanten}
+\CommentTok{\# + Mafia{-}Determinanten}
+\NormalTok{fasci\_mod\_FE\_FM }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ peasants\_fasci }\SpecialCharTok{\textasciitilde{}} 
+\NormalTok{    sp3m1893\_n30 }
+  
+  \SpecialCharTok{+}\NormalTok{ predr\_peas\_fasci}
+  \SpecialCharTok{+}\NormalTok{ ruralcentre1861}
+  \SpecialCharTok{+}\NormalTok{ Rural\_rent}
+  \SpecialCharTok{+}\NormalTok{ Urban\_rent}
+  \SpecialCharTok{+}\NormalTok{ agricola\_rel}
+  \SpecialCharTok{+}\NormalTok{ seminatoritot\_rel}
+  
+  \SpecialCharTok{+}\NormalTok{ sulfurproduction1868\_70}
+  \SpecialCharTok{+}\NormalTok{ Citrus\_groves}
+  \SpecialCharTok{+}\NormalTok{ Olives\_groves}
+  \SpecialCharTok{+}\NormalTok{ Vineyards}
+  \SpecialCharTok{+}\NormalTok{ Mafia1885}
+  
+  \SpecialCharTok{|}\NormalTok{ provincia1853,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ distretto1853 }\SpecialCharTok{+}\NormalTok{ cl1\_stn\_sp1893\_n30,}
+  \AttributeTok{data =}\NormalTok{ ADD\_dat }
+\NormalTok{) }
+
+\FunctionTok{summary}\NormalTok{(fasci\_mod\_FE\_FM, }\AttributeTok{n =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: peasants_fasci
+Observations: 245
+Fixed-effects: provincia1853: 7
+Standard-errors: Clustered (distretto1853 & cl1_stn_sp1893_n30) 
+              Estimate Std. Error  t value  Pr(>|t|)    
+sp3m1893_n30 -0.738703   0.165957 -4.45117 0.0002004 ***
+... 11 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.341461     Adj. R2: 0.441285
+                 Within R2: 0.253188
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# First Stage}
+\CommentTok{\# + Provinz{-}Fixed{-}Effects}
+\CommentTok{\# + Fasci{-}Determinanten}
+\CommentTok{\# + Mafia{-}Determinanten}
+\CommentTok{\# + geografische Faktoren}
+\NormalTok{fasci\_mod\_FE\_FMG }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+\NormalTok{  peasants\_fasci }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sp3m1893\_n30 }
+  
+  \SpecialCharTok{+}\NormalTok{ predr\_peas\_fasci}
+  \SpecialCharTok{+}\NormalTok{ ruralcentre1861}
+  \SpecialCharTok{+}\NormalTok{ Rural\_rent}
+  \SpecialCharTok{+}\NormalTok{ Urban\_rent}
+  \SpecialCharTok{+}\NormalTok{ agricola\_rel}
+  \SpecialCharTok{+}\NormalTok{ seminatoritot\_rel}
+  
+  \SpecialCharTok{+}\NormalTok{ sulfurproduction1868\_70}
+  \SpecialCharTok{+}\NormalTok{ Citrus\_groves}
+  \SpecialCharTok{+}\NormalTok{ Olives\_groves}
+  \SpecialCharTok{+}\NormalTok{ Vineyards}
+  \SpecialCharTok{+}\NormalTok{ Mafia1885}
+  
+  \SpecialCharTok{+}\NormalTok{ lnpop1861}
+  \SpecialCharTok{+}\NormalTok{ lnsurface}
+  \SpecialCharTok{+}\NormalTok{ centreheight}
+  \SpecialCharTok{+}\NormalTok{ maxheight}
+  \SpecialCharTok{+}\NormalTok{ slope2}
+  \SpecialCharTok{+}\NormalTok{ pa\_pdist1856}
+  \SpecialCharTok{+}\NormalTok{ port2\_pdist1856}
+  \SpecialCharTok{+}\NormalTok{ roads1799}
+  \SpecialCharTok{+}\NormalTok{ ave\_temp}
+  \SpecialCharTok{+}\NormalTok{ sp3m\_ave\_n30}
+  \SpecialCharTok{+}\NormalTok{ var\_sp3m\_n30}
+  
+  \SpecialCharTok{|}\NormalTok{ provincia1853,  }
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ distretto1853 }\SpecialCharTok{+}\NormalTok{ cl1\_stn\_sp1893\_n30,}
+  \AttributeTok{data =}\NormalTok{ ADD\_dat }
+\NormalTok{) }
+
+\FunctionTok{summary}\NormalTok{(fasci\_mod\_FE\_FMG, }\AttributeTok{n =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: peasants_fasci
+Observations: 245
+Fixed-effects: provincia1853: 7
+Standard-errors: Clustered (distretto1853 & cl1_stn_sp1893_n30) 
+              Estimate Std. Error  t value  Pr(>|t|)    
+sp3m1893_n30 -0.718998   0.209917 -3.42515 0.0024214 ** 
+... 22 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.338173     Adj. R2: 0.423955
+                 Within R2: 0.267501
+\end{verbatim}
+
+Für eine tabellarische Übersicht fassen wir die interessierenden
+Komponenten der Schätzungen mit \texttt{modelsummary::modelsummary()}
+zusammen. Hierfür sammeln wir zunächst jeweils die Modelle mit und ohne
+Provinz-Fixed-Effects in benannten Listen, sodass die Ergebnisse später
+in separaten Panelen dargestellt werden können. Für die Formatierung von
+Labels für die Fixed Effects und Koeffizienten definieren wir das
+\texttt{tribble}-Objekt \texttt{gm} und übergeben reguläre Ausdrücke für
+eine Auswahl an zusammenfassenden Statistiken.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(modelsummary)}
+
+\CommentTok{\# Modelle in benannten Listen sammeln}
+\NormalTok{panels }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{(}
+  \StringTok{"Panel A"} \OtherTok{=} \FunctionTok{list}\NormalTok{(}
+    \StringTok{"Keine Controls"} \OtherTok{=}\NormalTok{ fasci\_mod,}
+    \StringTok{"Fasci"} \OtherTok{=}\NormalTok{ fasci\_mod\_F,}
+    \StringTok{"Fasci + Mafia"} \OtherTok{=}\NormalTok{ fasci\_mod\_FM,}
+    \StringTok{"Fasci + Mafia + Geo"} \OtherTok{=}\NormalTok{ fasci\_mod\_FMG}
+\NormalTok{  ),}
+  \StringTok{"Panel B (Fixed Effects)"} \OtherTok{=} \FunctionTok{list}\NormalTok{(}
+    \StringTok{"Keine Controls"} \OtherTok{=}\NormalTok{ fasci\_mod\_FE,}
+    \StringTok{"Fasci"} \OtherTok{=}\NormalTok{ fasci\_mod\_FE\_F,}
+    \StringTok{"Fasci + Mafia"} \OtherTok{=}\NormalTok{ fasci\_mod\_FE\_FM,}
+    \StringTok{"Fasci + Mafia + Geo"} \OtherTok{=}\NormalTok{ fasci\_mod\_FE\_FMG}
+\NormalTok{  )}
+\NormalTok{)}
+
+\CommentTok{\# Format für FE{-}label}
+\NormalTok{gm }\OtherTok{\textless{}{-}} \FunctionTok{tribble}\NormalTok{(}
+  \SpecialCharTok{\textasciitilde{}}\NormalTok{raw, }\SpecialCharTok{\textasciitilde{}}\NormalTok{clean, }\SpecialCharTok{\textasciitilde{}}\NormalTok{fmt,}
+  \StringTok{"FE: provincia1853"}\NormalTok{, }\StringTok{"FE: Provinz"}\NormalTok{, }\SpecialCharTok{\textasciitilde{}}\NormalTok{fmt}
+\NormalTok{)}
+
+\CommentTok{\# Tabellarische Zusammenfassung}
+\FunctionTok{modelsummary}\NormalTok{(}
+  \AttributeTok{models =}\NormalTok{ panels,}
+  \AttributeTok{shape =} \StringTok{"rbind"}\NormalTok{,}
+  \AttributeTok{coef\_omit =} \StringTok{"\^{}(?!(sp3m1893}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{\_n30*)$).*"}\NormalTok{,}
+  \AttributeTok{stars =}\NormalTok{ T,}
+  \AttributeTok{gof\_omit =} \StringTok{"\^{}(?!(FE.*)$).*"}\NormalTok{,}
+  \AttributeTok{coef\_map =} \FunctionTok{c}\NormalTok{(}
+    \StringTok{"sp3m1893\_n30"} \OtherTok{=} \StringTok{"Rel. Niederschlag 1893"}
+\NormalTok{    ),}
+  \AttributeTok{gof\_map =}\NormalTok{ gm, }
+  \AttributeTok{notes =} \FunctionTok{c}\NormalTok{(}\StringTok{"Abhängige Variable: Peasants Fasci"}\NormalTok{, }\StringTok{"Cluster{-}robuste Standardfehler: Naheste Wetterstation + Distrikt"}\NormalTok{),}
+  \AttributeTok{output =} \StringTok{"gt"}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{tabopts}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begingroup
+\setlength\LTleft{0.1\linewidth}
+\setlength\LTright{0.1\linewidth}\fontsize{12.0pt}{14.4pt}\selectfont
+\setlength{\LTpost}{0mm}
+
+\begin{longtable}{@{\extracolsep{\fill}}lcccc}
+
+\caption{\label{tbl-addfs}\texttt{ADD\_dat} -- First-Stage-Regressionen
+aus Acemoglu, De Feo, und De Luca (2020)}
+
+\tabularnewline
+
+\toprule
+  & Keine Controls & Fasci & Fasci + Mafia & Fasci + Mafia + Geo \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{5}{>{\raggedright\arraybackslash}m{0.8\linewidth}}{Panel A} \\[2.5pt] 
+\midrule\addlinespace[2.5pt]
+Rel. Niederschlag 1893 & -1.003*** & -0.942*** & -0.934*** & -0.782*** \\ 
+ & (0.131) & (0.121) & (0.128) & (0.153) \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{5}{>{\raggedright\arraybackslash}m{0.8\linewidth}}{Panel B (Fixed Effects)} \\[2.5pt] 
+\midrule\addlinespace[2.5pt]
+Rel. Niederschlag 1893 & -0.763*** & -0.814*** & -0.739*** & -0.719** \\ 
+ & (0.139) & (0.159) & (0.166) & (0.210) \\ 
+FE: Provinz & X & X & X & X \\ 
+\bottomrule
+
+\end{longtable}
+
+\begin{minipage}{\linewidth}
++ p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001\\
+Abhängige Variable: Peasants Fasci\\
+Cluster-robuste Standardfehler: Naheste Wetterstation + Distrikt\\
+\end{minipage}
+\endgroup
+
+Die Ergebnisse in Tabelle~\ref{tbl-addfs} bestätigen die Vermutung der
+Autoren, dass der Effekt des relativen Niederschlags auf den
+Organisationsgrad der Bauern ohne Kontrolle für die betrachteten
+Kovariablen tendenziell überschätzt wird. Tatsächlich führt multiple
+Regression mit Fixed Effects und sämtlichen Kovariablen (letzte Spalte
+in Panel B) zu einem etwa 30\% kleineren geschätzten Effekt als für die
+einfache Regression in Panel A.
+
+\subsubsection{Second-Stage-Regressionen}\label{second-stage-regressionen}
+
+Mit
+\texttt{fml\ =\ Mafia1900\ \textasciitilde{}\ 1\ \textbar{}\ peasants\_fasci\ \textasciitilde{}\ sp3m1893\_n30}
+legen wir fest, dass \texttt{Mafia1900} auf eine Konstante sowie die
+angepassten Werte des endogenen Regressors \texttt{peasants\_fasci} aus
+der ersten Stufe (instrumentiert durch \texttt{sp3m1893\_n30})
+regressiert werden soll. Wie für die Regressionen in
+Tabelle~\ref{tbl-addfs} schätzen wir jeweils vier verschiedene
+Spezfikationen, unterscheiden zwischen Modellen mit und ohne
+Provinz-Fixed-Effects und berechnen cluster-robuste Standardfehler.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Second{-}Stage{-}Regression:}
+\CommentTok{\# Keine Kontrollvariablen}
+\CommentTok{\# (1)}
+\NormalTok{fasciIV\_mod }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ Mafia1900 }\SpecialCharTok{\textasciitilde{}} \DecValTok{1} 
+  \CommentTok{\# IV{-}Spezifikation}
+  \SpecialCharTok{|}\NormalTok{ peasants\_fasci }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sp3m1893\_n30,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ distretto1853 }\SpecialCharTok{+}\NormalTok{ cl1\_stn\_sp1893\_n30,}
+  \AttributeTok{data =}\NormalTok{ ADD\_dat}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(fasciIV\_mod, }\AttributeTok{n =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+TSLS estimation - Dep. Var.: Mafia1900
+                  Endo.    : peasants_fasci
+                  Instr.   : sp3m1893_n30
+Second stage: Dep. Var.: Mafia1900
+Observations: 245
+Standard-errors: Clustered (distretto1853 & cl1_stn_sp1893_n30) 
+            Estimate Std. Error t value  Pr(>|t|)    
+(Intercept) 0.692647   0.203977 3.39571 0.0025978 ** 
+... 1 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 1.16456   Adj. R2: -0.027853
+F-test (1st stage), peasants_fasci: stat = 134.7, p < 2.2e-16 , on 1 and 243 DoF.
+                        Wu-Hausman: stat =  35.2, p = 1.013e-8, on 1 and 242 DoF.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Second{-}Stage{-}Regression:}
+\CommentTok{\# + Fasci{-}Determinanten}
+\NormalTok{fasciIV\_mod\_F }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ Mafia1900 }\SpecialCharTok{\textasciitilde{}} 
+  \CommentTok{\# Fasci}
+\NormalTok{  predr\_peas\_fasci}
+  \SpecialCharTok{+}\NormalTok{ ruralcentre1861}
+  \SpecialCharTok{+}\NormalTok{ Rural\_rent}
+  \SpecialCharTok{+}\NormalTok{ Urban\_rent}
+  \SpecialCharTok{+}\NormalTok{ agricola\_rel}
+  \SpecialCharTok{+}\NormalTok{ seminatoritot\_rel}
+  \CommentTok{\# IV{-}Spezifikation}
+  \SpecialCharTok{|}\NormalTok{ peasants\_fasci }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sp3m1893\_n30,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ distretto1853 }\SpecialCharTok{+}\NormalTok{ cl1\_stn\_sp1893\_n30,}
+  \AttributeTok{data =}\NormalTok{ ADD\_dat}
+\NormalTok{) }
+
+\FunctionTok{summary}\NormalTok{(fasciIV\_mod\_F, }\AttributeTok{n =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+TSLS estimation - Dep. Var.: Mafia1900
+                  Endo.    : peasants_fasci
+                  Instr.   : sp3m1893_n30
+Second stage: Dep. Var.: Mafia1900
+Observations: 245
+Standard-errors: Clustered (distretto1853 & cl1_stn_sp1893_n30) 
+             Estimate Std. Error   t value Pr(>|t|) 
+(Intercept) -0.253013    1.03236 -0.245083  0.80866 
+... 7 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 1.14179   Adj. R2: -0.01306
+F-test (1st stage), peasants_fasci: stat = 115.1, p < 2.2e-16 , on 1 and 237 DoF.
+                        Wu-Hausman: stat =  39.0, p = 1.931e-9, on 1 and 236 DoF.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Second{-}Stage{-}Regression:}
+\CommentTok{\# + Fasci{-}Determinanten}
+\CommentTok{\# + Mafia{-}Determinanten}
+\NormalTok{fasciIV\_mod\_FM }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ Mafia1900 }\SpecialCharTok{\textasciitilde{}} 
+    \CommentTok{\# Fasci}
+\NormalTok{    predr\_peas\_fasci}
+  \SpecialCharTok{+}\NormalTok{ ruralcentre1861}
+  \SpecialCharTok{+}\NormalTok{ Rural\_rent}
+  \SpecialCharTok{+}\NormalTok{ Urban\_rent}
+  \SpecialCharTok{+}\NormalTok{ agricola\_rel}
+  \SpecialCharTok{+}\NormalTok{ seminatoritot\_rel}
+    \CommentTok{\# Mafia}
+  \SpecialCharTok{+}\NormalTok{ sulfurproduction1868\_70}
+  \SpecialCharTok{+}\NormalTok{ Citrus\_groves}
+  \SpecialCharTok{+}\NormalTok{ Olives\_groves}
+  \SpecialCharTok{+}\NormalTok{ Vineyards}
+  \SpecialCharTok{+}\NormalTok{ Mafia1885}
+    \CommentTok{\# IV{-}Spezifikation}
+  \SpecialCharTok{|}\NormalTok{ peasants\_fasci }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sp3m1893\_n30,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ distretto1853 }\SpecialCharTok{+}\NormalTok{ cl1\_stn\_sp1893\_n30,}
+  \AttributeTok{data =}\NormalTok{ ADD\_dat}
+\NormalTok{) }
+
+\FunctionTok{summary}\NormalTok{(fasciIV\_mod\_FM, }\AttributeTok{n =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+TSLS estimation - Dep. Var.: Mafia1900
+                  Endo.    : peasants_fasci
+                  Instr.   : sp3m1893_n30
+Second stage: Dep. Var.: Mafia1900
+Observations: 245
+Standard-errors: Clustered (distretto1853 & cl1_stn_sp1893_n30) 
+             Estimate Std. Error   t value Pr(>|t|) 
+(Intercept) -0.272777    1.03221 -0.264266  0.79403 
+... 12 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 1.0177   Adj. R2: 0.177817
+F-test (1st stage), peasants_fasci: stat = 111.6, p < 2.2e-16 , on 1 and 232 DoF.
+                        Wu-Hausman: stat =  30.9, p = 7.381e-8, on 1 and 231 DoF.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Second{-}Stage{-}Regression:}
+\CommentTok{\# + Fasci{-}Determinanten}
+\CommentTok{\# + Mafia{-}Determinanten}
+\CommentTok{\# + Geographie}
+\NormalTok{fasciIV\_mod\_FMG }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ Mafia1900 }\SpecialCharTok{\textasciitilde{}} 
+    \CommentTok{\# Fasci}
+\NormalTok{    predr\_peas\_fasci}
+  \SpecialCharTok{+}\NormalTok{ ruralcentre1861}
+  \SpecialCharTok{+}\NormalTok{ Rural\_rent}
+  \SpecialCharTok{+}\NormalTok{ Urban\_rent}
+  \SpecialCharTok{+}\NormalTok{ agricola\_rel}
+  \SpecialCharTok{+}\NormalTok{ seminatoritot\_rel}
+    \CommentTok{\# Mafia}
+  \SpecialCharTok{+}\NormalTok{ sulfurproduction1868\_70}
+  \SpecialCharTok{+}\NormalTok{ Citrus\_groves}
+  \SpecialCharTok{+}\NormalTok{ Olives\_groves}
+  \SpecialCharTok{+}\NormalTok{ Vineyards}
+  \SpecialCharTok{+}\NormalTok{ Mafia1885}
+    \CommentTok{\# Geographie}
+  \SpecialCharTok{+}\NormalTok{ lnpop1861}
+  \SpecialCharTok{+}\NormalTok{ lnsurface}
+  \SpecialCharTok{+}\NormalTok{ centreheight}
+  \SpecialCharTok{+}\NormalTok{ maxheight}
+  \SpecialCharTok{+}\NormalTok{ slope2}
+  \SpecialCharTok{+}\NormalTok{ pa\_pdist1856}
+  \SpecialCharTok{+}\NormalTok{ port2\_pdist1856}
+  \SpecialCharTok{+}\NormalTok{ roads1799}
+  \SpecialCharTok{+}\NormalTok{ ave\_temp}
+  \SpecialCharTok{+}\NormalTok{ sp3m\_ave\_n30}
+  \SpecialCharTok{+}\NormalTok{ var\_sp3m\_n30}
+   \CommentTok{\# IV{-}Spezifikation}
+  \SpecialCharTok{|}\NormalTok{ peasants\_fasci }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sp3m1893\_n30,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ distretto1853 }\SpecialCharTok{+}\NormalTok{ cl1\_stn\_sp1893\_n30,}
+  \AttributeTok{data =}\NormalTok{ ADD\_dat}
+\NormalTok{) }
+
+\FunctionTok{summary}\NormalTok{(fasciIV\_mod\_FMG, }\AttributeTok{n =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+TSLS estimation - Dep. Var.: Mafia1900
+                  Endo.    : peasants_fasci
+                  Instr.   : sp3m1893_n30
+Second stage: Dep. Var.: Mafia1900
+Observations: 245
+Standard-errors: Clustered (distretto1853 & cl1_stn_sp1893_n30) 
+            Estimate Std. Error  t value Pr(>|t|) 
+(Intercept) 0.614509    2.70956 0.226793  0.82268 
+... 23 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.896696   Adj. R2: 0.329944
+F-test (1st stage), peasants_fasci: stat = 33.4, p = 2.528e-8, on 1 and 221 DoF.
+                        Wu-Hausman: stat = 12.2, p = 5.753e-4, on 1 and 220 DoF.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Second{-}Stage{-}Regression:}
+\CommentTok{\# + Provinz{-}FE}
+\NormalTok{fasciIV\_mod\_FE }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ Mafia1900 }\SpecialCharTok{\textasciitilde{}} \DecValTok{1} 
+  \CommentTok{\# Fixed Effecs}
+  \SpecialCharTok{|}\NormalTok{ provincia1853 }
+  \CommentTok{\# IV{-}Spezifikation}
+  \SpecialCharTok{|}\NormalTok{ peasants\_fasci }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sp3m1893\_n30,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ distretto1853 }\SpecialCharTok{+}\NormalTok{ cl1\_stn\_sp1893\_n30,}
+  \AttributeTok{data =}\NormalTok{ ADD\_dat}
+\NormalTok{) }
+
+\FunctionTok{summary}\NormalTok{(fasciIV\_mod\_FE, }\AttributeTok{n =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+TSLS estimation - Dep. Var.: Mafia1900
+                  Endo.    : peasants_fasci
+                  Instr.   : sp3m1893_n30
+Second stage: Dep. Var.: Mafia1900
+Observations: 245
+Fixed-effects: provincia1853: 7
+Standard-errors: Clustered (distretto1853 & cl1_stn_sp1893_n30) 
+                   Estimate Std. Error t value  Pr(>|t|)    
+fit_peasants_fasci 0.866875   0.243571 3.55902 0.0017565 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.894467     Adj. R2:  0.378283
+                 Within R2: -0.059948
+F-test (1st stage), peasants_fasci: stat = 32.3    , p = 3.836e-8, on 1 and 237 DoF.
+                        Wu-Hausman: stat =  2.46207, p = 0.117965, on 1 and 236 DoF.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Second{-}Stage{-}Regression:}
+\CommentTok{\# + Fasci{-}Determinanten}
+\CommentTok{\# + Provinz{-}FE}
+\NormalTok{fasciIV\_mod\_FE\_F }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ Mafia1900 }\SpecialCharTok{\textasciitilde{}} 
+    \CommentTok{\# Fasci}
+\NormalTok{    predr\_peas\_fasci}
+  \SpecialCharTok{+}\NormalTok{ ruralcentre1861}
+  \SpecialCharTok{+}\NormalTok{ Rural\_rent}
+  \SpecialCharTok{+}\NormalTok{ Urban\_rent}
+  \SpecialCharTok{+}\NormalTok{ agricola\_rel}
+  \SpecialCharTok{+}\NormalTok{ seminatoritot\_rel}
+    \CommentTok{\# Fixed Effects}
+  \SpecialCharTok{|}\NormalTok{ provincia1853}
+    \CommentTok{\# IV{-}Spezifikation}
+  \SpecialCharTok{|}\NormalTok{ peasants\_fasci }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sp3m1893\_n30,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ distretto1853 }\SpecialCharTok{+}\NormalTok{ cl1\_stn\_sp1893\_n30,}
+  \AttributeTok{data =}\NormalTok{ ADD\_dat}
+\NormalTok{) }
+
+\FunctionTok{summary}\NormalTok{(fasciIV\_mod\_FE\_F, }\AttributeTok{n =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+TSLS estimation - Dep. Var.: Mafia1900
+                  Endo.    : peasants_fasci
+                  Instr.   : sp3m1893_n30
+Second stage: Dep. Var.: Mafia1900
+Observations: 245
+Fixed-effects: provincia1853: 7
+Standard-errors: Clustered (distretto1853 & cl1_stn_sp1893_n30) 
+                   Estimate Std. Error t value   Pr(>|t|)    
+fit_peasants_fasci  1.02514   0.256786 3.99219 0.00061474 ***
+... 6 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.878524     Adj. R2:  0.384671
+                 Within R2: -0.0225  
+F-test (1st stage), peasants_fasci: stat = 37.2    , p = 4.42e-9 , on 1 and 231 DoF.
+                        Wu-Hausman: stat =  5.78115, p = 0.016991, on 1 and 230 DoF.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Second{-}Stage{-}Regression:}
+\CommentTok{\# + Fasci{-}Determinanten}
+\CommentTok{\# + Mafia{-}Determinanten}
+\CommentTok{\# + Provinz{-}FE}
+\NormalTok{fasciIV\_mod\_FE\_FM }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ Mafia1900 }\SpecialCharTok{\textasciitilde{}} 
+    \CommentTok{\# Fasci}
+\NormalTok{    predr\_peas\_fasci}
+  \SpecialCharTok{+}\NormalTok{ ruralcentre1861}
+  \SpecialCharTok{+}\NormalTok{ Rural\_rent}
+  \SpecialCharTok{+}\NormalTok{ Urban\_rent}
+  \SpecialCharTok{+}\NormalTok{ agricola\_rel}
+  \SpecialCharTok{+}\NormalTok{ seminatoritot\_rel}
+    \CommentTok{\# Mafia}
+  \SpecialCharTok{+}\NormalTok{ sulfurproduction1868\_70}
+  \SpecialCharTok{+}\NormalTok{ Citrus\_groves}
+  \SpecialCharTok{+}\NormalTok{ Olives\_groves}
+  \SpecialCharTok{+}\NormalTok{ Vineyards}
+  \SpecialCharTok{+}\NormalTok{ Mafia1885}
+    \CommentTok{\# Fixed Effects}
+  \SpecialCharTok{|}\NormalTok{ provincia1853 }
+    \CommentTok{\# IV{-}Spezifikation}
+  \SpecialCharTok{|}\NormalTok{ peasants\_fasci }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sp3m1893\_n30,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ distretto1853 }\SpecialCharTok{+}\NormalTok{ cl1\_stn\_sp1893\_n30,}
+  \AttributeTok{data =}\NormalTok{ ADD\_dat}
+\NormalTok{) }
+
+\FunctionTok{summary}\NormalTok{(fasciIV\_mod\_FE\_FM, }\AttributeTok{n =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+TSLS estimation - Dep. Var.: Mafia1900
+                  Endo.    : peasants_fasci
+                  Instr.   : sp3m1893_n30
+Second stage: Dep. Var.: Mafia1900
+Observations: 245
+Fixed-effects: provincia1853: 7
+Standard-errors: Clustered (distretto1853 & cl1_stn_sp1893_n30) 
+                   Estimate Std. Error t value  Pr(>|t|)    
+fit_peasants_fasci  1.33734     0.4272 3.13047 0.0048655 ** 
+... 11 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.84824     Adj. R2: 0.41367 
+                Within R2: 0.046778
+F-test (1st stage), peasants_fasci: stat = 31.4    , p = 6.07e-8 , on 1 and 226 DoF.
+                        Wu-Hausman: stat =  6.49318, p = 0.011495, on 1 and 225 DoF.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Second{-}Stage{-}Regression:}
+\CommentTok{\# + Fasci{-}Determinanten}
+\CommentTok{\# + Mafia{-}Determinanten}
+\CommentTok{\# + Geographische Faktoren}
+\CommentTok{\# + Provinz{-}FE}
+\NormalTok{fasciIV\_mod\_FE\_FMG }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ Mafia1900 }\SpecialCharTok{\textasciitilde{}} 
+    \CommentTok{\# Fasci}
+\NormalTok{    predr\_peas\_fasci}
+  \SpecialCharTok{+}\NormalTok{ ruralcentre1861}
+  \SpecialCharTok{+}\NormalTok{ Rural\_rent}
+  \SpecialCharTok{+}\NormalTok{ Urban\_rent}
+  \SpecialCharTok{+}\NormalTok{ agricola\_rel}
+  \SpecialCharTok{+}\NormalTok{ seminatoritot\_rel}
+    \CommentTok{\# Mafia}
+  \SpecialCharTok{+}\NormalTok{ sulfurproduction1868\_70}
+  \SpecialCharTok{+}\NormalTok{ Citrus\_groves}
+  \SpecialCharTok{+}\NormalTok{ Olives\_groves}
+  \SpecialCharTok{+}\NormalTok{ Vineyards}
+  \SpecialCharTok{+}\NormalTok{ Mafia1885}
+    \CommentTok{\# Geo}
+  \SpecialCharTok{+}\NormalTok{ lnpop1861}
+  \SpecialCharTok{+}\NormalTok{ lnsurface}
+  \SpecialCharTok{+}\NormalTok{ centreheight}
+  \SpecialCharTok{+}\NormalTok{ maxheight}
+  \SpecialCharTok{+}\NormalTok{ slope2}
+  \SpecialCharTok{+}\NormalTok{ pa\_pdist1856}
+  \SpecialCharTok{+}\NormalTok{ port2\_pdist1856}
+  \SpecialCharTok{+}\NormalTok{ roads1799}
+  \SpecialCharTok{+}\NormalTok{ ave\_temp}
+  \SpecialCharTok{+}\NormalTok{ sp3m\_ave\_n30}
+  \SpecialCharTok{+}\NormalTok{ var\_sp3m\_n30}
+    \CommentTok{\# Fixed Effects}
+  \SpecialCharTok{|}\NormalTok{ provincia1853 }
+    \CommentTok{\# IV{-}Spezifikation}
+  \SpecialCharTok{|}\NormalTok{ peasants\_fasci }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sp3m1893\_n30,}
+  \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ distretto1853 }\SpecialCharTok{+}\NormalTok{ cl1\_stn\_sp1893\_n30,}
+  \AttributeTok{data =}\NormalTok{ ADD\_dat}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(fasciIV\_mod\_FE\_FMG, }\AttributeTok{n =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+TSLS estimation - Dep. Var.: Mafia1900
+                  Endo.    : peasants_fasci
+                  Instr.   : sp3m1893_n30
+Second stage: Dep. Var.: Mafia1900
+Observations: 245
+Fixed-effects: provincia1853: 7
+Standard-errors: Clustered (distretto1853 & cl1_stn_sp1893_n30) 
+                   Estimate Std. Error t value Pr(>|t|)    
+fit_peasants_fasci  1.56343   0.599753  2.6068 0.016101 *  
+... 22 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.857152     Adj. R2: 0.370653
+                 Within R2: 0.026644
+F-test (1st stage), peasants_fasci: stat = 20.8    , p = 8.72e-6 , on 1 and 215 DoF.
+                        Wu-Hausman: stat =  7.05768, p = 0.008487, on 1 and 214 DoF.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Modelle in benannten Listen sammeln}
+\NormalTok{panels }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{(}
+  \StringTok{"Panel A"} \OtherTok{=} \FunctionTok{list}\NormalTok{(}
+    \StringTok{"Keine Controls"} \OtherTok{=}\NormalTok{ fasciIV\_mod,}
+    \StringTok{"Fasci"} \OtherTok{=}\NormalTok{ fasciIV\_mod\_F,}
+    \StringTok{"Fasci + Mafia"} \OtherTok{=}\NormalTok{ fasciIV\_mod\_FM,}
+    \StringTok{"Fasci + Mafia + Geo"} \OtherTok{=}\NormalTok{ fasciIV\_mod\_FMG}
+\NormalTok{  ),}
+  \StringTok{"Panel B (Fixed Effects)"} \OtherTok{=} \FunctionTok{list}\NormalTok{(}
+    \StringTok{"Keine Controls"} \OtherTok{=}\NormalTok{ fasciIV\_mod\_FE,}
+    \StringTok{"Fasci"} \OtherTok{=}\NormalTok{ fasciIV\_mod\_FE\_F,}
+    \StringTok{"Fasci + Mafia"} \OtherTok{=}\NormalTok{ fasciIV\_mod\_FE\_FM,}
+    \StringTok{"Fasci + Mafia + Geo"} \OtherTok{=}\NormalTok{ fasciIV\_mod\_FE\_FMG}
+\NormalTok{  )}
+\NormalTok{)}
+
+\CommentTok{\# Tabellarische Zusammenfassung}
+\FunctionTok{modelsummary}\NormalTok{(}
+  \AttributeTok{models =}\NormalTok{ panels,}
+  \AttributeTok{shape =} \StringTok{"rbind"}\NormalTok{,}
+  \AttributeTok{coef\_omit =} \StringTok{"\^{}(?!(fit}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{\_peasants}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{\_fasci*)$).*"}\NormalTok{,}
+  \AttributeTok{stars =}\NormalTok{ T,}
+  \AttributeTok{gof\_omit =} \StringTok{"\^{}(?!(FE.*)$).*"}\NormalTok{,}
+  \AttributeTok{coef\_map =} \FunctionTok{c}\NormalTok{(}
+    \StringTok{"fit\_peasants\_fasci"} \OtherTok{=} \StringTok{"Fasci"}
+\NormalTok{    ),}
+  \AttributeTok{gof\_map =}\NormalTok{ gm, }
+  \AttributeTok{notes =} \FunctionTok{c}\NormalTok{(}
+    \StringTok{"Abhängige Variable: Mafia{-}Präsenz in 1900"}\NormalTok{, }
+    \StringTok{"Instrument: Rel. Niederschlag 1893"}\NormalTok{, }
+    \StringTok{"Cluster{-}robuste Standardfehler: Naheste Wetterstation + Distrikt"}
+\NormalTok{  ),}
+  \AttributeTok{output =} \StringTok{"gt"}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{tabopts}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begingroup
+\setlength\LTleft{0.1\linewidth}
+\setlength\LTright{0.1\linewidth}\fontsize{12.0pt}{14.4pt}\selectfont
+\setlength{\LTpost}{0mm}
+
+\begin{longtable}{@{\extracolsep{\fill}}lcccc}
+
+\caption{\label{tbl-addss}\texttt{ADD\_dat} -- Second-Stage-Regressionen
+aus Acemoglu, De Feo, und De Luca (2020)}
+
+\tabularnewline
+
+\toprule
+  & Keine Controls & Fasci & Fasci + Mafia & Fasci + Mafia + Geo \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{5}{>{\raggedright\arraybackslash}m{0.8\linewidth}}{Panel A} \\[2.5pt] 
+\midrule\addlinespace[2.5pt]
+Fasci & 2.051*** & 2.096*** & 1.958*** & 1.688** \\ 
+ & (0.383) & (0.371) & (0.332) & (0.532) \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{5}{>{\raggedright\arraybackslash}m{0.8\linewidth}}{Panel B (Fixed Effects)} \\[2.5pt] 
+\midrule\addlinespace[2.5pt]
+Fasci & 0.867** & 1.025*** & 1.337** & 1.563* \\ 
+ & (0.244) & (0.257) & (0.427) & (0.600) \\ 
+FE: Provinz & X & X & X & X \\ 
+\bottomrule
+
+\end{longtable}
+
+\begin{minipage}{\linewidth}
++ p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001\\
+Abhängige Variable: Mafia-Präsenz in 1900\\
+Instrument: Rel. Niederschlag 1893\\
+Cluster-robuste Standardfehler: Naheste Wetterstation + Distrikt\\
+\end{minipage}
+\endgroup
+
+Die Ergebnisse für die IV-Schätzung des kausalen Effekts von
+Bauernorganisationen auf die Präsenz der Mafia zu Beginn des 20.
+Jahrhundert sind in Tabelle~\ref{tbl-addss} dargestellt. Die
+LATE-Schätzung in Spalte 4 von Panel B hat folgende Interpretation: Die
+Präsenz der Fasci in einer Gemeinde erhöht die Intensität der
+Mafia-Aktivität um etwa 1.56 Punkte.\footnote{Nach Cutrera (1900)
+  entspricht eine Erhöhung des Mafia-Index von 1 auf 2 einem Sprung von
+  einer geringen Präsenz der Mafia zu einer signifikanten Präsenz.}
+
+Wie ist dieser Effekt einzuordnen? Wir berechnen zunächst die
+\emph{Anzahl} an Gemeinden, in denen es im Jahr 1900 Fasci gibt.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Anz. Gemeinden mit Fasci im Jahr 1900}
+\NormalTok{ADD\_dat }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{drop\_na}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(}
+\NormalTok{    peasants\_fasci }\SpecialCharTok{==} \DecValTok{1}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{count}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+# A tibble: 1 x 1
+      n
+  <int>
+1    84
+\end{verbatim}
+
+Für diese 84 Gemeinden erwarten wir jeweils einen Effekt von 1.56
+Punkten auf die im Jahr 1900 beobachtete \emph{gesamte} Intensität des
+Einflusses der Mafia in Sizilien, gemessen als gewichtete Summe.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Beitrag der Gemeinden mit Fasci im Jahr 1900}
+\DecValTok{84} \SpecialCharTok{*} \FloatTok{1.56}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] 131.04
+\end{verbatim}
+
+Die gesamte Mafia-Intensität für Sizilien zu Beginn des 20. Jahrhunderts
+berechnen wir analog.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Mafia{-}Intensität in Sizilien im Jahr 1900}
+\NormalTok{ADD\_dat }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{drop\_na}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{count}\NormalTok{(Mafia1900) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Beitrag =}\NormalTok{ Mafia1900 }\SpecialCharTok{*}\NormalTok{ n) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}
+\NormalTok{     Intensität }\OtherTok{=} \FunctionTok{sum}\NormalTok{(Beitrag)}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+# A tibble: 1 x 1
+  Intensität
+       <dbl>
+1        342
+\end{verbatim}
+
+Der Anteil der Gemeinden mit Bauernorganisationen im Jahr 1900 an dieser
+Summe erlaubt eine Einordnung des Effekts der Fasci auf die Verbreitung
+der Mafia.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Anteil des geschätzten Effekts}
+\DecValTok{84} \SpecialCharTok{*} \FloatTok{1.56} \SpecialCharTok{/} \DecValTok{342}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] 0.3831579
+\end{verbatim}
+
+Die Interpretation lautet, dass bis zu 38\% der Stärke der Mafia im Jahr
+1900 in Sizilien auf ihren Einsatz gegen die Fasci zurückzuführen sein
+könnte.
 
 \section{Case Study: Ökonomische Schocks und
 Bürgerkriege}\label{case-study-uxf6konomische-schocks-und-buxfcrgerkriege}
@@ -6810,7 +8238,7 @@ Wirtschaftslage}
 In der ``Konfliktgleichung''
 
 \begin{align}
-  \text{Konflikt-Wsk.} = \beta_0 + \beta_1\, \Delta\text{BIP} + \text{Kontrollv.} + \epsilon\label{eq:rainconf1}
+  \textup{Konflikt-Wsk.} = \beta_0 + \beta_1\, \Delta\text{BIP} + \text{Kontrollv.} + \epsilon\label{eq:rainconf1}
 \end{align}
 
 liegt dann Endogenität des Regressors für ``wirtschaftliche
@@ -6913,7 +8341,11 @@ $ tot_100_g  <dbl> 0.3326812088, -0.0604966730, 0.0235692672, 0.6656700373, -0~
 $ year       <dbl> 1981, 1982, 1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990,~
 \end{verbatim}
 
-\begin{longtable}{ll}
+\begingroup
+\setlength\LTleft{0.1\linewidth}
+\setlength\LTright{0.1\linewidth}\fontsize{12.0pt}{14.4pt}\selectfont
+
+\begin{longtable}{@{\extracolsep{\fill}}ll}
 
 \caption{\label{tbl-rainconfdata}\texttt{rainconflict} --
 Polit-ökonomische Charakteristika afrikanischer Länder v. 1981 bis 1999}
@@ -6945,6 +8377,8 @@ year & Jahr der Beobachtung \\
 \bottomrule
 
 \end{longtable}
+
+\endgroup
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -7194,15 +8628,19 @@ RMSE: 0.059582     Adj. R2: 0.052542
 \NormalTok{  ),}
   \AttributeTok{stars =}\NormalTok{ T, }
   \AttributeTok{coef\_omit =} \StringTok{"\^{}year.*$"}\NormalTok{,}
-  \AttributeTok{gof\_omit =} \StringTok{"\^{}(?!(R2|Num.Obs.|FE.*)$).*"}\NormalTok{, }
+  \AttributeTok{gof\_omit =} \StringTok{"\^{}(?!(R2|Num.Obs.|FE.*)$).*"}\NormalTok{,}
   \AttributeTok{output =} \StringTok{"gt"}
-\NormalTok{)}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{tabopts}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
 
+\begingroup
+\setlength\LTleft{0.1\linewidth}
+\setlength\LTright{0.1\linewidth}\fontsize{12.0pt}{14.4pt}\selectfont
 \setlength{\LTpost}{0mm}
 
-\begin{longtable}{lccccc}
+\begin{longtable}{@{\extracolsep{\fill}}lccccc}
 
 \caption{\label{tbl-blablabla}First-Stage-Regressionen für
 \texttt{gdp\_g}}
@@ -7235,7 +8673,7 @@ lpopl1 &  & -0.104 &  &  &  \\
 GPCP\_g\_fl &  &  &  & 0.001 &  \\ 
  &  &  &  & (0.019) &  \\ 
 tot\_100\_g &  &  &  &  & -0.002 \\ 
- &  &  &  &  & (0.022) \\ 
+{} & {} & {} & {} & {} & {(0.022)} \\ 
 Num.Obs. & 743 & 743 & 743 & 743 & 661 \\ 
 R2 & 0.024 & 0.079 & 0.133 & 0.133 & 0.162 \\ 
 FE: ccode &  &  & X & X & X \\ 
@@ -7246,6 +8684,7 @@ FE: ccode &  &  & X & X & X \\
 \begin{minipage}{\linewidth}
 + p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001\\
 \end{minipage}
+\endgroup
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -7294,7 +8733,7 @@ FE: ccode &  &  & X & X & X \\
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IV_files/figure-pdf/unnamed-chunk-22-1.pdf}
+\includegraphics{IV_files/figure-pdf/unnamed-chunk-52-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -7393,7 +8832,7 @@ RMSE: 0.204541     Adj. R2: 0.661198
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IV_files/figure-pdf/unnamed-chunk-26-1.pdf}
+\includegraphics{IV_files/figure-pdf/unnamed-chunk-56-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -7987,7 +9426,7 @@ globalen ATT zusammengefasst werden können.\footnote{Die Methoden von
   Callaway und Sant'Anna (2021) sind im R-Paket \texttt{did}
   implementiert.}
 
-\begin{tcolorbox}[enhanced jigsaw, opacityback=0, rightrule=.15mm, breakable, bottomtitle=1mm, colbacktitle=quarto-callout-note-color!10!white, arc=.35mm, toptitle=1mm, titlerule=0mm, left=2mm, bottomrule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, toprule=.15mm, colback=white, coltitle=black, leftrule=.75mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum einfachen DID-Schätzer}]
+\begin{tcolorbox}[enhanced jigsaw, breakable, colbacktitle=quarto-callout-note-color!10!white, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum einfachen DID-Schätzer}, opacityback=0, coltitle=black, colback=white, arc=.35mm, titlerule=0mm, bottomtitle=1mm, leftrule=.75mm, toptitle=1mm, bottomrule=.15mm, left=2mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame]
 
 \begin{itemize}
 \item
@@ -8458,6 +9897,9 @@ Wir lesen den Datensatz zunächst ein.
 Eine Übersicht des Datensatzes \texttt{eitc\_data} ist in
 Tabelle~\ref{tbl-EITCdata} dargestellt.
 
+\begingroup
+\fontsize{12.0pt}{14.4pt}\selectfont
+
 \begin{longtable}{ll}
 
 \caption{\label{tbl-EITCdata}Sozi-ökomonische Variablen zu US-Familien
@@ -8482,6 +9924,8 @@ unearn & = Haushaltseinkommen - Einkommen der Frau (Tsd. US-\$)  \\
 \bottomrule
 
 \end{longtable}
+
+\endgroup
 
 Wir erweitern das \texttt{tibble}-Objekt zunächst um eine Dummy-Variable
 für Mütter (\texttt{anykids}), sowie spezifischere Dummies für Frauen
@@ -10015,6 +11459,8 @@ Expression} aus.\footnote{Der Ausdruck
 \end{Highlighting}
 \end{Shaded}
 
+\begingroup
+\fontsize{12.0pt}{14.4pt}\selectfont
 \setlength{\LTpost}{0mm}
 
 \begin{longtable}{lccccc}
@@ -10044,6 +11490,7 @@ FE: monat & X & X & X & X &  \\
 \begin{minipage}{\linewidth}
 + p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001\\
 \end{minipage}
+\endgroup
 
 Tabelle~\ref{tbl-ditella3} präsentiert die Ergebnisse. Der Koeffizient
 von \texttt{same} ist jeweils in den Regressionen (3A), (3B) und (3C)
@@ -10265,6 +11712,8 @@ RMSE: 0.182841     Adj. R2: 0.09205
 \end{Highlighting}
 \end{Shaded}
 
+\begingroup
+\fontsize{12.0pt}{14.4pt}\selectfont
 \setlength{\LTpost}{0mm}
 
 \begin{longtable}{lccc}
@@ -10295,6 +11744,7 @@ FE: monat & X & X & X \\
 + p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001\\
 Fiktive Interventionen: (4A) Ende April. (4B): Ende Mai. (4C): Ende Juni.\\
 \end{minipage}
+\endgroup
 
 Die Ergebnisse in Tabelle~\ref{tbl-placebopp} stützen die kausale
 Interpretation der Regressionen in Tabelle~\ref{tbl-ditella3}: Für
@@ -10631,6 +12081,8 @@ Log-Likelihood: -1,902.7   Adj. Pseudo R2: -0.193316
 \end{Highlighting}
 \end{Shaded}
 
+\begingroup
+\fontsize{12.0pt}{14.4pt}\selectfont
 \setlength{\LTpost}{0mm}
 
 \begin{longtable}{lcccccc}
@@ -10661,6 +12113,7 @@ FE: mbc &  &  &  & X &  &  \\
 \begin{minipage}{\linewidth}
 + p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001\\
 \end{minipage}
+\endgroup
 
 Anhand von Tabelle~\ref{tbl-pprobust} finden wir weitere Evidenz für die
 Robustheit der DID-Schätzung (T3C) in Tabelle~\ref{tbl-ditella3}:
@@ -10707,6 +12160,606 @@ eine robuste Methode zur Schätzung kausaler Effekte, insbesondere wenn
 randomisierte Experimente nicht durchführbar sind. Durch den Vergleich
 von Zeitverläufen in Behandlungs- und Kontrollgruppen unter der Annahme
 paralleler Trends können wir verlässliche Schätzungen des ATT gewinnen.
+
+\bookmarksetup{startatroot}
+
+\chapter{Event Studies}\label{event-studies}
+
+\section{Case Study: Abschreckungseffekte durch
+Strafgesetzgebung}\label{case-study-abschreckungseffekte-durch-strafgesetzgebung}
+
+David S. Abrams (2012a) untersucht den Abschreckungseffekt drohender
+Inhaftierung für Straftaten anhand von Daten zu verschärfter
+Strafgesetzgebung (``Add-on laws'') in den USA. Solche Gesetze erhöhen
+in der Regel die Strafen für Delikte, insbesondere wenn nachweißlich
+Schusswaffen verwendet werden. Die Studie nutzt eine
+Event-Study-Methodik, um die Auswirkungen dieser Gesetzesänderung auf
+die Kriminalitätsraten für verschiedene Straftaten zu analysieren. Dabei
+wird der Zeitpunkt der tatsächlichen Gesetzeseinführung in verschiedenen
+US-Bundesstaaten herangezogen, um den kausalen Abschreckungseffekt einer
+drohenden Gefängnisstrafe anhand von Statistiken in den unmittelbaren
+Folgeperioden zu isolieren.
+
+\subsection{Identifikationsstrategie}\label{identifikationsstrategie-1}
+
+Der Fokus des Forschungsdesigns liegt auf der Unterscheidung zwischen
+zwei wesentlichen Wirkungskanälen von verschärften Strafgesetzen auf die
+Kriminalitätsrate:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Abschreckungseffekt}: Die Aussicht auf eine längere
+  Inhaftierung erzielt einen Abschreckungseffekt, der sich `positiv' auf
+  die Kriminalitätsrate auswirkt (im Sinne einer verringerten
+  Kriminalität). Dies ist der vermutete (kausale) Effekt.
+\item
+  \textbf{Inhaftierungseffekt}: Inhaftierte Individuen können keine
+  Straftaten begehen und verringern daher die Kriminalitätsrate. Dieser
+  Effekt ist insbesondere für Straftaten mit großer Rückfälligkeit
+  plausibel (etwa Beschaffungskriminalität). Für längere Haftstrafen
+  erwarten wir daher einen Rückgang dieser Kriminalitätsraten nach der
+  Verschärfung der Gesetze.
+\end{enumerate}
+
+Der in 2. beschriebene Effekt der Gesetzesverschärfung kann sich erst
+\emph{nach} der im Rahmen der alten Gesetzgebung verhängten
+durchschnitlichen Mindesthaftstrafe einstellen: Der verringernde Effekt
+auf die Kriminalitätsrate zeigt sich erst in den Daten, nachdem
+Straftäter länger als gemäß der alten Gesetzgebung üblich inhaftiert
+sind. Rückgänge der Kriminalitätrate die in diesem Zeitraum unmittelbar
+nach der Gesetztesverschärfung gemessen werden, können also auf den
+Abschreckungseffekt zurückgeführt werden.
+
+\subsection{Replikation mit R}\label{replikation-mit-r}
+
+Der Datensatz \texttt{Abrams2012.dta} ist ein Auszug der Daten aus dem
+Replikationspaket David S. Abrams (2012b){]} zu, welches
+\href{https://www.openicpsr.org/openicpsr/project/113838/version/V1/view}{hier}
+eingesehen werden kann. Die Daten liegen im STATA-Format \texttt{.dta}
+und können mit \texttt{haven::read\_dta()} eingelesen werden.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(haven)}
+\FunctionTok{library}\NormalTok{(dplyr)}
+
+\CommentTok{\# Datensatz einlesen}
+\NormalTok{abrams }\OtherTok{\textless{}{-}} \FunctionTok{read\_dta}\NormalTok{(}\AttributeTok{file =} \StringTok{"datasets/Abrams2012.dta"}\NormalTok{)}
+
+\CommentTok{\# Überblick}
+\FunctionTok{glimpse}\NormalTok{(abrams)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Rows: 19,760
+Columns: 21
+$ pcralloffense  <dbl> 5311.245, 6034.215, 5539.623, 6560.377, 7993.297, 8707.~
+$ pcrrobgun      <dbl> 42.16867, 38.79277, 39.62264, 71.69811, 73.31378, 120.7~
+$ lnpcrrobgun    <dbl> 3.741678, 3.658234, 3.679401, 4.272464, 4.294749, 4.793~
+$ FSTATE         <dbl+lbl> 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, ~
+$ year           <dbl> 1965, 1966, 1967, 1968, 1969, 1970, 1971, 1972, 1973, 1~
+$ ymm            <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1~
+$ relyr          <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,~
+$ everaddon      <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0~
+$ yaddon         <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,~
+$ twoyears_add   <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0~
+$ threeyears_add <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0~
+$ dcpoverty      <dbl> NA, NA, NA, NA, NA, 11.6, 10.5, 9.5, 8.6, 7.7, 6.7, 7.7~
+$ dcunemp        <dbl> NA, NA, NA, NA, NA, 10.3, 10.5, 10.5, 10.8, 10.0, 8.6, ~
+$ dcblack_per    <dbl> NA, NA, NA, NA, NA, 2.924476, 2.970040, 3.032215, 3.120~
+$ dcp15t17       <dbl> NA, NA, NA, NA, NA, 6.571856, 6.003273, 6.125687, 6.301~
+$ dcp18t24       <dbl> NA, NA, NA, NA, NA, 13.80090, 14.53424, 13.78279, 14.10~
+$ dcp25t34       <dbl> NA, NA, NA, NA, NA, 15.11527, 16.74597, 17.45821, 18.00~
+$ dcpolice_per1  <dbl> NA, NA, NA, NA, NA, 93.91892, 103.83533, 108.05892, 106~
+$ dcprison_per1  <dbl> NA, NA, NA, NA, NA, 71.62162, 65.71857, 60.34869, 56.05~
+$ post74         <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1~
+$ statepop       <dbl> 49800, 51556, 53000, 53000, 47740, 48029, 49750, 54714,~
+\end{verbatim}
+
+Eine Erläuterung der verfügbaren (ausschließlich numerischen) Variablen
+erfolgt in Tabelle~\ref{tbl-abrams2012vars}.
+
+\begingroup
+\setlength\LTleft{0.1\linewidth}
+\setlength\LTright{0.1\linewidth}\fontsize{12.0pt}{14.4pt}\selectfont
+
+\begin{longtable}{@{\extracolsep{\fill}}ll}
+
+\caption{\label{tbl-abrams2012vars}\texttt{Abrams2012.dta} --
+Kriminalität in US-Bundesstaaten.}
+
+\tabularnewline
+
+\toprule
+Variable & Beschreibung \\ 
+\midrule\addlinespace[2.5pt]
+pcralloffense & Pro-Kopf-Kriminalitätsrate \\ 
+pcrrobgun & Pro-Kopf-Rate Raubüberfälle mit Schusswaffen \\ 
+lnpcrrobgun & Log Pro-Kopf-Rate Raubüberfälle mit Schusswaffen \\ 
+FSTATE & Bundesstaat \\ 
+year & Jahr \\ 
+ymm & Gesetzliche Mindeststrafe in Kraft \\ 
+relyr & Perioden rel. zur Einführung von Add-On-Law \\ 
+everaddon & Dummy: Jemals Add-on-Law? \\ 
+yaddon & Dummy: 1 Jahr nach Einführung Add-On-Law \\ 
+twoyears\_add & Dummy: 2 Jahre nach Einführung Add-On-Law \\ 
+threeyears\_add & Dummy: 3 Jahre nach Einführung Add-On-Law \\ 
+dcpoverty & Armutsquote \\ 
+dcunemp & Arbeitlosenquote \\ 
+dcblack\_per & Bevölkerungsstruktur \\ 
+dcp15t17 & Anteil 15 bis 17 Jährige \\ 
+dcp18t24 & Anteil 18 bis 24 Jährige \\ 
+dcp25t34 & Anteil 25 bis 34 Jährige \\ 
+dcpolice\_per1 & Anteil Polizeikräfte an Bevölkerung \\ 
+dcprison\_per1 & Anteil Inhaftierte an der Bevölkerung \\ 
+post74 & Dummy: Beobachtung nach 1974 \\ 
+statepop & Bevölkerung \\ 
+\bottomrule
+
+\end{longtable}
+
+\endgroup
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(tidyr)}
+
+\CommentTok{\# Populationsgewichtete Trends berechnen}
+\NormalTok{plot\_dat }\OtherTok{\textless{}{-}}\NormalTok{ abrams }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{select}\NormalTok{(}
+\NormalTok{    year, }
+\NormalTok{    everaddon, }
+\NormalTok{    pcralloffense, }
+\NormalTok{    pcrrobgun, }
+\NormalTok{    statepop}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{pcrrobgun =}\NormalTok{ pcrrobgun }\SpecialCharTok{*} \FloatTok{33.3}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{rename}\NormalTok{(}
+    \AttributeTok{Schusswaffen =}\NormalTok{ pcrrobgun, }
+    \AttributeTok{Gesamt =}\NormalTok{ pcralloffense,}
+    \AttributeTok{AddOnGesetze =}\NormalTok{ everaddon}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{pivot\_longer}\NormalTok{(}
+    \AttributeTok{cols =}\NormalTok{ Schusswaffen}\SpecialCharTok{:}\NormalTok{Gesamt, }
+    \AttributeTok{names\_to =} \StringTok{"Verbrechen"}\NormalTok{, }
+    \AttributeTok{values\_to =} \StringTok{"Wert"}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(year, AddOnGesetze, Verbrechen) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{AddOnGesetze =} \FunctionTok{as.factor}\NormalTok{(AddOnGesetze),}
+\NormalTok{    ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{Wert =} \FunctionTok{weighted.mean}\NormalTok{(}
+\NormalTok{      Wert, }
+      \AttributeTok{w =}\NormalTok{ statepop, }
+      \AttributeTok{na.rm =}\NormalTok{ T}
+\NormalTok{    )}
+\NormalTok{  ) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(cowplot)}
+
+\CommentTok{\# Trendverlauf plotten}
+\FunctionTok{ggplot}\NormalTok{(}
+  \AttributeTok{data =}\NormalTok{ plot\_dat,}
+  \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}
+    \AttributeTok{x =}\NormalTok{ year, }
+    \AttributeTok{y =}\NormalTok{ Wert, }
+    \AttributeTok{color =}\NormalTok{ Verbrechen, }
+    \AttributeTok{lty =}\NormalTok{ AddOnGesetze}
+\NormalTok{  )}
+\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}
+    \AttributeTok{name =} \StringTok{"Gesamte Anzeigen / 100k Einw."}\NormalTok{,}
+    \AttributeTok{sec.axis =} \FunctionTok{sec\_axis}\NormalTok{(}
+      \AttributeTok{transform =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ . }\SpecialCharTok{/} \FloatTok{33.3}\NormalTok{, }
+      \AttributeTok{name =} \StringTok{"Raubüberfälle Schusswaffen / 100k Einw."}
+\NormalTok{    )}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_cowplot}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}
+    \AttributeTok{legend.position =} \StringTok{"bottom"}\NormalTok{, }
+    \AttributeTok{axis.title.y.left =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{color =} \StringTok{"\#F8766D"}\NormalTok{),}
+    \AttributeTok{axis.title.y.right =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{color =} \StringTok{"\#00BFC4"}\NormalTok{)}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics{EventStudies_files/figure-pdf/fig-abramstrends-1.pdf}
+
+}
+
+\caption{\label{fig-abramstrends}Populations-gewichtete mittlere
+Pro-Kopf-Kriminalitätsraten für US-Bundesstaaten}
+
+\end{figure}%
+
+Abbildung~\ref{fig-abramstrends} zeigt einen starken Anstieg der
+Kriminalität in den 1960er und 1970er Jahren, insbesondere für
+Rabüberfälle mit Schusswaffen. Weiterhin sind die Trends in Staaten mit
+und ohne Zusatzstrafen deutlich korreliert. Die Entwicklung der
+Pro-Kopf-Kriminalität insgesamt schwächt sich nachfolgend ab und folgt
+ab den 1990er Jahren einem rückläufigen Trend. Es ist auffällig, dass
+sowohl die bewaffneten Raubüberfälle als auch die allgemeine
+Kriminalität zu Beginn des Beobachtungszeitraums für Staaten mit
+Add-on-Gesetzen höher sind, sich dies aber im letzten Jahrzehnt
+ebenfalls umkehrt. Wie in David S. Abrams (2012a) erläutert, könnte dies
+sowohl auf verschäfte Gesetze als auch auf Variation zwischen den
+Bundesstaaten zurückzuführen sein. Statistische Verfahren sollten
+zwischen diesen Möglichkeiten unterscheiden können (bspw. durch Fixed
+Effects und spezifische Zeit-Trends).
+
+\subsubsection{Basis-Spezifikation}\label{basis-spezifikation}
+
+Wir folgen David S. Abrams (2012a) und schätzen zunächst mehrere
+Basis-Spezifikationen für eine balancierte Teilstichprobe aus
+\texttt{abrams}. Das Regressionsmodell ist \begin{align}
+  \log\textup{Rob}_{at} = \beta \textup{AddOn}^i_{st} + \lambda_s + \gamma_t + x_{st} + \epsilon_{at},
+\end{align} wobei \(\log\textup{Rob}_{at}\) die logarithmierte
+Pro-Kopf-Rate für Überfälle mit Schusswaffe (\texttt{lnpcrrobgun}).
+\(\textup{AddOn}^i_{st}\) ist eine Dummy-Variable die 1 ist für
+Beobachtungen des Bundesstaats \(s\) in Jahr \(t\), wenn die Einführung
+des Add-On-Gesetzes \(i\) Jahre zurückliegt. \(\lambda_s\) und
+\(\gamma_t\) sind Fixed Effects für Bundesstaaten und Perioden.
+\(x_{st}\) repräsentiert alle Kontrollvariablen auf Bundesstaatenebene.
+Hierbei werden stets sämtliche Variablen mit einer Bezeichnung beginnend
+mit \texttt{dc} berücksichtigt, vgl. Tabelle~\ref{tbl-abrams2012vars}.
+
+Für die komfortable Schätzung von Fixed Effects und die Berechnung
+cluster-robusten Standardfehlern verwenden wir \texttt{fixest::feols()},
+siehe Kapitel~\ref{sec-paneldata} für Details zur Schätzung von
+Panel-Daten-Modellen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(fixest)}
+
+\CommentTok{\# Basis{-}Spezifikation}
+\CommentTok{\# Table 3 (3)}
+\NormalTok{mod\_basis }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ lnpcrrobgun }\SpecialCharTok{\textasciitilde{}}
+   \CommentTok{\# Effekt 1 Jahr nach Add{-}on law              }
+\NormalTok{   yaddon}
+   \CommentTok{\# Ges. Mindeststrafe?}
+   \SpecialCharTok{+}\NormalTok{ ymm}
+   \CommentTok{\# Kontrollvariablen}
+   \SpecialCharTok{+}\NormalTok{ dcpoverty}
+   \SpecialCharTok{+}\NormalTok{ dcunemp}
+   \SpecialCharTok{+}\NormalTok{ dcblack\_per}
+   \SpecialCharTok{+}\NormalTok{ dcp15t17}
+   \SpecialCharTok{+}\NormalTok{ dcp18t24 }
+   \SpecialCharTok{+}\NormalTok{ dcp25t34}
+   \SpecialCharTok{+}\NormalTok{ dcpolice\_per1}
+   \SpecialCharTok{+}\NormalTok{ dcprison\_per1}
+   \CommentTok{\# Fixed Effects}
+   \SpecialCharTok{|}\NormalTok{ FSTATE }\SpecialCharTok{+}\NormalTok{ year,}
+   \AttributeTok{data =}\NormalTok{ abrams }\SpecialCharTok{\%\textgreater{}\%} 
+     \FunctionTok{filter}\NormalTok{(relyr }\SpecialCharTok{\textgreater{}=} \SpecialCharTok{{-}}\DecValTok{7} \SpecialCharTok{\&}\NormalTok{ relyr }\SpecialCharTok{\textless{}=} \DecValTok{6}\NormalTok{), }
+   \AttributeTok{weights =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ statepop,}
+   \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ FSTATE}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(mod\_basis)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: lnpcrrobgun
+Observations: 2,975
+Weights: statepop
+Fixed-effects: FSTATE: 24,  year: 30
+Standard-errors: Clustered (FSTATE) 
+               Estimate Std. Error   t value  Pr(>|t|)    
+yaddon        -0.047700   0.030857 -1.545837 0.1357937    
+ymm           -0.119297   0.098727 -1.208357 0.2391873    
+dcpoverty     -0.038550   0.032352 -1.191557 0.2455858    
+dcunemp       -0.031828   0.018550 -1.715780 0.0996445 .  
+dcblack_per   -0.286705   0.080383 -3.566730 0.0016382 ** 
+dcp15t17       0.117641   0.180309  0.652440 0.5205854    
+dcp18t24      -0.132965   0.088240 -1.506851 0.1454617    
+dcp25t34       0.104971   0.091479  1.147480 0.2629797    
+dcpolice_per1 -0.003242   0.001738 -1.865732 0.0748846 .  
+dcprison_per1 -0.000759   0.001088 -0.697450 0.4925122    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 480.2     Adj. R2: 0.164734
+              Within R2: 0.014269
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# (4)}
+\CommentTok{\# + state{-}specific time trends}
+\NormalTok{mod\_trends }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}\AttributeTok{fml =}\NormalTok{ lnpcrrobgun }\SpecialCharTok{\textasciitilde{}}
+        \CommentTok{\# Effekt 1 Jahr nach Add{-}on law              }
+\NormalTok{        yaddon}
+        \CommentTok{\# Ges. Mindeststrafe?}
+      \SpecialCharTok{+}\NormalTok{ ymm}
+        \CommentTok{\# Kontrollvariablen}
+      \SpecialCharTok{+}\NormalTok{ dcpoverty}
+      \SpecialCharTok{+}\NormalTok{ dcunemp}
+      \SpecialCharTok{+}\NormalTok{ dcblack\_per}
+      \SpecialCharTok{+}\NormalTok{ dcp15t17}
+      \SpecialCharTok{+}\NormalTok{ dcp18t24 }
+      \SpecialCharTok{+}\NormalTok{ dcp25t34}
+      \SpecialCharTok{+}\NormalTok{ dcpolice\_per1}
+      \SpecialCharTok{+}\NormalTok{ dcprison\_per1}
+      \CommentTok{\# Trends: Bundesstaat}
+      \SpecialCharTok{+}\NormalTok{ FSTATE}\SpecialCharTok{:}\NormalTok{year}
+      \CommentTok{\# Fixed Effects}
+      \SpecialCharTok{|}\NormalTok{ FSTATE }\SpecialCharTok{+}\NormalTok{ year,}
+      \AttributeTok{data =}\NormalTok{ abrams }\SpecialCharTok{\%\textgreater{}\%} 
+        \FunctionTok{filter}\NormalTok{(relyr }\SpecialCharTok{\textgreater{}=} \SpecialCharTok{{-}}\DecValTok{7} \SpecialCharTok{\&}\NormalTok{ relyr }\SpecialCharTok{\textless{}=} \DecValTok{6}\NormalTok{), }
+      \AttributeTok{weights =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ statepop,}
+      \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ FSTATE}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(mod\_trends)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: lnpcrrobgun
+Observations: 2,975
+Weights: statepop
+Fixed-effects: FSTATE: 24,  year: 30
+Standard-errors: Clustered (FSTATE) 
+               Estimate Std. Error   t value   Pr(>|t|)    
+yaddon        -0.056318   0.027889 -2.019346 0.05525316 .  
+ymm           -0.124815   0.098098 -1.272352 0.21596140    
+dcpoverty     -0.027195   0.025217 -1.078427 0.29202391    
+dcunemp       -0.033766   0.015947 -2.117371 0.04525337 *  
+dcblack_per   -0.316316   0.079576 -3.975012 0.00059854 ***
+dcp15t17       0.141592   0.172457  0.821031 0.42005746    
+dcp18t24      -0.110749   0.085236 -1.299325 0.20670663    
+dcp25t34       0.133817   0.085029  1.573780 0.12919472    
+dcpolice_per1 -0.003116   0.001674 -1.861080 0.07556395 .  
+dcprison_per1 -0.000017   0.001076 -0.016102 0.98729199    
+FSTATE:year    0.000812   0.000640  1.268967 0.21714516    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 480.0     Adj. R2: 0.164996
+              Within R2: 0.014916
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# (8)}
+\CommentTok{\# Post 1974}
+\CommentTok{\# + state{-}specific time trends}
+\NormalTok{mod\_trends\_post }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ lnpcrrobgun }\SpecialCharTok{\textasciitilde{}}
+        \CommentTok{\# Effekt 1 Jahr nach Add{-}on law}
+\NormalTok{        yaddon}
+        \CommentTok{\# Ges. Mindeststrafe?}
+      \SpecialCharTok{+}\NormalTok{ ymm}
+        \CommentTok{\# Kontrollvariablen}
+      \SpecialCharTok{+}\NormalTok{ dcpoverty}
+      \SpecialCharTok{+}\NormalTok{ dcunemp}
+      \SpecialCharTok{+}\NormalTok{ dcblack\_per}
+      \SpecialCharTok{+}\NormalTok{ dcp15t17}
+      \SpecialCharTok{+}\NormalTok{ dcp18t24 }
+      \SpecialCharTok{+}\NormalTok{ dcp25t34}
+      \SpecialCharTok{+}\NormalTok{ dcpolice\_per1}
+      \SpecialCharTok{+}\NormalTok{ dcprison\_per1}
+      \CommentTok{\# Trends: Bundesstaat}
+      \SpecialCharTok{+}\NormalTok{ FSTATE}\SpecialCharTok{:}\NormalTok{year}
+      \CommentTok{\# Fixed Effects}
+      \SpecialCharTok{|}\NormalTok{ FSTATE }\SpecialCharTok{+}\NormalTok{ year,}
+      \AttributeTok{data =}\NormalTok{ abrams }\SpecialCharTok{\%\textgreater{}\%} 
+        \FunctionTok{filter}\NormalTok{(}
+\NormalTok{          relyr }\SpecialCharTok{\textgreater{}=} \SpecialCharTok{{-}}\DecValTok{7} \SpecialCharTok{\&}\NormalTok{ relyr }\SpecialCharTok{\textless{}=} \DecValTok{6}\NormalTok{, }
+\NormalTok{          post74 }\SpecialCharTok{==} \DecValTok{1}
+\NormalTok{        ), }
+      \AttributeTok{weights =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ statepop, }
+      \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ FSTATE}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(mod\_trends\_post)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: lnpcrrobgun
+Observations: 2,234
+Weights: statepop
+Fixed-effects: FSTATE: 24,  year: 25
+Standard-errors: Clustered (FSTATE) 
+               Estimate Std. Error   t value   Pr(>|t|)    
+yaddon        -0.041467   0.026530 -1.562991 1.3171e-01    
+ymm           -0.068592   0.155262 -0.441785 6.6277e-01    
+dcpoverty      0.022925   0.021797  1.051741 3.0384e-01    
+dcunemp       -0.031165   0.016785 -1.856693 7.6209e-02 .  
+dcblack_per   -0.496051   0.056004 -8.857481 7.1606e-09 ***
+dcp15t17       0.493592   0.274723  1.796687 8.5532e-02 .  
+dcp18t24      -0.110750   0.107322 -1.031935 3.1283e-01    
+dcp25t34       0.153253   0.073566  2.083197 4.8539e-02 *  
+dcpolice_per1 -0.004692   0.001661 -2.824861 9.6046e-03 ** 
+dcprison_per1 -0.000743   0.001127 -0.658681 5.1664e-01    
+FSTATE:year   -0.000200   0.000377 -0.530718 6.0070e-01    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 499.4     Adj. R2: 0.15993 
+              Within R2: 0.014619
+\end{verbatim}
+
+\subsubsection{Event Study}\label{event-study}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Dateb für ES vorbereiten}
+\NormalTok{abrams\_es }\OtherTok{\textless{}{-}}\NormalTok{ abrams }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{relyr =} \FunctionTok{if\_else}\NormalTok{(relyr }\SpecialCharTok{\textless{}} \SpecialCharTok{{-}}\DecValTok{7}\NormalTok{, }\SpecialCharTok{{-}}\DecValTok{7}\NormalTok{, relyr),}
+    \AttributeTok{relyr =} \FunctionTok{if\_else}\NormalTok{(relyr }\SpecialCharTok{\textgreater{}} \DecValTok{6}\NormalTok{, }\DecValTok{6}\NormalTok{, relyr)}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{pivot\_wider}\NormalTok{(}
+    \AttributeTok{names\_from =}\NormalTok{ relyr, }
+    \AttributeTok{values\_from =}\NormalTok{ relyr, }
+    \AttributeTok{names\_prefix =} \StringTok{"D"}\NormalTok{, }
+    \AttributeTok{values\_fn =} \FunctionTok{list}\NormalTok{(}\AttributeTok{relyr =} \SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{), }
+    \AttributeTok{values\_fill =} \DecValTok{0}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{rename\_with}\NormalTok{(}
+    \AttributeTok{.fn =} \SpecialCharTok{\textasciitilde{}} \FunctionTok{gsub}\NormalTok{(}\StringTok{"{-}"}\NormalTok{, }\StringTok{"\_"}\NormalTok{, .), }
+    \AttributeTok{.cols =} \FunctionTok{starts\_with}\NormalTok{(}\StringTok{"D"}\NormalTok{)}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Event{-}Study{-}Regression}
+\NormalTok{es\_mod }\OtherTok{\textless{}{-}} \FunctionTok{feols}\NormalTok{(}
+  \AttributeTok{fml =}\NormalTok{ lnpcrrobgun }\SpecialCharTok{\textasciitilde{}}
+      \CommentTok{\# Rel. Zeitpunkt{-}Dummies}
+      \SpecialCharTok{+}\NormalTok{ D\_6}
+      \SpecialCharTok{+}\NormalTok{ D\_5}
+      \SpecialCharTok{+}\NormalTok{ D\_4}
+      \SpecialCharTok{+}\NormalTok{ D\_3}
+      \SpecialCharTok{+}\NormalTok{ D\_2}
+      \SpecialCharTok{+}\NormalTok{ D\_1}
+      \SpecialCharTok{+}\NormalTok{ D0      }
+      \SpecialCharTok{+}\NormalTok{ D1}
+      \SpecialCharTok{+}\NormalTok{ D2}
+      \SpecialCharTok{+}\NormalTok{ D3}
+      \SpecialCharTok{+}\NormalTok{ D4}
+      \SpecialCharTok{+}\NormalTok{ D5}
+      \SpecialCharTok{+}\NormalTok{ D6}
+      \CommentTok{\# Kovariablen}
+      \SpecialCharTok{+}\NormalTok{ dcpoverty}
+      \SpecialCharTok{+}\NormalTok{ dcunemp}
+      \SpecialCharTok{+}\NormalTok{ dcblack\_per}
+      \SpecialCharTok{+}\NormalTok{ dcp15t17}
+      \SpecialCharTok{+}\NormalTok{ dcp18t24 }
+      \SpecialCharTok{+}\NormalTok{ dcp25t34}
+      \SpecialCharTok{+}\NormalTok{ dcpolice\_per1}
+      \SpecialCharTok{+}\NormalTok{ dcprison\_per1}
+      \CommentTok{\# Trends: Bundesstaaten}
+      \SpecialCharTok{+}\NormalTok{ FSTATE}\SpecialCharTok{:}\NormalTok{year}
+      \CommentTok{\# Fixed Effects}
+      \SpecialCharTok{|}\NormalTok{ FSTATE }\SpecialCharTok{+}\NormalTok{ year,}
+       \AttributeTok{data =}\NormalTok{ abrams\_es,}
+      \AttributeTok{weights =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ statepop, }
+      \AttributeTok{vcov =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ FSTATE}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(es\_mod, }\AttributeTok{n =} \DecValTok{13}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+OLS estimation, Dep. Var.: lnpcrrobgun
+Observations: 15,516
+Weights: statepop
+Fixed-effects: FSTATE: 50,  year: 30
+Standard-errors: Clustered (FSTATE) 
+     Estimate Std. Error   t value Pr(>|t|)    
+D_6  0.206771   0.095983  2.154245 0.036165 *  
+D_5  0.123620   0.098353  1.256903 0.214747    
+D_4  0.132076   0.099437  1.328232 0.190255    
+D_3  0.133140   0.101256  1.314889 0.194668    
+D_2  0.152313   0.113890  1.337367 0.187278    
+D_1  0.111510   0.133117  0.837687 0.406274    
+D0   0.028083   0.143639  0.195514 0.845799    
+D1  -0.085274   0.147059 -0.579867 0.564661    
+D2  -0.202242   0.153729 -1.315577 0.194439    
+D3  -0.188191   0.170367 -1.104618 0.274720    
+D4  -0.090850   0.177349 -0.512269 0.610764    
+D5  -0.052461   0.172848 -0.303507 0.762788    
+D6  -0.094067   0.143815 -0.654085 0.516115    
+... 9 coefficients remaining
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 508.5     Adj. R2: 0.164053
+              Within R2: 0.008389
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Daten für Event{-}Study{-}Plot}
+\CommentTok{\# Extract the coefficients and standard errors for the dummies}
+\NormalTok{coefficients }\OtherTok{\textless{}{-}} \FunctionTok{coef}\NormalTok{(es\_mod)}
+\NormalTok{std\_errors }\OtherTok{\textless{}{-}} \FunctionTok{se}\NormalTok{(es\_mod)}
+
+\CommentTok{\# Select the relevant coefficients and standard errors for the dummies D\_{-}6 to D\_6}
+\NormalTok{events }\OtherTok{\textless{}{-}} \SpecialCharTok{{-}}\DecValTok{6}\SpecialCharTok{:}\DecValTok{6}
+\NormalTok{event\_names }\OtherTok{\textless{}{-}} \FunctionTok{names}\NormalTok{(coefficients)[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{13}\NormalTok{]}
+
+\NormalTok{event\_coefficients }\OtherTok{\textless{}{-}}\NormalTok{ coefficients[event\_names]}
+\NormalTok{event\_std\_errors }\OtherTok{\textless{}{-}}\NormalTok{ std\_errors[event\_names]}
+
+
+\CommentTok{\# Create a data frame for plotting}
+\NormalTok{plot\_data }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}
+  \AttributeTok{Event =}\NormalTok{ events,}
+  \AttributeTok{Estimate =}\NormalTok{ event\_coefficients,}
+  \AttributeTok{SE =}\NormalTok{ event\_std\_errors}
+\NormalTok{)}
+
+\CommentTok{\# Add confidence intervals}
+\NormalTok{plot\_data }\OtherTok{\textless{}{-}}\NormalTok{ plot\_data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{CI\_Lower =}\NormalTok{ Estimate }\SpecialCharTok{{-}}\NormalTok{ SE,}
+    \AttributeTok{CI\_Upper =}\NormalTok{ Estimate }\SpecialCharTok{+}\NormalTok{ SE}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Event{-}Study{-}Plot}
+\FunctionTok{ggplot}\NormalTok{(}
+  \AttributeTok{data =}\NormalTok{ plot\_data, }
+  \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ Event, }\AttributeTok{y =}\NormalTok{ Estimate)}
+\NormalTok{) }\SpecialCharTok{+}
+  \CommentTok{\# gesch. Effekte}
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+}
+  \CommentTok{\# SE{-}Intervall}
+  \FunctionTok{geom\_ribbon}\NormalTok{(}
+    \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}
+      \AttributeTok{ymin =}\NormalTok{ CI\_Lower, }
+      \AttributeTok{ymax =}\NormalTok{ CI\_Upper}
+\NormalTok{    ),}
+    \AttributeTok{fill =} \StringTok{"steelblue"}\NormalTok{,}
+    \AttributeTok{color =}\StringTok{"white"}\NormalTok{,}
+    \AttributeTok{alpha =} \FloatTok{0.2}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \CommentTok{\# Hilfslinien}
+  \FunctionTok{geom\_hline}\NormalTok{(}
+    \AttributeTok{yintercept =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{), }
+    \AttributeTok{linewidth =}\NormalTok{ .}\DecValTok{2}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{geom\_vline}\NormalTok{(}
+    \AttributeTok{xintercept =} \DecValTok{0}\NormalTok{, }
+    \AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{, }
+    \AttributeTok{color =} \StringTok{"red"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \CommentTok{\# Labels}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{x =} \StringTok{"Relativer Zeitpunkt zur Einf. Add{-}on{-}Gesetz"}\NormalTok{,}
+    \AttributeTok{y =} \StringTok{"Log Rate: Schussw. Überfälle"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_cowplot}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{EventStudies_files/figure-pdf/unnamed-chunk-12-1.pdf}
+
+\section{Zusammenfassung}\label{zusammenfassung-1}
 
 \bookmarksetup{startatroot}
 
@@ -11362,6 +13415,8 @@ des \emph{gesamten} Datensatzes für die Schätzung.
 \end{Highlighting}
 \end{Shaded}
 
+\begingroup
+\fontsize{12.0pt}{14.4pt}\selectfont
 \setlength{\LTpost}{0mm}
 \begin{longtable*}{lc}
 \toprule
@@ -11374,13 +13429,14 @@ BTRUE & 0.118*** \\
 StimmenTm1 & 0.297*** \\ 
  & (0.016) \\ 
 BTRUE × StimmenTm1 & 0.046* \\ 
- & (0.018) \\ 
+{} & {(0.018)} \\ 
 Num.Obs. & 6558 \\ 
 \bottomrule
 \end{longtable*}
 \begin{minipage}{\linewidth}
 + p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001\\
 \end{minipage}
+\endgroup
 
 Der geschätzte Koeffizient von \(B\) (\texttt{BTRUE}) beträgt etwa
 \(0.12\) und ist hochsignifikant. Übereinstimmend mit
@@ -11476,6 +13532,8 @@ Für eine Gegenüberstellung der Ergebnisse verwenden wir
 \end{Highlighting}
 \end{Shaded}
 
+\begingroup
+\fontsize{12.0pt}{14.4pt}\selectfont
 \setlength{\LTpost}{0mm}
 
 \begin{longtable}{lcc}
@@ -11503,7 +13561,7 @@ poly(StimmenTm1, degree = 2, raw = T)2 &  & 0.798 \\
 BTRUE × poly(StimmenTm1, degree = 2, raw = T)1 &  & 0.036 \\ 
  &  & (0.219) \\ 
 BTRUE × poly(StimmenTm1, degree = 2, raw = T)2 &  & -1.529+ \\ 
- &  & (0.834) \\ 
+{} & {} & {(0.834)} \\ 
 Num.Obs. & 2956 & 2956 \\ 
 \bottomrule
 
@@ -11512,6 +13570,7 @@ Num.Obs. & 2956 & 2956 \\
 \begin{minipage}{\linewidth}
 + p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001\\
 \end{minipage}
+\endgroup
 
 Die Spalte (1) in Tabelle~\ref{tbl-intmodsLee} zeigt die lokale
 Schätzung mit einem linearen Interaktionsmodell. Wir erhalten damit
@@ -11989,6 +14048,9 @@ Die Tabelle erzeugen wir mit \texttt{gt::gt()}.
 \end{Highlighting}
 \end{Shaded}
 
+\begingroup
+\fontsize{12.0pt}{14.4pt}\selectfont
+
 \begin{longtable}{lrrrrrr}
 
 \caption{\label{tbl-sumstat}Datensatz \texttt{BastenBetz} --
@@ -12001,15 +14063,17 @@ Zusammenfassende Statistiken}
 \cmidrule(lr){2-4} \cmidrule(lr){5-7}
 variable & Mean & SD & N & Mean & SD & N \\ 
 \midrule\addlinespace[2.5pt]
-gini & $0.302$ & $0.029$ & $49$ & $0.367$ & $0.052$ & $84$ \\ 
-prot & $9.428$ & $5.695$ & $49$ & $83.245$ & $11.411$ & $84$ \\ 
-bord & $-2.327$ & $1.274$ & $49$ & $2.493$ & $1.201$ & $84$ \\ 
-pfl & $48.239$ & $4.774$ & $49$ & $39.508$ & $5.723$ & $84$ \\ 
-pfr & $43.049$ & $2.634$ & $49$ & $39.19$ & $5.025$ & $84$ \\ 
-pfi & $52.642$ & $2.94$ & $49$ & $47.086$ & $3.368$ & $84$ \\ 
+gini & 0.302 & 0.029 & 49 & 0.367 & 0.052 & 84 \\ 
+prot & 9.428 & 5.695 & 49 & 83.245 & 11.411 & 84 \\ 
+bord & -2.327 & 1.274 & 49 & 2.493 & 1.201 & 84 \\ 
+pfl & 48.239 & 4.774 & 49 & 39.508 & 5.723 & 84 \\ 
+pfr & 43.049 & 2.634 & 49 & 39.19 & 5.025 & 84 \\ 
+pfi & 52.642 & 2.94 & 49 & 47.086 & 3.368 & 84 \\ 
 \bottomrule
 
 \end{longtable}
+
+\endgroup
 
 Die Statistiken in Tabelle~\ref{tbl-sumstat} scheinen konsistent mit der
 (historischen) Verteilung der Religionszugehörigkeit und politischen
@@ -12249,6 +14313,8 @@ anhand der jeweiligen KQ-Regressionen beurteilen.\footnote{Wir nutzen
 \end{Highlighting}
 \end{Shaded}
 
+\begingroup
+\fontsize{12.0pt}{14.4pt}\selectfont
 \setlength{\LTpost}{0mm}
 
 \begin{longtable}{lcccc}
@@ -12267,7 +14333,7 @@ vaud & 0.671*** & 0.726*** & 0.756*** & 0.710*** \\
 bord & 0.017** & 0.001 & 0.001 & 0.002* \\ 
  & (0.006) & (0.003) & (0.001) & (0.001) \\ 
 vaud × bord & -0.006 & -0.001 & -0.009*** & -0.004*** \\ 
- & (0.012) & (0.005) & (0.003) & (0.001) \\ 
+{} & {(0.012)} & {(0.005)} & {(0.003)} & {(0.001)} \\ 
 Num.Obs. & 133 & 207 & 312 & 509 \\ 
 \bottomrule
 
@@ -12276,6 +14342,7 @@ Num.Obs. & 133 & 207 & 312 & 509 \\
 \begin{minipage}{\linewidth}
 + p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001\\
 \end{minipage}
+\endgroup
 
 Für die geschätze Bandweite schätzen wir einen hochsignifikanten Sprung
 in \texttt{prot} von etwa 67\% an der Kantonsgrenze. Auch für größere
@@ -12416,6 +14483,8 @@ Inferenz betreiben zu können.\footnote{Die Autoren geben an, robuste SEs
 \end{Highlighting}
 \end{Shaded}
 
+\begingroup
+\fontsize{12.0pt}{14.4pt}\selectfont
 \setlength{\LTpost}{0mm}
 
 \begin{longtable}{lcccc}
@@ -12435,7 +14504,7 @@ prot & -13.460*** & -5.061* & -6.487*** & -6.487*** \\
 bord & 0.438 & 0.444 & -0.165 & -0.165 \\ 
  & (0.639) & (0.357) & (0.332) & (0.332) \\ 
 bord × vaud & -0.364 & -0.909 & 0.011 & 0.011 \\ 
- & (0.811) & (0.561) & (0.432) & (0.432) \\ 
+{} & {(0.811)} & {(0.561)} & {(0.432)} & {(0.432)} \\ 
 Num.Obs. & 133 & 133 & 133 & 133 \\ 
 \bottomrule
 
@@ -12444,6 +14513,7 @@ Num.Obs. & 133 & 133 & 133 & 133 \\
 \begin{minipage}{\linewidth}
 + p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001\\
 \end{minipage}
+\endgroup
 
 Die Koeffizienten von \texttt{prot} in Tabelle~\ref{tbl-BastenBetzSS}
 sind die mit 2SLS ermittelten erwarteten Behandlungseffekte einer
@@ -13402,7 +15472,7 @@ Erklärungskraft werden durch die Regularisierung in Richtung 0 gezwungen
 und reduzieren so die Varianz der Vorhersage gegenüber der
 (idealerweise) unverzerrten KQ-Schätzung.
 
-\begin{tcolorbox}[enhanced jigsaw, opacityback=0, rightrule=.15mm, breakable, bottomtitle=1mm, colbacktitle=quarto-callout-note-color!10!white, arc=.35mm, toptitle=1mm, titlerule=0mm, left=2mm, bottomrule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, toprule=.15mm, colback=white, coltitle=black, leftrule=.75mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Ridge Regression}]
+\begin{tcolorbox}[enhanced jigsaw, breakable, colbacktitle=quarto-callout-note-color!10!white, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Ridge Regression}, opacityback=0, coltitle=black, colback=white, arc=.35mm, titlerule=0mm, bottomtitle=1mm, leftrule=.75mm, toptitle=1mm, bottomrule=.15mm, left=2mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame]
 
 \begin{itemize}
 \item
@@ -13977,7 +16047,7 @@ und damit zu einer höheren Vorhersagegüte. Das ``sparsame'' mit
 Lasso-Regression geschätzte Modell ist dem ``großen'' mit KQ geschätztem
 Modell in dieser Hinsicht also überlegen.
 
-\begin{tcolorbox}[enhanced jigsaw, opacityback=0, rightrule=.15mm, breakable, bottomtitle=1mm, colbacktitle=quarto-callout-note-color!10!white, arc=.35mm, toptitle=1mm, titlerule=0mm, left=2mm, bottomrule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, toprule=.15mm, colback=white, coltitle=black, leftrule=.75mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Lasso-Regression}]
+\begin{tcolorbox}[enhanced jigsaw, breakable, colbacktitle=quarto-callout-note-color!10!white, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zu Lasso-Regression}, opacityback=0, coltitle=black, colback=white, arc=.35mm, titlerule=0mm, bottomtitle=1mm, leftrule=.75mm, toptitle=1mm, bottomrule=.15mm, left=2mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame]
 
 \begin{itemize}
 \item
@@ -14214,6 +16284,9 @@ Darstellung.
 \end{Highlighting}
 \end{Shaded}
 
+\begingroup
+\fontsize{12.0pt}{14.4pt}\selectfont
+
 \begin{longtable}{lrrr}
 
 \caption{\label{tbl-lrsimA}Durchschnittliche Testset-MSEs für Setting A}
@@ -14223,11 +16296,13 @@ Darstellung.
 \toprule
 Methode & Kor=0 & Kor=0.5 & Kor=0.8 \\ 
 \midrule\addlinespace[2.5pt]
-Lasso-Regression & $7.17$ & $10.398$ & $7.581$ \\ 
-Ridge-Regression & $4.841$ & $1.615$ & $1.517$ \\ 
+Lasso-Regression & 7.17 & 10.398 & 7.581 \\ 
+Ridge-Regression & 4.841 & 1.615 & 1.517 \\ 
 \bottomrule
 
 \end{longtable}
+
+\endgroup
 
 Tabelle~\ref{tbl-lrsimA} zeigt, dass Ridge-Regression gegenüber
 Lasso-Regression für jede der drei betrachteten Korrelationen überlegen
@@ -14949,7 +17024,7 @@ Der Post-Double-Selection-Schätzer liefert unter den betrachteten
 Verfahren die beste Schätzung von \(\alpha_0\) und erlaubt gülstige
 statistische Inferenz. Der geschätzte Effekt ist hoch-signifikant.
 
-\begin{tcolorbox}[enhanced jigsaw, opacityback=0, rightrule=.15mm, breakable, bottomtitle=1mm, colbacktitle=quarto-callout-note-color!10!white, arc=.35mm, toptitle=1mm, titlerule=0mm, left=2mm, bottomrule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, toprule=.15mm, colback=white, coltitle=black, leftrule=.75mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum Post-Double-Selection-Schätzer}]
+\begin{tcolorbox}[enhanced jigsaw, breakable, colbacktitle=quarto-callout-note-color!10!white, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Key Facts zum Post-Double-Selection-Schätzer}, opacityback=0, coltitle=black, colback=white, arc=.35mm, titlerule=0mm, bottomtitle=1mm, leftrule=.75mm, toptitle=1mm, bottomrule=.15mm, left=2mm, toprule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame]
 
 \begin{itemize}
 \item
@@ -15194,6 +17269,9 @@ lediglich sieben Regressoren aus.
 Tabelle~\ref{tbl-growthpdssek} zeigt die Definitionen der ausgewählten
 Variablen.
 
+\begingroup
+\fontsize{12.0pt}{14.4pt}\selectfont
+
 \begin{longtable}{ll}
 
 \caption{\label{tbl-growthpdssek}Mit PDS selektierte Variablen aus
@@ -15214,6 +17292,8 @@ pop6565 & Anteil Bevölkerung ü. 65 Jahre \\
 \bottomrule
 
 \end{longtable}
+
+\endgroup
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -15255,7 +17335,7 @@ effektiver zu überwinden.
 
 \begin{align}
 & \textbf{Algorithmus: Gradientenabstiegsverfahren mit Momentum} \\
-& \text{Initialisiere: }\\ 
+& \textup{Initialisiere: }\\ 
 & \quad x_0 \text{ (Startpunkt) }\\
 & \quad \eta \text{ (Lernrate) }\\
 & \quad \alpha \text{ (Momentum-Faktor) }\\ 
@@ -15749,6 +17829,9 @@ wir lediglich Volkswirtschaften mit Gewicht \textgreater{} .0001.
 \end{Highlighting}
 \end{Shaded}
 
+\begingroup
+\fontsize{12.0pt}{14.4pt}\selectfont
+
 \begin{longtable}{rlr}
 
 \caption{\label{tbl-brexitcw}Gewichte für den synthetischen
@@ -15759,14 +17842,16 @@ UK-Doppelgänger}
 \toprule
 w.weights & unit.names & unit.numbers \\ 
 \midrule\addlinespace[2.5pt]
-$0.738$ & United States & $24$ \\ 
-$0.145$ & Italy & $11$ \\ 
-$0.067$ & Iceland & $9$ \\ 
-$0.048$ & Luxembourg & $14$ \\ 
-$0.002$ & Germany & $7$ \\ 
+0.738 & United States & 24 \\ 
+0.145 & Italy & 11 \\ 
+0.067 & Iceland & 9 \\ 
+0.048 & Luxembourg & 14 \\ 
+0.002 & Germany & 7 \\ 
 \bottomrule
 
 \end{longtable}
+
+\endgroup
 
 Der synthetische UK-Doppelgänger kann nun gemäß der Vorschrift
 \eqref{eq:dgkonst} konstruiert werden. Wir erzeugen hierzu ein
@@ -16476,6 +18561,9 @@ zusammen.
 \end{Highlighting}
 \end{Shaded}
 
+\begingroup
+\fontsize{12.0pt}{14.4pt}\selectfont
+
 \begin{longtable}{rrl}
 
 \caption{\label{tbl-growthpdssek}Andrews' (1993) End-of-Sample
@@ -16486,10 +18574,12 @@ Instability Test}
 \toprule
 statistic & p.value & method \\ 
 \midrule\addlinespace[2.5pt]
-$14.196$ & $0.693$ & Andrews' Test for Structural Change \\ 
+14.196 & 0.693 & Andrews' Test for Structural Change \\ 
 \bottomrule
 
 \end{longtable}
+
+\endgroup
 
 Gem. des großen \(p\)-Werts kann die Nullhypothese (keine strukturelle
 Veränderung ab 2017) nicht abgelehnt werden. Wir führen den Test nun für
@@ -16582,6 +18672,18 @@ Control Methods for Comparative Case Studies: Estimating the Effect of
 California's Tobacco Control Program.``} \emph{Journal of the American
 Statistical Association} 105 (490): 493--505.
 \url{https://doi.org/10.1198/jasa.2009.ap08746}.
+
+\bibitem[\citeproctext]{ref-Abrams2012}
+Abrams, David S. 2012a. {„Estimating the Deterrent Effect of
+Incarceration Using Sentencing Enhancements``}. \emph{American Economic
+Journal: Applied Economics} 4 (4): 32--56.
+\url{https://doi.org/10.1257/app.4.4.32}.
+
+\bibitem[\citeproctext]{ref-Abrams2012data}
+Abrams, David S. 2012b. {„Replication data for: Estimating the Deterrent
+Effect of Incarceration Using Sentencing Enhancements``}. ICPSR -
+Interuniversity Consortium for Political; Social Research.
+\url{https://doi.org/10.3886/E113838V1}.
 
 \bibitem[\citeproctext]{ref-Acemogluetal2020}
 Acemoglu, Daron, Giuseppe De Feo, und Giacomo Davide De Luca. 2020.
@@ -16680,6 +18782,17 @@ Callaway, Brantly, und Pedro H. C. Sant'Anna. 2021.
 of Econometrics} 225 (2): 200--230.
 \url{https://doi.org/10.1016/j.jeconom.2020.12.001}.
 
+\bibitem[\citeproctext]{ref-Cameronetal2008}
+Cameron, A. Colin, Jonah B. Gelbach, und Douglas L. Miller. 2008.
+{„Bootstrap-Based Improvements for Inference with Clustered Errors``}.
+\emph{Review of Economics and Statistics} 90 (3): 414--27.
+\url{https://doi.org/10.1162/rest.90.3.414}.
+
+\bibitem[\citeproctext]{ref-Cameronetal2011}
+---------. 2011. {„Robust Inference With Multiway Clustering``}.
+\emph{Journal of Business \&amp; Economic Statistics} 29 (2): 238--49.
+\url{https://doi.org/10.1198/jbes.2010.07136}.
+
 \bibitem[\citeproctext]{ref-CJM2020}
 Cattaneo, Matias D, Michael Jansson, und Xinwei Ma. 2020. {„Simple local
 polynomial density estimators``}. \emph{Journal of the American
@@ -16688,6 +18801,10 @@ Statistical Association} 115 (531): 1449--55.
 \bibitem[\citeproctext]{ref-CortezSilva2008}
 Cortez, Paulo, und Alice Maria Gonçalves Silva. 2008. {„Using data
 mining to predict secondary school student performance``}.
+
+\bibitem[\citeproctext]{ref-Cutrera1900}
+Cutrera, Antonino. 1900. \emph{{La Mafia E I Mafiosi}}. (Palermo, IT:
+Reber).
 
 \bibitem[\citeproctext]{ref-Dahl1971}
 Dahl, Robert Alan. 1971. \emph{Polyarchy: Participation and Opposition:
@@ -16796,6 +18913,11 @@ of economic studies} 79 (3): 933--59.
 Lee, David S. 2008. {„Randomized experiments from non-random selection
 in US House elections``}. \emph{Journal of Econometrics} 142 (2):
 675--97.
+
+\bibitem[\citeproctext]{ref-Liu1988}
+Liu, Regina Y. 1988. {„Bootstrap Procedures under some Non-I.I.D.
+Models``}. \emph{The Annals of Statistics} 16 (4): 1696--1708.
+\url{https://doi.org/10.1214/aos/1176351062}.
 
 \bibitem[\citeproctext]{ref-Love2004}
 Love, Thomas. 2004. {„Graphical display of covariate balance``}.
