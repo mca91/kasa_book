@@ -1,9 +1,24 @@
+---
+webr: 
+  show-startup-message: true
+  packages: [
+            'cowplot',
+            'dplyr',
+            'fixest',
+            'ggplot2',
+            'haven',
+            'tidyr',
+            'readr'
+            ]
+---
 
 # Event Studies
 
 ```{r, echo=F, message=FALSE}
 library(gt)
+library(haven)
 library(tidyverse)
+
 # Formatierung von gt-Tabellen
 tabopts <- function(x) {
   fmt_number(x, decimals = 3, drop_trailing_zeros = T) %>%
@@ -33,9 +48,256 @@ tabopts <- function(x) {
       table.border.bottom.color = "black"
     )
 }
+
+abrams <- read_dta(file = "datasets/Abrams2012.dta")
 ```
 
-## Case Study: Abschreckungseffekte durch Strafgesetzgebung
+```{webr-r}
+#| context: setup
+# create dataset directory
+dir.create("datasets")
+# download the dataset
+download.file(
+    "https://raw.githubusercontent.com/mca91/kausal_data/main/Abrams2012.dta",
+    'datasets/Abrams2012.dta',
+)
+```
+
+Eine *Event Study* ist ein empirischer Ansatz, um die Auswirkungen von zufälligen Ereignissen oder bestimmen Interventionen auf eine Outcome-Variable zu messen. Die zentrale Annahme hierbei ist, dass das untersuchte Ereignis exogen ist, also als ein 'natürlicher' Schock wirkt: Die Intervention löst eine Reaktion in der Outcome-Variable aus, ist jedoch unabhängig von andere unbeobachtbaren Determinanten der Outcome-Variable, sodass Backdoors vermieden werden. Ist diese Annahme gegeben, so kann eine Event Study den kausalen Effekt einer Intervention vergleichsweise einfach ermitteln, indem überprüft wird, ob und wie stark die Outcome-Variable im Zeitraum nahe des Ereignis reagiert. Letzteres erfolgt häufig durch eine Analyse der durch das Event verursachten Variation in der Outcome-Variable mit einem ökonometrischen Modell.
+
+## Counterfactuals und Regression
+
+Event Studies sind hilfreich, weil sie die Identifizierung kausaler Zusammenhänge in komplexen Situationen mit vielen potentiellen (unbeobachtbaren) Backdoor-Variablen ermöglichen können. Durch die Fokussierung auf einen klar definierten Zeitraum um das Ereignis und die Anwendung zusätzlicher Kontrollmechanismen (Regression) kann der interessierende Effekt oftmals plausibel identifiziert werden.
+
+Für die Schätzug des Behandlungseffekts ist es nötig, einen plausiblen (kontrafaktischen) Vergleichswert für die nach der Intervention beobachteten Werte der Outcome-Variable zu finden. Hierbei gibt es drei wesentliche Vorgehensweisen:
+
+1. **Durschnittlichen Entwicklung als Counterfactual**: Hierbei werden Mittelwerte der Outcome Variable vor und nach der Intervention vergleichen. Diese Methode ignoriert mögliche Zeiteffekte in der Outcome-Variable und sollte nur für kleine Zeiträume vor und nach der Intervention angewendet werden.
+
+2. **Vorhersage mit Vor-Event-Daten**: Modelliere die Outcome-Variable basierend auf Daten *vor* dem Event und erhalte Vorhersagen für Perioden (unmittelbar) *nach* dem Event.
+
+3. **Vorhersage mit Nach-Event-Daten**: Modelliere die Outcome basierend auf Daten *vor* dem Event unter Berücksichtigung weiterer Regressoren. Erhalte Vorhersagen für Perioden  (unmittelbar) *nach* dem Event unter Einbezug der *nach* dem Event beobachteten Regressor-Werte.
+
+In vielem polit-ökonomischen Anwendungen ist es plausibel, dass eine Intervention einen längerfristigen (konstanten) Effekt hat. In solchen Fällen kann ein Interkationsmodell^[Der Ansatz \eqref{eq:eslinint} wird auch als *segmentierte Regression* bezeichnet.] geschätzt werden:
+\begin{align}
+  Y_t = \beta_0 + \beta_1 t + \beta_2 \textup{post}_t + \beta_3 \cdot t \cdot \textup{post}_t + \epsilon_t.\label{eq:eslinint}
+\end{align}
+Hier ist $t$ die Zeit-Variable und $\textup{post}_t$ ein Dummy-Regressor für Perioden *nach* dem Event. Die Regression \eqref{eq:eslinint} modelliert also einen linearen Trend in der Outcome-Variable $Y$, der sich vor und nach dem Event unterscheiden kann. Eine Schätzung mit Regressions ist außerdem hilfreich, weil für beobachtbare Determinanten von $Y$, die möglicherweise durch das Event beeinflusst werden, kontrolliert werden kann. Solche "robusten" Spezifikationen erhöhen die plausibilität der Identifikationsstrategie und können eine präzisere Schätzung des Behandlungseffekts gewährleisten.
+
+Modell \eqref{eq:eslinint} kann leicht auf Panel-Daten erweitert werden, wobei die zusätzliche Information aus der Querschnittsdimension die Schätzung eines zeitlichen Verlaufs des Interventionseffekts ermöglicht. Bei Verfügbarkeit können Beobachtungseinheiten, die nicht von der Intervention betroffen sind als Counterfactuals herangezogen werden. Wir betrachten die Anwendung einer Event-Study-Methodik mit Panel-Daten-Modellen in der Case Study in @sec-deterrance.
+
+::: callout-note
+#### Key Facts zu Event Studies
+
+- Eine Event Study misst Auswirkungen eines Ereignisses oder Interventionen auf eine über mehrere Perioden beobachtete Outcome-Variable.
+
+-	Ziel ist die Schätzung des kausalen Effekt der Intervention durch die Analyse der beobachteten Variation in der Outcome-Variable über die Zeit, meist für Zeitpunkte nahe des Events.
+
+- Annahme: Das Event ist exogen. In empirischen Studien werden häufig quasi-experimentelle Forschungsdesigns verwendet (Events sind natürliche Schocks).
+
+- Regressionsmodelle können genutzt werden, um den Effekt der Intervention über die Zeit zu schätzen. Hierbei gewährleistet die Kontrolle für potentielle Confounder die Robustheit und Präzision der Schätzung des interessierenden Effekts.
+
+:::
+
+## Beispiel: Strukturbruch in Zeitreihe
+
+Zur Illustration der Methodik simulieren wir Zeitreihendaten mit einem durch ein Ereignis in der Mitte des Beobachtungszeitraums ausgelösten Strukturbruch im Erwartungswert (der kausale Effekt des Events). Wir interessieren uns für den Effekt des Events auf die Variablen $X_t$ und $Y_t$.
+
+Der hierfür verwendete DGP lautet
+\begin{align*}
+  X_t = &\, \alpha_1 \textup{post}_t + \epsilon_t,\\
+  \\
+  Y_t = &\, \beta_1 X_t + \beta_2 \textup{post}_t + \varepsilon_t,
+\end{align*}
+für $t=1,\dots,n$ mit $\epsilon_t,\ \varepsilon_t \sim\,u.i.v. N(0,1)$. Der Dummy-Regressor $\textup{post}_t$ ist definiert als
+\begin{align*}
+  \textup{post}_t = 
+  \begin{cases}
+     1 \ \ \textup{für}  &t > t_\textup{Event},\\
+     0 \ \ &\textup{sonst}
+  \end{cases}
+\end{align*}
+wobei $t_\textup{Event} = \lfloor n/2 \rfloor$. Für den Effekt des Events auf $X_t$ und $Y_t$ wählen wir $\alpha_1 = 2$ und $\beta_2 = 2$. Weiterhin ist $\beta_1 = .75$. Wir generieren beide Zeitreihen für $n=200$ Perioden.
+
+Beachte das $X_t$ ein *Confounder* bei der Ermittlung des Effekts auf $Y_t$ ist: Das Event zum Zeitpunkt $t=100$ hat einen kausalen Effekt von $\alpha_1 = \beta_2 = 2$ auf *beide* Variablen. Da $X_t$ einen Einfluss von $\beta_1\cdot X_t = .75\cdot X_t$ auf $Y_t$ hat, müssen wir für $X_t$ kontrollieren, um die back door durch $X_t$ zu schließen. Für $X_t$ hingegen ist der Event-Regressor $\textup{post}_t$ exogen.
+
+
+```{r}
+library(ggplot2)
+library(cowplot)
+# Daten simulieren
+set.seed(123)
+
+# Parameter der Simulation
+n <- 200  # Anzahl der Beobachtungen
+t_event <- floor(n/2)  # Zeitpunkt des Ereignisses
+effect_size <- 2  # Größe des Effekts nach dem Ereignis
+
+# Zeitindex
+time <- 1:n
+
+# X generieren 
+x <- ifelse(
+  test = time <= t_event, 
+  yes = rnorm(n, mean = 0), 
+  no = rnorm(n, mean = effect_size)
+)
+
+# Y generieren
+pre_event_mean <- .75 * x
+post_event_mean <- pre_event_mean + effect_size
+
+y <- ifelse(
+  test = time <= t_event, 
+  yes = rnorm(n, mean = pre_event_mean), 
+  no = rnorm(n, mean = post_event_mean)
+)
+
+# Zusammenführen der Daten
+data <- tibble(
+  time = time, 
+  x = x,
+  y = y, 
+  # Event bei t_event
+  post = ifelse(
+    test = time > t_event, 
+    yes = TRUE, 
+    no = FALSE
+  )
+)
+
+# Überblick
+head(data)
+```
+
+```{r}
+# Plotten der Zielvariable und Regressor
+ggplot(data, aes(x = time)) +
+  geom_line(aes(y = y, linetype = "Outcome-Variable"), size = 1) +
+  geom_vline(xintercept = t_event, linetype = "dashed", color = "red") +
+  geom_line(aes(y = x, linetype = "Regressor")) +
+  labs(x = "Zeit", y = "Wert", color = "Legende") +
+  scale_linetype_discrete("") +
+  theme_cowplot() +
+  theme(legend.position = "top")
+```
+
+### Event-Study-Schätzung: Kausaler Effekt für $X_t$
+
+Wir schätzen zunächst den Effekt des Events auf $X_t$. Die Differenz der Mittelwerte nach und vor des Events ist ein erwartungstreuer und konistenter Schätzer für $\alpha_1$. Dieser Schätzer ist äquivalent zum KQ-Schätzer von $\alpha_1$ im Modell
+\begin{align}
+  X_t = \alpha_1 \textup{post}_t + u.
+\end{align}
+
+```{r}
+# Effekt-Schätzung für X
+
+# Post-mean vs. Pre-Mean
+data %>% 
+  group_by(post) %>% 
+  summarise(x_mean = mean(x)) %>%
+  pull(x_mean) %>%
+  diff()
+
+# ...ist äquivalent zum KQ-Schätzer
+lm(
+  formula = x ~ post,
+  data = data
+) %>%
+  summary()
+```
+
+### Event-Study-Schätzung: Kausaler Effekt für $Y_t$
+
+Für die Schätzung von $\beta_2$ liefert diese Vorgehensweise einen verzerrten Schätzer des kausalen Effekts des Events auf $Y_t$.
+
+```{r}
+# Verzerrte Effekt-Schätzung für Y
+# Post-mean vs. Pre-Mean
+data %>% 
+  group_by(post) %>% 
+  summarise(y_mean = mean(y)) %>%
+  pull(y_mean) %>%
+  diff()
+
+# ...ist äquivalent zum KQ-Schätzer
+lm(
+  formula = y ~ post,
+  data = data
+) %>%
+  summary()
+```
+
+Eine bessere Alternative ist die Schätzung des Effekts anhand der Vorhersage von $Y_t$ durch $X_t$ für Beobachtungen von $X_t$ *nach* dem Event. Hierfür schätzen wir das Modell \begin{align}
+  Y_t = \beta_0 + \beta_1 X_t + e_t\label{eq:xpredy}
+\end{align}
+mit Beobachtungen *vor* dem Event und berechnen vorhergesagte Werte $\widehat{Y}_t$ mit Beobachtungen $X_t$ *nach* dem Event.
+
+```{r}
+# Modell zur Vorhersage von Y mit X
+model_pre_event <- lm(
+  formula = y ~ x, 
+  # Beobachtungen vor dem Ereignis
+  data = data %>% 
+    filter(!post)
+)
+
+# Vorhersage von Y mit X
+data <- data %>%
+  mutate(
+    predicted = predict(
+      object = model_pre_event, 
+      newdata = data
+    )
+  )
+```
+
+Die nachfolgende Grafik zeigt die mit $X_t$ vorhergesagte Entwicklung von $Y_t$ nach dem Event.
+
+```{r}
+# Vorhersage von Y und X plotten
+ggplot(data, aes(x = time)) +
+  geom_line(aes(y = y, color = "Outcome Y"), size = 1) +
+  geom_vline(xintercept = t_event, color = "red", linetype = "dashed") +
+  geom_line(
+    data = data %>% filter(post), 
+    mapping = aes(y = predicted, color = "Counterfactual Y"),
+    size = 1
+  ) +
+  labs(x = "Zeit", y = "Zielvariable") +
+  scale_color_manual(
+    "",
+    values = c(
+      "Outcome Y" = "black", 
+      "Counterfactual Y" = "steelblue"
+    )
+  ) +
+  theme_cowplot() +
+  theme(legend.position = "top")
+```
+
+Ein Schätzer des Effekts basierend auf dieser Vorhersage ist die Differenz zwischen dem mittleren beobachteten und vorhersagten Werten von $Y_t$ (counterfactual).
+
+```{r}
+# mean(Y) - mean(gesch. counterfactual)
+data %>% 
+  filter(post) %>% 
+  summarise(
+    effect = mean(y) - mean(predicted)
+  )
+```
+
+Unter der Annahme, dass der kausale Effekt des Events langfristig (für sämtliche Beobachtungen mit $t>t_\textup{Event}$) auf $Y_t$ wirkt, können wir $\beta_2$ effizienter mit einem Interaktionsmodell schätzen. Hierbei vermeiden wir die Unsicherheit in den vorhergesagten Werten $\widehat{Y}_t$, die aus der Schätzung des Modells \eqref{eq:xpredy} resultiert.
+
+```{r}
+lm(
+  formula = y ~ x + post,
+  data = data
+) %>%
+  summary()
+```
+
+
+## Case Study: Abschreckungseffekte durch Strafgesetzgebung {#sec-deterrance}
 
 @Abrams2012 untersucht den Abschreckungseffekt drohender Inhaftierung für Straftaten anhand von Daten zu verschärfter Strafgesetzgebung ("Add-on laws") in den USA. Solche Gesetze erhöhen in der Regel die Strafen für Delikte, insbesondere wenn nachweißlich Schusswaffen verwendet werden. Die Studie nutzt eine Event-Study-Methodik, um die Auswirkungen dieser Gesetzesänderung auf die Kriminalitätsraten für verschiedene Straftaten zu analysieren. Dabei wird der Zeitpunkt der tatsächlichen Gesetzeseinführung in verschiedenen US-Bundesstaaten herangezogen, um den kausalen Abschreckungseffekt einer drohenden Gefängnisstrafe anhand von Statistiken in den unmittelbaren Folgeperioden zu isolieren. 
 
@@ -47,13 +309,17 @@ Der Fokus des Forschungsdesigns liegt auf der Unterscheidung zwischen zwei wesen
 
 2. **Inhaftierungseffekt**: Inhaftierte Individuen können keine Straftaten begehen und verringern daher die Kriminalitätsrate. Dieser Effekt ist insbesondere für Straftaten mit großer Rückfälligkeit plausibel (etwa Beschaffungskriminalität). Für längere Haftstrafen erwarten wir daher einen Rückgang dieser Kriminalitätsraten nach der Verschärfung der Gesetze.
 
-Der in 2. beschriebene Effekt der Gesetzesverschärfung kann sich erst *nach* der im Rahmen der alten Gesetzgebung verhängten durchschnitlichen Mindesthaftstrafe einstellen: Der verringernde Effekt auf die Kriminalitätsrate zeigt sich erst in den Daten, nachdem Straftäter länger als gemäß der alten Gesetzgebung üblich inhaftiert sind. Rückgänge der Kriminalitätrate die in diesem Zeitraum unmittelbar nach der Gesetztesverschärfung gemessen werden, können also auf den Abschreckungseffekt zurückgeführt werden.
+Der in 2. beschriebene Effekt der Gesetzesverschärfung kann sich erst *nach* der im Rahmen der alten Gesetzgebung verhängten durchschnitlichen Mindesthaftstrafe einstellen: Der verringernde Effekt auf die Kriminalitätsrate zeigt sich erst in den Daten, nachdem Straftäter länger als gemäß der alten Gesetzgebung üblich inhaftiert sind. Rückgänge der Kriminalitätrate die in diesem Zeitraum unmittelbar nach der Gesetztesverschärfung gemessen werden, können also auf den Abschreckungseffekt zurückgeführt werden. Anhand von Statistiken zu verhängten Strafen für Überfälle mit Schusswaffen ermittelt @Abrams2012 ein mittleres Mindest-Strafmaß von drei Jahren.
+
+
+Die Exogenität der Verabschiedung von Add-On-Gesetzen wird in @Abrams2012 wiefolgt begründet: Obwohl die meisten Zusatzgesetze zu Schusswaffen in den 1970er Jahren erlassen wurden und es gemeinsame Trends in den Kriminalitäsraten der Bundesstaaten gibt, sind *die genauen Zeitpunkte* der Einführung solcher Gesetze aufgrund einer Vielzahl von Eigenheiten des politischen Prozesses in den Bundesstaaten weitgehend zufällig. Die Exogenität ist plausibel, wenn wir (durch Regression) Backdoors aufgrund Bundesstaat-spezifischer (konstanter und zeit-variierender) Faktoren schließen. 
 
 ### Replikation mit R
 
-Der Datensatz `Abrams2012.dta` ist ein Auszug der Daten aus dem Replikationspaket @Abrams2012data] zu, welches [hier](https://www.openicpsr.org/openicpsr/project/113838/version/V1/view) eingesehen werden kann. Die Daten liegen im STATA-Format `.dta` und können mit `haven::read_dta()` eingelesen werden.
+Der Datensatz `Abrams2012.dta` ist ein Auszug der Daten aus dem Replikationspaket [@Abrams2012data], welches [hier](https://www.openicpsr.org/openicpsr/project/113838/version/V1/view) eingesehen werden kann. Die Daten liegen im STATA-Format `.dta` vor und können mit `haven::read_dta()` eingelesen werden.
 
-```{r}
+```{webr-r}
+#| autorun: true
 library(haven)
 library(dplyr)
 
@@ -64,7 +330,7 @@ abrams <- read_dta(file = "datasets/Abrams2012.dta")
 glimpse(abrams)
 ```
 
-Eine Erläuterung der verfügbaren (ausschließlich numerischen) Variablen erfolgt in @tbl-abrams2012vars.
+Die Beobachtungen (Zeilen) in `abrams` sind Kriminalstatistiken von staatlichen Rechtsberichterstattungsagenturen, die im Rahmen der [Uniform Crime Reports](https://www.fbi.gov/how-we-can-help-you/more-fbi-services-and-information/ucr) des  FBI landesweit für den Zeitraum 1965 bis 2002 zusammengetragen wurden. Eine Erläuterung der verfügbaren (ausschließlich numerischen) Variablen erfolgt in @tbl-abrams2012vars.
 
 ```{r}
 #| echo: false
@@ -75,6 +341,9 @@ tibble(
   Beschreibung = c(
     "Pro-Kopf-Kriminalitätsrate",
     "Pro-Kopf-Rate Raubüberfälle mit Schusswaffen",
+    "Pro-Kopf-Rate Angriff mit Schusswaffen",
+    "Einbruch",
+    "Mord",
     "Log Pro-Kopf-Rate Raubüberfälle mit Schusswaffen",
     "Bundesstaat",
     "Jahr",
@@ -100,6 +369,58 @@ tibble(
   tabopts()
 ```
 
+Wir replizieren nachfolgend Kernergebnisse aus @Abrams2012 hinsichtlich des Abschreckungseffekts von drohenden Gefängnisstrafen auf die Begehung von Raubüberfällen mit Schusswaffen. 
+
+Für einen ersten Eindruck der Entwicklung von Kriminalitätsraten in US-Bundesstaaten, die über den Beobachutungszeitraum Add-On-Gesetze erlassen haben, berechnen wir zunächst mit der Population  (`statepop`) gewichtete Mittelwerte vor und nach der Einführung dieser Gesetzte.^[Die Mittelwerte hier und sämtliche Punktschätzer in den nachfolgenden Regressionen sind bevölkerungsgewichtet, sodass Statistiken von Behörden, die größere Bevölkerungsteile abdecken, einen größeren Einfluss auf die Schätzung haben als Behörden in Regionen mit kleinerer Population.] Hierzu verwenden wir eine Teilmenge des Panel-Datensatzes `abrams` mit Beobachtungen zu 7 Zeitpunkten vor sowie 6 Zeitpunkten nach dem Inkraftreten der Gesetzesverschärfung. 
+
+```{r}
+# Datensatz für Vergleich mittlerer Kriminalität vorbereiten
+abrams_t1 <- abrams %>% 
+  mutate(
+    before = case_when(
+      relyr > 0 ~ "Danach",
+      T ~ "Bevor"
+    )
+  ) %>% 
+  filter(relyr >= -7 & relyr <= 6) %>%
+  rename(
+    `Angriff mit Schusswaffen` = pcrasltgun,
+    `Einbruch` = pcrburgtot,
+    `Raubüberfall mit Schusswaffe` = pcrrobgun,
+    `Mord` = pcrmurder
+  )
+```
+
+Für die tabellarische Zusammenfassung nutzen wir `modelsummary::datasummary()`. Über das Argument `formula` definieren wir die zu berechnenden Statistiken `diagis::weighted_mean` und `diagis::weighted_se` für vier Kategorien von Delikten. Der Operator `*` bewirkt eine gruppierte Berechnung dieser Statistiken (gemäß `before`).
+
+```{r}
+#| tbl-cap: "Mittlere Kriminalitätsraten je 100k Einwohner vor und nach Einführung strafverschärfender Gesetze"
+#| label: tbl-abramssmmry
+
+library(modelsummary)
+
+# Tabellarische Zusammenfassung
+datasummary(
+  formula =
+    `Angriff mit Schusswaffen`
+  + `Einbruch`
+  + `Mord`
+  + `Raubüberfall mit Schusswaffe`
+  
+  ~ (Factor(before) 
+     * (
+        (
+          (mean = diagis::weighted_mean) + (SE = diagis::weighted_se) 
+        )
+        * Arguments(na.rm = TRUE, w = statepop)
+       )
+     ), 
+  
+  data = abrams_t1
+  )
+```
+
+@tbl-abramssmmry zeigt, dass es in den Zeiträumen nach Gesetzesverschärfungen im Mittel zu einer Verringerung der betrachteten Pro-Kopf-Kriminalitätsraten kommt.^[@tbl-abramssmmry reproduziert Teilergebnisse von Tabelle 1 in @Abrams2012.] Da @Abrams2012 sich auf die Analyse des Effekts auf Delikte unter Gebrauch von Schusswaffen fokussiert, berechnen wir weiterhin Trends in der allgemeinen Pro-Kopf-Kriminalität (`pcralloffense`) und Raubüberfälle mit Schusswaffen, (`pcrrobgun`). Wir unterscheiden hierbei zusätzlich zwischen Bundesstaaten, die im Beobachtungszeitraum Add-On-Gesetzte verabschiedet haben (`everaddon`) und solchen ohne.
 
 ```{r}
 library(tidyr)
@@ -114,6 +435,7 @@ plot_dat <- abrams %>%
     statepop
   ) %>%
   mutate(
+    # Skalierung für 2. Y-Achse
     pcrrobgun = pcrrobgun * 33.3
   ) %>%
   rename(
@@ -129,7 +451,8 @@ plot_dat <- abrams %>%
   group_by(year, AddOnGesetze, Verbrechen) %>% 
   mutate(
     AddOnGesetze = as.factor(AddOnGesetze),
-    ) %>%
+  ) %>%
+  # Gewichtete Mittelwerte
   summarise(
     Wert = weighted.mean(
       Wert, 
@@ -139,9 +462,11 @@ plot_dat <- abrams %>%
   ) 
 ```
 
+Wir plotten die berechneten Trends in `plot_dat` mit entsprechender Farbgebung mit `ggplot2()`. Das Ergebnis (@fig-abramstrends) ist eine Reproduktion von Abbildung 2 in @Abrams2012.
+
 ```{r}
 #| label: fig-abramstrends
-#| fig-cap: "Populations-gewichtete mittlere Pro-Kopf-Kriminalitätsraten für US-Bundesstaaten"
+#| fig-cap: "Populations-gewichtete mittlere Pro-Kopf-Kriminalitätsraten für US-Bundesstaaten (1965--2002)"
 library(ggplot2)
 library(cowplot)
 
@@ -171,24 +496,38 @@ ggplot(
   )
 ```
 
-@fig-abramstrends zeigt einen starken Anstieg der Kriminalität in den 1960er und 1970er Jahren, insbesondere für Rabüberfälle mit Schusswaffen. Weiterhin sind die Trends in Staaten mit und ohne Zusatzstrafen deutlich korreliert. Die Entwicklung der Pro-Kopf-Kriminalität insgesamt schwächt sich nachfolgend ab und folgt ab den 1990er Jahren einem rückläufigen Trend. Es ist auffällig, dass sowohl die bewaffneten Raubüberfälle als auch die allgemeine Kriminalität zu Beginn des Beobachtungszeitraums für Staaten mit Add-on-Gesetzen höher sind, sich dies aber im letzten Jahrzehnt ebenfalls umkehrt. Wie in @Abrams2012 erläutert, könnte dies sowohl auf verschäfte Gesetze als auch auf Variation zwischen den Bundesstaaten zurückzuführen sein. Statistische Verfahren sollten zwischen diesen Möglichkeiten unterscheiden können (bspw. durch Fixed Effects und spezifische Zeit-Trends).
+@fig-abramstrends zeigt einen starken Anstieg der Kriminalität in den 1960er und 1970er Jahren, insbesondere für Rabüberfälle mit Schusswaffen. Weiterhin sind die Trends in Staaten mit und ohne Zusatzstrafen deutlich korreliert. Die Entwicklung der Pro-Kopf-Kriminalität insgesamt schwächt sich anschließend ab und folgt ab den 1990er Jahren einem rückläufigen Trend. Es ist auffällig, dass sowohl die bewaffneten Raubüberfälle als auch die allgemeine Kriminalität zu Beginn des Beobachtungszeitraums für Staaten mit Add-on-Gesetzen höher sind, sich dies aber im letzten Jahrzehnt ebenfalls umkehrt. Wie in @Abrams2012 erläutert, könnte dies sowohl auf verschäfte Gesetze als auch auf Variation zwischen den Bundesstaaten zurückzuführen sein. Statistische Verfahren zur Schätzung des Effekts also sollten zwischen diesen Möglichkeiten unterscheiden können, bspw. durch die Kontrolle für Fixed Effects und Zeit-Trends.
 
 #### Basis-Spezifikation
 
-Wir folgen @Abrams2012 und schätzen zunächst mehrere Basis-Spezifikationen für eine balancierte Teilstichprobe aus `abrams`. Das Regressionsmodell ist
+Wir folgen @Abrams2012 und schätzen zunächst eine Basis-Spezifikation für eine balancierte Teilstichprobe aus `abrams`. Hierbei werden lediglich Bundesstaaten mit Datenpunkten mindestens 7 Jahre vor und maximal 6 Jahre nach der Einfühung eines Add-On-Gesetzes berücksichtigt. Das Regressionsmodell ist
 \begin{align}
-  \log\textup{Rob}_{at} = \beta \textup{AddOn}^i_{st} + \lambda_s + \gamma_t + x_{st} + \epsilon_{at},
+  \log\textup{Rob}_{at} = \beta \textup{AddOn}^i_{st} + \lambda_s + \gamma_t + x_{st} + \epsilon_{at},\label{eq:abramsbase}
 \end{align}
-wobei $\log\textup{Rob}_{at}$ die logarithmierte Pro-Kopf-Rate für Überfälle mit Schusswaffe (`lnpcrrobgun`). $\textup{AddOn}^i_{st}$ ist eine Dummy-Variable die 1 ist für Beobachtungen des Bundesstaats $s$ in Jahr $t$, wenn die Einführung des Add-On-Gesetzes $i$ Jahre zurückliegt. $\lambda_s$ und $\gamma_t$ sind Fixed Effects für Bundesstaaten und Perioden. $x_{st}$ repräsentiert alle Kontrollvariablen auf Bundesstaatenebene. Hierbei werden stets sämtliche Variablen mit einer Bezeichnung beginnend mit `dc` berücksichtigt, vgl. @tbl-abrams2012vars.
+wobei $\log\textup{Rob}_{at}$ die logarithmierte Pro-Kopf-Rate für Überfälle mit Schusswaffe (`lnpcrrobgun`). $\textup{AddOn}^i_{st}$ ist eine Dummy-Variable die 1 ist für Beobachtungen des Bundesstaats $s$ in Jahr $t$, wenn die Einführung des Add-On-Gesetzes $i$ Jahre zurückliegt. Wir folgen @Abrams2012 und betrachten Modelle mit $i\in\{1,2,3\}$, d.h. wir unterscheiden zwischen Effekten bis zu drei Jahren (durchschnittliche Mindeststrafe nach alter Gesetzgebung) nach Einführung eines Add-On-Gesetzes.
 
-Für die komfortable Schätzung von Fixed Effects und die Berechnung cluster-robusten Standardfehlern verwenden wir `fixest::feols()`, siehe @sec-paneldata für Details zur Schätzung von Panel-Daten-Modellen.
+$\lambda_s$ und $\gamma_t$ sind Fixed Effects für Bundesstaaten und Perioden. $x_{st}$ repräsentiert alle Kontrollvariablen auf Bundesstaatenebene. Hierbei werden stets sämtliche Variablen mit einer Bezeichnung beginnend mit `dc` berücksichtigt, vgl. @tbl-abrams2012vars. Weiterhin wird mit `ymm` für den Effekt eines aktiven Gesetzes für eine Mindeststrafe kontrolliert.
+
+Eine Erweiterung von \eqref{eq:abramsbase} kontrolliert für Bundesstaat-spezifische Zeit-Trends^[Für die Implementierung in R wählen wir $\omega_s = \beta_s \cdot D_s$, wobei $\beta_s$ der Trend-Koeffizient für Bundesstaat $s$ und $D_s$ ein Indikator für den Staat $s$ ist.] $\omega_s\cdot t$,
+\begin{align}
+  \log\textup{Rob}_{at} = \beta \textup{AddOn}^i_{st} + \lambda_s + \gamma_t + \omega_s\cdot t + x_{st} + \epsilon_{at}.\label{eq:abramstrend}
+\end{align}
+
+Anhand von \eqref{eq:abramstrend} kontrollieren wir zusätzlich für über die Zeit variierende Faktoren in $\log\textup{Rob}_{at}$ welche die Wahrscheinlichkeit einer Verabschiedung von Add-On in den jeweiligen Bundesstaaten beeinflussen. Diese Spezifikation ist also etwas konservativer als Modell \eqref{eq:abramsbase}, da hier lediglich der Zeitpunkt der Einführung der Gesetze exogen sein muss, siehe die Diskussion in Abschnitt II in @Abrams2012.
+
+Für die komfortable Schätzung von Modellen mit Fixed Effects und die Berechnung von cluster-robusten Standardfehlern (Clustering auf Bundesstaaten-Ebene) verwenden wir `fixest::feols()`, siehe @sec-paneldata für Details zur Schätzung von Panel-Daten-Modellen.
+
+Aufgrund eine Diskontinuität in Daten für die Beobachtungen mehrerer Variablen im Jahr 1974 Schätzen wir \eqref{eq:abramsbase} und \eqref{eq:abramstrend} jeweils zusätzlich für Daten nach 1974. Insgesamt schätzen wir also neun Modelle:
+
+- Spezifikation \eqref{eq:abramsbase}, jeweils einmal für $i\in\{1,2,3\}$
+- Spezifikation \eqref{eq:abramstrend}, jeweils einmal für $i\in\{1,2,3\}$
+- Spezifikation \eqref{eq:abramstrend}, jeweils einmal für $i\in\{1,2,3\}$ und für Beobachtungen mit $t>1974$.
 
 ```{r}
 library(fixest)
 
-# Basis-Spezifikation
-# Table 3 (3)
-mod_basis <- feols(
+# Basis-Spezifikation (1): 1 Jahr
+mod_basis_1J <- feols(
   fml = lnpcrrobgun ~
    # Effekt 1 Jahr nach Add-on law              
    yaddon
@@ -211,13 +550,79 @@ mod_basis <- feols(
    vcov = ~ FSTATE
 )
 
-summary(mod_basis)
+summary(mod_basis_1J)
 ```
 
 ```{r}
-# (4)
-# + state-specific time trends
-mod_trends <- feols(fml = lnpcrrobgun ~
+# Basis-Spezifikation (1): 2 Jahre
+mod_basis_2J <- feols(
+  fml = lnpcrrobgun ~
+   # Effekt 2 Jahre nach Add-on law              
+   twoyears_add
+   # Ges. Mindeststrafe?
+   + ymm
+   # Kontrollvariablen
+   + dcpoverty
+   + dcunemp
+   + dcblack_per
+   + dcp15t17
+   + dcp18t24 
+   + dcp25t34
+   + dcpolice_per1
+   + dcprison_per1
+   # Fixed Effects
+   | FSTATE + year,
+   data = abrams %>% 
+     filter(relyr >= -7 & relyr <= 6), 
+   weights = ~ statepop,
+   vcov = ~ FSTATE
+)
+
+summary(mod_basis_2J)
+```
+
+
+```{r}
+# Basis-Spezifikation (1): 3 Jahre
+mod_basis_3J <- feols(
+  fml = lnpcrrobgun ~
+   # Effekt 2 Jahre nach Add-on law              
+   threeyears_add
+   # Ges. Mindeststrafe?
+   + ymm
+   # Kontrollvariablen
+   + dcpoverty
+   + dcunemp
+   + dcblack_per
+   + dcp15t17
+   + dcp18t24 
+   + dcp25t34
+   + dcpolice_per1
+   + dcprison_per1
+   # Fixed Effects
+   | FSTATE + year,
+   data = abrams %>% 
+     filter(relyr >= -7 & relyr <= 6), 
+   weights = ~ statepop,
+   vcov = ~ FSTATE
+)
+
+summary(mod_basis_3J)
+```
+
+
+Vor der Schätzung der Spezifikationen mit Trends transformieren wir `FSTATE` zu einer Variable des kategorischen Typs `factor`, damit Bundesstaat-spezifische Trends mit ` FSTATE:year` über das Argument `fml` in `feols()` definiert werden können.
+
+```{r}
+# 'FSTATE' zu factor transformieren
+abrams <- abrams %>%
+  mutate(
+    FSTATE = factor(FSTATE)
+  )
+
+# Spezifikation (2): 1 Jahr
+mod_trends_1J <- feols(
+    fml = lnpcrrobgun ~
         # Effekt 1 Jahr nach Add-on law              
         yaddon
         # Ges. Mindeststrafe?
@@ -241,14 +646,73 @@ mod_trends <- feols(fml = lnpcrrobgun ~
       vcov = ~ FSTATE
 )
 
-summary(mod_trends)
+summary(mod_trends_1J, n = 10)
 ```
 
 ```{r}
-# (8)
+# Spezifikation (2): 2 Jahre
+mod_trends_2J <- feols(
+    fml = lnpcrrobgun ~
+        # Effekt 1 Jahr nach Add-on law              
+        twoyears_add
+        # Ges. Mindeststrafe?
+      + ymm
+        # Kontrollvariablen
+      + dcpoverty
+      + dcunemp
+      + dcblack_per
+      + dcp15t17
+      + dcp18t24 
+      + dcp25t34
+      + dcpolice_per1
+      + dcprison_per1
+      # Trends: Bundesstaat
+      + FSTATE:year
+      # Fixed Effects
+      | FSTATE + year,
+      data = abrams %>% 
+        filter(relyr >= -7 & relyr <= 6), 
+      weights = ~ statepop,
+      vcov = ~ FSTATE
+)
+
+summary(mod_trends_2J, n = 10)
+```
+
+```{r}
+# Spezifikation (2): 3 Jahre
+mod_trends_3J <- feols(
+    fml = lnpcrrobgun ~
+        # Effekt 1 Jahr nach Add-on law              
+        threeyears_add
+        # Ges. Mindeststrafe?
+      + ymm
+        # Kontrollvariablen
+      + dcpoverty
+      + dcunemp
+      + dcblack_per
+      + dcp15t17
+      + dcp18t24 
+      + dcp25t34
+      + dcpolice_per1
+      + dcprison_per1
+      # Trends: Bundesstaat
+      + FSTATE:year
+      # Fixed Effects
+      | FSTATE + year,
+      data = abrams %>% 
+        filter(relyr >= -7 & relyr <= 6), 
+      weights = ~ statepop,
+      vcov = ~ FSTATE
+)
+
+summary(mod_trends_3J, n = 10)
+```
+
+```{r}
+# Spezifikation (2): 1 Jahr
 # Post 1974
-# + state-specific time trends
-mod_trends_post <- feols(
+mod_trends_1J_post <- feols(
   fml = lnpcrrobgun ~
         # Effekt 1 Jahr nach Add-on law
         yaddon
@@ -276,36 +740,168 @@ mod_trends_post <- feols(
       vcov = ~ FSTATE
 )
 
-summary(mod_trends_post)
+summary(mod_trends_1J_post, n = 10)
 ```
-
-#### Event Study
 
 ```{r}
-# Dateb für ES vorbereiten
-abrams_es <- abrams %>%
-  mutate(
-    relyr = if_else(relyr < -7, -7, relyr),
-    relyr = if_else(relyr > 6, 6, relyr)
-  ) %>%
-  pivot_wider(
-    names_from = relyr, 
-    values_from = relyr, 
-    names_prefix = "D", 
-    values_fn = list(relyr = ~ 1), 
-    values_fill = 0
-  ) %>%
-  rename_with(
-    .fn = ~ gsub("-", "_", .), 
-    .cols = starts_with("D")
-  )
+# Spezifikation (2): 2 Jahre
+# Post 1974
+mod_trends_2J_post <- feols(
+  fml = lnpcrrobgun ~
+        # Effekt 1 Jahr nach Add-on law
+        twoyears_add
+        # Ges. Mindeststrafe?
+      + ymm
+        # Kontrollvariablen
+      + dcpoverty
+      + dcunemp
+      + dcblack_per
+      + dcp15t17
+      + dcp18t24 
+      + dcp25t34
+      + dcpolice_per1
+      + dcprison_per1
+      # Trends: Bundesstaat
+      + FSTATE:year
+      # Fixed Effects
+      | FSTATE + year,
+      data = abrams %>% 
+        filter(
+          relyr >= -7 & relyr <= 6, 
+          post74 == 1
+        ), 
+      weights = ~ statepop, 
+      vcov = ~ FSTATE
+)
+
+summary(mod_trends_2J_post, n = 10)
 ```
 
+```{r}
+# Spezifikation (2): 3 Jahre
+# Post 1974
+mod_trends_3J_post <- feols(
+  fml = lnpcrrobgun ~
+        # Effekt 1 Jahr nach Add-on law
+        threeyears_add
+        # Ges. Mindeststrafe?
+      + ymm
+        # Kontrollvariablen
+      + dcpoverty
+      + dcunemp
+      + dcblack_per
+      + dcp15t17
+      + dcp18t24 
+      + dcp25t34
+      + dcpolice_per1
+      + dcprison_per1
+      # Trends: Bundesstaat
+      + FSTATE:year
+      # Fixed Effects
+      | FSTATE + year,
+      data = abrams %>% 
+        filter(
+          relyr >= -7 & relyr <= 6, 
+          post74 == 1
+        ), 
+      weights = ~ statepop, 
+      vcov = ~ FSTATE
+)
+
+summary(mod_trends_3J_post, n = 10)
+```
+
+Wir fassen die Ergebnisse mit tabellarisch mit `modelsummary::modelsummary()` zusammen. Hierzu sammeln wir die Modell-Objekte gemäß der Struktur der zugrundeliegenden Spezifikation in benannten Listen und erzeugen eine nach dem Zeithorizont nach der Einführung eines Add-On-Gesetzes gruppierte Tabelle. Für eine bessere Übersicht berücksichtigen wir hierbei jeweils nur die Koeffizienten für den Zeitpunkt der Gesetzesverschärfung und die Dummyvariable für gesetzliche Mindeststrafen (`ymm`). Über das Argument `coef_map` definieren wir entsprechende Labels für diese geschätzten Koeffizienten.
+
+```{r}
+#| label: tbl-abramsbase
+#| tbl-cap: "`abrams` -- Einfluss von Add-on-Gesetzen auf Kriminalitätsrate: Raubüberfälle mit Waffen [@Abrams2012] "
+library(modelsummary)
+
+# Modelle in benannten Listen sammeln
+panels <- list(
+  "1 Jahr nach Add-On" = list(
+    "(1) Basis" = mod_basis_1J,
+    "(2) Trends" = mod_trends_1J,
+    "(2) Nach 74" = mod_trends_1J_post
+  ),
+  "2 Jahre nach Add-On" = list(
+    "(1) Basis" = mod_basis_2J,
+    "(2) Trends" = mod_trends_2J,
+    "(2) Nach 74" = mod_trends_2J_post
+  ),
+  "3 Jahre nach Add-On" = list(
+    "(1) Basis" = mod_basis_3J,
+    "(2) Trends" = mod_trends_3J,
+    "(2) Nach 74" = mod_trends_3J_post
+  )
+)
+
+# Tabellarische Zusammenfassung
+modelsummary(
+  models = panels,
+  shape = "rbind",
+  coef_omit = "^(?!.*(add|ymm)).*$",
+  stars = T,
+  gof_omit = "^(?!(R2*)$).*",
+  coef_map = c(
+    "yaddon" = "Add-On",
+    "twoyears_add" = "Add-On",
+    "threeyears_add" = "Add-On",
+    "ymm" = "Mindeststrafe"
+    ),
+  notes = c(
+    "Abh. Var.: Log Kriminalitätsrate: Raubüberfälle mit Schusswaffen", 
+    "Cluster-robuste Standardfehler: Bundesstaat",
+    "Fixed Effects: Bundesstaat + Jahr"
+  ),
+  output = "gt"
+) %>%
+  tabopts()
+```
+
+Die in @tbl-abramsbase zusammengefassten Ergebnisse deuten darauf, dass es im ersten Jahr nach der Einführung eines Add-On-Gesetzes keinen Signifikanten Effekt auf die Kriminalitätsrate für Raubüberfälle mit Schusswaffen gibt, wenngleich der geschätzte Koeffizient in sämtlichen Modellen negativ ist und damit konsistent mit dem vermuteten Abschreckungseffekt ist.In den Folgeperioden finden wir signifikante negative Effekte verschärfter Gesetze auf die Kriminalitätsrate von bis zu 12.7\% (Effekt in Modell \eqref{eq:abramsbase} nach drei Jahren). Die konservativste Spezifikation (Modell \eqref{eq:abramstrend} mit Beobachtungen nach 1974) liefert Evidenz eines Rückgangs der Kriminalität durch Abschreckungseffekte in Höhe von etwa 5\% innerhalb der ersten drei Jahre nach der Gesetzesänderung. Weiterhin ist der geschätzte Effekt von gesetzlichen Vorschriften zu Mindeststrafen zwar durchweg negativ, jedoch insignifikant.
+
+
+#### Event-Study-Regression
+
+Für eine detalliertere Einschätzung des zeitlichen Verlaufs des Effekts verschärfender Gesetze betrachtet @Abrams2012 eine Spezifikation ähnlich zu @Jacobsonetal1993,
+\begin{align}
+  \log\textup{Rob}_{at} = \sum_{i\in[-6,6]} \beta_i\cdot\textup{AddOn}^i_{st} + \lambda_s + \gamma_t + \omega_s\cdot t + x_{st} + \epsilon_{at},\label{eq:abramsesreg}
+\end{align}
+mit perioden-spezifischen Effekten $\beta_i$ in einem Zeitfenster von sechs Jahren vor und nach Gesetzesänderungen, wobei die $\textup{AddOn}^i_{st}$ definiert sind wie in \eqref{eq:abramsbase} Für die Schätzung von Modell \eqref{eq:abramsesreg} mit R zeigen wir zunächst, wie diese Dummies anhand der Variable `relyr` effizient erzeugt werden können. 
+
+```{r}
+# Ausprägungen von 'relyr'
+abrams %>% 
+  pull(relyr) %>% 
+  table()
+```
+
+Hierfür generieren wir mit `tidyr::pivot_wider()` eine Variante des Datensatzes, `abrams_es`, in der Beobachtungen von `relyr` spaltenweise in binärer Kodierung abgetragen sind. Diese Variablen erhalten das Präfix `D`. Für leichtere Handhabung der Variablennamen innerhalb von `feols()` wird das negative Vorzeichen wird druch `dplyr::rename_with()` in einen Underscore umgewandelt.
+
+```{r}
+# Dummy-Variablen für Event-Study-Regression erzeugen
+abrams_es <- abrams %>%
+    pivot_wider(
+        names_from = relyr, 
+        values_from = relyr, 
+        names_prefix = "D", 
+        values_fn = list(relyr = ~ 1), 
+        values_fill = 0
+    ) %>%
+    rename_with(
+        .fn = ~ gsub("-", "_", .), 
+        .cols = starts_with("D")
+    )
+```
+
+Wir schätzen nun die Regression \eqref{eq:abramsesreg}, sowohl mit als auch ohne Bundesstaat-spezifische Zeit-Trends und fassen die Ergebnisse anschließend mit `modelsummary()` zusammen.
 
 ```{r}
 #| message: false
-# Event-Study-Regression
-es_mod <- feols(
+# Event-Study-Regression ohne Zeit-Trends
+abrams_mod_es <- feols(
   fml = lnpcrrobgun ~
       # Rel. Zeitpunkt-Dummies
       + D_6
@@ -321,7 +917,45 @@ es_mod <- feols(
       + D4
       + D5
       + D6
-      # Kovariablen
+      # Kontrollvariablen
+      + dcpoverty
+      + dcunemp
+      + dcblack_per
+      + dcp15t17
+      + dcp18t24 
+      + dcp25t34
+      + dcpolice_per1
+      + dcprison_per1
+      # Fixed Effects
+      | FSTATE + year,
+       data = abrams_es,
+      weights = ~ statepop, 
+      vcov = ~ FSTATE
+)
+
+summary(abrams_mod_es, n = 13)
+```
+
+```{r}
+#| message: false
+# Event-Study-Regression mit Zeit-Trends
+abrams_mod_es_trends <- feols(
+  fml = lnpcrrobgun ~
+      # Rel. Zeitpunkt-Dummies
+      + D_6
+      + D_5
+      + D_4
+      + D_3
+      + D_2
+      + D_1
+      + D0      
+      + D1
+      + D2
+      + D3
+      + D4
+      + D5
+      + D6
+      # Kontrollvariablen
       + dcpoverty
       + dcunemp
       + dcblack_per
@@ -339,32 +973,75 @@ es_mod <- feols(
       vcov = ~ FSTATE
 )
 
-summary(es_mod, n = 13)
+summary(abrams_mod_es_trends, n = 13)
 ```
 
+
 ```{r}
-# Daten für Event-Study-Plot
-# Extract the coefficients and standard errors for the dummies
-coefficients <- coef(es_mod)
-std_errors <- se(es_mod)
+#| label: tbl-abramsesreg
+#| tbl-cap: "KQ-Schätzung der Event-Study-Spezifikation: Koeffizienten der Dummies [@Abrams2012] "
 
-# Select the relevant coefficients and standard errors for the dummies D_-6 to D_6
-events <- -6:6
-event_names <- names(coefficients)[1:13]
-
-event_coefficients <- coefficients[event_names]
-event_std_errors <- std_errors[event_names]
-
-
-# Create a data frame for plotting
-plot_data <- tibble(
-  Event = events,
-  Estimate = event_coefficients,
-  SE = event_std_errors
+# Modelle in benannten Listen sammeln
+modelle <- list(
+  "Ohne Trends" = abrams_mod_es,
+  "Zeit-Trends" = abrams_mod_es_trends
 )
 
-# Add confidence intervals
-plot_data <- plot_data %>%
+# Tabellarische Zusammenfassung
+modelsummary(
+  models = modelle,
+  coef_omit = "^(?!.*(D|D\\_)).*$",
+  stars = T,
+  gof_omit = "^(?!(R2*)$).*",
+  notes = c(
+    "Abh. Var.: Log Kriminalitätsrate: Raubüberfälle mit Schusswaffen", 
+    "Cluster-robuste Standardfehler: Bundesstaat",
+    "Fixed Effects: Bundesstaat + Jahr"
+  ),
+  output = "gt"
+) %>%
+  tabopts()
+```
+
+Die statistische Zusammenfassung beider Event-Study-Spezifikationen in @tbl-abramsesreg untermauern die Ergebnisse aus @tbl-abramsbase: 
+
+- Die positiven geschätzten Koeffizienten der Dummies für Zeitpunkte *vor* der Einführung von Add-On-Gesetzen ($i=-6,\dots,-1$) sind signifikant und zeigen einen stabilen Verlauf der Kriminalitätsrate an.
+
+- Die negativen, nicht-signifikant von 0 verschiedenen geschätzten Koeffizienten *nach* der Einführung von Add-On-Gesetzen ($i=0,\dots,6$) sind Evidenz für einen Rückgang der Pro-Kopf-Kriminalitätsrate für Raubüberfälle mit Schusswaffen im Folgezeitraum.
+
+Für eine grafische Veranschaulichung der zeitlichen Entwicklung des geschätzten Effekts plotten wir die Schätzungen aus @tbl-abramsesreg zusammen mit einem 1-Standardfehler-Intervall.^[Vgl. Abbildung 4 in @Abrams2012.] Hierzu lesen wir zunächst die geschätzten Koeffizienten und Standardfehler aus dem Objekten `abrams_mod_es` und `abrams_mod_es_trends` aus, berechnen die zugehörigen Konfidenzintervalle und sammeln die Ergebnisse unter Verwendung einer Indikatorvariable für das zugrundeliegende Modell in einem `tibble`-Objekt
+
+```{r}
+# Koeffizienten: Modell mit Trend
+coefficients_1 <- coef(abrams_mod_es_trends)
+std_errors_1 <- se(abrams_mod_es_trends)
+
+# Koeffizienten: Modell ohne Trend
+coefficients_2 <- coef(abrams_mod_es)
+std_errors_2 <- se(abrams_mod_es)
+
+# Subset von i = -6,...,0,...,6 auslesen
+events <- -6:6
+event_names <- names(coefficients_1)[1:13]
+
+# Schätzungen je Modell sammeln
+plot_data_1 <- tibble(
+  Modell = "Mit Trends",
+  Event = events,
+  Estimate = coefficients_1[event_names],
+  SE = std_errors_1[event_names]
+)
+
+plot_data_2 <- tibble(
+  Modell = "Ohne Trends",
+  Event = events,
+  Estimate = coefficients_2[event_names],
+  SE = std_errors_2[event_names]
+)
+
+# Datenpunkte sammeln
+plot_data <- bind_rows(plot_data_1, plot_data_2) %>%
+  # 1-Standardfehler-Intervall
   mutate(
     CI_Lower = Estimate - SE,
     CI_Upper = Estimate + SE
@@ -372,21 +1049,28 @@ plot_data <- plot_data %>%
 ```
 
 ```{r}
+#| label: fig-abramsesregres
+#| fig-cap: "Event-Study-Regression -- Geschätze Rate: Raubüberfälle rel. zur Einführung von Add-On-Gesetzen"
+
 # Event-Study-Plot
 ggplot(
   data = plot_data, 
-  mapping = aes(x = Event, y = Estimate)
+  mapping = aes(
+    x = Event, 
+    y = Estimate, 
+    color = Modell, 
+    fill = Modell
+  )
 ) +
   # gesch. Effekte
   geom_point() +
   geom_line() +
-  # SE-Intervall
+  # 1-SE-Intervall
   geom_ribbon(
     mapping = aes(
       ymin = CI_Lower, 
       ymax = CI_Upper
     ),
-    fill = "steelblue",
     color ="white",
     alpha = 0.2
   ) +
@@ -397,17 +1081,23 @@ ggplot(
   ) +
   geom_vline(
     xintercept = 0, 
-    linetype = "dashed", 
-    color = "red"
+    linetype = "dashed"
   ) +
-  # Labels
+  # Labels + Legende
   labs(
-    x = "Relativer Zeitpunkt zur Einf. Add-on-Gesetz",
-    y = "Log Rate: Schussw. Überfälle") +
-  theme_cowplot()
+    x = "Zeitpunkt rel. zur Einf. Add-on-Gesetz",
+    y = "Log-Rate: Überfälle mit Schusswaffen") +
+  scale_y_continuous(limits = c(-.4, .4)) +
+  theme_cowplot() +
+  theme(legend.position = "top")
 ```
+
+Beachte, dass lediglich die Änderungen der Koeffizienten in  @fig-abramsesregres eine sinnvolle Interpretation haben: Die absoluten Werte auf der Y-Achse  sind nicht aussagekräftig, da sie aus Regressionen mit mehreren Regressoren mit von Null verschiedenen Mittelwerten stammen. 
+
+Eine Auffälligkeit in @fig-abramsesregres ist, dass die mittlere Kriminalitätsrate bereits eine Periode *vor* dem Zeitpunkt der Gesetzeseinführung eine Trendumkehr aufzuweisen scheint. @Abrams2012 weißt darauf hin, dass potenzielle Straftäter durch die laufende öffentliche Debatte und Diskussion über das Gesetz erfahren und ihr Verhaltensweisen in Erwartung der Gesetzesänderung anpassen könnten. Die emprische Studienlage hinsichtlich eines solches Verhalten ist jedoch nicht eindeutig, siehe die Diskussion in @Abrams2012, Abschnitt IV B.
 
 ## Zusammenfassung
 
+Mit Event Studies können die Auswirkungen spezifischer Ereignisse oder Interventionen auf eine über die Zeit beobachtete Outcome-Variable untersucht werden. Die zugrunde liegende Annahme für die Identifizierbarkeit des kausalen Effekts ist, dass das untersuchte Event als exogener Schock fungiert, der die Outcome-Variable beeinflusst, jedoch unabhängig von anderen unbeobachtbaren Einflussfaktoren ist, sodass die der Front-Door-Pfad isoliert werden kann.
 
-
+Der Effekt wird meist in einem zeitlichen Umfeld nahe des Ereignisses analysiert. Zur Bestimmung eines kontrafaktischen Vergleichswerts für die Outcome-Variable nach dem Event kann die Prognose des Outcomes hilfreich sein. Für die präzise Schätzung des Behandlungseffekts werden häufig Regressionsmodelle herangezogen, die es ermöglichen, zeitliche Veränderungen in der Outcome-Variable zu modellieren und zusätzliche Kontrollvariablen zu berücksichtigen. Dadurch wird die Robustheit und Genauigkeit der Ergebnisse erhöht, was insbesondere bei der Analyse langfristiger Interventionseffekte in komplexen ökonomischen und politischen Kontexten von relevant ist.

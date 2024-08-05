@@ -857,7 +857,10 @@ modelsummary(
     "sp3m1893_n30" = "Rel. Niederschlag 1893"
     ),
   gof_map = gm, 
-  notes = c("Abhängige Variable: Peasants Fasci", "Cluster-robuste Standardfehler: Naheste Wetterstation + Distrikt"),
+  notes = c(
+    "Abhängige Variable: Peasants Fasci", 
+    "Cluster-robuste Standardfehler: Naheste Wetterstation + Distrikt"
+  ),
   output = "gt"
 ) %>%
   tabopts()
