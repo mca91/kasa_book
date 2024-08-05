@@ -47,6 +47,9 @@ reg_dat <- es %>%
   transmute(
     pcralloffense,
     pcrrobgun,
+    pcrasltgun,
+    pcrburgtot,
+    pcrmurder,
     lnpcrrobgun,
     FSTATE = as.factor(FSTATE),
     year,
