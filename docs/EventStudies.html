@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.4.553">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Kausalanalyse mit R - 8&nbsp; Event Studies</title>
+<title>Kausalanalyse mit R - 9&nbsp; Event Studies</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -368,7 +368,7 @@ globalThis.qwebrCustomizedWebROptions = {
 };
 
 // Store cell data
-globalThis.qwebrCellDetails = [{"code":"# create dataset directory\ndir.create(\"datasets\")\n# download the dataset\ndownload.file(\n    \"https://raw.githubusercontent.com/mca91/kausal_data/main/Abrams2012.dta\",\n    'datasets/Abrams2012.dta',\n)","id":1,"options":{"classes":"","warning":"true","comment":"","fig-height":5,"context":"setup","out-width":"700px","autorun":"true","output":"true","message":"true","dpi":72,"label":"unnamed-chunk-1","fig-width":7,"fig-cap":"","out-height":"","results":"markup"}},{"code":"library(haven)\nlibrary(dplyr)\n\n# Datensatz einlesen\nabrams <- read_dta(file = \"datasets/Abrams2012.dta\")\n\n# Überblick\nglimpse(abrams)","id":2,"options":{"classes":"","warning":"true","comment":"","fig-height":5,"context":"interactive","out-width":"700px","autorun":"true","output":"true","message":"true","dpi":72,"label":"unnamed-chunk-2","fig-width":7,"fig-cap":"","out-height":"","results":"markup"}}];
+globalThis.qwebrCellDetails = [{"id":1,"code":"# create dataset directory\ndir.create(\"datasets\")\n# download the dataset\ndownload.file(\n    \"https://raw.githubusercontent.com/mca91/kausal_data/main/Abrams2012.dta\",\n    'datasets/Abrams2012.dta',\n)","options":{"results":"markup","label":"unnamed-chunk-1","classes":"","fig-width":7,"autorun":"true","message":"true","fig-cap":"","fig-height":5,"output":"true","comment":"","dpi":72,"out-width":"700px","context":"setup","warning":"true","out-height":""}},{"id":2,"code":"library(haven)\nlibrary(dplyr)\n\n# Datensatz einlesen\nabrams <- read_dta(file = \"datasets/Abrams2012.dta\")\n\n# Überblick\nglimpse(abrams)","options":{"results":"markup","label":"unnamed-chunk-2","classes":"","fig-width":7,"autorun":"true","message":"true","fig-cap":"","fig-height":5,"output":"true","comment":"","dpi":72,"out-width":"700px","context":"interactive","warning":"true","out-height":""}}];
 
 </script><script type="module">
 // Declare startupMessageQWebR globally
@@ -1113,7 +1113,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./EventStudies.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Event Studies</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./EventStudies.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Event Studies</span></a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -1161,56 +1161,62 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./Simulation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Simulation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./Matching.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Matching</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Matching</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./FixedEffects.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Panel-Daten</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Panel-Daten</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./IV.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">IV-Regression</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">IV-Regression</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./DiD.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./EventStudies.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Event Studies</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Event Studies</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./RDD.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./RegReg.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Regularisierte Regression</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Regularisierte Regression</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./Machine Learning.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Machine Learning</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Machine Learning</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./SyntheticControl.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Synthetic Control</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Synthetic Control</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -1224,28 +1230,28 @@ window.Quarto = {
     <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title"><a href="./index.html">Übersicht</a></h2>
    
   <ul>
-<li><a href="#counterfactuals-und-regression" id="toc-counterfactuals-und-regression" class="nav-link active" data-scroll-target="#counterfactuals-und-regression"><span class="header-section-number">8.1</span> Counterfactuals und Regression</a></li>
+<li><a href="#counterfactuals-und-regression" id="toc-counterfactuals-und-regression" class="nav-link active" data-scroll-target="#counterfactuals-und-regression"><span class="header-section-number">9.1</span> Counterfactuals und Regression</a></li>
   <li>
-<a href="#beispiel-strukturbruch-in-zeitreihe" id="toc-beispiel-strukturbruch-in-zeitreihe" class="nav-link" data-scroll-target="#beispiel-strukturbruch-in-zeitreihe"><span class="header-section-number">8.2</span> Beispiel: Strukturbruch in Zeitreihe</a>
+<a href="#beispiel-strukturbruch-in-zeitreihe" id="toc-beispiel-strukturbruch-in-zeitreihe" class="nav-link" data-scroll-target="#beispiel-strukturbruch-in-zeitreihe"><span class="header-section-number">9.2</span> Beispiel: Strukturbruch in Zeitreihe</a>
   <ul>
-<li><a href="#event-study-sch%C3%A4tzung-kausaler-effekt-f%C3%BCr-x_t" id="toc-event-study-schätzung-kausaler-effekt-für-x_t" class="nav-link" data-scroll-target="#event-study-sch%C3%A4tzung-kausaler-effekt-f%C3%BCr-x_t"><span class="header-section-number">8.2.1</span> Event-Study-Schätzung: Kausaler Effekt für <span class="math inline">\(X_t\)</span></a></li>
-  <li><a href="#event-study-sch%C3%A4tzung-kausaler-effekt-f%C3%BCr-y_t" id="toc-event-study-schätzung-kausaler-effekt-für-y_t" class="nav-link" data-scroll-target="#event-study-sch%C3%A4tzung-kausaler-effekt-f%C3%BCr-y_t"><span class="header-section-number">8.2.2</span> Event-Study-Schätzung: Kausaler Effekt für <span class="math inline">\(Y_t\)</span></a></li>
+<li><a href="#event-study-sch%C3%A4tzung-kausaler-effekt-f%C3%BCr-x_t" id="toc-event-study-schätzung-kausaler-effekt-für-x_t" class="nav-link" data-scroll-target="#event-study-sch%C3%A4tzung-kausaler-effekt-f%C3%BCr-x_t"><span class="header-section-number">9.2.1</span> Event-Study-Schätzung: Kausaler Effekt für <span class="math inline">\(X_t\)</span></a></li>
+  <li><a href="#event-study-sch%C3%A4tzung-kausaler-effekt-f%C3%BCr-y_t" id="toc-event-study-schätzung-kausaler-effekt-für-y_t" class="nav-link" data-scroll-target="#event-study-sch%C3%A4tzung-kausaler-effekt-f%C3%BCr-y_t"><span class="header-section-number">9.2.2</span> Event-Study-Schätzung: Kausaler Effekt für <span class="math inline">\(Y_t\)</span></a></li>
   </ul>
 </li>
   <li>
-<a href="#sec-deterrance" id="toc-sec-deterrance" class="nav-link" data-scroll-target="#sec-deterrance"><span class="header-section-number">8.3</span> Case Study: Abschreckungseffekte durch Strafgesetzgebung</a>
+<a href="#sec-deterrance" id="toc-sec-deterrance" class="nav-link" data-scroll-target="#sec-deterrance"><span class="header-section-number">9.3</span> Case Study: Abschreckungseffekte durch Strafgesetzgebung</a>
   <ul>
-<li><a href="#identifikationsstrategie" id="toc-identifikationsstrategie" class="nav-link" data-scroll-target="#identifikationsstrategie"><span class="header-section-number">8.3.1</span> Identifikationsstrategie</a></li>
+<li><a href="#identifikationsstrategie" id="toc-identifikationsstrategie" class="nav-link" data-scroll-target="#identifikationsstrategie"><span class="header-section-number">9.3.1</span> Identifikationsstrategie</a></li>
   <li>
-<a href="#replikation-mit-r" id="toc-replikation-mit-r" class="nav-link" data-scroll-target="#replikation-mit-r"><span class="header-section-number">8.3.2</span> Replikation mit R</a>
+<a href="#replikation-mit-r" id="toc-replikation-mit-r" class="nav-link" data-scroll-target="#replikation-mit-r"><span class="header-section-number">9.3.2</span> Replikation mit R</a>
   <ul class="collapse">
-<li><a href="#basis-spezifikation" id="toc-basis-spezifikation" class="nav-link" data-scroll-target="#basis-spezifikation"><span class="header-section-number">8.3.2.1</span> Basis-Spezifikation</a></li>
-  <li><a href="#event-study-regression" id="toc-event-study-regression" class="nav-link" data-scroll-target="#event-study-regression"><span class="header-section-number">8.3.2.2</span> Event-Study-Regression</a></li>
+<li><a href="#basis-spezifikation" id="toc-basis-spezifikation" class="nav-link" data-scroll-target="#basis-spezifikation"><span class="header-section-number">9.3.2.1</span> Basis-Spezifikation</a></li>
+  <li><a href="#event-study-regression" id="toc-event-study-regression" class="nav-link" data-scroll-target="#event-study-regression"><span class="header-section-number">9.3.2.2</span> Event-Study-Regression</a></li>
   </ul>
 </li>
   </ul>
 </li>
-  <li><a href="#zusammenfassung" id="toc-zusammenfassung" class="nav-link" data-scroll-target="#zusammenfassung"><span class="header-section-number">8.4</span> Zusammenfassung</a></li>
+  <li><a href="#zusammenfassung" id="toc-zusammenfassung" class="nav-link" data-scroll-target="#zusammenfassung"><span class="header-section-number">9.4</span> Zusammenfassung</a></li>
   </ul></nav>
 </nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
@@ -1424,7 +1430,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 }
 </script><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
 <div class="quarto-title-block"><div><h1 class="title">
-<span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Event Studies</span>
+<span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Event Studies</span>
 </h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
 </div>
 
@@ -1445,8 +1451,8 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <div id="qwebr-insertion-location-1"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p>Eine <em>Event Study</em> ist ein empirischer Ansatz, um die Auswirkungen von zufälligen Ereignissen oder bestimmen Interventionen auf eine Outcome-Variable zu messen. Die zentrale Annahme hierbei ist, dass das untersuchte Ereignis exogen ist, also als ein ‘natürlicher’ Schock wirkt: Die Intervention löst eine Reaktion in der Outcome-Variable aus, ist jedoch unabhängig von andere unbeobachtbaren Determinanten der Outcome-Variable, sodass Backdoors vermieden werden. Ist diese Annahme gegeben, so kann eine Event Study den kausalen Effekt einer Intervention vergleichsweise einfach ermitteln, indem überprüft wird, ob und wie stark die Outcome-Variable im Zeitraum nahe des Ereignis reagiert. Letzteres erfolgt häufig durch eine Analyse der durch das Event verursachten Variation in der Outcome-Variable mit einem ökonometrischen Modell.</p>
-<section id="counterfactuals-und-regression" class="level2 page-columns page-full" data-number="8.1"><h2 data-number="8.1" class="anchored" data-anchor-id="counterfactuals-und-regression">
-<span class="header-section-number">8.1</span> Counterfactuals und Regression</h2>
+<section id="counterfactuals-und-regression" class="level2 page-columns page-full" data-number="9.1"><h2 data-number="9.1" class="anchored" data-anchor-id="counterfactuals-und-regression">
+<span class="header-section-number">9.1</span> Counterfactuals und Regression</h2>
 <p>Event Studies sind hilfreich, weil sie die Identifizierung kausaler Zusammenhänge in komplexen Situationen mit vielen potentiellen (unbeobachtbaren) Backdoor-Variablen ermöglichen können. Durch die Fokussierung auf einen klar definierten Zeitraum um das Ereignis und die Anwendung zusätzlicher Kontrollmechanismen (Regression) kann der interessierende Effekt oftmals plausibel identifiziert werden.</p>
 <p>Für die Schätzug des Behandlungseffekts ist es nötig, einen plausiblen (kontrafaktischen) Vergleichswert für die nach der Intervention beobachteten Werte der Outcome-Variable zu finden. Hierbei gibt es drei wesentliche Vorgehensweisen:</p>
 <ol type="1">
@@ -1457,7 +1463,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <p>In vielem polit-ökonomischen Anwendungen ist es plausibel, dass eine Intervention einen längerfristigen (konstanten) Effekt hat. In solchen Fällen kann ein Interkationsmodell<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> geschätzt werden: <span class="math display">\[\begin{align}
   Y_t = \beta_0 + \beta_1 t + \beta_2 \textup{post}_t + \beta_3 \cdot t \cdot \textup{post}_t + \epsilon_t.\label{eq:eslinint}
 \end{align}\]</span> Hier ist <span class="math inline">\(t\)</span> die Zeit-Variable und <span class="math inline">\(\textup{post}_t\)</span> ein Dummy-Regressor für Perioden <em>nach</em> dem Event. Die Regression <span class="math inline">\(\eqref{eq:eslinint}\)</span> modelliert also einen linearen Trend in der Outcome-Variable <span class="math inline">\(Y\)</span>, der sich vor und nach dem Event unterscheiden kann. Eine Schätzung mit Regressions ist außerdem hilfreich, weil für beobachtbare Determinanten von <span class="math inline">\(Y\)</span>, die möglicherweise durch das Event beeinflusst werden, kontrolliert werden kann. Solche “robusten” Spezifikationen erhöhen die plausibilität der Identifikationsstrategie und können eine präzisere Schätzung des Behandlungseffekts gewährleisten.</p>
-<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;Der Ansatz <span class="math inline">\(\eqref{eq:eslinint}\)</span> wird auch als <em>segmentierte Regression</em> bezeichnet.</p></div></div><p>Modell <span class="math inline">\(\eqref{eq:eslinint}\)</span> kann leicht auf Panel-Daten erweitert werden, wobei die zusätzliche Information aus der Querschnittsdimension die Schätzung eines zeitlichen Verlaufs des Interventionseffekts ermöglicht. Bei Verfügbarkeit können Beobachtungseinheiten, die nicht von der Intervention betroffen sind als Counterfactuals herangezogen werden. Wir betrachten die Anwendung einer Event-Study-Methodik mit Panel-Daten-Modellen in der Case Study in <a href="#sec-deterrance" class="quarto-xref"><span>Kapitel 8.3</span></a>.</p>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;Der Ansatz <span class="math inline">\(\eqref{eq:eslinint}\)</span> wird auch als <em>segmentierte Regression</em> bezeichnet.</p></div></div><p>Modell <span class="math inline">\(\eqref{eq:eslinint}\)</span> kann leicht auf Panel-Daten erweitert werden, wobei die zusätzliche Information aus der Querschnittsdimension die Schätzung eines zeitlichen Verlaufs des Interventionseffekts ermöglicht. Bei Verfügbarkeit können Beobachtungseinheiten, die nicht von der Intervention betroffen sind als Counterfactuals herangezogen werden. Wir betrachten die Anwendung einer Event-Study-Methodik mit Panel-Daten-Modellen in der Case Study in <a href="#sec-deterrance" class="quarto-xref"><span>Kapitel 9.3</span></a>.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1476,8 +1482,8 @@ Key Facts zu Event Studies
 </ul>
 </div>
 </div>
-</section><section id="beispiel-strukturbruch-in-zeitreihe" class="level2" data-number="8.2"><h2 data-number="8.2" class="anchored" data-anchor-id="beispiel-strukturbruch-in-zeitreihe">
-<span class="header-section-number">8.2</span> Beispiel: Strukturbruch in Zeitreihe</h2>
+</section><section id="beispiel-strukturbruch-in-zeitreihe" class="level2" data-number="9.2"><h2 data-number="9.2" class="anchored" data-anchor-id="beispiel-strukturbruch-in-zeitreihe">
+<span class="header-section-number">9.2</span> Beispiel: Strukturbruch in Zeitreihe</h2>
 <p>Zur Illustration der Methodik simulieren wir Zeitreihendaten mit einem durch ein Ereignis in der Mitte des Beobachtungszeitraums ausgelösten Strukturbruch im Erwartungswert (der kausale Effekt des Events). Wir interessieren uns für den Effekt des Events auf die Variablen <span class="math inline">\(X_t\)</span> und <span class="math inline">\(Y_t\)</span>.</p>
 <p>Der hierfür verwendete DGP lautet <span class="math display">\[\begin{align*}
   X_t = &amp;\, \alpha_1 \textup{post}_t + \epsilon_t,\\
@@ -1566,8 +1572,8 @@ Key Facts zu Event Studies
 </div>
 </div>
 </div>
-<section id="event-study-schätzung-kausaler-effekt-für-x_t" class="level3" data-number="8.2.1"><h3 data-number="8.2.1" class="anchored" data-anchor-id="event-study-schätzung-kausaler-effekt-für-x_t">
-<span class="header-section-number">8.2.1</span> Event-Study-Schätzung: Kausaler Effekt für <span class="math inline">\(X_t\)</span>
+<section id="event-study-schätzung-kausaler-effekt-für-x_t" class="level3" data-number="9.2.1"><h3 data-number="9.2.1" class="anchored" data-anchor-id="event-study-schätzung-kausaler-effekt-für-x_t">
+<span class="header-section-number">9.2.1</span> Event-Study-Schätzung: Kausaler Effekt für <span class="math inline">\(X_t\)</span>
 </h3>
 <p>Wir schätzen zunächst den Effekt des Events auf <span class="math inline">\(X_t\)</span>. Die Differenz der Mittelwerte nach und vor des Events ist ein erwartungstreuer und konistenter Schätzer für <span class="math inline">\(\alpha_1\)</span>. Dieser Schätzer ist äquivalent zum KQ-Schätzer von <span class="math inline">\(\alpha_1\)</span> im Modell <span class="math display">\[\begin{align}
   X_t = \alpha_1 \textup{post}_t + u.
@@ -1611,8 +1617,8 @@ Multiple R-squared:  0.481, Adjusted R-squared:  0.4784
 F-statistic: 183.5 on 1 and 198 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 </div>
-</section><section id="event-study-schätzung-kausaler-effekt-für-y_t" class="level3" data-number="8.2.2"><h3 data-number="8.2.2" class="anchored" data-anchor-id="event-study-schätzung-kausaler-effekt-für-y_t">
-<span class="header-section-number">8.2.2</span> Event-Study-Schätzung: Kausaler Effekt für <span class="math inline">\(Y_t\)</span>
+</section><section id="event-study-schätzung-kausaler-effekt-für-y_t" class="level3" data-number="9.2.2"><h3 data-number="9.2.2" class="anchored" data-anchor-id="event-study-schätzung-kausaler-effekt-für-y_t">
+<span class="header-section-number">9.2.2</span> Event-Study-Schätzung: Kausaler Effekt für <span class="math inline">\(Y_t\)</span>
 </h3>
 <p>Für die Schätzung von <span class="math inline">\(\beta_2\)</span> liefert diese Vorgehensweise einen verzerrten Schätzer des kausalen Effekts des Events auf <span class="math inline">\(Y_t\)</span>.</p>
 <div class="cell">
@@ -1746,11 +1752,11 @@ Multiple R-squared:  0.7762,    Adjusted R-squared:  0.774
 F-statistic: 341.7 on 2 and 197 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 </div>
-</section></section><section id="sec-deterrance" class="level2 page-columns page-full" data-number="8.3"><h2 data-number="8.3" class="anchored" data-anchor-id="sec-deterrance">
-<span class="header-section-number">8.3</span> Case Study: Abschreckungseffekte durch Strafgesetzgebung</h2>
+</section></section><section id="sec-deterrance" class="level2 page-columns page-full" data-number="9.3"><h2 data-number="9.3" class="anchored" data-anchor-id="sec-deterrance">
+<span class="header-section-number">9.3</span> Case Study: Abschreckungseffekte durch Strafgesetzgebung</h2>
 <p><span class="citation" data-cites="Abrams2012">David S. Abrams (<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">2012a</a>)</span> untersucht den Abschreckungseffekt drohender Inhaftierung für Straftaten anhand von Daten zu verschärfter Strafgesetzgebung (“Add-on laws”) in den USA. Solche Gesetze erhöhen in der Regel die Strafen für Delikte, insbesondere wenn nachweißlich Schusswaffen verwendet werden. Die Studie nutzt eine Event-Study-Methodik, um die Auswirkungen dieser Gesetzesänderung auf die Kriminalitätsraten für verschiedene Straftaten zu analysieren. Dabei wird der Zeitpunkt der tatsächlichen Gesetzeseinführung in verschiedenen US-Bundesstaaten herangezogen, um den kausalen Abschreckungseffekt einer drohenden Gefängnisstrafe anhand von Statistiken in den unmittelbaren Folgeperioden zu isolieren.</p>
-<section id="identifikationsstrategie" class="level3" data-number="8.3.1"><h3 data-number="8.3.1" class="anchored" data-anchor-id="identifikationsstrategie">
-<span class="header-section-number">8.3.1</span> Identifikationsstrategie</h3>
+<section id="identifikationsstrategie" class="level3" data-number="9.3.1"><h3 data-number="9.3.1" class="anchored" data-anchor-id="identifikationsstrategie">
+<span class="header-section-number">9.3.1</span> Identifikationsstrategie</h3>
 <p>Der Fokus des Forschungsdesigns liegt auf der Unterscheidung zwischen zwei wesentlichen Wirkungskanälen von verschärften Strafgesetzen auf die Kriminalitätsrate:</p>
 <ol type="1">
 <li><p><strong>Abschreckungseffekt</strong>: Die Aussicht auf eine längere Inhaftierung erzielt einen Abschreckungseffekt, der sich ‘positiv’ auf die Kriminalitätsrate auswirkt (im Sinne einer verringerten Kriminalität). Dies ist der vermutete (kausale) Effekt.</p></li>
@@ -1758,12 +1764,12 @@ F-statistic: 341.7 on 2 and 197 DF,  p-value: &lt; 2.2e-16</code></pre>
 </ol>
 <p>Der in 2. beschriebene Effekt der Gesetzesverschärfung kann sich erst <em>nach</em> der im Rahmen der alten Gesetzgebung verhängten durchschnitlichen Mindesthaftstrafe einstellen: Der verringernde Effekt auf die Kriminalitätsrate zeigt sich erst in den Daten, nachdem Straftäter länger als gemäß der alten Gesetzgebung üblich inhaftiert sind. Rückgänge der Kriminalitätrate die in diesem Zeitraum unmittelbar nach der Gesetztesverschärfung gemessen werden, können also auf den Abschreckungseffekt zurückgeführt werden. Anhand von Statistiken zu verhängten Strafen für Überfälle mit Schusswaffen ermittelt <span class="citation" data-cites="Abrams2012">David S. Abrams (<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">2012a</a>)</span> ein mittleres Mindest-Strafmaß von drei Jahren.</p>
 <p>Die Exogenität der Verabschiedung von Add-On-Gesetzen wird in <span class="citation" data-cites="Abrams2012">David S. Abrams (<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">2012a</a>)</span> wiefolgt begründet: Obwohl die meisten Zusatzgesetze zu Schusswaffen in den 1970er Jahren erlassen wurden und es gemeinsame Trends in den Kriminalitäsraten der Bundesstaaten gibt, sind <em>die genauen Zeitpunkte</em> der Einführung solcher Gesetze aufgrund einer Vielzahl von Eigenheiten des politischen Prozesses in den Bundesstaaten weitgehend zufällig. Die Exogenität ist plausibel, wenn wir (durch Regression) Backdoors aufgrund Bundesstaat-spezifischer (konstanter und zeit-variierender) Faktoren schließen.</p>
-</section><section id="replikation-mit-r" class="level3 page-columns page-full" data-number="8.3.2"><h3 data-number="8.3.2" class="anchored" data-anchor-id="replikation-mit-r">
-<span class="header-section-number">8.3.2</span> Replikation mit R</h3>
+</section><section id="replikation-mit-r" class="level3 page-columns page-full" data-number="9.3.2"><h3 data-number="9.3.2" class="anchored" data-anchor-id="replikation-mit-r">
+<span class="header-section-number">9.3.2</span> Replikation mit R</h3>
 <p>Der Datensatz <code>Abrams2012.dta</code> ist ein Auszug der Daten aus dem Replikationspaket <span class="citation" data-cites="Abrams2012data">(<a href="Literatur.html#ref-Abrams2012data" role="doc-biblioref">David S. Abrams 2012b</a>)</span>, welches <a href="https://www.openicpsr.org/openicpsr/project/113838/version/V1/view">hier</a> eingesehen werden kann. Die Daten liegen im STATA-Format <code>.dta</code> vor und können mit <code><a href="https://haven.tidyverse.org/reference/read_dta.html">haven::read_dta()</a></code> eingelesen werden.</p>
 <div id="qwebr-insertion-location-2"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p>Die Beobachtungen (Zeilen) in <code>abrams</code> sind Kriminalstatistiken von staatlichen Rechtsberichterstattungsagenturen, die im Rahmen der <a href="https://www.fbi.gov/how-we-can-help-you/more-fbi-services-and-information/ucr">Uniform Crime Reports</a> des FBI landesweit für den Zeitraum 1965 bis 2002 zusammengetragen wurden. Eine Erläuterung der verfügbaren (ausschließlich numerischen) Variablen erfolgt in <a href="#tbl-abrams2012vars" class="quarto-xref">Tabelle&nbsp;<span>8.1</span></a>.</p>
+<p>Die Beobachtungen (Zeilen) in <code>abrams</code> sind Kriminalstatistiken von staatlichen Rechtsberichterstattungsagenturen, die im Rahmen der <a href="https://www.fbi.gov/how-we-can-help-you/more-fbi-services-and-information/ucr">Uniform Crime Reports</a> des FBI landesweit für den Zeitraum 1965 bis 2002 zusammengetragen wurden. Eine Erläuterung der verfügbaren (ausschließlich numerischen) Variablen erfolgt in <a href="#tbl-abrams2012vars" class="quarto-xref">Tabelle&nbsp;<span>9.1</span></a>.</p>
 <div class="cell page-columns page-full">
 <div id="tbl-abrams2012vars" class="cell quarto-float anchored page-columns page-full">
 <figure class="quarto-float quarto-float-tbl figure page-columns page-full"><div aria-describedby="tbl-abrams2012vars-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -2327,7 +2333,7 @@ F-statistic: 341.7 on 2 and 197 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-abrams2012vars-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;8.1: <code>Abrams2012.dta</code> – Kriminalität in US-Bundesstaaten.
+Tabelle&nbsp;9.1: <code>Abrams2012.dta</code> – Kriminalität in US-Bundesstaaten.
 </figcaption></figure>
 </div>
 </div>
@@ -2544,12 +2550,12 @@ window.addEventListener('load', function () { styleCell_tinytable_3p0ogkzg4s8u5u
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-abramssmmry-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;8.2: Mittlere Kriminalitätsraten je 100k Einwohner vor und nach Einführung strafverschärfender Gesetze
+Tabelle&nbsp;9.2: Mittlere Kriminalitätsraten je 100k Einwohner vor und nach Einführung strafverschärfender Gesetze
 </figcaption></figure>
 </div>
 </div>
-<p><a href="#tbl-abramssmmry" class="quarto-xref">Tabelle&nbsp;<span>8.2</span></a> zeigt, dass es in den Zeiträumen nach Gesetzesverschärfungen im Mittel zu einer Verringerung der betrachteten Pro-Kopf-Kriminalitätsraten kommt.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> Da <span class="citation" data-cites="Abrams2012">David S. Abrams (<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">2012a</a>)</span> sich auf die Analyse des Effekts auf Delikte unter Gebrauch von Schusswaffen fokussiert, berechnen wir weiterhin Trends in der allgemeinen Pro-Kopf-Kriminalität (<code>pcralloffense</code>) und Raubüberfälle mit Schusswaffen, (<code>pcrrobgun</code>). Wir unterscheiden hierbei zusätzlich zwischen Bundesstaaten, die im Beobachtungszeitraum Add-On-Gesetzte verabschiedet haben (<code>everaddon</code>) und solchen ohne.</p>
-<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;<a href="#tbl-abramssmmry" class="quarto-xref">Tabelle&nbsp;<span>8.2</span></a> reproduziert Teilergebnisse von Tabelle 1 in <span class="citation" data-cites="Abrams2012">David S. Abrams (<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">2012a</a>)</span>.</p></div></div><div class="cell">
+<p><a href="#tbl-abramssmmry" class="quarto-xref">Tabelle&nbsp;<span>9.2</span></a> zeigt, dass es in den Zeiträumen nach Gesetzesverschärfungen im Mittel zu einer Verringerung der betrachteten Pro-Kopf-Kriminalitätsraten kommt.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> Da <span class="citation" data-cites="Abrams2012">David S. Abrams (<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">2012a</a>)</span> sich auf die Analyse des Effekts auf Delikte unter Gebrauch von Schusswaffen fokussiert, berechnen wir weiterhin Trends in der allgemeinen Pro-Kopf-Kriminalität (<code>pcralloffense</code>) und Raubüberfälle mit Schusswaffen, (<code>pcrrobgun</code>). Wir unterscheiden hierbei zusätzlich zwischen Bundesstaaten, die im Beobachtungszeitraum Add-On-Gesetzte verabschiedet haben (<code>everaddon</code>) und solchen ohne.</p>
+<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;<a href="#tbl-abramssmmry" class="quarto-xref">Tabelle&nbsp;<span>9.2</span></a> reproduziert Teilergebnisse von Tabelle 1 in <span class="citation" data-cites="Abrams2012">David S. Abrams (<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">2012a</a>)</span>.</p></div></div><div class="cell">
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org">tidyr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Populationsgewichtete Trends berechnen</span></span>
@@ -2588,7 +2594,7 @@ Tabelle&nbsp;8.2: Mittlere Kriminalitätsraten je 100k Einwohner vor und nach Ei
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span> </span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Wir plotten die berechneten Trends in <code>plot_dat</code> mit entsprechender Farbgebung mit <code>ggplot2()</code>. Das Ergebnis (<a href="#fig-abramstrends" class="quarto-xref">Abbildung&nbsp;<span>8.1</span></a>) ist eine Reproduktion von Abbildung 2 in <span class="citation" data-cites="Abrams2012">David S. Abrams (<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">2012a</a>)</span>.</p>
+<p>Wir plotten die berechneten Trends in <code>plot_dat</code> mit entsprechender Farbgebung mit <code>ggplot2()</code>. Das Ergebnis (<a href="#fig-abramstrends" class="quarto-xref">Abbildung&nbsp;<span>9.1</span></a>) ist eine Reproduktion von Abbildung 2 in <span class="citation" data-cites="Abrams2012">David S. Abrams (<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">2012a</a>)</span>.</p>
 <div class="cell page-columns page-full">
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/">cowplot</a></span><span class="op">)</span></span>
@@ -2623,18 +2629,18 @@ Tabelle&nbsp;8.2: Mittlere Kriminalitätsraten je 100k Einwohner vor und nach Ei
 <img src="EventStudies_files/figure-html/fig-abramstrends-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-abramstrends-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;8.1: Populations-gewichtete mittlere Pro-Kopf-Kriminalitätsraten für US-Bundesstaaten (1965–2002)
+Abbildung&nbsp;9.1: Populations-gewichtete mittlere Pro-Kopf-Kriminalitätsraten für US-Bundesstaaten (1965–2002)
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p><a href="#fig-abramstrends" class="quarto-xref">Abbildung&nbsp;<span>8.1</span></a> zeigt einen starken Anstieg der Kriminalität in den 1960er und 1970er Jahren, insbesondere für Rabüberfälle mit Schusswaffen. Weiterhin sind die Trends in Staaten mit und ohne Zusatzstrafen deutlich korreliert. Die Entwicklung der Pro-Kopf-Kriminalität insgesamt schwächt sich anschließend ab und folgt ab den 1990er Jahren einem rückläufigen Trend. Es ist auffällig, dass sowohl die bewaffneten Raubüberfälle als auch die allgemeine Kriminalität zu Beginn des Beobachtungszeitraums für Staaten mit Add-on-Gesetzen höher sind, sich dies aber im letzten Jahrzehnt ebenfalls umkehrt. Wie in <span class="citation" data-cites="Abrams2012">David S. Abrams (<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">2012a</a>)</span> erläutert, könnte dies sowohl auf verschäfte Gesetze als auch auf Variation zwischen den Bundesstaaten zurückzuführen sein. Statistische Verfahren zur Schätzung des Effekts also sollten zwischen diesen Möglichkeiten unterscheiden können, bspw. durch die Kontrolle für Fixed Effects und Zeit-Trends.</p>
-<section id="basis-spezifikation" class="level4 page-columns page-full" data-number="8.3.2.1"><h4 data-number="8.3.2.1" class="anchored" data-anchor-id="basis-spezifikation">
-<span class="header-section-number">8.3.2.1</span> Basis-Spezifikation</h4>
+<p><a href="#fig-abramstrends" class="quarto-xref">Abbildung&nbsp;<span>9.1</span></a> zeigt einen starken Anstieg der Kriminalität in den 1960er und 1970er Jahren, insbesondere für Rabüberfälle mit Schusswaffen. Weiterhin sind die Trends in Staaten mit und ohne Zusatzstrafen deutlich korreliert. Die Entwicklung der Pro-Kopf-Kriminalität insgesamt schwächt sich anschließend ab und folgt ab den 1990er Jahren einem rückläufigen Trend. Es ist auffällig, dass sowohl die bewaffneten Raubüberfälle als auch die allgemeine Kriminalität zu Beginn des Beobachtungszeitraums für Staaten mit Add-on-Gesetzen höher sind, sich dies aber im letzten Jahrzehnt ebenfalls umkehrt. Wie in <span class="citation" data-cites="Abrams2012">David S. Abrams (<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">2012a</a>)</span> erläutert, könnte dies sowohl auf verschäfte Gesetze als auch auf Variation zwischen den Bundesstaaten zurückzuführen sein. Statistische Verfahren zur Schätzung des Effekts also sollten zwischen diesen Möglichkeiten unterscheiden können, bspw. durch die Kontrolle für Fixed Effects und Zeit-Trends.</p>
+<section id="basis-spezifikation" class="level4 page-columns page-full" data-number="9.3.2.1"><h4 data-number="9.3.2.1" class="anchored" data-anchor-id="basis-spezifikation">
+<span class="header-section-number">9.3.2.1</span> Basis-Spezifikation</h4>
 <p>Wir folgen <span class="citation" data-cites="Abrams2012">David S. Abrams (<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">2012a</a>)</span> und schätzen zunächst eine Basis-Spezifikation für eine balancierte Teilstichprobe aus <code>abrams</code>. Hierbei werden lediglich Bundesstaaten mit Datenpunkten mindestens 7 Jahre vor und maximal 6 Jahre nach der Einfühung eines Add-On-Gesetzes berücksichtigt. Das Regressionsmodell ist <span class="math display">\[\begin{align}
   \log\textup{Rob}_{at} = \beta \textup{AddOn}^i_{st} + \lambda_s + \gamma_t + x_{st} + \epsilon_{at},\label{eq:abramsbase}
 \end{align}\]</span> wobei <span class="math inline">\(\log\textup{Rob}_{at}\)</span> die logarithmierte Pro-Kopf-Rate für Überfälle mit Schusswaffe (<code>lnpcrrobgun</code>). <span class="math inline">\(\textup{AddOn}^i_{st}\)</span> ist eine Dummy-Variable die 1 ist für Beobachtungen des Bundesstaats <span class="math inline">\(s\)</span> in Jahr <span class="math inline">\(t\)</span>, wenn die Einführung des Add-On-Gesetzes <span class="math inline">\(i\)</span> Jahre zurückliegt. Wir folgen <span class="citation" data-cites="Abrams2012">David S. Abrams (<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">2012a</a>)</span> und betrachten Modelle mit <span class="math inline">\(i\in\{1,2,3\}\)</span>, d.h. wir unterscheiden zwischen Effekten bis zu drei Jahren (durchschnittliche Mindeststrafe nach alter Gesetzgebung) nach Einführung eines Add-On-Gesetzes.</p>
-<p><span class="math inline">\(\lambda_s\)</span> und <span class="math inline">\(\gamma_t\)</span> sind Fixed Effects für Bundesstaaten und Perioden. <span class="math inline">\(x_{st}\)</span> repräsentiert alle Kontrollvariablen auf Bundesstaatenebene. Hierbei werden stets sämtliche Variablen mit einer Bezeichnung beginnend mit <code>dc</code> berücksichtigt, vgl. <a href="#tbl-abrams2012vars" class="quarto-xref">Tabelle&nbsp;<span>8.1</span></a>. Weiterhin wird mit <code>ymm</code> für den Effekt eines aktiven Gesetzes für eine Mindeststrafe kontrolliert.</p>
+<p><span class="math inline">\(\lambda_s\)</span> und <span class="math inline">\(\gamma_t\)</span> sind Fixed Effects für Bundesstaaten und Perioden. <span class="math inline">\(x_{st}\)</span> repräsentiert alle Kontrollvariablen auf Bundesstaatenebene. Hierbei werden stets sämtliche Variablen mit einer Bezeichnung beginnend mit <code>dc</code> berücksichtigt, vgl. <a href="#tbl-abrams2012vars" class="quarto-xref">Tabelle&nbsp;<span>9.1</span></a>. Weiterhin wird mit <code>ymm</code> für den Effekt eines aktiven Gesetzes für eine Mindeststrafe kontrolliert.</p>
 <p>Eine Erweiterung von <span class="math inline">\(\eqref{eq:abramsbase}\)</span> kontrolliert für Bundesstaat-spezifische Zeit-Trends<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> <span class="math inline">\(\omega_s\cdot t\)</span>, <span class="math display">\[\begin{align}
   \log\textup{Rob}_{at} = \beta \textup{AddOn}^i_{st} + \lambda_s + \gamma_t + \omega_s\cdot t + x_{st} + \epsilon_{at}.\label{eq:abramstrend}
 \end{align}\]</span></p>
@@ -3753,13 +3759,13 @@ RMSE: 498.0     Adj. R2: 0.15601
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-abramsbase-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;8.3: <code>abrams</code> – Einfluss von Add-on-Gesetzen auf Kriminalitätsrate: Raubüberfälle mit Waffen <span class="citation" data-cites="Abrams2012">(<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">David S. Abrams 2012a</a>)</span>
+Tabelle&nbsp;9.3: <code>abrams</code> – Einfluss von Add-on-Gesetzen auf Kriminalitätsrate: Raubüberfälle mit Waffen <span class="citation" data-cites="Abrams2012">(<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">David S. Abrams 2012a</a>)</span>
 </figcaption></figure>
 </div>
 </div>
-<p>Die in <a href="#tbl-abramsbase" class="quarto-xref">Tabelle&nbsp;<span>8.3</span></a> zusammengefassten Ergebnisse deuten darauf, dass es im ersten Jahr nach der Einführung eines Add-On-Gesetzes keinen Signifikanten Effekt auf die Kriminalitätsrate für Raubüberfälle mit Schusswaffen gibt, wenngleich der geschätzte Koeffizient in sämtlichen Modellen negativ ist und damit konsistent mit dem vermuteten Abschreckungseffekt ist.In den Folgeperioden finden wir signifikante negative Effekte verschärfter Gesetze auf die Kriminalitätsrate von bis zu 12.7% (Effekt in Modell <span class="math inline">\(\eqref{eq:abramsbase}\)</span> nach drei Jahren). Die konservativste Spezifikation (Modell <span class="math inline">\(\eqref{eq:abramstrend}\)</span> mit Beobachtungen nach 1974) liefert Evidenz eines Rückgangs der Kriminalität durch Abschreckungseffekte in Höhe von etwa 5% innerhalb der ersten drei Jahre nach der Gesetzesänderung. Weiterhin ist der geschätzte Effekt von gesetzlichen Vorschriften zu Mindeststrafen zwar durchweg negativ, jedoch insignifikant.</p>
-</section><section id="event-study-regression" class="level4 page-columns page-full" data-number="8.3.2.2"><h4 data-number="8.3.2.2" class="anchored" data-anchor-id="event-study-regression">
-<span class="header-section-number">8.3.2.2</span> Event-Study-Regression</h4>
+<p>Die in <a href="#tbl-abramsbase" class="quarto-xref">Tabelle&nbsp;<span>9.3</span></a> zusammengefassten Ergebnisse deuten darauf, dass es im ersten Jahr nach der Einführung eines Add-On-Gesetzes keinen Signifikanten Effekt auf die Kriminalitätsrate für Raubüberfälle mit Schusswaffen gibt, wenngleich der geschätzte Koeffizient in sämtlichen Modellen negativ ist und damit konsistent mit dem vermuteten Abschreckungseffekt ist.In den Folgeperioden finden wir signifikante negative Effekte verschärfter Gesetze auf die Kriminalitätsrate von bis zu 12.7% (Effekt in Modell <span class="math inline">\(\eqref{eq:abramsbase}\)</span> nach drei Jahren). Die konservativste Spezifikation (Modell <span class="math inline">\(\eqref{eq:abramstrend}\)</span> mit Beobachtungen nach 1974) liefert Evidenz eines Rückgangs der Kriminalität durch Abschreckungseffekte in Höhe von etwa 5% innerhalb der ersten drei Jahre nach der Gesetzesänderung. Weiterhin ist der geschätzte Effekt von gesetzlichen Vorschriften zu Mindeststrafen zwar durchweg negativ, jedoch insignifikant.</p>
+</section><section id="event-study-regression" class="level4 page-columns page-full" data-number="9.3.2.2"><h4 data-number="9.3.2.2" class="anchored" data-anchor-id="event-study-regression">
+<span class="header-section-number">9.3.2.2</span> Event-Study-Regression</h4>
 <p>Für eine detalliertere Einschätzung des zeitlichen Verlaufs des Effekts verschärfender Gesetze betrachtet <span class="citation" data-cites="Abrams2012">David S. Abrams (<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">2012a</a>)</span> eine Spezifikation ähnlich zu <span class="citation" data-cites="Jacobsonetal1993">Jacobson, LaLonde, und Sullivan (<a href="Literatur.html#ref-Jacobsonetal1993" role="doc-biblioref">1993</a>)</span>, <span class="math display">\[\begin{align}
   \log\textup{Rob}_{at} = \sum_{i\in[-6,6]} \beta_i\cdot\textup{AddOn}^i_{st} + \lambda_s + \gamma_t + \omega_s\cdot t + x_{st} + \epsilon_{at},\label{eq:abramsesreg}
 \end{align}\]</span> mit perioden-spezifischen Effekten <span class="math inline">\(\beta_i\)</span> in einem Zeitfenster von sechs Jahren vor und nach Gesetzesänderungen, wobei die <span class="math inline">\(\textup{AddOn}^i_{st}\)</span> definiert sind wie in <span class="math inline">\(\eqref{eq:abramsbase}\)</span> Für die Schätzung von Modell <span class="math inline">\(\eqref{eq:abramsesreg}\)</span> mit R zeigen wir zunächst, wie diese Dummies anhand der Variable <code>relyr</code> effizient erzeugt werden können.</p>
@@ -4561,16 +4567,16 @@ RMSE: 505.3     Adj. R2: 0.171869
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-abramsesreg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;8.4: KQ-Schätzung der Event-Study-Spezifikation: Koeffizienten der Dummies <span class="citation" data-cites="Abrams2012">(<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">David S. Abrams 2012a</a>)</span>
+Tabelle&nbsp;9.4: KQ-Schätzung der Event-Study-Spezifikation: Koeffizienten der Dummies <span class="citation" data-cites="Abrams2012">(<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">David S. Abrams 2012a</a>)</span>
 </figcaption></figure>
 </div>
 </div>
-<p>Die statistische Zusammenfassung beider Event-Study-Spezifikationen in <a href="#tbl-abramsesreg" class="quarto-xref">Tabelle&nbsp;<span>8.4</span></a> untermauern die Ergebnisse aus <a href="#tbl-abramsbase" class="quarto-xref">Tabelle&nbsp;<span>8.3</span></a>:</p>
+<p>Die statistische Zusammenfassung beider Event-Study-Spezifikationen in <a href="#tbl-abramsesreg" class="quarto-xref">Tabelle&nbsp;<span>9.4</span></a> untermauern die Ergebnisse aus <a href="#tbl-abramsbase" class="quarto-xref">Tabelle&nbsp;<span>9.3</span></a>:</p>
 <ul>
 <li><p>Die positiven geschätzten Koeffizienten der Dummies für Zeitpunkte <em>vor</em> der Einführung von Add-On-Gesetzen (<span class="math inline">\(i=-6,\dots,-1\)</span>) sind signifikant und zeigen einen stabilen Verlauf der Kriminalitätsrate an.</p></li>
 <li><p>Die negativen, nicht-signifikant von 0 verschiedenen geschätzten Koeffizienten <em>nach</em> der Einführung von Add-On-Gesetzen (<span class="math inline">\(i=0,\dots,6\)</span>) sind Evidenz für einen Rückgang der Pro-Kopf-Kriminalitätsrate für Raubüberfälle mit Schusswaffen im Folgezeitraum.</p></li>
 </ul>
-<p>Für eine grafische Veranschaulichung der zeitlichen Entwicklung des geschätzten Effekts plotten wir die Schätzungen aus <a href="#tbl-abramsesreg" class="quarto-xref">Tabelle&nbsp;<span>8.4</span></a> zusammen mit einem 1-Standardfehler-Intervall.<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a> Hierzu lesen wir zunächst die geschätzten Koeffizienten und Standardfehler aus dem Objekten <code>abrams_mod_es</code> und <code>abrams_mod_es_trends</code> aus, berechnen die zugehörigen Konfidenzintervalle und sammeln die Ergebnisse unter Verwendung einer Indikatorvariable für das zugrundeliegende Modell in einem <code>tibble</code>-Objekt</p>
+<p>Für eine grafische Veranschaulichung der zeitlichen Entwicklung des geschätzten Effekts plotten wir die Schätzungen aus <a href="#tbl-abramsesreg" class="quarto-xref">Tabelle&nbsp;<span>9.4</span></a> zusammen mit einem 1-Standardfehler-Intervall.<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a> Hierzu lesen wir zunächst die geschätzten Koeffizienten und Standardfehler aus dem Objekten <code>abrams_mod_es</code> und <code>abrams_mod_es_trends</code> aus, berechnen die zugehörigen Konfidenzintervalle und sammeln die Ergebnisse unter Verwendung einer Indikatorvariable für das zugrundeliegende Modell in einem <code>tibble</code>-Objekt</p>
 <div class="no-row-height column-margin column-container"><div id="fn5"><p><sup>5</sup>&nbsp;Vgl. Abbildung 4 in <span class="citation" data-cites="Abrams2012">David S. Abrams (<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">2012a</a>)</span>.</p></div></div><div class="cell">
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Koeffizienten: Modell mit Trend</span></span>
 <span><span class="va">coefficients_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">abrams_mod_es_trends</span><span class="op">)</span></span>
@@ -4652,15 +4658,15 @@ Tabelle&nbsp;8.4: KQ-Schätzung der Event-Study-Spezifikation: Koeffizienten der
 <img src="EventStudies_files/figure-html/fig-abramsesregres-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-abramsesregres-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;8.2: Event-Study-Regression – Geschätze Rate: Raubüberfälle rel. zur Einführung von Add-On-Gesetzen
+Abbildung&nbsp;9.2: Event-Study-Regression – Geschätze Rate: Raubüberfälle rel. zur Einführung von Add-On-Gesetzen
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p>Beachte, dass lediglich die Änderungen der Koeffizienten in <a href="#fig-abramsesregres" class="quarto-xref">Abbildung&nbsp;<span>8.2</span></a> eine sinnvolle Interpretation haben: Die absoluten Werte auf der Y-Achse sind nicht aussagekräftig, da sie aus Regressionen mit mehreren Regressoren mit von Null verschiedenen Mittelwerten stammen.</p>
-<p>Eine Auffälligkeit in <a href="#fig-abramsesregres" class="quarto-xref">Abbildung&nbsp;<span>8.2</span></a> ist, dass die mittlere Kriminalitätsrate bereits eine Periode <em>vor</em> dem Zeitpunkt der Gesetzeseinführung eine Trendumkehr aufzuweisen scheint. <span class="citation" data-cites="Abrams2012">David S. Abrams (<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">2012a</a>)</span> weißt darauf hin, dass potenzielle Straftäter durch die laufende öffentliche Debatte und Diskussion über das Gesetz erfahren und ihr Verhaltensweisen in Erwartung der Gesetzesänderung anpassen könnten. Die emprische Studienlage hinsichtlich eines solches Verhalten ist jedoch nicht eindeutig, siehe die Diskussion in <span class="citation" data-cites="Abrams2012">David S. Abrams (<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">2012a</a>)</span>, Abschnitt IV B.</p>
-</section></section></section><section id="zusammenfassung" class="level2" data-number="8.4"><h2 data-number="8.4" class="anchored" data-anchor-id="zusammenfassung">
-<span class="header-section-number">8.4</span> Zusammenfassung</h2>
+<p>Beachte, dass lediglich die Änderungen der Koeffizienten in <a href="#fig-abramsesregres" class="quarto-xref">Abbildung&nbsp;<span>9.2</span></a> eine sinnvolle Interpretation haben: Die absoluten Werte auf der Y-Achse sind nicht aussagekräftig, da sie aus Regressionen mit mehreren Regressoren mit von Null verschiedenen Mittelwerten stammen.</p>
+<p>Eine Auffälligkeit in <a href="#fig-abramsesregres" class="quarto-xref">Abbildung&nbsp;<span>9.2</span></a> ist, dass die mittlere Kriminalitätsrate bereits eine Periode <em>vor</em> dem Zeitpunkt der Gesetzeseinführung eine Trendumkehr aufzuweisen scheint. <span class="citation" data-cites="Abrams2012">David S. Abrams (<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">2012a</a>)</span> weißt darauf hin, dass potenzielle Straftäter durch die laufende öffentliche Debatte und Diskussion über das Gesetz erfahren und ihr Verhaltensweisen in Erwartung der Gesetzesänderung anpassen könnten. Die emprische Studienlage hinsichtlich eines solches Verhalten ist jedoch nicht eindeutig, siehe die Diskussion in <span class="citation" data-cites="Abrams2012">David S. Abrams (<a href="Literatur.html#ref-Abrams2012" role="doc-biblioref">2012a</a>)</span>, Abschnitt IV B.</p>
+</section></section></section><section id="zusammenfassung" class="level2" data-number="9.4"><h2 data-number="9.4" class="anchored" data-anchor-id="zusammenfassung">
+<span class="header-section-number">9.4</span> Zusammenfassung</h2>
 <p>Mit Event Studies können die Auswirkungen spezifischer Ereignisse oder Interventionen auf eine über die Zeit beobachtete Outcome-Variable untersucht werden. Die zugrunde liegende Annahme für die Identifizierbarkeit des kausalen Effekts ist, dass das untersuchte Event als exogener Schock fungiert, der die Outcome-Variable beeinflusst, jedoch unabhängig von anderen unbeobachtbaren Einflussfaktoren ist, sodass die der Front-Door-Pfad isoliert werden kann.</p>
 <p>Der Effekt wird meist in einem zeitlichen Umfeld nahe des Ereignisses analysiert. Zur Bestimmung eines kontrafaktischen Vergleichswerts für die Outcome-Variable nach dem Event kann die Prognose des Outcomes hilfreich sein. Für die präzise Schätzung des Behandlungseffekts werden häufig Regressionsmodelle herangezogen, die es ermöglichen, zeitliche Veränderungen in der Outcome-Variable zu modellieren und zusätzliche Kontrollvariablen zu berücksichtigen. Dadurch wird die Robustheit und Genauigkeit der Ergebnisse erhöht, was insbesondere bei der Analyse langfristiger Interventionseffekte in komplexen ökonomischen und politischen Kontexten von relevant ist.</p>
 
@@ -5139,12 +5145,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script><nav class="page-navigation"><div class="nav-page nav-page-previous">
       <a href="./DiD.html" class="pagination-link" aria-label="Difference-in-Differences">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./RDD.html" class="pagination-link" aria-label="Regression Discontiniuty Designs">
-        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Quellcode</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">

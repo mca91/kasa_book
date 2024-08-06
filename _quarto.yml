@@ -19,6 +19,7 @@ book:
     - index.qmd
     - R_Einfuehrung.qmd
     - Reg.qmd
+    - Simulation.qmd
     - Matching.qmd
     - FixedEffects.qmd
     - IV.qmd

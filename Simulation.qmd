@@ -1,0 +1,163 @@
+---
+webr: 
+  show-startup-message: true
+  packages: [
+            'boot',
+            'cowplot',
+            'dplyr',
+            'ggplot2',
+            'purrr',
+            'tidyr'
+            ]
+---
+
+# Simulation
+
+Bei der Analyse quantitativer Methoden treten häufig Fragestellungen auf, die sich rein mathematisch nur schwer oder gar nicht lösen lassen. So ist es sogar in einfachsten ökonometrischen Modellen oft unmöglich, die exakte Verteilung von Koeffizientenschätzern unter “realistischen” Bedingungen (etwa eine endliche Stichprobengröße und schwache Annahmen über die Verteilung der Fehlerterme) formal zu bestimmen. Asymptotische Theorie kann dann helfen, indem eine Approximation der Stichproben-Eigenschaften eines Schätzers aus Eigenschaften der asymptotischen Verteilung abgeleitet werden. Häufig sind solche Approximationen jedoch nur bei großen Stichproben verlässlich. Wichtige Eigenschaften von Schätzern kausaler Effekte in empirischen Anwendungen, wie die Varianz der Schätzung oder das zu erwartende Außmaß der Verzerrung bei Verletzungen von Modellannahmen hingegen können mit asymptotischer Theorie oftmals gar nicht approximiert werden.
+
+Um diese Schwierigkeiten zu überwinden, können wir Simulationstechniken (Monte-Carlo-Methoden) verwenden. In Monte-Carlo-Simulationen wird die Möglichkeit der Erzeugung von Pseudozufallszahlen mit Computern und ihre Rechenleistung genutzt, um eine Vielzahl von Datensätzen gemäß eines interessierenden datenerzeugenden Prozess (DGP) zu generieren. Anhand dieser simulierten Datensätze können wir die Stichprobenverteilung von Schätzern approximieren und so die statistischen Eigenschaften für verschiedene Parameterwerte des DGP analysieren. Insbesondere erlauben *Monte-Carlo-Studien* den Vergleich verschiedener Schätzfunktionen hinsichtlich ihrer Robustheit gegenüber Verletzungen zugrundeliegender Annahmen über den DGP. Der *Bootstrap* [@Efron1979] ist eine simulations-basierte Methode, um gültige statistische Inferenz in empirischen Anwendungen zu gewährleisten, wenn Modellannahmen derart verletzt sind, dass asymptotische kritische Werte (sogar für große Stichproben) ungültig sind.
+
+In diesem Kapitel erläutern wir Grundlagen der Anwendung von Simulations-Methoden mit R anhand von Beispielen für die Schätzung kausaler Effekte mit Regressionsmodellen.
+
+## Monte Carlo Setup
+
+```{webr-r}
+#| autorun: true
+library(dplyr)
+
+set.seed(1234)
+n <- 50
+
+(
+est <- rnorm(n = n, mean = 50, sd = 12) %>% 
+  mean()
+)
+```
+
+```{webr-r}
+#| autorun: true
+N <- 5000
+est <- numeric(N)
+
+set.seed(1234)
+
+for (i in 1:N) {
+  est[i] <- mean(
+    x = rnorm(
+      n = n, 
+      mean = 50, 
+      sd = 12
+    )
+  )
+}
+
+summary(est)
+```
+
+
+```{webr-r}
+#| autorun: true
+library(purrr)
+
+set.seed(1234)
+
+est <- map_dbl(
+  .x = 1:N, 
+  .f =  ~ mean(
+    x = rnorm(
+      n = n, 
+      mean = 50, 
+      sd = 12
+    )
+  )
+)
+
+summary(est)
+```
+
+```{webr-r}
+#| autorun: true
+library(ggplot2)
+
+# Simulierte und theoretische Verteilung des Schätzers plotten
+tibble(est = est) %>%
+  ggplot(
+    mapping = aes(x = est)
+  ) +
+  geom_density() +
+    stat_function(
+      fun = dnorm, 
+      args = list(
+        mean = 50, 
+        sd = 12/sqrt(n)
+      ), 
+      color = "red"
+    ) +
+  theme_cowplot()
+```
+
+```{webr-r}
+#| autorun: true
+# Theoretische Standardabweichung
+12/sqrt(100)
+
+# Simulierte Standardabweichung
+sd(est)
+```
+
+Verletzung von Normalverteilungsannahme
+
+```{webr-r}
+#| autorun: true
+library(purrr)
+
+set.seed(1234)
+
+est <- tibble(
+  norm = est, 
+  chisq = map_dbl(
+    .x = 1:N, 
+    .f =  ~ mean(
+      x = rt(
+        n = n, 
+        df = 4, 
+      ) + 50
+    )
+  )
+)
+
+library(tidyr)
+est %>% 
+  pivot_longer(
+    cols = everything(), 
+    names_to = "Variable"
+  ) %>%
+  ggplot(
+    mapping = aes(
+      x = value, 
+      col = Variable
+    )
+  ) +
+  geom_density() +
+  theme_cowplot() +
+  theme(legend.position = "top")
+```
+
+## Der Bootstrap
+
+1.**Stichproben mit Zurücklegen ziehen**: Ziehe wiederholt ($B$-mal) Stichproben mit Zurücklegen aus den Originaldaten. Jede dieser Bootstrap-Stichproben hat die gleiche Größe $N$ wie die ursprüngliche Stichprobe.
+
+
+2. **Parameterschätzung für jede Bootstrap-Stichprobe**: Wende die Schätzgunktion auf jede der $B$ Bootstrap-Stichproben an und erhalte $B$ Bootstrap-Schätzwerte des interessierenden Parameters.
+
+5. **Konfidenzintervall bestimmen**
+   - Sortiere die berechneten Parameterwerte (z.B. die Mittelwerte) und bestimme das Konfidenzintervall anhand der gewünschten Perzentile. Für ein 95%-Konfidenzintervall werden üblicherweise das 2,5. und 97,5. Perzentil verwendet.
+   - *Erklärung*: Das Konfidenzintervall gibt an, in welchem Bereich der wahre Parameterwert mit hoher Wahrscheinlichkeit liegt.
+
+6. **Ergebnis interpretieren**
+   - Das ermittelte Konfidenzintervall und die Verteilung der Bootstrap-Schätzungen helfen dabei, die Unsicherheit in der Schätzung zu verstehen.
+   - *Beispiel*: Wenn das 95%-Konfidenzintervall für den Mittelwert `[5.5, 10.5]` beträgt, kann angenommen werden, dass der wahre Mittelwert der Population mit 95%iger Sicherheit zwischen 5.5 und 10.5 liegt.
+
+<iframe class="obs-soft-box-shadow" width="100%" height="668" frameborder="0"
+  src="https://observablehq.com/embed/62d24833f3dbd27a?cells=svg%2Cviewof+B%2Cviewof+BW%2Cviewof+speed%2Cviewof+n">
+</iframe>
