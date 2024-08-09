@@ -55,7 +55,6 @@ webr:
 
 </style>
 ```
-
 # Synthetic Control
 
 ```{r, echo=F,message=F,warning=F}
@@ -86,7 +85,6 @@ library(Synth)
 options(pillar.sigfig = 2)
 ```
 
-
 ```{webr-r}
 #| context: setup
 
@@ -109,7 +107,7 @@ library(Synth)
 options(pillar.sigfig = 2)
 ```
 
-Synthetic Control Methoden (SCM) wurden in @Abadieetal2010 für die Auswertung kausaler Effekte von politischen Interventionen vorgeschlagen. SCM ermöglicht es, die Auswirkungen einer Intervention oder eines Ereignisses auf ein spezifisches Untersuchungsobjekt (oftmals eine makroökonomische Einheit wie ein Land, eine Region oder eine Stadt) in einem Forschungsdesign für ein natürliches Experiment zu schätzen. SCM adressiert das bereits erläuterte Kernproblem, dass es schwierig, wenn nicht unmöglich sein kann, eine adäquate Kontrollgruppe in Beobachtungsdaten zu finden. Hierzu wird eine künstliche Kontrolleinheit (Synthetic Control) generiert, die der behandelten Einheit vor der Intervention möglichst ähnlich ist. Dieser synthetische Doppelgänger kann die unbeobachtbare Entwicklungen der behandelten Einheit *nach* der Intervention repräsentieren und so eine plausible Schätzung des kausalen Effekts der Intervention für die Post-Interventionsperioden gewährleisten. 
+Synthetic Control Methoden (SCM) wurden in @Abadieetal2010 für die Auswertung kausaler Effekte von politischen Interventionen vorgeschlagen. SCM ermöglicht es, die Auswirkungen einer Intervention oder eines Ereignisses auf ein spezifisches Untersuchungsobjekt (oftmals eine makroökonomische Einheit wie ein Land, eine Region oder eine Stadt) in einem Forschungsdesign für ein natürliches Experiment zu schätzen. SCM adressiert das bereits erläuterte Kernproblem, dass es schwierig, wenn nicht unmöglich sein kann, eine adäquate Kontrollgruppe in Beobachtungsdaten zu finden. Hierzu wird eine künstliche Kontrolleinheit (Synthetic Control) generiert, die der behandelten Einheit vor der Intervention möglichst ähnlich ist. Dieser synthetische Doppelgänger kann die unbeobachtbare Entwicklungen der behandelten Einheit *nach* der Intervention repräsentieren und so eine plausible Schätzung des kausalen Effekts der Intervention für die Post-Interventionsperioden gewährleisten.
 
 ## Schätzung von Interventionseffekten mit SCM {#sec-siscm}
 
@@ -117,23 +115,26 @@ Synthetic Control Methoden (SCM) wurden in @Abadieetal2010 für die Auswertung k
 
 Für SCM bestimmen wir einen Vektor von Gewichten $\mathbf{w}^* := (w_2^*, \ldots, w_k^*)^T$, der die Summe der quadrierten Differenzen zwischen den Ausprägungen von $k$ Charakteristika der behandelten Einheit vor der Intervention, $X_{1,\,m}^{\text{Pre}}$, $m=1,\dots,k$, und der gewichteten Summe dieser Charakteristika für die Kontrolleinheiten, $X_{i,\,m}^{\text{Pre}}$, minimiert:
 
+```{=tex}
 \begin{align}
   \mathbf{w}^* := \arg\min_{\mathbf{w}} \sum_{m=1}^{k} v_m \left( X_{1,\,m}^{\text{Pre}} - \sum_{i=2}^{N} w_i X_{i,m}^{\text{Pre}} \right)^2,\label{eq:scopt}
 \end{align}
+```
+unter der Nebenbedingung, dass $\sum_{i=2}^{N} w_i = 1$ und $w_i \geq 0$ für alle $i$. Die $v_m$ sind weitere Gewichte, welche die Relevanz der Variablen für die Vorhersage der Outcome-Variable der interessierenden Einheit, $Y_{1,\,t}$, beinflussen. Diese Gewichte werden meist in einem weiteren Optimierungsverfahren (bspw. mit Cross-Validation) bestimmt [vgl. @Abadieetal2014]. Als Verlustfunktion hierbei wird meist der mittlere quadratische Fehler bei der Vorhersage von $Y_{1,\,t}$ (MSPE)[^syntheticcontrol-1] vor der Behandlung anhand der synthetischen Einheit verwendet,
 
-unter der Nebenbedingung, dass $\sum_{i=2}^{N} w_i = 1$ und $w_i \geq 0$ für alle $i$. Die $v_m$ sind weitere Gewichte, welche die Relevanz der Variablen für die Vorhersage der Outcome-Variable der interessierenden Einheit, $Y_{1,\,t}$, beinflussen. Diese Gewichte werden meist in einem weiteren Optimierungsverfahren (bspw. mit Cross-Validation) bestimmt [vgl. @Abadieetal2014]. Als Verlustfunktion hierbei wird meist der mittlere quadratische Fehler bei der Vorhersage von $Y_{1,\,t}$ (MSPE)^[Engl. für *Mean squared prediction error*] vor der Behandlung anhand der synthetischen Einheit verwendet,
+[^syntheticcontrol-1]: Engl. für *Mean squared prediction error*
 
 \begin{align}
   \sum_{t=1}^{T_0} \left( Y_{1,\,t} - \sum_{i=2}^N w_i(\mathbf{v}) Y_{i,\,t} \right)^2, \label{eq:scopt2}
-\end{align}
-mit $\mathbf{v} := (v_1,\dots,v_k)'$.
+\end{align} mit $\mathbf{v} := (v_1,\dots,v_k)'$.
 
 Durch die Lösung des Optimierungsproblems \eqref{eq:scopt} unter Berücksichtigung von \eqref{eq:scopt2} erhalten wir die geschätzten Gewichte $\widehat{w}_i$, welche den Einfluss der Kontrolleinheit $i=2,\dots,N$-ten bei der Zusammensetzung der Kontrollgruppe festlegen. Anhand der $\widehat{w}_i$ wird die Outcome-Variable der synthetischen Kontrolleinheit konstruiert, welche als Referenz für die Schätzung des kausalen Effekts der Intervention dient. Die Outcome-Variable der synthetischen Kontrollgruppe für die Nach-Interventionsperiode kann formal ausgedrückt werden als
 
+```{=tex}
 \begin{align}
   Y_{1,\,t}^{\text{Synth}} = \sum_{i=2}^{N} \widehat{w}_i Y_{i,\,t},\quad t > T_0,\label{eq:dgkonst}
 \end{align}
-
+```
 wobei $Y_{1,t}^{\text{Synth}}$ der Wert der Outcome-Variable $Y$ für die synthetische Kontrollgruppe zum Zeitpunkt $t$ und $Y_{i,t}$ der entsprechende Wert des Outcomes für die $i$-te Kontrolleinheit ist. Bei SCM schätzen wir den kausalen Effekt $\tau_t$ der Intervention zum Zeitpunkt $t$ als die Differenz der Post-Interventionswerte von $Y$ zwischen der behandelten Einheit und dem synthetischen Doppelgänger,
 
 $$
@@ -146,9 +147,9 @@ Der SCM-Schätzer von @Abadieetal2010 ist im R-Paket `Synth` [@Hainmuelleretal20
 
 ## Case Study: Ökonomische Kosten des Brexit
 
-@Bornetal2019 untersuchen die ökonomischen Kosten des Brexits mit einem kausalanalytischen Forschungsansatz. Der Kern der empirischen Analyse ist eine Kombination von quasi-experimenteller Identifikation und struktureller Zeitreihenanalyse. Hiermit können nicht nur die aggregierten Kosten des EU-Ausstiegs für Großbrittanien zu quantifiziert, sondern auch die Kanäle indentifiziert werden, durch die die erwartete wirtschaftliche Desintegration die britische Makroökonomie beeinflusst hat. Hierbei identifizieren @Bornetal2019 einen Anstieg der wirtschaftspolitischen Unsicherheit und eine Abwärtskorrektur der Wachstumserwartungen als Haupttreiber für den Rückgang der Wirtschaftsleistung.  
+@Bornetal2019 untersuchen die ökonomischen Kosten des Brexits mit einem kausalanalytischen Forschungsansatz. Der Kern der empirischen Analyse ist eine Kombination von quasi-experimenteller Identifikation und struktureller Zeitreihenanalyse. Hiermit können nicht nur die aggregierten Kosten des EU-Ausstiegs für Großbrittanien zu quantifiziert, sondern auch die Kanäle indentifiziert werden, durch die die erwartete wirtschaftliche Desintegration die britische Makroökonomie beeinflusst hat. Hierbei identifizieren @Bornetal2019 einen Anstieg der wirtschaftspolitischen Unsicherheit und eine Abwärtskorrektur der Wachstumserwartungen als Haupttreiber für den Rückgang der Wirtschaftsleistung.
 
-Der quasi-experimentelle Ansatz betrachtet das Brexit-Referendum als ein natürliches makroökonomisches Experiment und untersucht die Konsequenzn der wirtschaftlichen Desintegration für das Bruttoinlandsprodukt (BIP) im Nachfolgezeitraum mit SCM. Hierzu wird gemäß der in @sec-siscm erläuterten Vorgehensweise ein syntetischer Doppelgänger für die britische Wirtschaft aus einem Donor Pool von 23 Volkswirtschaften konstruiert, und der Effekt des Referendums als Unterschied zwischen der tatsächlichen und synthetischen Trajektorien des BIP für Folgeperioden ermittelt. Die Analyse zeigt, dass das Brexit-Votum bis Ende 2018 zu einem BIP-Rückgang von etwa 1.7\% bis 2.5\% geführt hat.
+Der quasi-experimentelle Ansatz betrachtet das Brexit-Referendum als ein natürliches makroökonomisches Experiment und untersucht die Konsequenzn der wirtschaftlichen Desintegration für das Bruttoinlandsprodukt (BIP) im Nachfolgezeitraum mit SCM. Hierzu wird gemäß der in @sec-siscm erläuterten Vorgehensweise ein syntetischer Doppelgänger für die britische Wirtschaft aus einem Donor Pool von 23 Volkswirtschaften konstruiert, und der Effekt des Referendums als Unterschied zwischen der tatsächlichen und synthetischen Trajektorien des BIP für Folgeperioden ermittelt. Die Analyse zeigt, dass das Brexit-Votum bis Ende 2018 zu einem BIP-Rückgang von etwa 1.7% bis 2.5% geführt hat.
 
 Wie reproduzieren nun die wesentlichen Ergebnisse des SCM-Ansatzes der Studie mit R. Hierfür lesen zunächst den Datensatz `brexit.csv` ([hier verfügbar](https://raw.githubusercontent.com/mca91/kausal_data/main/brexit.csv)) in R ein. Dieser enthält vierteljährliche Beobachtungen makroökonomischer Variablen für 24 Länder für den Zeitraum 1995-Q1--2021-Q4.
 
@@ -177,21 +178,22 @@ brexit %>%
 
 Für die Schätzung der Gewichte $w_i$ für die Konstruktion des UK-Doppelgängers werden die in gelisteten Charakteristika der Volkswirtschaften verwendet.
 
-| Variable      | Definition                                                |
-|---------------|-----------------------------------------------------------|
-| `gdp`         | Veränderung des BIP relativ zu 2016                       |  
-| `ConGDP`      | Anteil: Konsum/BIP (%)                                    |
-| `InvGDP`      | Anteil: Investitionen/BIP (%)                             |
-| `ExpGDP`      | Anteil: Exporte/BIP (%)                                   |
-| `ImpGDP`      | Anteil: Importe/BIP (%)                                   |
-| `EmpSha`      | Anteil: Beschäftigte/Erwerbsbevölkerung (%)               |
-| `LPG`         | Wachstum der Arbeitsproduktivität (%)                     |
-    
+| Variable | Definition                                  |
+|----------|---------------------------------------------|
+| `gdp`    | Veränderung des BIP relativ zu 2016         |
+| `ConGDP` | Anteil: Konsum/BIP (%)                      |
+| `InvGDP` | Anteil: Investitionen/BIP (%)               |
+| `ExpGDP` | Anteil: Exporte/BIP (%)                     |
+| `ImpGDP` | Anteil: Importe/BIP (%)                     |
+| `EmpSha` | Anteil: Beschäftigte/Erwerbsbevölkerung (%) |
+| `LPG`    | Wachstum der Arbeitsproduktivität (%)       |
+
 : `brexit` -- Variablen und Definitionen {#tbl-Born2019preds}
 
 Zur Berechnung von SCM mit dem R-Paket `Synth` müssen die Daten zunächst mit der Funktion `Synth::dataprep()` aufbereitet werden, s. `?Synth::dataprep()` für weitere Details. Neben dem Datensatz (`foo`) unter expliziter Nennung der Prädiktoren (`predictors`) und der Outcome-Variable (`dependent`) übergeben wir Variablen für die Indentifikation von Einheiten (`ID`) und Zeitpunkten (`Time`), sowie Donor Pool (`controls.identifier`) und behandelter Einheit (`treatment.identifier`). Weiterhin werden die Vorbehandlungsperiode (`time.predictors.prior`) sowie der Zeitraum über den die Regressor-Gewichte $v_m$ bestimmt werden sollen (`time.optimize.ssr`), festgelegt. Für letztere übergeben wir einen numerischen Vektor für sämtliche Zeitpunkte von 1995-Q1 bis zum Brexit-Referendum in 2016-Q2.
 
-Um einen ersten Überblick über die Entwicklung der BIP im Datensatz zu gewinnen, vergleichen wir die Zeitreihen für Donor-Pool-Länder (grau) und Großbritannien (blau) mit `ggplot`. 
+Um einen ersten Überblick über die Entwicklung der BIP im Datensatz zu gewinnen, vergleichen wir die Zeitreihen für Donor-Pool-Länder (grau) und Großbritannien (blau) mit `ggplot`.
+
 ```{r}
 #| fig-cap: "BIP relativ zu 2016"
 #| label: "fig-bipv"
@@ -283,7 +285,7 @@ synth_out <- synth(dataprep_out)
 )
 ```
 
-Für die tabellarische Darstellung mit `gt::gt()` berücksichtigen wir lediglich Volkswirtschaften mit Gewicht > .0001.
+Für die tabellarische Darstellung mit `gt::gt()` berücksichtigen wir lediglich Volkswirtschaften mit Gewicht \> .0001.
 
 ```{r}
 #| tbl-cap: "Gewichte für den synthetischen UK-Doppelgänger"
@@ -332,7 +334,7 @@ the_gdps <- bind_rows(
 )
 ```
 
-Für einen Vergleich von UK- und Doppelgänger-BIP folgen wir @Bornetal2019 und berechnen die Differenz der BIP über den gesamten Zeitraum, die so genannte *Doppelgänger-Gap*. 
+Für einen Vergleich von UK- und Doppelgänger-BIP folgen wir @Bornetal2019 und berechnen die Differenz der BIP über den gesamten Zeitraum, die so genannte *Doppelgänger-Gap*.
 
 ```{r}
 # UK-Doppelgänger-Gap berechnen
@@ -445,7 +447,7 @@ ggplot(data = gdp_gap) +
   cowplot::theme_cowplot()
 ```
 
-Die in @fig-ukdggap gezeigte Doppelgänger-Gap stimmt gut mit dem von @Bornetal2019 geschätzten verlorenen Wachstums des BIP relativ zu 2016 um bis zu 2.5\% bis Ende des Jahres 2018 überein.
+Die in @fig-ukdggap gezeigte Doppelgänger-Gap stimmt gut mit dem von @Bornetal2019 geschätzten verlorenen Wachstums des BIP relativ zu 2016 um bis zu 2.5% bis Ende des Jahres 2018 überein.
 
 Als weiteres Maß für den Effekt des Referendums im Folgezeitraum können wir die mittlere Doppelgänger-Gap für sämtliche Beobachtungsperioden nach dem Brexit-Referendum schnell bestimmen.
 
@@ -459,7 +461,7 @@ gdp_gap %>%
 
 ### Placebo-Tests: Grafische Inferenz
 
-Auch für SCM sind Placebo-Tests ein hilfreiches Instrument zur Überprüfung der Gültigkeit von Studienergebnissen. Eine gründliche Placebo-Analyse kann festzustellen, ob der beobachtete Effekt tatsächlich auf die Intervention zurückzuführen ist und nicht auf unberücksichtigte (möglicherweise unbeobachtbare) Faktoren. 
+Auch für SCM sind Placebo-Tests ein hilfreiches Instrument zur Überprüfung der Gültigkeit von Studienergebnissen. Eine gründliche Placebo-Analyse kann festzustellen, ob der beobachtete Effekt tatsächlich auf die Intervention zurückzuführen ist und nicht auf unberücksichtigte (möglicherweise unbeobachtbare) Faktoren.
 
 Ein Ansatz ist hierfür ist es, den synthetische-Doppelgänger für *fiktive Interventionszeitpunkte* vor dem tatsächlichen Behandlungszeitpunkt zu konstruieren, und die entsprechenden Trajektorien mit dem ursprünglichen Doppelgänger zu vergleichen. So kann die Validität der ursprünglichen Doppelgänger-Trajektorie im Hinblick auf mögliche anderweitige Ereignisse vor der Intervention geprüft werden: Doppelgänger-Trajektorien für fiktive, frühere Interventionen sollten sich nicht systematisch von der andhand von Daten bis zur tatsächlichen Intervention berechneten Trajektorie unterscheiden.
 
@@ -585,9 +587,9 @@ p_UKDG +
 
 Beachte, dass `position = position_jitter(height = .25)` eine zufällige, kleine Verschiebung (jitter) der Trajektorien der Placebo-Doppelgänger für eine bessere Unterscheidbarkeit bewirkt. @fig-pdgukbip und @fig-pdgukbipcu zeigen, dass sich die Placebo-Pfade für fiktive frühere Referenden (grau) nicht systematisch vom ursprünglich berechneten synthetischen Doppelgänger (rot) unterscheiden. Insbesondere finden wir keinen Rückgang der synthetischen BIP relativ zum beobachteten BIP für Großbritannien *vor* dem Referendum. Deutliche Abweichungen vom tatsächlichen BIP ergeben sich erst jenseits der tatsächlichen Referendums. Diese Placebo-Analyse bekräftigt also die Validität der Konstruktion des "Benchmark-Doppelgängers" für die Periode bis 2016-Q2 und die Schätzung des kausalen Effekts des Referendums anhand der entsprechenden Doppelgänger-Gap.
 
-Ein weiterer Placebo-Test in @Bornetal2019 ist ein Vergleich der Doppelgänger-Gap Großbritanniens mit Doppelgänger-Gaps für fiktive Referenden in 2016-Q2 in Ländern mit wesentlichem Einfluss bei der Konstruktion des synthetischen Doppelgängers für Großbritannien: Die Schätzung des kausalen Effekts des Referendums auf das BIP in Großbritannien ist glaubwürdig, wenn lediglich die Doppelgänger-Gap für Großbritannien durch das Referendum beeinflusst wird, *nicht* aber die Doppelgänger-Gaps für Länder in der Kontrollgruppe. 
+Ein weiterer Placebo-Test in @Bornetal2019 ist ein Vergleich der Doppelgänger-Gap Großbritanniens mit Doppelgänger-Gaps für fiktive Referenden in 2016-Q2 in Ländern mit wesentlichem Einfluss bei der Konstruktion des synthetischen Doppelgängers für Großbritannien: Die Schätzung des kausalen Effekts des Referendums auf das BIP in Großbritannien ist glaubwürdig, wenn lediglich die Doppelgänger-Gap für Großbritannien durch das Referendum beeinflusst wird, *nicht* aber die Doppelgänger-Gaps für Länder in der Kontrollgruppe.
 
-Für diese grafische Placebo-Analyse modifizieren wir die Funktion `placebo()` entsprechend. `placebo_gap()` berechnet die Doppelgänger-Gap für das mit `treat` identifizierte Land. Das `if`-Statement zu Beginn stellt sicher, dass Großbritannien *nicht* als Kontroll-Einheit für die Placebo-Gaps verwendet wird. 
+Für diese grafische Placebo-Analyse modifizieren wir die Funktion `placebo()` entsprechend. `placebo_gap()` berechnet die Doppelgänger-Gap für das mit `treat` identifizierte Land. Das `if`-Statement zu Beginn stellt sicher, dass Großbritannien *nicht* als Kontroll-Einheit für die Placebo-Gaps verwendet wird.
 
 ```{r}
 # Funktion für Placebo-Gaps
@@ -657,7 +659,7 @@ placebo_gap <- function(treat) {
 }
 ```
 
-Für die Berechnung der Placebo-Gaps iterieren wir über die Indizes der in @tbl-brexitcw gelisteten Volkswirtschaften der Kontrollgruppe für Großbritannien. 
+Für die Berechnung der Placebo-Gaps iterieren wir über die Indizes der in @tbl-brexitcw gelisteten Volkswirtschaften der Kontrollgruppe für Großbritannien.
 
 ```{r}
 # Indizes für "Donor Countries" und UK
@@ -758,7 +760,7 @@ ggplot(
   theme(legend.position = c(.05, .9))
 ```
 
-@fig-pdgukg zeigt die standardisierten Placebo-Doppelgänger-Gaps für ein fiktives Referendum zum Zeitpunkt 2016-Q2 in den 5 Kontroll-Volkswirtschaften, die für Konstruktion des BIP-Doppelgängers von Großbrittannien relevant sind (grau). Der Vergleich mit der standardisierten Doppelgänger-Gap für Großbritannien (blau). Der Verlauf der Placebo-Gaps zeigt an, dass keine Abweichungen mit negativem Trend von der Referenzlinie bei 0 (kein Unterschied zwischen beobachtetem und syntetischem BIP) nach dem Referendum vorliegen. Damit liefert die Grafik keine Hinweise auf einen  Effekt fiktiver Interventionen in den Kontroll-Ländern. Für Großbritannien jedoch ist, ähnlich wie in @fig-ukdggap, ein negativer Trend nach dem Referendum deutlich erkennbar.
+@fig-pdgukg zeigt die standardisierten Placebo-Doppelgänger-Gaps für ein fiktives Referendum zum Zeitpunkt 2016-Q2 in den 5 Kontroll-Volkswirtschaften, die für Konstruktion des BIP-Doppelgängers von Großbrittannien relevant sind (grau). Der Vergleich mit der standardisierten Doppelgänger-Gap für Großbritannien (blau). Der Verlauf der Placebo-Gaps zeigt an, dass keine Abweichungen mit negativem Trend von der Referenzlinie bei 0 (kein Unterschied zwischen beobachtetem und syntetischem BIP) nach dem Referendum vorliegen. Damit liefert die Grafik keine Hinweise auf einen Effekt fiktiver Interventionen in den Kontroll-Ländern. Für Großbritannien jedoch ist, ähnlich wie in @fig-ukdggap, ein negativer Trend nach dem Referendum deutlich erkennbar.
 
 ### Statistische Inferenz
 
@@ -781,7 +783,7 @@ Andrews.test(
   tabopts
 ```
 
-Gem. des großen $p$-Werts kann die Nullhypothese (keine strukturelle Veränderung ab 2017) nicht abgelehnt werden. Wir führen den Test nun für sämtliche Zeitpunkte ab 2017 durch und plotten die $p$-Werte nebst gepunkteten roten Hilfslinien für die gängigen Signifikanzniveaus (10\%, 5\%, 1\%).
+Gem. des großen $p$-Werts kann die Nullhypothese (keine strukturelle Veränderung ab 2017) nicht abgelehnt werden. Wir führen den Test nun für sämtliche Zeitpunkte ab 2017 durch und plotten die $p$-Werte nebst gepunkteten roten Hilfslinien für die gängigen Signifikanzniveaus (10%, 5%, 1%).
 
 ```{r}
 # Andrews' (1993) test für 
@@ -816,4 +818,3 @@ pvals_andrews %>%
 ```
 
 Der Verlauf der $p$-Werte zeigt deutlich, dass es für Zeitpunkte jenseits von 2018-Q3 Evidenz für eine strukturelle Veränderung der Doppelgänger-Gap für Großbrittannien gibt. Diese Ergebnisse untermauern die Signifikanz der in @Bornetal2019 mit SCM gefundenen negativen Effekte des Brexit-Votums auf die Britische Volkswirtschaft weiter.
-

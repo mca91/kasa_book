@@ -2,9 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.553">
+<meta name="generator" content="quarto-1.5.56">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Kausalanalyse mit R - 2&nbsp; Statistische Programmierung mit R</title>
+<title>2&nbsp; Statistische Programmierung mit R – Kausalanalyse mit R</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,7 +30,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -105,6 +105,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   };
 </script><script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js" integrity="sha512-aoZChv+8imY/U1O7KIHXvO87EOzCuKO0GhFtpD6G2Cyjo/xPeTgdf3/bchB10iB+AojMTDkMHDPLKNxPJVqDcw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
 <style>
+  .panel-tabset .tab-content {
+    border: 0;
+    padding: 1em 0 0 0;
+  }
+  
+  .panel-tabset .nav-item a {
+    border-radius: 5px 5px 0 0;
+  }
+  
   .scientific_borders {
     border: 0;
     border-top: 2px solid black !important; 
@@ -174,8 +183,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    text-align: center;
 }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/quizdown@latest/public/build/quizdown.js"></script><script>quizdown.init();</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/editor/editor.main.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<script src="https://cdn.jsdelivr.net/npm/quizdown@latest/public/build/quizdown.js"></script><script>quizdown.init();</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.47.0/min/vs/editor/editor.main.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style type="text/css">
 .monaco-editor pre {
   background-color: unset !important;
@@ -214,43 +223,72 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   color: #0d9c29
 }
 
-.qwebr-output-code-stdout {
+body.quarto-light .qwebr-output-code-stdout {
   color: #111;
+}
+
+body.quarto-dark .qwebr-output-code-stdout {
+  color: #EEE;
 }
 
 .qwebr-output-code-stderr {
   color: #db4133;
 }
 
-.qwebr-editor {
+body.quarto-light .qwebr-editor {
   border: 1px solid #EEEEEE;
 }
 
-.qwebr-editor-toolbar {
+body.quarto-light .qwebr-editor-toolbar {
   background-color: #EEEEEE;
   padding: 0.2rem 0.5rem;
 }
 
+body.quarto-dark .qwebr-editor {
+  border: 1px solid #111;
+}
+
+body.quarto-dark .qwebr-editor-toolbar {
+  background-color: #111;
+  padding: 0.2rem 0.5rem;
+}
+
 .qwebr-button {
-  background-color: #EEEEEE;
   display: inline-block;
   font-weight: 400;
   line-height: 1;
   text-decoration: none;
   text-align: center;
-  color: #000;
-  border-color: #dee2e6;
-  border: 1px solid rgba(0,0,0,0);
   padding: 0.375rem 0.75rem;
   font-size: .9rem;
   border-radius: 0.25rem;
   transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
-.qwebr-button:hover {
+body.quarto-light .qwebr-button {
+  background-color: #EEEEEE;
+  color: #000;
+  border-color: #dee2e6;
+  border: 1px solid rgba(0,0,0,0);
+}
+
+body.quarto-dark .qwebr-button {
+  background-color: #111;
+  color: #EEE;
+  border-color: #dee2e6;
+  border: 1px solid rgba(0,0,0,0);
+}
+
+body.quarto-light .qwebr-button:hover {
   color: #000;
   background-color: #d9dce0;
   border-color: #c8ccd0;
+}
+
+body.quarto-dark .qwebr-button:hover {
+  color: #d9dce0;
+  background-color: #323232;
+  border-color: #d9dce0;
 }
 
 .qwebr-button:disabled,.qwebr-button.disabled,fieldset:disabled .qwebr-button {
@@ -266,6 +304,91 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   color: #696969;
 }
 
+/* Style the code highlight lines */
+body.quarto-light .qwebr-editor-highlight-line {
+  background-color: lightblue;
+}
+
+body.quarto-dark .qwebr-editor-highlight-line {
+  background-color: darkblue;
+}
+
+/* Style the modal pop-up */
+
+/* The Modal (background) */
+.qwebr-modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  padding-top: 60px;
+}
+
+/* Modal Content */
+.qwebr-modal-content {
+  background-color: #fefefe;
+  margin: 5% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+
+.qwebr-modal-content-code {
+  max-height: 50vh;
+  min-height: 5vh;
+  overflow: scroll;
+  border: 1px solid #888;
+}
+
+/* The Close Button */
+.qwebr-modal-close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.qwebr-modal-close:hover,
+.qwebr-modal-close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.qwebr-download-btn {
+  margin-top: 10px;
+  text-decoration: none !important;
+}
+
+/* Styling to download image that is created */
+
+.qwebr-canvas-image {
+  position: relative;
+  display: inline-block;
+  margin: 10px;
+}
+
+.qwebr-canvas-image-download-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: none;
+}
+
+figure:hover .qwebr-canvas-image-download-btn {
+  display: block;
+}
 
 /* Custom styling for RevealJS Presentations*/
 
@@ -290,8 +413,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   display: contents;
 }
 
-.reveal pre div code.qwebr-output-code-stdout {
+body.reveal.quarto-light pre div code.qwebr-output-code-stdout {
   color: #111;
+}
+
+body.reveal.quarto-dark pre div code.qwebr-output-code-stdout {
+  color: #EEEEEE;
 }
 
 .reveal pre div code.qwebr-output-code-stderr {
@@ -300,10 +427,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 /* Create a border around console and output (does not effect graphs) */
-.reveal div.qwebr-console-area {
+body.reveal.quarto-light div.qwebr-console-area {
   border: 1px solid #EEEEEE;
   box-shadow: 2px 2px 10px #EEEEEE;
 }
+
+body.reveal.quarto-dark div.qwebr-console-area {
+  border: 1px solid #111;
+  box-shadow: 2px 2px 10px #111;
+}
+
 
 /* Cap output height and allow text to scroll */
 /* TODO: Is there a better way to fit contents/max it parallel to the monaco editor size? */
@@ -332,19 +465,23 @@ globalThis.qwebrShowHeaderMessage = false;
 
 // Describe the webR settings that should be used
 globalThis.qwebrCustomizedWebROptions = {
-  "baseURL": "https://webr.r-wasm.org/v0.2.2/",
+  "baseURL": "https://webr.r-wasm.org/v0.4.0/",
   "serviceWorkerUrl": "",
   "homedir": "/home/web_user", 
   "channelType": "ChannelType.Automatic"
 };
 
 // Store cell data
-globalThis.qwebrCellDetails = [{"code":"# Variable definieren...\nx <- pi\n# ... und evaluieren\nx\n\n# Äquivalent:\n(\n  x <- pi\n)","id":1,"options":{"message":"true","label":"unnamed-chunk-1","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# 'klasurergebnisse' als tibble definieren\n(\n  klausurergebnisse <- tribble(\n    ~Name,    ~Mikro, ~Makro, ~Mathe,\n    \"Tim\",        NA,    1.3,    3.0,\n    \"Lena\",      1.0,    3.0,     NA,\n    \"Ricarda\",   2.0,    1.7,    1.3,\n    \"Simon\",     2.3,    3.3,     NA\n  )\n)","id":2,"options":{"message":"true","label":"unnamed-chunk-2","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# 'klausurergebnisse' in Tidy-Format überführen\n(\n  long <- pivot_longer(\n    data = klausurergebnisse, \n    cols = Mikro:Mathe, \n    names_to = \"Modul\", \n    values_to = \"Note\"\n  )\n)","id":3,"options":{"message":"true","label":"unnamed-chunk-3","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# langes Format in das Ausgangsformat transformieren\n(\n  wide <- pivot_wider(\n    data = long,\n    id_cols = \"Name\",\n    names_from = \"Modul\", \n    values_from = \"Note\"\n  )\n)","id":4,"options":{"message":"true","label":"unnamed-chunk-4","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# langes Format mit %>%\n(\n  long <- klausurergebnisse %>% \n    pivot_longer(\n      cols = Mikro:Mathe, \n      names_to = \"Modul\", \n      values_to = \"Note\"\n    )\n)\n\n# weites Format mit %>%\n(\n  wide <- long %>% \n    pivot_wider(\n      id_cols = \"Name\",\n      names_from = \"Modul\", \n      values_from = \"Note\"\n    )\n)","id":5,"options":{"message":"true","label":"unnamed-chunk-5","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# NA-Einträge aus dem \"weiten\" Format entfernen\nwide %>% \n  drop_na()","id":6,"options":{"message":"true","label":"unnamed-chunk-6","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# NA-Einträge aus dem \"langen\" Format entfernen\nlong %>% \n  drop_na()","id":7,"options":{"message":"true","label":"unnamed-chunk-7","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Datensatz in der Arbeitsumgebung verfügbar machen\ndata(penguins)\n\n# Übersicht anzeigen lassen\nglimpse(penguins)","id":8,"options":{"message":"true","label":"unnamed-chunk-8","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Neue Variable mit Gewicht in Kg definieren\npenguins %>% \n  mutate(\n    body_mass_kg = body_mass_g/1000\n  ) %>%\n  glimpse()","id":9,"options":{"message":"true","label":"unnamed-chunk-9","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# species, island, sex und year in Typ 'character' umwandeln\npenguins %>% \n  mutate(\n    across(\n      c(species, island, sex, year), \n      .fns = as.character\n    )\n  ) %>%\n  glimpse()","id":10,"options":{"message":"true","label":"unnamed-chunk-10","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Nur transformierte Variablen behalten\npenguins %>% \n  transmute(\n    body_mass_kg = body_mass_g/1000\n  )","id":11,"options":{"message":"true","label":"unnamed-chunk-11","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# 'species' auswählen\npenguins %>% \n  select(species)","id":12,"options":{"message":"true","label":"unnamed-chunk-12","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Teilmenge von Variablen per Index auswählen\npenguins %>% \n  select(\n    c(1, 2, 3)\n  )","id":13,"options":{"message":"true","label":"unnamed-chunk-13","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Nur in mm gemessene Variablen auslesen\npenguins %>% \n  select(\n    ends_with(\"mm\")\n  )","id":14,"options":{"message":"true","label":"unnamed-chunk-14","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Nur numerische Variablen auswählen\npenguins %>% \n  select(\n    where(is.numeric)\n  )","id":15,"options":{"message":"true","label":"unnamed-chunk-15","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Nur Pinguine mit bill_length_mm >= 39\npenguins %>% \n  filter(\n    bill_length_mm >= 39\n  )","id":16,"options":{"message":"true","label":"unnamed-chunk-16","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Nur Pinguine mit bill_length_mm <= 40\npenguins %>% \n  filter(\n    bill_length_mm <= 40\n  )","id":17,"options":{"message":"true","label":"unnamed-chunk-17","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Kombinierter Filter -- Variante 1\npenguins %>% \n  filter(\n    bill_length_mm >= 39 & bill_length_mm <= 40\n  )","id":18,"options":{"message":"true","label":"unnamed-chunk-18","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Kombinierter Filter -- Variante 2\npenguins %>% \n  filter(\n    bill_length_mm >= 39, \n    bill_length_mm <= 40\n  )","id":19,"options":{"message":"true","label":"unnamed-chunk-19","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Filtern mit Hilfsfunktion\npenguins %>% \n  filter(\n    between(\n      bill_length_mm, left = 39, right = 40\n    )\n  )","id":20,"options":{"message":"true","label":"unnamed-chunk-20","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Schritt 1\n(\n  penguins_cleaned <- penguins %>% \n    rename(\n      bill_length = bill_length_mm,\n      bill_depth  = bill_depth_mm,\n      flipper_length = flipper_length_mm,\n      body_mass = body_mass_g\n    )\n)","id":21,"options":{"message":"true","label":"unnamed-chunk-21","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Schritt 2\n(\n  penguins_cleaned <- penguins_cleaned %>%\n    drop_na()\n)","id":22,"options":{"message":"true","label":"unnamed-chunk-22","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Schritt 3\npenguins_cleaned %>% \n  filter(\n    body_mass < quantile(body_mass, probs = .95)\n  ) %>%\n  glimpse()","id":23,"options":{"message":"true","label":"unnamed-chunk-23","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Verketter Funktionsaufruf für Datensatzbereinigung\npenguins_cleaned <- penguins %>% \n  rename(\n    bill_length = bill_length_mm,\n    bill_depth  = bill_depth_mm,\n    flipper_length = flipper_length_mm,\n    body_mass = body_mass_g\n  ) %>% \n  drop_na() %>% \n  filter(\n    body_mass < quantile(body_mass, .95)\n  )\n\npenguins_cleaned %>% \n  glimpse()","id":24,"options":{"message":"true","label":"unnamed-chunk-24","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# statistische Zusammenfassung mit 'summarise()'\npenguins %>% \n  select(flipper_length_mm) %>% \n  summarise(\n    mean = mean(flipper_length_mm, na.rm = TRUE), \n    sd = sd(flipper_length_mm, na.rm = TRUE)\n  )","id":25,"options":{"message":"true","label":"unnamed-chunk-25","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"penguins %>% \n  summarise(\n    across(\n      where(is.numeric), \n      .fns = list(\n        mean = \\(x) mean(x, na.rm = TRUE), \n        sd = \\(x) sd(x, na.rm = TRUE)\n      )\n    )\n  ) %>%\n  glimpse()","id":26,"options":{"message":"true","label":"unnamed-chunk-26","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Datensatz aufsteigend nach 'body_mass_g' sortieren\npenguins %>% \n  arrange(body_mass_g)","id":27,"options":{"message":"true","label":"unnamed-chunk-27","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Absteigende Sortierung nach 'body_mass_g'\npenguins %>% \n  arrange(\n    desc(body_mass_g)\n  )","id":28,"options":{"message":"true","label":"unnamed-chunk-28","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Erst Sortierung nach 'sex', dann gruppenweise absteigend \n# nach 'body_mass_g' sortieren\npenguins %>% \n  arrange(\n    sex, desc(body_mass_g)\n  )","id":29,"options":{"message":"true","label":"unnamed-chunk-29","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Datensatz gruppieren\npenguins_grouped <- penguins %>% \n  group_by(species)\n\n# Datensatz hat nun die Eigenschaft 'Groups'\nglimpse(penguins_grouped)","id":30,"options":{"message":"true","label":"unnamed-chunk-30","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# summarise -- ungruppiert:\npenguins %>%\n  summarise(\n    across(\n      where(is.numeric), \\(x) mean(x, na.rm = T)\n      )\n    )","id":31,"options":{"message":"true","label":"unnamed-chunk-31","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# summarise -- gruppiert:    \npenguins_grouped %>%\n  summarise(\n    across(\n      where(is.numeric), \n      ~ mean(., na.rm = T)\n    )\n  )","id":32,"options":{"message":"true","label":"unnamed-chunk-32","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Zufallsstichprobe generieren\nset.seed(123)\n(\n  penguins_sample <- penguins %>%\n    slice_sample(n = 10)  \n)","id":33,"options":{"message":"true","label":"unnamed-chunk-33","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# mutate() -- ungruppiert:\npenguins_sample %>%\n  transmute(\n    mean = mean(bill_length_mm)\n  )","id":34,"options":{"message":"true","label":"unnamed-chunk-34","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# mutate() -- gruppiert\npenguins_sample %>%\n  group_by(species) %>%\n  transmute(\n    mean = mean(bill_length_mm)\n  )","id":35,"options":{"message":"true","label":"unnamed-chunk-35","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Punkteplot: body_mass vs. bill_depth\npenguins_cleaned %>%\n  ggplot(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth\n    )\n  ) +\n  geom_point()","id":36,"options":{"message":"true","label":"unnamed-chunk-36","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Punkteplot: Farbliche Darstellung verschiedener Arten\npenguins_cleaned %>%\n  ggplot(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth, \n      color = species\n    )\n  ) +\n  geom_point()","id":37,"options":{"message":"true","label":"unnamed-chunk-37","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Lineare Regression per Art\npenguins_cleaned %>%\n  ggplot(\n    aes(\n      x = body_mass, \n      y = bill_depth, \n      color = species\n    )\n  ) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = F)","id":38,"options":{"message":"true","label":"unnamed-chunk-38","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Zusatz: Globale Regression\npenguins_cleaned %>%\n  ggplot(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth, \n      color = species\n    )\n  ) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = F) +\n  # Regression für alle Datenpunkte\n  geom_smooth(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth\n    ),\n    method = \"lm\", \n    se = F, \n    inherit.aes = F\n  )","id":39,"options":{"message":"true","label":"unnamed-chunk-39","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}},{"code":"# Facettierung des per In\npenguins_cleaned %>%\n  ggplot(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth, \n      color = species)\n  ) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = F) +\n  facet_wrap(~ island)","id":40,"options":{"message":"true","label":"unnamed-chunk-40","output":"true","comment":"","out-width":"700px","context":"interactive","fig-width":7,"results":"markup","classes":"","out-height":"","fig-cap":"","warning":"true","dpi":72,"fig-height":5,"autorun":"false"}}];
+globalThis.qwebrCellDetails = [{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-1","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":1,"code":"# Variable definieren...\nx <- pi\n# ... und evaluieren\nx\n\n# Äquivalent:\n(\n  x <- pi\n)"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-2","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":2,"code":"# 'klasurergebnisse' als tibble definieren\n(\n  klausurergebnisse <- tribble(\n    ~Name,    ~Mikro, ~Makro, ~Mathe,\n    \"Tim\",        NA,    1.3,    3.0,\n    \"Lena\",      1.0,    3.0,     NA,\n    \"Ricarda\",   2.0,    1.7,    1.3,\n    \"Simon\",     2.3,    3.3,     NA\n  )\n)"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-3","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":3,"code":"# 'klausurergebnisse' in Tidy-Format überführen\n(\n  long <- pivot_longer(\n    data = klausurergebnisse, \n    cols = Mikro:Mathe, \n    names_to = \"Modul\", \n    values_to = \"Note\"\n  )\n)"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-4","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":4,"code":"# langes Format in das Ausgangsformat transformieren\n(\n  wide <- pivot_wider(\n    data = long,\n    id_cols = \"Name\",\n    names_from = \"Modul\", \n    values_from = \"Note\"\n  )\n)"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-5","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":5,"code":"# langes Format mit %>%\n(\n  long <- klausurergebnisse %>% \n    pivot_longer(\n      cols = Mikro:Mathe, \n      names_to = \"Modul\", \n      values_to = \"Note\"\n    )\n)\n\n# weites Format mit %>%\n(\n  wide <- long %>% \n    pivot_wider(\n      id_cols = \"Name\",\n      names_from = \"Modul\", \n      values_from = \"Note\"\n    )\n)"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-6","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":6,"code":"# NA-Einträge aus dem \"weiten\" Format entfernen\nwide %>% \n  drop_na()"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-7","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":7,"code":"# NA-Einträge aus dem \"langen\" Format entfernen\nlong %>% \n  drop_na()"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-8","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":8,"code":"# Datensatz in der Arbeitsumgebung verfügbar machen\ndata(penguins)\n\n# Übersicht anzeigen lassen\nglimpse(penguins)"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-9","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":9,"code":"# Neue Variable mit Gewicht in Kg definieren\npenguins %>% \n  mutate(\n    body_mass_kg = body_mass_g/1000\n  ) %>%\n  glimpse()"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-10","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":10,"code":"# species, island, sex und year in Typ 'character' umwandeln\npenguins %>% \n  mutate(\n    across(\n      c(species, island, sex, year), \n      .fns = as.character\n    )\n  ) %>%\n  glimpse()"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-11","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":11,"code":"# Nur transformierte Variablen behalten\npenguins %>% \n  transmute(\n    body_mass_kg = body_mass_g/1000\n  )"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-12","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":12,"code":"# 'species' auswählen\npenguins %>% \n  select(species)"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-13","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":13,"code":"# Teilmenge von Variablen per Index auswählen\npenguins %>% \n  select(\n    c(1, 2, 3)\n  )"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-14","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":14,"code":"# Nur in mm gemessene Variablen auslesen\npenguins %>% \n  select(\n    ends_with(\"mm\")\n  )"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-15","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":15,"code":"# Nur numerische Variablen auswählen\npenguins %>% \n  select(\n    where(is.numeric)\n  )"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-16","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":16,"code":"# Nur Pinguine mit bill_length_mm >= 39\npenguins %>% \n  filter(\n    bill_length_mm >= 39\n  )"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-17","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":17,"code":"# Nur Pinguine mit bill_length_mm <= 40\npenguins %>% \n  filter(\n    bill_length_mm <= 40\n  )"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-18","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":18,"code":"# Kombinierter Filter -- Variante 1\npenguins %>% \n  filter(\n    bill_length_mm >= 39 & bill_length_mm <= 40\n  )"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-19","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":19,"code":"# Kombinierter Filter -- Variante 2\npenguins %>% \n  filter(\n    bill_length_mm >= 39, \n    bill_length_mm <= 40\n  )"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-20","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":20,"code":"# Filtern mit Hilfsfunktion\npenguins %>% \n  filter(\n    between(\n      bill_length_mm, left = 39, right = 40\n    )\n  )"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-21","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":21,"code":"# Schritt 1\n(\n  penguins_cleaned <- penguins %>% \n    rename(\n      bill_length = bill_length_mm,\n      bill_depth  = bill_depth_mm,\n      flipper_length = flipper_length_mm,\n      body_mass = body_mass_g\n    )\n)"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-22","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":22,"code":"# Schritt 2\n(\n  penguins_cleaned <- penguins_cleaned %>%\n    drop_na()\n)"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-23","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":23,"code":"# Schritt 3\npenguins_cleaned %>% \n  filter(\n    body_mass < quantile(body_mass, probs = .95)\n  ) %>%\n  glimpse()"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-24","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":24,"code":"# Verketter Funktionsaufruf für Datensatzbereinigung\npenguins_cleaned <- penguins %>% \n  rename(\n    bill_length = bill_length_mm,\n    bill_depth  = bill_depth_mm,\n    flipper_length = flipper_length_mm,\n    body_mass = body_mass_g\n  ) %>% \n  drop_na() %>% \n  filter(\n    body_mass < quantile(body_mass, .95)\n  )\n\npenguins_cleaned %>% \n  glimpse()"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-25","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":25,"code":"# statistische Zusammenfassung mit 'summarise()'\npenguins %>% \n  select(flipper_length_mm) %>% \n  summarise(\n    mean = mean(flipper_length_mm, na.rm = TRUE), \n    sd = sd(flipper_length_mm, na.rm = TRUE)\n  )"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-26","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":26,"code":"penguins %>% \n  summarise(\n    across(\n      where(is.numeric), \n      .fns = list(\n        mean = \\(x) mean(x, na.rm = TRUE), \n        sd = \\(x) sd(x, na.rm = TRUE)\n      )\n    )\n  ) %>%\n  glimpse()"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-27","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":27,"code":"# Datensatz aufsteigend nach 'body_mass_g' sortieren\npenguins %>% \n  arrange(body_mass_g)"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-28","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":28,"code":"# Absteigende Sortierung nach 'body_mass_g'\npenguins %>% \n  arrange(\n    desc(body_mass_g)\n  )"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-29","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":29,"code":"# Erst Sortierung nach 'sex', dann gruppenweise absteigend \n# nach 'body_mass_g' sortieren\npenguins %>% \n  arrange(\n    sex, desc(body_mass_g)\n  )"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-30","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":30,"code":"# Datensatz gruppieren\npenguins_grouped <- penguins %>% \n  group_by(species)\n\n# Datensatz hat nun die Eigenschaft 'Groups'\nglimpse(penguins_grouped)"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-31","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":31,"code":"# summarise -- ungruppiert:\npenguins %>%\n  summarise(\n    across(\n      where(is.numeric), \\(x) mean(x, na.rm = T)\n      )\n    )"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-32","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":32,"code":"# summarise -- gruppiert:    \npenguins_grouped %>%\n  summarise(\n    across(\n      where(is.numeric), \n      ~ mean(., na.rm = T)\n    )\n  )"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-33","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":33,"code":"# Zufallsstichprobe generieren\nset.seed(123)\n(\n  penguins_sample <- penguins %>%\n    slice_sample(n = 10)  \n)"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-34","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":34,"code":"# mutate() -- ungruppiert:\npenguins_sample %>%\n  transmute(\n    mean = mean(bill_length_mm)\n  )"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-35","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":35,"code":"# mutate() -- gruppiert\npenguins_sample %>%\n  group_by(species) %>%\n  transmute(\n    mean = mean(bill_length_mm)\n  )"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-36","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":36,"code":"# Punkteplot: body_mass vs. bill_depth\npenguins_cleaned %>%\n  ggplot(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth\n    )\n  ) +\n  geom_point()"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-37","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":37,"code":"# Punkteplot: Farbliche Darstellung verschiedener Arten\npenguins_cleaned %>%\n  ggplot(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth, \n      color = species\n    )\n  ) +\n  geom_point()"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-38","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":38,"code":"# Lineare Regression per Art\npenguins_cleaned %>%\n  ggplot(\n    aes(\n      x = body_mass, \n      y = bill_depth, \n      color = species\n    )\n  ) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = F)"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-39","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":39,"code":"# Zusatz: Globale Regression\npenguins_cleaned %>%\n  ggplot(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth, \n      color = species\n    )\n  ) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = F) +\n  # Regression für alle Datenpunkte\n  geom_smooth(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth\n    ),\n    method = \"lm\", \n    se = F, \n    inherit.aes = F\n  )"},{"options":{"dpi":72,"read-only":"false","autorun":"false","classes":"","editor-quick-suggestions":"false","message":"true","fig-height":5,"out-height":"","editor-font-scale":"1","label":"unnamed-chunk-40","results":"markup","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","warning":"true","output":"true","out-width":"700px","context":"interactive","comment":"","fig-cap":""},"id":40,"code":"# Facettierung des per In\npenguins_cleaned %>%\n  ggplot(\n    mapping = aes(\n      x = body_mass, \n      y = bill_depth, \n      color = species)\n  ) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = F) +\n  facet_wrap(~ island)"}];
 
 </script><script type="module">
 // Declare startupMessageQWebR globally
 globalThis.qwebrStartupMessage = document.createElement("p");
 
+// Verify if OffScreenCanvas is supported
+globalThis.qwebrOffScreenCanvasSupport = function() {
+  return typeof OffscreenCanvas !== 'undefined'
+}
 
 // Function to set the button text
 globalThis.qwebrSetInteractiveButtonState = function(buttonText, enableCodeButton = true) {
@@ -368,15 +505,122 @@ globalThis.qwebrUpdateStatusHeader = function(message) {
     <span>${message}</span>`;
 }
 
+// Function to return true if element is found, false if not
+globalThis.qwebrCheckHTMLElementExists = function(selector) {
+  const element = document.querySelector(selector);
+  return !!element;
+}
+
+// Function that detects whether reveal.js slides are present
+globalThis.qwebrIsRevealJS = function() {
+  // If the '.reveal .slides' selector exists, RevealJS is likely present
+  return qwebrCheckHTMLElementExists('.reveal .slides');
+}
+
+// Initialize the Quarto sidebar element
+function qwebrSetupQuartoSidebar() {
+  var newSideBarDiv = document.createElement('div');
+  newSideBarDiv.id = 'quarto-margin-sidebar';
+  newSideBarDiv.className = 'sidebar margin-sidebar';
+  newSideBarDiv.style.top = '0px';
+  newSideBarDiv.style.maxHeight = 'calc(0px + 100vh)';
+
+  return newSideBarDiv;
+}
+
+// Position the sidebar in the document
+function qwebrPlaceQuartoSidebar() {
+  // Get the reference to the element with id 'quarto-document-content'
+  var referenceNode = document.getElementById('quarto-document-content');
+
+  // Create the new div element
+  var newSideBarDiv = qwebrSetupQuartoSidebar();
+
+  // Insert the new div before the 'quarto-document-content' element
+  referenceNode.parentNode.insertBefore(newSideBarDiv, referenceNode);
+}
+
+function qwebrPlaceMessageContents(content, html_location = "title-block-header", revealjs_location = "title-slide") {
+
+  // Get references to header elements
+  const headerHTML = document.getElementById(html_location);
+  const headerRevealJS = document.getElementById(revealjs_location);
+
+  // Determine where to insert the quartoTitleMeta element
+  if (headerHTML || headerRevealJS) {
+    // Append to the existing "title-block-header" element or "title-slide" div
+    (headerHTML || headerRevealJS).appendChild(content);
+  } else {
+    // If neither headerHTML nor headerRevealJS is found, insert after "webr-monaco-editor-init" script
+    const monacoScript = document.getElementById("qwebr-monaco-editor-init");
+    const header = document.createElement("header");
+    header.setAttribute("id", "title-block-header");
+    header.appendChild(content);
+    monacoScript.after(header);
+  }
+}
+
+
+
+function qwebrOffScreenCanvasSupportWarningMessage() {
+  
+  // Verify canvas is supported.
+  if(qwebrOffScreenCanvasSupport()) return;
+
+  // Create the main container div
+  var calloutContainer = document.createElement('div');
+  calloutContainer.classList.add('callout', 'callout-style-default', 'callout-warning', 'callout-titled');
+
+  // Create the header div
+  var headerDiv = document.createElement('div');
+  headerDiv.classList.add('callout-header', 'd-flex', 'align-content-center');
+
+  // Create the icon container div
+  var iconContainer = document.createElement('div');
+  iconContainer.classList.add('callout-icon-container');
+
+  // Create the icon element
+  var iconElement = document.createElement('i');
+  iconElement.classList.add('callout-icon');
+
+  // Append the icon element to the icon container
+  iconContainer.appendChild(iconElement);
+
+  // Create the title container div
+  var titleContainer = document.createElement('div');
+  titleContainer.classList.add('callout-title-container', 'flex-fill');
+  titleContainer.innerText = 'Warning: Web Browser Does Not Support Graphing!';
+
+  // Append the icon container and title container to the header div
+  headerDiv.appendChild(iconContainer);
+  headerDiv.appendChild(titleContainer);
+
+  // Create the body container div
+  var bodyContainer = document.createElement('div');
+  bodyContainer.classList.add('callout-body-container', 'callout-body');
+
+  // Create the paragraph element for the body content
+  var paragraphElement = document.createElement('p');
+  paragraphElement.innerHTML = 'This web browser does not have support for displaying graphs through the <code>quarto-webr</code> extension since it lacks an <code>OffScreenCanvas</code>. Please upgrade your web browser to one that supports <code>OffScreenCanvas</code>.';
+
+  // Append the paragraph element to the body container
+  bodyContainer.appendChild(paragraphElement);
+
+  // Append the header div and body container to the main container div
+  calloutContainer.appendChild(headerDiv);
+  calloutContainer.appendChild(bodyContainer);
+
+  // Append the main container div to the document depending on format
+  qwebrPlaceMessageContents(calloutContainer, "title-block-header"); 
+
+}
+
+
 // Function that attaches the document status message and diagnostics
 function displayStartupMessage(showStartupMessage, showHeaderMessage) {
   if (!showStartupMessage) {
     return;
   }
-
-  // Get references to header elements
-  const headerHTML = document.getElementById("title-block-header");
-  const headerRevealJS = document.getElementById("title-slide");
 
   // Create the outermost div element for metadata
   const quartoTitleMeta = document.createElement("div");
@@ -419,21 +663,297 @@ function displayStartupMessage(showStartupMessage, showHeaderMessage) {
   firstInnerDiv.appendChild(secondInnerDivContents);
   quartoTitleMeta.appendChild(firstInnerDiv);
 
-  // Determine where to insert the quartoTitleMeta element
-  if (headerHTML || headerRevealJS) {
-    // Append to the existing "title-block-header" element or "title-slide" div
-    (headerHTML || headerRevealJS).appendChild(quartoTitleMeta);
+  // Place message on webpage
+  qwebrPlaceMessageContents(quartoTitleMeta); 
+}
+
+function qwebrAddCommandHistoryModal() {
+  // Create the modal div
+  var modalDiv = document.createElement('div');
+  modalDiv.id = 'qwebr-history-modal';
+  modalDiv.className = 'qwebr-modal';
+
+  // Create the modal content div
+  var modalContentDiv = document.createElement('div');
+  modalContentDiv.className = 'qwebr-modal-content';
+
+  // Create the span for closing the modal
+  var closeSpan = document.createElement('span');
+  closeSpan.id = 'qwebr-command-history-close-btn';
+  closeSpan.className = 'qwebr-modal-close';
+  closeSpan.innerHTML = '&times;';
+
+  // Create the h1 element for the modal
+  var modalH1 = document.createElement('h1');
+  modalH1.textContent = 'R History Command Contents';
+
+  // Create an anchor element for downloading the Rhistory file 
+  var downloadLink = document.createElement('a');
+  downloadLink.href = '#';
+  downloadLink.id = 'qwebr-download-history-btn';
+  downloadLink.className = 'qwebr-download-btn';
+
+  // Create an 'i' element for the icon
+  var icon = document.createElement('i');
+  icon.className = 'bi bi-file-code';
+
+  // Append the icon to the anchor element
+  downloadLink.appendChild(icon);
+
+  // Add the text 'Download R History' to the anchor element
+  downloadLink.appendChild(document.createTextNode(' Download R History File'));
+
+  // Create the pre for command history contents
+  var commandContentsPre = document.createElement('pre');
+  commandContentsPre.id = 'qwebr-command-history-contents';
+  commandContentsPre.className = 'qwebr-modal-content-code';
+
+  // Append the close span, h1, and history contents pre to the modal content div
+  modalContentDiv.appendChild(closeSpan);
+  modalContentDiv.appendChild(modalH1);
+  modalContentDiv.appendChild(downloadLink);
+  modalContentDiv.appendChild(commandContentsPre);
+
+  // Append the modal content div to the modal div
+  modalDiv.appendChild(modalContentDiv);
+
+  // Append the modal div to the body
+  document.body.appendChild(modalDiv);
+}
+
+function qwebrRegisterRevealJSCommandHistoryModal() {
+  // Select the <ul> element inside the <div> with data-panel="Custom0"
+  let ulElement = document.querySelector('div[data-panel="Custom0"] > ul.slide-menu-items');
+
+  // Find the last <li> element with class slide-tool-item
+  let lastItem = ulElement.querySelector('li.slide-tool-item:last-child');
+
+  // Calculate the next data-item value
+  let nextItemValue = 0;
+  if (lastItem) {
+      nextItemValue = parseInt(lastItem.dataset.item) + 1;
+  }
+
+  // Create a new <li> element
+  let newListItem = document.createElement('li');
+  newListItem.className = 'slide-tool-item';
+  newListItem.dataset.item = nextItemValue.toString(); // Set the next available data-item value
+
+  // Create the <a> element inside the <li>
+  let newLink = document.createElement('a');
+  newLink.href = '#';
+  newLink.id = 'qwebrRHistoryButton'; // Set the ID for the new link
+  
+  // Create the <kbd> element inside the <a>
+  let newKbd = document.createElement('kbd');
+  newKbd.textContent = ' '; // Set to empty as we are not registering a keyboard shortcut
+
+  // Create text node for the link text
+  let newText = document.createTextNode(' View R History');
+
+  // Append <kbd> and text node to <a>
+  newLink.appendChild(newKbd);
+  newLink.appendChild(newText);
+
+  // Append <a> to <li>
+  newListItem.appendChild(newLink);
+
+  // Append <li> to <ul>
+  ulElement.appendChild(newListItem);
+}
+
+// Handle setting up the R history modal
+function qwebrCodeLinks() {
+
+  if (qwebrIsRevealJS()) {
+    qwebrRegisterRevealJSCommandHistoryModal();
+    return;
+  }
+
+  // Create the container div
+  var containerDiv = document.createElement('div');
+  containerDiv.className = 'quarto-code-links';
+
+  // Create the h2 element
+  var h2 = document.createElement('h2');
+  h2.textContent = 'webR Code Links';
+
+  // Create the ul element
+  var ul = document.createElement('ul');
+
+  // Create the li element
+  var li = document.createElement('li');
+
+  // Create the a_history_btn element
+  var a_history_btn = document.createElement('a');
+  a_history_btn.href = 'javascript:void(0)';
+  a_history_btn.setAttribute('id', 'qwebrRHistoryButton');
+
+  // Create the i_history_btn element
+  var i_history_btn = document.createElement('i');
+  i_history_btn.className = 'bi bi-file-code';
+
+  // Create the text node for the link text
+  var text_history_btn = document.createTextNode('View R History');
+
+  // Append the icon element and link text to the a element
+  a_history_btn.appendChild(i_history_btn);
+  a_history_btn.appendChild(text_history_btn);
+
+  // Append the a element to the li element
+  li.appendChild(a_history_btn);
+
+  // Append the li element to the ul element
+  ul.appendChild(li);
+
+  // Append the h2 and ul elements to the container div
+  containerDiv.appendChild(h2);
+  containerDiv.appendChild(ul);
+
+  // Append the container div to the element with the ID 'quarto-margin-sidebar'
+  var sidebar = document.getElementById('quarto-margin-sidebar');
+    
+  // If the sidebar element is not found, create it
+  if(!sidebar) {
+    qwebrPlaceQuartoSidebar();
+  }
+  
+  // Re-select the sidebar element (if it was just created)
+  sidebar = document.getElementById('quarto-margin-sidebar');   
+
+
+  // If the sidebar element exists, append the container div to it
+  if(sidebar) {
+    // Append the container div to the sidebar
+    sidebar.appendChild(containerDiv);
+    // Force the sidebar to be clickable by removing the 'zindex-bottom' class
+    // added in pre-release: https://github.com/quarto-dev/quarto-cli/commit/f0c53a1ffcaa1de4eccbf07803b096898248adcc
+    sidebar.className = 'sidebar margin-sidebar';
   } else {
-    // If neither headerHTML nor headerRevealJS is found, insert after "webr-monaco-editor-init" script
-    const monacoScript = document.getElementById("qwebr-monaco-editor-init");
-    const header = document.createElement("header");
-    header.setAttribute("id", "title-block-header");
-    header.appendChild(quartoTitleMeta);
-    monacoScript.after(header);
+    // Get a debugger ...
+    console.warn('Element with ID "quarto-margin-sidebar" not found.');
   }
 }
 
+// Call the function to append the code links for qwebR into the right sidebar
+qwebrCodeLinks();
+
+// Add the command history modal
+qwebrAddCommandHistoryModal();
+
 displayStartupMessage(qwebrShowStartupMessage, qwebrShowHeaderMessage);
+qwebrOffScreenCanvasSupportWarningMessage();
+</script><script type="module">
+// Define a global storage and retrieval solution ----
+
+// Store commands executed in R
+globalThis.qwebrRCommandHistory = [];
+
+// Function to retrieve the command history
+globalThis.qwebrFormatRHistory = function() {
+   return qwebrRCommandHistory.join("\n\n");
+}
+
+// Retrieve HTML Elements ----
+
+// Get the command modal
+const command_history_modal = document.getElementById("qwebr-history-modal");
+
+// Get the button that opens the command modal
+const command_history_btn = document.getElementById("qwebrRHistoryButton");
+
+// Get the <span> element that closes the command modal
+const command_history_close_span = document.getElementById("qwebr-command-history-close-btn");
+
+// Get the download button for r history information
+const command_history_download_btn = document.getElementById("qwebr-download-history-btn");
+
+// Plug in command history into modal/download button ----
+
+// Function to populate the modal with command history
+function populateCommandHistoryModal() {
+    document.getElementById("qwebr-command-history-contents").innerHTML = qwebrFormatRHistory() || "No commands have been executed yet.";
+}
+
+// Function to format the current date and time to
+// a string with the format YYYY-MM-DD-HH-MM-SS
+function formatDateTime() {
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
+}
+
+
+// Function to convert document title with datetime to a safe filename
+function safeFileName() {
+    // Get the current page title
+    let pageTitle = document.title;
+
+    // Combine the current page title with the current date and time
+    let pageNameWithDateTime = `Rhistory-${pageTitle}-${formatDateTime()}`;
+
+    // Replace unsafe characters with safe alternatives
+    let safeFilename = pageNameWithDateTime.replace(/[\\/:\*\?! "<>\|]/g, '-');
+
+    return safeFilename;
+}
+
+
+// Function to download list contents as text file
+function downloadRHistory() {
+    // Get the current page title + datetime and use it as the filename
+    const filename = `${safeFileName()}.R`;
+
+    // Get the text contents of the R History list
+    const text = qwebrFormatRHistory();
+
+    // Create a new Blob object with the text contents
+    const blob = new Blob([text], { type: 'text/plain' });
+  
+    // Create a new anchor element for the download
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+
+    // Append the anchor to the body, click it, and remove it
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+// Register event handlers ----
+
+// When the user clicks the View R History button, open the command modal
+command_history_btn.onclick = function() {
+    populateCommandHistoryModal();
+    command_history_modal.style.display = "block";
+}
+
+// When the user clicks on <span> (x), close the command modal
+command_history_close_span.onclick = function() {
+    command_history_modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the command modal, close it
+window.onclick = function(event) {
+    if (event.target == command_history_modal) {
+        command_history_modal.style.display = "none";
+    }
+}
+
+// Add an onclick event listener to the download button so that
+// the user can download the R history as a text file
+command_history_download_btn.onclick = function() {
+    downloadRHistory();
+};
 </script><script type="module">
 // Supported Evaluation Types for Context
 globalThis.EvalTypes = Object.freeze({
@@ -441,6 +961,35 @@ globalThis.EvalTypes = Object.freeze({
   Setup: 'setup',
   Output: 'output',
 });
+
+// Function that obtains the font size for a given element 
+globalThis.qwebrCurrentFontSizeOnElement = function(element, cssProperty = 'font-size') {
+
+  const currentFontSize = parseFloat(
+    window
+    .getComputedStyle(element)
+    .getPropertyValue(cssProperty)
+  );
+  
+  return currentFontSize;
+}
+
+// Function to determine font scaling
+globalThis.qwebrScaledFontSize = function(div, qwebrOptions) {
+  // Determine if we should compute font-size using RevealJS's `--r-main-font-size` 
+  // or if we can directly use the document's `font-size`.
+  const cssProperty = document.body.classList.contains('reveal') ? 
+    "--r-main-font-size" : "font-size";
+  
+  // Get the current font size on the div element
+  const elementFontSize = qwebrCurrentFontSizeOnElement(div, cssProperty);
+
+  // Determine the scaled font size value
+  const scaledFontSize = ((qwebrOptions['editor-font-scale'] ?? 1) * elementFontSize) ?? 17.5;
+
+  return scaledFontSize;
+}
+
 
 // Function that dispatches the creation request
 globalThis.qwebrCreateHTMLElement = function (
@@ -568,10 +1117,10 @@ globalThis.qwebrCreateInteractiveElement = function (qwebrCounter, qwebrOptions)
   toolbarDiv.appendChild(rightButtonsDiv);
 
   // Append all elements to the main div
-  consoleAreaDiv.appendChild(editorDiv);
-  mainDiv.appendChild(consoleAreaDiv);
   mainDiv.appendChild(toolbarDiv);
-  mainDiv.appendChild(outputCodeAreaDiv);
+  consoleAreaDiv.appendChild(editorDiv);
+  consoleAreaDiv.appendChild(outputCodeAreaDiv);
+  mainDiv.appendChild(consoleAreaDiv);
   mainDiv.appendChild(outputGraphAreaDiv);
 
   return mainDiv;
@@ -803,6 +1352,34 @@ globalThis.qwebrPrefixComment = function(x, comment) {
     return `${comment}${x}`;
 };
 
+// Function to store the code in the history
+globalThis.qwebrLogCodeToHistory = function(codeToRun, options) {
+    qwebrRCommandHistory.push(
+        `# Ran code in ${options.label} at ${new Date().toLocaleString()} ----\n${codeToRun}`
+    );
+}
+
+// Function to attach a download button onto the canvas
+// allowing the user to download the image.
+function qwebrImageCanvasDownloadButton(canvas, canvasContainer) {
+
+    // Create the download button
+    const downloadButton = document.createElement('button');
+    downloadButton.className = 'qwebr-canvas-image-download-btn';
+    downloadButton.textContent = 'Download Image';
+    canvasContainer.appendChild(downloadButton);
+
+    // Trigger a download of the image when the button is clicked
+    downloadButton.addEventListener('click', function() {
+        const image = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = image;
+        link.download = 'qwebr-canvas-image.png';
+        link.click();
+    });
+  }
+  
+
 // Function to parse the pager results
 globalThis.qwebrParseTypePager = async function (msg) { 
 
@@ -843,10 +1420,8 @@ globalThis.qwebrComputeEngine = async function(
     // 1. We setup a canvas device to write to by making a namespace call into the {webr} package
     // 2. We use values inside of the options array to set the figure size.
     // 3. We capture the output stream information (STDOUT and STERR)
-    // 4. While parsing the results, we disable image creation.
-
-    // Create a canvas variable for graphics
-    let canvas = undefined;
+    // 4. We disable the current device's image creation.
+    // 5. Piece-wise parse the results into the different output areas
 
     // Create a pager variable for help/file contents
     let pager = [];
@@ -870,23 +1445,45 @@ globalThis.qwebrComputeEngine = async function(
     // Initialize webR
     await mainWebR.init();
 
-    // Setup a webR canvas by making a namespace call into the {webr} package
-    await mainWebR.evalRVoid(`webr::canvas(width=${fig_width}, height=${fig_height})`);
-
-    const result = await mainWebRCodeShelter.captureR(codeToRun, {
+    // Configure capture output
+    let captureOutputOptions = {
         withAutoprint: true,
         captureStreams: true,
-        captureConditions: false//,
+        captureConditions: false,
         // env: webR.objs.emptyEnv, // maintain a global environment for webR v0.2.0
-    });
+    };
+    
+    // Determine if the browser supports OffScreen
+    if (qwebrOffScreenCanvasSupport()) {
+        // Mirror default options of webr::canvas()
+        // with changes to figure height and width.
+        captureOutputOptions.captureGraphics = {
+            width: fig_width,
+            height: fig_height,
+            bg: "white", // default: transparent
+            pointsize: 12,
+            capture: true
+        };
+    }  else {
+        // Disable generating graphics
+        captureOutputOptions.captureGraphics = false;
+    }
+
+    // Store the code to run in history
+    qwebrLogCodeToHistory(codeToRun, options);
+
+    // Setup a webR canvas by making a namespace call into the {webr} package
+    // Evaluate the R code
+    // Remove the active canvas silently
+    const result = await mainWebRCodeShelter.captureR(
+        `${codeToRun}`,
+        captureOutputOptions
+    );
 
     // -----
 
     // Start attempting to parse the result data
     processResultOutput:try {
-
-        // Stop creating images
-        await mainWebR.evalRVoid("dev.off()");
         
         // Avoid running through output processing
         if (options.results === "hide" || options.output === "false") { 
@@ -909,33 +1506,10 @@ globalThis.qwebrComputeEngine = async function(
 
 
         // Clean the state
-        // We're now able to process both graphics and pager events.
+        // We're now able to process pager events.
         // As a result, we cannot maintain a true 1-to-1 output order 
         // without individually feeding each line
         const msgs = await mainWebR.flush();
-
-        // Output each image event stored
-        msgs.forEach((msg) => {
-        // Determine if old canvas can be used or a new canvas is required.
-        if (msg.type === 'canvas'){
-            // Add image to the current canvas
-            if (msg.data.event === 'canvasImage') {
-                canvas.getContext('2d').drawImage(msg.data.image, 0, 0);
-            } else if (msg.data.event === 'canvasNewPage') {
-
-                // Generate a new canvas element
-                canvas = document.createElement("canvas");
-                canvas.setAttribute("width", 2 * fig_width);
-                canvas.setAttribute("height", 2 * fig_height);
-                canvas.style.width = options["out-width"] ? options["out-width"] : `${fig_width}px`;
-                if (options["out-height"]) {
-                    canvas.style.height = options["out-height"];
-                }
-                canvas.style.display = "block";
-                canvas.style.margin = "auto";
-            }
-        } 
-        });
 
         // Use `map` to process the filtered "pager" events asynchronously
         const pager = await Promise.all(
@@ -956,6 +1530,13 @@ globalThis.qwebrComputeEngine = async function(
             // Display results as HTML elements to retain output styling
             const div = document.createElement("div");
             div.innerHTML = out;
+
+            // Calculate a scaled font-size value
+            const scaledFontSize = qwebrScaledFontSize(
+                elements.outputCodeDiv, options);
+
+            // Override output code cell size
+            pre.style.fontSize = `${scaledFontSize}px`;
             pre.appendChild(div);
         } else {
             // If nothing is present, hide the element.
@@ -964,14 +1545,45 @@ globalThis.qwebrComputeEngine = async function(
 
         elements.outputCodeDiv.appendChild(pre);
 
-        // Place the graphics on the canvas
-        if (canvas) {
+        // Determine if we have graphs to display
+        if (result.images.length > 0) {
+
             // Create figure element
-            const figureElement = document.createElement('figure');
+            const figureElement = document.createElement("figure");
+            figureElement.className = "qwebr-canvas-image";
 
-            // Append canvas to figure
-            figureElement.appendChild(canvas);
+            // Place each rendered graphic onto a canvas element
+            result.images.forEach((img) => {
 
+                // Construct canvas for object
+                const canvas = document.createElement("canvas");
+
+                // Add an image download button
+                qwebrImageCanvasDownloadButton(canvas, figureElement);
+
+                // Set canvas size to image
+                canvas.width = img.width;
+                canvas.height = img.height;
+
+                // Apply output truncations
+                canvas.style.width = options["out-width"] ? options["out-width"] : `${fig_width}px`;
+                if (options["out-height"]) {
+                    canvas.style.height = options["out-height"];
+                }
+
+                // Apply styling
+                canvas.style.display = "block";
+                canvas.style.margin = "auto";
+
+                // Draw image onto Canvas
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, img.width, img.height);
+          
+                // Append canvas to figure output area
+                figureElement.appendChild(canvas);
+
+            });
+            
             if (options['fig-cap']) {
                 // Create figcaption element
                 const figcaptionElement = document.createElement('figcaption');
@@ -979,8 +1591,9 @@ globalThis.qwebrComputeEngine = async function(
                 // Append figcaption to figure
                 figureElement.appendChild(figcaptionElement);    
             }
-
+        
             elements.outputGraphDiv.appendChild(figureElement);
+
         }
 
         // Display the pager data
@@ -1050,7 +1663,7 @@ globalThis.qwebrExecuteCode = async function (
     }
 }
 
-</script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
+</script><script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
 const typesetMath = (el) => {
   if (window.MathJax) {
     // MathJax Typeset
@@ -1081,13 +1694,13 @@ window.Quarto = {
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./R_Einfuehrung.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Statistische Programmierung mit R</span></a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
-      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+      <button type="button" class="btn quarto-search-button" aria-label="Suchen" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
@@ -1132,56 +1745,62 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./Simulation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Simulation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./Matching.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Matching</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Matching</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./FixedEffects.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Panel-Daten</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Panel-Daten</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./IV.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">IV-Regression</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">IV-Regression</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./DiD.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./EventStudies.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Event Studies</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Event Studies</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./RDD.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./RegReg.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Regularisierte Regression</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Regularisierte Regression</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./Machine Learning.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Machine Learning</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Machine Learning</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./SyntheticControl.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Synthetic Control</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Synthetic Control</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -1211,20 +1830,69 @@ window.Quarto = {
   </ul></nav>
 </nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
     </div>
 <!-- main -->
-<main class="content page-columns page-full" id="quarto-document-content"><script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script><script type="module" id="qwebr-monaco-editor-init">
+<main class="content page-columns page-full" id="quarto-document-content"><script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.47.0/min/vs/loader.js"></script><script type="module" id="qwebr-monaco-editor-init">
 
   // Configure the Monaco Editor's loader
   require.config({
     paths: {
-      'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs'
+      'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.47.0/min/vs'
     }
   });
 </script><script type="module">
-// Global dictionary to store Monaco Editor instances
-globalThis.qwebrEditorInstances = {};
+// Function to update Monaco Editors when body class changes
+function updateMonacoEditorsOnBodyClassChange() {
+    // Select the body element
+    const body = document.querySelector('body');
+
+    // Options for the observer (which mutations to observe)
+    const observerOptions = {
+        attributes: true,  // Observe changes to attributes
+        attributeFilter: ['class'] // Only observe changes to the 'class' attribute
+    };
+
+    // Callback function to execute when mutations are observed
+    const bodyClassChangeCallback = function(mutationsList, observer) {
+        for(let mutation of mutationsList) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                // Class attribute has changed
+                // Update all Monaco Editors on the page
+                updateMonacoEditorTheme();
+            }
+        }
+    };
+
+    // Create an observer instance linked to the callback function
+    const observer = new MutationObserver(bodyClassChangeCallback);
+
+    // Start observing the target node for configured mutations
+    observer.observe(body, observerOptions);
+}
+
+// Function to update all instances of Monaco Editors on the page
+function updateMonacoEditorTheme() {
+    // Determine what VS Theme to use
+    const vsThemeToUse = document.body.classList.contains("quarto-dark") ? 'vs-dark' : 'vs' ;
+
+    // Iterate through all initialized Monaco Editors
+    qwebrEditorInstances.forEach( function(editorInstance) { 
+        editorInstance.updateOptions({ theme: vsThemeToUse }); 
+    });
+}
+
+// Call the function to start observing changes to body class
+updateMonacoEditorsOnBodyClassChange();
+</script><script type="module">
+// Global array to store Monaco Editor instances
+globalThis.qwebrEditorInstances = [];
+
+function isValidCodeLineNumbers(stringCodeLineNumbers) {
+  // Regular expression to match valid input strings
+  const regex = /^(\d+(-\d+)?)(,\d+(-\d+)?)*$/;
+  return regex.test(stringCodeLineNumbers);
+}
 
 // Function that builds and registers a Monaco Editor instance    
 globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
@@ -1238,7 +1906,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   let resetButton = document.getElementById(`qwebr-button-reset-${qwebrCounter}`);
   let copyButton = document.getElementById(`qwebr-button-copy-${qwebrCounter}`);
   let editorDiv = document.getElementById(`qwebr-editor-${qwebrCounter}`);
-  
+
   // Load the Monaco Editor and create an instance
   let editor;
   require(['vs/editor/editor.main'], function () {
@@ -1251,9 +1919,12 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
       minimap: {
         enabled: false
       },
-      fontSize: '14pt',              // Bootstrap is 1 rem
-      renderLineHighlight: "none",     // Disable current line highlighting
-      hideCursorInOverviewRuler: true  // Remove cursor indictor in right hand side scroll bar
+      fontSize: qwebrScaledFontSize(editorDiv, qwebrOptions),         
+      renderLineHighlight: "none",      // Disable current line highlighting
+      hideCursorInOverviewRuler: true,  // Remove cursor indictor in right hand side scroll bar
+      readOnly: qwebrOptions['read-only'] ?? false,
+      quickSuggestions: qwebrOptions['editor-quick-suggestions'] ?? false,
+      wordWrap: (qwebrOptions['editor-word-wrap'] == 'true' ? "on" : "off")
     });
 
     // Store the official counter ID to be used in keyboard shortcuts
@@ -1276,14 +1947,22 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
     const model = editor.getModel();
     // Set EOL for the model
     model.setEOL(monaco.editor.EndOfLineSequence.LF);
-
+    
     // Dynamically modify the height of the editor window if new lines are added.
     let ignoreEvent = false;
     const updateHeight = () => {
-      const contentHeight = editor.getContentHeight();
+      // Increment editor height by 2 to prevent vertical scroll bar from appearing
+      const contentHeight = editor.getContentHeight() + 2;
+
+      // Retrieve editor-max-height option
+      const maxEditorHeight = qwebrOptions['editor-max-height'];
+
+      // If editor-max-height is missing, allow infinite growth. Otherwise, threshold.
+      const editorHeight = !maxEditorHeight ?  contentHeight : Math.min(contentHeight, maxEditorHeight);
+
       // We're avoiding a width change
       //editorDiv.style.width = `${width}px`;
-      editorDiv.style.height = `${contentHeight}px`;
+      editorDiv.style.height = `${editorHeight}px`;
       try {
         ignoreEvent = true;
 
@@ -1293,6 +1972,56 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
         ignoreEvent = false;
       }
     };
+
+    // Function to generate decorations to highlight lines
+    // in the editor based on input string.
+    function decoratorHighlightLines(codeLineNumbers) {
+      // Store the lines to be lighlight
+      let linesToHighlight = [];
+      
+      // Parse the codeLineNumbers string to get the line numbers to highlight
+      // First, split the string by commas
+      codeLineNumbers.split(',').forEach(part => {
+        // Check if we have a range of lines
+        if (part.includes('-')) {
+            // Handle range of lines (e.g., "6-8")
+            const [start, end] = part.split('-').map(Number);
+            for (let i = start; i <= end; i++) {
+                linesToHighlight.push(i);
+            }
+        } else {
+            // Handle single line (e.g., "7")
+            linesToHighlight.push(Number(part));
+        }
+      });
+  
+      // Create monaco decorations for the lines to highlight
+      const decorations = linesToHighlight.map(lineNumber => ({
+          range: new monaco.Range(lineNumber, 1, lineNumber, 1),
+          options: {
+              isWholeLine: true,
+              className: 'qwebr-editor-highlight-line'
+          }
+      }));
+  
+      // Return decorations to be applied to the editor
+      return decorations;
+    }
+
+    // Ensure that the editor-code-line-numbers option is set and valid
+    // then apply styling
+    if (qwebrOptions['editor-code-line-numbers']) {
+      // Remove all whitespace from the string
+      const codeLineNumbers = qwebrOptions['editor-code-line-numbers'].replace(/\s/g,'');
+      // Check if the string is valid for line numbers, e.g., "1,3-5,7"
+      if (isValidCodeLineNumbers(codeLineNumbers)) {
+        // Apply the decorations to the editor
+        editor.createDecorationsCollection(decoratorHighlightLines(codeLineNumbers));
+      } else {
+        // Warn the user that the input is invalid
+        console.warn(`Invalid "editor-code-line-numbers" value in code cell ${qwebrOptions['label']}: ${codeLineNumbers}`);
+      }
+    }
 
     // Helper function to check if selected text is empty
     function isEmptyCodeText(selectedCodeText) {
@@ -1436,27 +2165,26 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <span class="header-section-number">2.1</span> Lange, weite und “tidy” Datenformate</h2>
 <p>Wir betrachten den in <a href="#tbl-Klausurergebnisse" class="quarto-xref">Tabelle&nbsp;<span>2.1</span></a> dargestellten Datensatz <em>Klausurergebnisse</em>.</p>
 <div class="cell page-columns page-full">
-<div id="tbl-Klausurergebnisse" class="cell quarto-float anchored page-columns page-full">
+<div id="tbl-Klausurergebnisse" class="cell quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="quarto-float quarto-float-tbl figure page-columns page-full"><div aria-describedby="tbl-Klausurergebnisse-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div>
-<div id="qpayxickis" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#qpayxickis table {
+<div id="npfecgvlnt" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#npfecgvlnt table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#qpayxickis thead, #qpayxickis tbody, #qpayxickis tfoot, #qpayxickis tr, #qpayxickis td, #qpayxickis th {
+#npfecgvlnt thead, #npfecgvlnt tbody, #npfecgvlnt tfoot, #npfecgvlnt tr, #npfecgvlnt td, #npfecgvlnt th {
   border-style: none;
 }
 
-#qpayxickis p {
+#npfecgvlnt p {
   margin: 0;
   padding: 0;
 }
 
-#qpayxickis .gt_table {
+#npfecgvlnt .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1482,12 +2210,12 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-left-color: #D3D3D3;
 }
 
-#qpayxickis .gt_caption {
+#npfecgvlnt .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#qpayxickis .gt_title {
+#npfecgvlnt .gt_title {
   color: #000000;
   font-size: 125%;
   font-weight: initial;
@@ -1499,7 +2227,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-bottom-width: 0;
 }
 
-#qpayxickis .gt_subtitle {
+#npfecgvlnt .gt_subtitle {
   color: #000000;
   font-size: 85%;
   font-weight: initial;
@@ -1511,7 +2239,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-top-width: 0;
 }
 
-#qpayxickis .gt_heading {
+#npfecgvlnt .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1523,13 +2251,13 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-right-color: #D3D3D3;
 }
 
-#qpayxickis .gt_bottom_border {
+#npfecgvlnt .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#qpayxickis .gt_col_headings {
+#npfecgvlnt .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #000000;
@@ -1544,7 +2272,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-right-color: #D3D3D3;
 }
 
-#qpayxickis .gt_col_heading {
+#npfecgvlnt .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1564,7 +2292,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   overflow-x: hidden;
 }
 
-#qpayxickis .gt_column_spanner_outer {
+#npfecgvlnt .gt_column_spanner_outer {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1576,15 +2304,15 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   padding-right: 4px;
 }
 
-#qpayxickis .gt_column_spanner_outer:first-child {
+#npfecgvlnt .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#qpayxickis .gt_column_spanner_outer:last-child {
+#npfecgvlnt .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#qpayxickis .gt_column_spanner {
+#npfecgvlnt .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #000000;
@@ -1596,11 +2324,11 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   width: 100%;
 }
 
-#qpayxickis .gt_spanner_row {
+#npfecgvlnt .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#qpayxickis .gt_group_heading {
+#npfecgvlnt .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1626,7 +2354,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   text-align: left;
 }
 
-#qpayxickis .gt_empty_group_heading {
+#npfecgvlnt .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -1641,15 +2369,15 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   vertical-align: middle;
 }
 
-#qpayxickis .gt_from_md > :first-child {
+#npfecgvlnt .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#qpayxickis .gt_from_md > :last-child {
+#npfecgvlnt .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#qpayxickis .gt_row {
+#npfecgvlnt .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1668,7 +2396,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   overflow-x: hidden;
 }
 
-#qpayxickis .gt_stub {
+#npfecgvlnt .gt_stub {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1681,7 +2409,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   padding-right: 5px;
 }
 
-#qpayxickis .gt_stub_row_group {
+#npfecgvlnt .gt_stub_row_group {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1695,15 +2423,15 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   vertical-align: top;
 }
 
-#qpayxickis .gt_row_group_first td {
+#npfecgvlnt .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#qpayxickis .gt_row_group_first th {
+#npfecgvlnt .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#qpayxickis .gt_summary_row {
+#npfecgvlnt .gt_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1713,16 +2441,16 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   padding-right: 5px;
 }
 
-#qpayxickis .gt_first_summary_row {
+#npfecgvlnt .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#qpayxickis .gt_first_summary_row.thick {
+#npfecgvlnt .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#qpayxickis .gt_last_summary_row {
+#npfecgvlnt .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1732,7 +2460,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-bottom-color: #D3D3D3;
 }
 
-#qpayxickis .gt_grand_summary_row {
+#npfecgvlnt .gt_grand_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1742,7 +2470,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   padding-right: 5px;
 }
 
-#qpayxickis .gt_first_grand_summary_row {
+#npfecgvlnt .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1752,7 +2480,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-top-color: #D3D3D3;
 }
 
-#qpayxickis .gt_last_grand_summary_row_top {
+#npfecgvlnt .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1762,11 +2490,11 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-bottom-color: #D3D3D3;
 }
 
-#qpayxickis .gt_striped {
+#npfecgvlnt .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#qpayxickis .gt_table_body {
+#npfecgvlnt .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1775,7 +2503,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-bottom-color: #000000;
 }
 
-#qpayxickis .gt_footnotes {
+#npfecgvlnt .gt_footnotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1789,7 +2517,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-right-color: #D3D3D3;
 }
 
-#qpayxickis .gt_footnote {
+#npfecgvlnt .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1798,7 +2526,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   padding-right: 5px;
 }
 
-#qpayxickis .gt_sourcenotes {
+#npfecgvlnt .gt_sourcenotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1812,7 +2540,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   border-right-color: #D3D3D3;
 }
 
-#qpayxickis .gt_sourcenote {
+#npfecgvlnt .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1820,64 +2548,73 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
   padding-right: 5px;
 }
 
-#qpayxickis .gt_left {
+#npfecgvlnt .gt_left {
   text-align: left;
 }
 
-#qpayxickis .gt_center {
+#npfecgvlnt .gt_center {
   text-align: center;
 }
 
-#qpayxickis .gt_right {
+#npfecgvlnt .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#qpayxickis .gt_font_normal {
+#npfecgvlnt .gt_font_normal {
   font-weight: normal;
 }
 
-#qpayxickis .gt_font_bold {
+#npfecgvlnt .gt_font_bold {
   font-weight: bold;
 }
 
-#qpayxickis .gt_font_italic {
+#npfecgvlnt .gt_font_italic {
   font-style: italic;
 }
 
-#qpayxickis .gt_super {
+#npfecgvlnt .gt_super {
   font-size: 65%;
 }
 
-#qpayxickis .gt_footnote_marks {
+#npfecgvlnt .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#qpayxickis .gt_asterisk {
+#npfecgvlnt .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#qpayxickis .gt_indent_1 {
+#npfecgvlnt .gt_indent_1 {
   text-indent: 5px;
 }
 
-#qpayxickis .gt_indent_2 {
+#npfecgvlnt .gt_indent_2 {
   text-indent: 10px;
 }
 
-#qpayxickis .gt_indent_3 {
+#npfecgvlnt .gt_indent_3 {
   text-indent: 15px;
 }
 
-#qpayxickis .gt_indent_4 {
+#npfecgvlnt .gt_indent_4 {
   text-indent: 20px;
 }
 
-#qpayxickis .gt_indent_5 {
+#npfecgvlnt .gt_indent_5 {
   text-indent: 25px;
+}
+
+#npfecgvlnt .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#npfecgvlnt div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
 }
 </style>
 <table class="gt_table do-not-create-environment cell table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
@@ -1914,7 +2651,6 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 </div>
 </div>
@@ -2133,18 +2869,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -2176,7 +2901,29 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
   const viewSource = window.document.getElementById('quarto-view-source') ||
                      window.document.getElementById('quarto-code-tools-source');
   if (viewSource) {
@@ -2235,7 +2982,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -3179,7 +3926,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-615"><a href="#cb3-615" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb3-616"><a href="#cb3-616" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-617"><a href="#cb3-617" aria-hidden="true" tabindex="-1"></a>Wir sehen, dass es hinsichtlich des Zusammenhangs von Gewicht und Schnabeltiefe keine wesentlichen Diskrepanzen zwischen den drei Inseln gibt. Darüber hinaus lässt sich anhand der Facetten leicht erkennen, wie die drei Arten über die Inseln verteilt sind.</span>
-</code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</code><button title="In die Zwischenablage kopieren" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 <script type="module">
@@ -3263,6 +4010,10 @@ qwebrInstance.then(
           break;
         case 'setup':
           const activeDiv = document.getElementById(`qwebr-noninteractive-setup-area-${qwebrCounter}`);
+
+          // Store code in history
+          qwebrLogCodeToHistory(cellCode, entry.options);
+
           // Run the code in a non-interactive state with all output thrown away
           await mainWebR.evalRVoid(`${cellCode}`);
           break;

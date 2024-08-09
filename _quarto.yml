@@ -5,6 +5,11 @@ engine: knitr
 webr: 
   show-startup-message: false 
   packages: ['dplyr']
+  cell-options:
+    editor-font-scale: .5
+    autorun: true
+    dpi: 150
+    out-width: "50%"
 
 project:
   type: book
@@ -46,7 +51,7 @@ format:
     grid: 
       body-width: 920px
       margin-width: 350px
-    fontsize: "1.1rem"
+    fontsize: "18px"  
     theme: cosmo
     cap-location: margin
     code-link: true

@@ -63,7 +63,7 @@ download.file(
 )
 ```
 
-Eine *Event Study* ist ein empirischer Ansatz, um die Auswirkungen von zufälligen Ereignissen oder bestimmen Interventionen auf eine Outcome-Variable zu messen. Die zentrale Annahme hierbei ist, dass das untersuchte Ereignis exogen ist, also als ein 'natürlicher' Schock wirkt: Die Intervention löst eine Reaktion in der Outcome-Variable aus, ist jedoch unabhängig von andere unbeobachtbaren Determinanten der Outcome-Variable, sodass Backdoors vermieden werden. Ist diese Annahme gegeben, so kann eine Event Study den kausalen Effekt einer Intervention vergleichsweise einfach ermitteln, indem überprüft wird, ob und wie stark die Outcome-Variable im Zeitraum nahe des Ereignis reagiert. Letzteres erfolgt häufig durch eine Analyse der durch das Event verursachten Variation in der Outcome-Variable mit einem ökonometrischen Modell.
+Eine *Event Study* ist ein empirischer Ansatz, um die Auswirkungen von zufälligen Ereignissen oder bestimmen Interventionen auf eine Outcome-Variable zu messen. Die zentrale Annahme hierbei ist, dass das untersuchte Ereignis exogen ist, also als ein 'natürlicher' Schock wirkt: Die Intervention löst eine Reaktion in der Outcome-Variable aus, ist jedoch unabhängig von anderen unbeobachtbaren Determinanten der Outcome-Variable, sodass Backdoors vermieden werden. Ist diese Annahme gegeben, so kann eine Event Study den kausalen Effekt einer Intervention vergleichsweise einfach ermitteln, indem überprüft wird, ob und wie stark die Outcome-Variable im Zeitraum nahe des Ereignis reagiert. Letzteres erfolgt häufig durch eine Analyse der durch das Event verursachten Variation in der Outcome-Variable mit einem ökonometrischen Modell.
 
 ## Counterfactuals und Regression
 
