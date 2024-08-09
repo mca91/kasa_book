@@ -7,9 +7,105 @@ webr:
             'dplyr',
             'ggplot2',
             'purrr',
+            'sandwich',
             'tidyr'
             ]
+  cell-options:
+    editor-font-scale: .85
+    autorun: true
+    out-width: "80%"
 ---
+
+```{=html}
+<style>
+.qwebr-code-output-stdout {background-color: powderblue;}
+
+.qwebr-button-run, .qwebr-button-reset, .qwebr-button-copy {
+  background-color:  rgba(0, 0, 0, 0) !important;
+  border-style: none;
+  font-weight: 400;
+  color: white !important; 
+  transition: none;
+}
+
+.qwebr-button-run:hover, .qwebr-button-reset:hover, .qwebr-button-copy:hover {
+    border-radius: 6px 6px 6px 6px;
+    border-color: darkgreen !important;
+    border: 1px 1px 1px 1px;
+}
+
+.qwebr-button-run {
+  font-weight: 600;
+}
+
+.qwebr-editor-toolbar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+  border-radius: 6px 6px 0 0;
+  background-color: darkgreen !important;
+  border: 1px solid darkgreen !important;
+  padding: 0 0; 
+  transition: color .1s ease-in-out, background-color .1s ease-in-out,border-color .1s ease-in-out,box-shadow .1s ease-in-out !important;
+}
+
+.qwebr-editor-toolbar:hover {
+  background-color: white !important;
+  border-color: darkgreen;
+  border: 1px 1px 0px 1px;
+}
+
+.qwebr-editor-toolbar:hover * {
+  color: darkgreen !important;
+}
+
+/*
+.qwebr-editor {
+  border-radius: 0 0 6px 6px !important;
+  border: 1px solid darkgreen !important;
+}
+*/
+
+.qwebr-output-code-area {
+  border-radius: 0 0 6px 6px !important;
+  padding-left: 3.7em;
+  padding-top: .5em;
+  margin-bottom: 1em;
+  /*background-color:rgba(250,250,250,.9) !important;*/
+}
+
+.qwebr-output-graph-area {
+  margin-bottom: 1.5em;
+}
+
+.monaco-editor .lines-content {
+  background: none;
+}
+
+.monaco-editor {
+  outline-width: 0;
+  background: none !important;
+}
+
+.monaco-editor .margin {
+  background: none !important;
+}
+
+.monaco-editor .line-numbers {
+  color:black !important;
+}
+
+.box-shadow {
+    box-shadow: 0px 1px 2px rgba(0,0,0,.1),
+                0px 3px 7px rgba(0,0,0,.1),
+                0px 12px 30px rgba(0,0,0,.08);
+    border-radius: 0 0 6px 6px;
+}
+
+
+</style>
+```
 
 # Simulation
 
@@ -17,32 +113,71 @@ Bei der Analyse quantitativer Methoden treten häufig Fragestellungen auf, die s
 
 Um diese Schwierigkeiten zu überwinden, können wir Simulationstechniken (Monte-Carlo-Methoden) verwenden. In Monte-Carlo-Simulationen wird die Möglichkeit der Erzeugung von Pseudozufallszahlen mit Computern und ihre Rechenleistung genutzt, um eine Vielzahl von Datensätzen gemäß eines interessierenden datenerzeugenden Prozess (DGP) zu generieren. Anhand dieser simulierten Datensätze können wir die Stichprobenverteilung von Schätzern approximieren und so die statistischen Eigenschaften für verschiedene Parameterwerte des DGP analysieren. Insbesondere erlauben *Monte-Carlo-Studien* den Vergleich verschiedener Schätzfunktionen hinsichtlich ihrer Robustheit gegenüber Verletzungen zugrundeliegender Annahmen über den DGP. Der *Bootstrap* [@Efron1979] ist eine simulations-basierte Methode, um gültige statistische Inferenz in empirischen Anwendungen zu gewährleisten, wenn Modellannahmen derart verletzt sind, dass asymptotische kritische Werte (sogar für große Stichproben) ungültig sind.
 
-In diesem Kapitel erläutern wir Grundlagen der Anwendung von Simulations-Methoden mit R anhand von Beispielen für die Schätzung kausaler Effekte mit Regressionsmodellen.
+In diesem Kapitel erläutern wir Grundlagen in der Anwendung von Simulations-Methoden mit R und diskutieren Beispiele für die Schätzung kausaler Effekte mit Regressionsmodellen.
 
-## Monte Carlo Setup
+## Simulation der Stichprobenverteilung eines Schätzers {#sec-simspv}
+
+Zur Illustration der Simulation von Stichprobenverteilungen eines Schätzers betrachten wir zunächst das kanonische Beispiel der Schätzung des Erwartungswerts $\mu_X$ einer normalverteilen Zufallsvariable $X$ anhand einer $n$-elementigen Stichprobe,
+\begin{align}
+  X_i \sim\,u.i.v. N(\mu_X,\ \sigma_X^2), \quad i=1,\dots,n.\label{eq:distx}
+\end{align}
+Die Vorschrift \eqref{eq:distx} ist der *datenerzeugende Prozess* (DGP)^[Englische Abkürzung für *data generating process*.]. Das arithmetische Mittel der $X_i$,
+\begin{align*}
+  \overline{X} := \sum_{i=1}^n X_i,
+\end{align*}
+ist ein *konsistenter Schätzer* für $\mu_X$ und hat (aufgrund der Normalverteilung der $X_i$) die formal herleitbare Eigenschaft, dass die Stichprobenverteilung normal ist^[D.h. hier ist $\overline{X}\sim N(50, 2.88)$.],
+\begin{align*}
+  \overline{X} \sim N(\mu_X, \sigma_X^2 / n), \qquad \overline{X}\xrightarrow{p}\mu_X.
+\end{align*}
+
+Wir können die Eigenschaften von $\overline{X}$ mit wenig Aufwand in R prüfen indem wir die Stichprobenentnahme durch wiederholtes Ziehen einer (großen) Anzahl von $N$ Stichproben aus der *Populationsverteilung* von $X$ gemäß der Vorschrift \eqref{eq:distx} simulieren und jeweils $\overline{X}$ für diese simulierten Stichproben berechnen. Wir simulieren so Züge aus der Stichprobenverteilung von $\overline{X}$, deren Eigenschaften -- in Abhängigkeit von $\mu_X$, $\sigma_X^2$ und $n$ -- wir anhand der Realisierungen von $\overline{X}$ ableiten können. In den nachfolgenden Code-Beispielen wählen wir
+\begin{align*}
+  \mu_X = 50,\quad \sigma_X^2=12^2,\quad n = 50.
+\end{align*}
+
+Eine einfache Zufallsstichprobe von $X$ erzeugen wir mit `rnorm()` und berechnen das arithmetische Mittel mit `mean()`.
 
 ```{webr-r}
 #| autorun: true
 library(dplyr)
 
+# Seed für Reproduzierbarkeit
 set.seed(1234)
-n <- 50
 
-(
-est <- rnorm(n = n, mean = 50, sd = 12) %>% 
-  mean()
+# Parameter der Simulation
+n <- 50
+mu_X <- 50
+sigma_X <- 12
+
+# Stichprobe ziehen, Mittel berechnen
+mean(
+  rnorm(
+    n = n, 
+    mean = mu_X, 
+    sd = sigma_X
+  )
 )
 ```
 
+Dieses einfache Simulationsexperiment mit $N=1$ ergibt zwar eine Schätzung des Erwartungswerts von $X$ nahe des wahren Werts $\mu_X = 50$, ist jedoch wenig informativ über die Qualität des Schätzers, d.h. die Eigenschaften der Stichprobenverteilung von $\overline{X}$. Diese *Realisation* könnte zufällig nahe bei $\mu_X = 50$ liegen, obwohl die Stichprobenverteilung  $\overline{X}$ einen von $50$ verschiedenen Erwartungswert hat und/oder eine große Varianz aufweist.
+
+Um die Stichprobenverteilung zu simulieren, wiederholen wir das Simulationsexperiment $N=1000$ mal: Wir erzeugen $N=1000$ Realisierungen aus der Stichprobenverteilung von $\overline{X}$ für die gewählten Parameter. Hierfür verwenden wir *Iteration* in R: Eine `for()`-Schleife wiederholt das Simulationsexperiment über `1:N` Iterationen und speichert das Ergebnis des `j`-ten Experiments in einem zuvor definierten numerischen Vektor `sim_est`.^[Iteration mit Funktionen aus dem Paket `purrr` (siehe tab) ist eine Alternative zum "klassischen" Ansatz mit einer `for()`-Schleife.]
+
+::: {.panel-tabset}
+
+## Iteration mit `for()-Schleife`
+
 ```{webr-r}
 #| autorun: true
-N <- 5000
-est <- numeric(N)
+# Parameter für Iteration
+N <- 1000
+sim_est <- numeric(N)
 
 set.seed(1234)
 
-for (i in 1:N) {
-  est[i] <- mean(
+# Simulation durchführen
+for (j in 1:N) {
+  sim_est[j] <- mean(
     x = rnorm(
       n = n, 
       mean = 50, 
@@ -51,17 +186,27 @@ for (i in 1:N) {
   )
 }
 
-summary(est)
+# Statistische Zusammenfassung
+tibble(sim_est) %>%
+    summarise(
+        mean_Xbar = mean(sim_est),
+        sd_Xbar = sd(sim_est)
+    )
 ```
 
+## Iteration mit `purrr`
 
 ```{webr-r}
 #| autorun: true
 library(purrr)
 
+# Parameter
+N <- 1000
+
 set.seed(1234)
 
-est <- map_dbl(
+# Simulation mit purrr
+sim_est <- map_dbl(
   .x = 1:N, 
   .f =  ~ mean(
     x = rnorm(
@@ -72,70 +217,100 @@ est <- map_dbl(
   )
 )
 
-summary(est)
+# Statistische Zusammenfassung
+tibble(sim_est) %>%
+    summarise(
+        mean_Xbar = mean(sim_est),
+        sd_Xbar = sd(sim_est)
+    )
 ```
+
+:::
+
+Die zusammenfassenden Statistiken sind *Schätzungen* der Verteilungseigenschaften von $\overline{X}$. Da wir die Anzahl der Replikation $N$ selber wählen, können wir die wahren Parameter theoretisch "beliebig" genau approximieren: Lediglich die Rechenleistung des Computers limitiert die Güte dieser Approximation. In vielen Anwendungen liefert eine vierstellige Zahl an Simulationsdurchläufen gute Approximationen. Tatsächlich liegen die simulierten Parameter der Stichprobenverteilung von $\overline{X}$ nahe bei den wahren Werten.
+
+```{webr-r}
+#| autorun: true
+# Simulierter Erwartungswert der Stichprobenverteilung
+mean(sim_est)
+
+# Theoretische Standardabweichung
+12/sqrt(n)
+
+# Simulierte Standardabweichung der Stichprobenverteilung
+sd(sim_est)
+```
+
+Für einen grafischen Vergleich der simulierten Stichprobenverteilung mit der theoretischen $N(50, 12^2/50)$-Verteilung plotten wir die theoretische Dichte sowie ein Dichte-Histogramm der simulierten Züge von $\overline{X}$ in `sim_est`.
 
 ```{webr-r}
 #| autorun: true
 library(ggplot2)
 
-# Simulierte und theoretische Verteilung des Schätzers plotten
-tibble(est = est) %>%
-  ggplot(
-    mapping = aes(x = est)
-  ) +
-  geom_density() +
-    stat_function(
-      fun = dnorm, 
-      args = list(
-        mean = 50, 
-        sd = 12/sqrt(n)
-      ), 
-      color = "red"
+# Simulierte und theoretische Verteilungen des Schätzers plotten
+tibble(est = sim_est) %>%
+    ggplot(
+        mapping = aes(x = sim_est)
     ) +
-  theme_cowplot()
+    geom_histogram(
+        mapping = aes(y = after_stat(density)), 
+        bins = 20, 
+        fill = "lightgray", 
+        color = "white"
+        ) +
+    stat_function(
+        fun = dnorm, 
+        args = list(
+            mean = 50, 
+            sd = 12/sqrt(n)
+        ), 
+        color = "purple",
+        lty = 2
+    ) +
+    theme_cowplot()
 ```
+
+Die Abbildung zeigt, dass die simulierte Stichprobenverteilung (graues Dichte-Histogramm) die Dichte der theoretischen Verteilung (gestrichelte Linie) gut approximiert.
+
+### Simulation mit nicht-normalen Daten
+
+Simulationen sind insbesondere dann hilfreich, wenn die Stichproben-Eigenschaften eines Schätzers *unbekannt* sind. Im nachfolgenden Beispiel wiederholen wir die Simulation für eine Log-normal-verteilte Zufallsvariable^[Ist $X$ log-normal-verteilt mit Erwartungswert $\mu_X$ und Varianz $\sigma_X^2$, dann ist $\log X$ normal-verteilt mit $\mu_{\log X} = \log \mu_X - \sigma_X^2/2$ und $\sigma^2_{\log X} = \mu_X^2 [\exp(\sigma_X^2)-1]$.] $X$ mit Erwartungswert $\mu_X = 50$ und plotten die geschätzten Dichtefunktionen der Stichprobenverteilungen von $\overline{X}$ für einen Vergleich.
 
 ```{webr-r}
 #| autorun: true
-# Theoretische Standardabweichung
-12/sqrt(100)
-
-# Simulierte Standardabweichung
-sd(est)
-```
-
-Verletzung von Normalverteilungsannahme
-
-```{webr-r}
-#| autorun: true
-library(purrr)
+library(tidyr)
 
 set.seed(1234)
 
-est <- tibble(
-  norm = est, 
-  chisq = map_dbl(
+# Parameter
+n <- 50
+N <- 1000
+
+# Simulation durchführe, Ergebnisse sammeln
+df <- tibble(
+  `Normal` = sim_est, 
+  `log-Normal` = map_dbl(
     .x = 1:N, 
     .f =  ~ mean(
-      x = rt(
+      x = rlnorm(
         n = n, 
-        df = 4, 
-      ) + 50
+        meanlog = log(50) - 1/2, 
+        sdlog = 1
+      ) 
     )
   )
 )
 
-library(tidyr)
-est %>% 
+# Gesch. Dichtefunktionen plotten
+df %>% 
   pivot_longer(
     cols = everything(), 
-    names_to = "Variable"
+    names_to = "Population"
   ) %>%
   ggplot(
     mapping = aes(
       x = value, 
-      col = Variable
+      col = Population
     )
   ) +
   geom_density() +
@@ -143,21 +318,799 @@ est %>%
   theme(legend.position = "top")
 ```
 
+Die funktionale Form der Stichprobenverteilung von $\overline{X}$ für eine log-normalverteilte Population ist unbekannt. Unsere Simulation erlaubt jedoch Rückschlüsse auf Eigenschaften dieser Verteilung: Die Verteilung ist rechtsschief und weißt eine höhere Varianz auf als die Stichprobenverteilung von $\overline{X}$ für die normal-verteilte Population.
+
+### Regression: Verzerrung durch Confounder {#sec-simbiasconf}
+
+Der DGP in @fig-simconf zeigt eine typische Situation, in der wir den kausalen Effekt von $X$ auf $Y$ nicht ohne Weiteres mit Regression identifizieren können: Die Variablen $U$ und $e$ sind unbeobachtbar. $e$ ist ein unsystematischer Fehler, der lediglich $Y$ beeinflusst. Die Variable $U$ hingegen beeinflusst sowohl $X$ als auch $Y$ und ist damit eine Backdoor-Variable: $U$ ist ein *Counfounder*, sodass der kausale Effekt von $X$ auf $Y$ in einer Regression, die nicht für den Effekt von $U$ kontrolliert, verzerrt geschätzt wird. Wie stark die Verzerrung ist, hängt von den Eigenschaften des DGP ab. Simulation kann hilfreich sein, um die Verzerrung eines Schätzers in Abhängigkeit der Parameter des DGP zu untersuchen.
+
+```{dot}
+//| fig-width: 6
+//| fig-height: 4
+//| fig-cap: "DGP mit unbeobachtbarem Confounder U"
+//| label: "fig-simconf" 
+digraph CONFSIM {
+    layout=neato
+    fontname="Helvetica,Arial,sans-serif"
+    node [fontname="Helvetica,Arial,sans-serif", shape="circle"]
+    edge [fontname="Helvetica,Arial,sans-serif"]
+
+    X [pos="0,0!"];
+    Y [pos="4,0!"];
+    U [pos="2,2!", color=gray, fontcolor=gray];
+    e [pos="6,0!", color=gray, fontcolor=gray];
+    
+    U -> Y [color=gray, style=dashed, headlabel = "beta = -1", labeldistance=10, labelangle=-17];
+    U -> X [color=gray, style=dashed, headlabel = "beta = 1", labeldistance=10, labelangle=17];
+    X -> Y [headlabel = "beta = 2", labeldistance=12.5, labelangle=10];
+    e -> Y [color=gray, style=dashed]
+}
+```
+
+Für die Simulation von Stichproben gemäß @fig-simconf nutzen wir den linearen Prozess
+
+\begin{align*}
+  X =& \, a + \alpha_1 U,\\
+  Y =& \, \beta_1 X + \beta_2 U + e,
+\end{align*}
+
+mit $a \sim \mathcal{U}[0,1]$, $U\sim N(0, 2^2)$ und $e\sim N(0, 10)$ und wählen die Parameter $\alpha_1 = 1$, $\beta_1 = 2$ und $\beta_2 = -1$.^[$\mathcal{U}[a,b]$ meint die stetige [Gleichverteilung](https://de.wikipedia.org/wiki/Gleichverteilung) auf dem Intervall $[a,b]$] Der nächste Code-Block implementiert den DGP und zeigt die KQ-Schätzung des fehlspezifizierten Modells
+
+\begin{align*}
+  Y = \beta_1 X + \epsilon
+\end{align*}
+
+anhand einer simulierten Stichprobe mit einem Umfang von 100 Beobachtungen.
+
+```{webr-r}
+#| autorun: true
+
+# Parameter
+n <- 100
+alpha_1 <- 1
+beta_1 <- 2
+beta_2 <- -.25
+
+set.seed(1234)
+
+# Stichprobe ziehen
+dat <- tibble(
+    U = rnorm(n, 0, 2),
+    X = alpha_1 * U + runif(n, 0, 1),
+    Y = beta_1 * X + beta_2 * U + rnorm(n, 10)
+) 
+
+# Fehlspezifiziertes Modell schätzen
+lm(
+  formula = Y ~ X - 1, 
+  data = dat
+) %>% 
+  summary()
+```
+
+Analog zu @sec-simspv ist diese Simulation mit nur einer Iteration wenig aussagekräftig für die Verzerrung der KQ-Schätzers. Für eine ausführlichere Analyse implementieren wir zunächst beide Schritte der Simulation (Stichprobe generieren, Modell schätzen) in einer Funktion `sim_function_conf()`, der wir sämtliche Parameter sowie das zu schätzende Regressionsmodell als Fomel übergeben können. Diese Funktion gibt die aus dem `lm`-Objekt ausgelesene KQ-Schätzung von $\beta_1$ zurück. Wir testen die Funktion `sim_function_conf()` durch Verwendung des selben Seeds.
+
+```{webr-r}
+#| autorun: true
+# Funktion für Simulation definieren
+sim_function_conf <- function(n, alpha_1, beta_1, beta_2, formula) {
+  
+  # Simulieren
+  tibble(
+    U = rnorm(n, 0, 2),
+    X = alpha_1 * U + runif(n, 0, 1),
+    Y = beta_1 * X + beta_2 * U + rnorm(n, 10)
+  ) %>% 
+    # KQ-Schätzung
+    lm(
+      formula = as.formula(formula), 
+      data = .
+    ) %>%
+      # Schätzwert auslesen
+      coefficients() %>% 
+      .["X"]    
+  
+}
+
+# Seed wie zuvor
+set.seed(1234)
+
+# Test
+sim_function_conf(
+  n = 100, 
+  alpha = 1, 
+  beta_1 = 2, 
+  beta_2 = -.25, 
+  formula = "Y ~ X - 1"
+)
+```
+
+Der mit `sim_function_conf()` simulierte Zug aus der Stichprobenverteilung stimmt mit dem Ergebnis des vorherigen Zufallsexperiments überein. Wir können nun die Simulation durch iterative Berechnung von `sim_function_conf()` über die Indexmenge `1:N` durchführen. Wie zuvor visualisieren wir die Simulationsergebnisse mit einem Plot der geschätzten Dichtefunktion von $\widehat{\beta}_1$.
+
+```{webr-r}
+#| autorun: true
+
+# Parameter
+n <- 100
+N <- 1000
+alpha_1 <- 1
+beta_1 <- 2
+beta_2 <- -.25
+
+# Simulation durchführen
+sim_est <- tibble(
+  hatbeta_1 = map_dbl(
+    .x = 1:N,
+    .f =  ~ sim_function_conf(
+      n = n, 
+      alpha_1 = alpha_1 ,
+      beta_1 = beta_1,
+      beta_2 = beta_2 ,
+      formula = "Y ~ X - 1"
+    )
+  )
+)
+
+# Gesch. Stichprobenverteilung plotten
+ggplot(
+  data = sim_est, 
+  mapping = aes(x = hatbeta_1)
+  ) +
+  # gesch. Dichtefunktion
+  geom_density() +
+  # Effekt einzeichnen
+  geom_vline(
+    xintercept = beta_1, 
+    linetype = "dashed",
+    col = "red"
+  ) +
+  theme_cowplot()
+```
+
+Der grafische Vergleich der simulierten Stichprobenverteilung von $\widehat{\beta}_1$ mit dem wahren Koeffizienten $\beta_1 = 2$ (gestrichelte rote Linie) zeigt, dass $\widehat{\beta}_1$ aufgrund des ausgelassenen Confounders $U$ für die hier gewählte Spezifikation des DGP tatsächlich ein *verzerrter* Schätzer für den kausalen Effekt $\beta_1$ ist: Die geschätzte Dichtefunktion ist ein Indikator dafür, dass die Verteilungsfunktion von $\widehat{\beta}_1$ einen Großteil der Wahrscheinlichkeitsmasse im Wertebereich oberhalb von $\beta_1 = 2$ hat, sodass wir den kausalen Effekt im Mittel *überschätzen*. 
+
+Wir können die Simulationsergebnisse in `sim_est` nutzen, um die Verzerrung^[Die Verzerrung (engl. *bias*) eines Schätzers $\widehat{\beta}_1$ für $\beta_1$ ist $\textup{bias}(\widehat{\beta}_1) = \textup{E}(\widehat{\beta}_1 - \beta_1)$.] von $\widehat\beta_1$ zu schätzen.
+
+```{webr-r}
+#| autorun: true
+# Verzerrung des KQ-Schätzers schätzen
+mean(sim_est$hatbeta_1) - beta_1
+```
+
+Diese Berechnung anhand von Zügen aus der Stichprobenverteilung von $\widehat{\beta}_1$ zeigt eine deutliche positive Verzerrung des KQ-Schätzers von $\beta_1$ aufgrund des Confounders $U$ von etwa 0.94.
+
+Anhand von `sim_function_conf()` können wir die Identifizierbarkeit des kausalen Effekts $\beta_1$ bei Kontrolle für $U$ im Modell
+
+\begin{align*}
+  Y = \beta_0 + \beta_1 X + \beta_2 U + \varepsilon
+\end{align*}
+
+überprüfen, in dem wir die Simulation unter Angabe dieses Modells über das Argument `formula` durchführen.
+
+```{webr-r}
+#| autorun: true
+
+# Parameter
+n <- 100
+N <- 1000
+alpha_1 <- 1
+beta_1 <- 2
+beta_2 <- -.25
+
+# Simulation durchführen
+sim_est <- tibble(
+  hatbeta_1 = map_dbl(
+    .x = 1:N,
+    .f =  ~ sim_function_conf(
+      n = n, 
+      alpha_1 = alpha_1,
+      beta_1 = beta_1,
+      beta_2 = beta_2 ,
+      # Kontrolle für Confounder U
+      formula = "Y ~ X + U"
+    )
+  )
+)
+
+# Gesch. Stichprobenverteilung plotten
+ggplot(
+  data = sim_est, 
+  mapping = aes(x = hatbeta_1)
+) +
+  geom_density() +
+  geom_vline(
+    xintercept = beta_1, 
+    linetype = "dashed",
+    col = "red"
+  ) +
+  theme_cowplot()
+```
+
+Die geschätzte Stichprobenverteilung von $\widehat{\beta}_1$ bei Kontrolle für den Confounder $U$ zeigt keine Anzeichen für eine Verzerrung des Schätzers für den kausalen Effekt von $X$ auf $Y$. Die Monte-Carlo-Schätzung der Verzerrung von $\widehat{\beta}_1$ unterstützt das Ergebnis der grafischen Analyse. 
+
+```{webr-r}
+#| autorun: true
+# Verzerrung des KQ-Schätzers schätzen
+mean(sim_est$hatbeta_1) - beta_1
+```
+
+### Regression: Verzerrung durch Collider
+
+Der Graph in @fig-simcol zeigt einen DGP, bei dem die Variable $C$ ein *Collider* auf dem Pfad $X\rightarrow C \leftarrow Y$ ist. Für die Identifikation des Effekts von $X$ auf $Y$ ist $C$ damit eine irrelavante Variable, für die *nicht* kontrolliert werden darf: Statistische Verfahren, die den Effekt von $X$ auf $Y$ unter Kontrolle des Effekts von $C$ auf $Y$ schätzen sind verzerrt, weil ein Backdoor-Pfad durch $C$ besteht.
+
+```{dot}
+//| fig-width: 6
+//| fig-height: 4
+//| fig-cap: "DGP mit Collider-Variable C"
+//| label: "fig-simcol" 
+digraph COLSIM {
+    layout=neato
+    fontname="Helvetica,Arial,sans-serif"
+    node [fontname="Helvetica,Arial,sans-serif", shape="circle"]
+    edge [fontname="Helvetica,Arial,sans-serif"]
+
+    X [pos="0,0!"];
+    Y [pos="4,0!"];
+    C [pos="2,2!"];
+    e [pos="6,0!", color=gray, fontcolor=gray];
+    
+    Y -> C [headlabel = "beta = .25", labeldistance=10, labelangle=-17];
+    X -> C [headlabel = "beta = .25", labeldistance=10, labelangle=17];
+    X -> Y [headlabel = "beta_1 = 2", labeldistance=12.5, labelangle=10];
+    e -> Y [style=dashed, color=gray];
+}
+```
+
+Ähnlich wie in @sec-simbiasconf können wir die Konsequezen der Kontrolle für eine Collider-Variable in einem linearen Regressionsmodell anhand einer Simulationsstudie untersuchen. Wir implementieren hierzu den DGP
+
+\begin{align*}
+  X \sim& \, N(0,1),\\
+  Y =& \, \beta_1 X + e,\\
+  C =& \, N(0,1) + .25X + .25Y,
+\end{align*}
+wobei $e \sim N(0,3^2)$ erneut ein unsystematischer Fehlterterm für $Y$ ist. Wie im DGP aus @sec-simbiasconf wählen wir $\beta_1 = 2$ für den wahren kausalen Effekt von $X$ auf $Y$.
+
+```{webr-r}
+#| autorun: true
+# Simulationsfunktion: DGP mit Collider
+sim_function_col <- function(n, beta_1, formula) {
+    # Daten erzeugen
+    tibble(
+        X = rnorm(n),
+        Y = beta_1 * X + rnorm(n, sd = 3),
+        C = .25 * X + .25 * Y + rnorm(n)
+    ) %>% 
+        # Modell schätzen
+        lm(
+            formula = as.formula(formula), 
+            data = .
+        ) %>% 
+        # Koeffizientenschätzung auslesen
+        coefficients() %>% 
+        .["X"]    
+}
+```
+
+In der nachfolgenden Simulation iterieren wir `sim_function_col()` für zwei verschiedene Modelle und speichern Ergebnisse in einer `tibble`: Die erste Spalte von `sim_est_col` enthält simulierte KQ-Schätzungen von $\widehat{\beta}_1$ in einem einfachen Regressionsmodell, dass *nicht* für den Collider $C$ kontrolliert (`formula = "Y ~ X"`). Die zweite Spalte hingegen sammelt Schätzungen für ein multiples Modell mit Kontrolle für $C$ (`formula = "Y ~ X + C"`).
+
+```{webr-r}
+#| autorun: true
+# Parameter
+n <- 150
+N <- 1000
+beta_1 = 2
+
+sim_est_col <- tibble(
+    # Ohne Kontrolle für C
+    hatbeta_1 = map_dbl(
+        .x = 1:N,
+        .f =  ~ sim_function_col(
+            n = n, 
+            beta_1 = beta_1,
+            formula = "Y ~ X"
+        )
+    ),
+    # Kontrolle für C
+    hatbeta_1_C = map_dbl(
+        .x = 1:N, 
+        .f = ~ sim_function_col(
+            n = n, 
+            beta_1 = beta_1,
+            formula = "Y ~ X + C"
+        )
+    )
+)
+
+# Überblick
+head(sim_est_col)
+```
+
+Für die Auswertung der Simulationsergebnisse hinsichtlich der Konsequenzen der Kontrolle für den Collider $C$ plotten wir die geschätzen Dichtefunktionen für die Stichprobenverteilung von $\widehat{\beta}_1$ aus beiden Monte-Carlo-Experimenten gemeinsam und vergleich mit dem wahren Wert $\beta_1 = 2$.
+
+```{webr-r}
+#| autorun: true
+# Vergleich von simulieren Stichprobenverteilungen 
+# in Regressionen mit und ohne Collider
+ggplot(data = sim_est_col) +
+  geom_density(
+    mapping = aes(x = hatbeta_1, linetype = "Y ~ X"),
+  ) +
+  geom_density(
+    mapping = aes(x = hatbeta_1_C, linetype = "Y ~ X + C"), 
+  ) +
+  geom_vline(
+    xintercept = beta_1, 
+    linetype = "dashed",
+    col = "red"
+  ) +
+  scale_linetype_manual(
+    "Modell",
+    values = c(
+      "Y ~ X" = "solid", 
+      "Y ~ X + C" = "dotdash"
+    )
+  ) +
+  labs(title = "Simulation von Collider-Bias in linearer Regression") +
+  theme_cowplot() + 
+  theme(legend.position = "top")
+```
+
+Die Abbildung zeigt deutlich die (negative) Verzerrung des KQ-Schätzers für den interessierenden kausalen Effekt im Modell mit Kontrolle für den Collider $C$. Die Simulationsergebnisse für eine einfache Regression von $Y$ auf $X$ hingegen stimmen mit dem theretischen Resultat überein, dass der KQ-Schätzer für $\beta_1$ in diesem Modell erwartungstreu ist.
+
+Durch Zusammenfassung der Simulationsergebnisse mit `dplyr::summarize()` können wir den Collider-Bias im Modell mit Kontrolle für $C$ schätzen und die Unverzerrtheit von $\widehat{\beta}_1$ in der einfachen Regression von $Y$ auf $X$ prüfen.
+
+```{webr-r}
+#| autorun: true
+# Bias aus Simulationsergebnissen schätzen
+sim_est_col %>%
+  summarise(
+    bias_simple = mean(hatbeta_1) - beta_1,
+    bias_collider = mean(hatbeta_1_C) - beta_1
+  )
+```
+
+
+## Regression: Durchschnittlicher Behandlungseffekt
+
+Wir können Simulation einsetzen, um die Güte der Schätzung von Behandlungseffekten in linearen Regressionsmodellen zu untersuchen. Hierzu implementieren wir einen DGP gemäß @fig-simheteff.
+
+```{dot}
+//| fig-width: 5
+//| fig-height: 3
+//| fig-cap: "DGP mit heterogenen Behandlungseffekten"
+//| label: "fig-simheteff" 
+digraph HETEFFSIM {
+    layout=neato
+    fontname="Helvetica,Arial,sans-serif"
+    node [fontname="Helvetica,Arial,sans-serif", shape="circle"]
+    edge [fontname="Helvetica,Arial,sans-serif"]
+    pad=.5
+
+    B [pos="0,0!"];
+    Y [pos="2,0!"];
+    X [pos="2,2!"];
+    e [pos="4,0!", color=gray, fontcolor=gray];
+
+    B -> Y [label = "β_1 heterogen"];
+    X -> Y [headlabel = "β_2 = 2", labeldistance=7, labelangle=-25];
+    e -> Y [style=dashed, color=gray];
+}
+```
+Für die Komponenten wählen wir:
+\begin{align}
+  \begin{split}
+    \text{B} &\sim \text{Bernoulli}(0.5) \\
+    X &\sim N(0, 2) \\
+    \beta_1 &\sim \mathcal{U}(0, 3) \\
+    e &\sim N(0, 2) \\
+    \\
+    Y &= 1 + \beta_1 \cdot \text{B} + 2 \cdot X + e
+  \end{split}\label{eq:dgpatesim}
+\end{align}
+
+In diesem linearen DGP bestimmt $B$ über die Zuteilung der Behandlung. $X$ ist eine Determinante der Outcome-Variable $Y$ ohne Backdoor-Pfad. Der Behandlungseffekt $\beta_1$ ist *heterogen*, da $\beta_1$ aus einer kontinuierlichen Gleichverteilung auf dem Intervall $[0, 3]$ gezogen wird. Der durchschnittliche Behandlungseffekt (ATE) entspricht hier dem *Erwartungswert* von $\beta_1$, was zu einem ATE von 1.5 führt, da
+
+\begin{align*}
+  \textup{ATE} =&\, \textup{E}(\beta_1)\\
+  =&\, \frac{1}{2}(a + b)\\ 
+  =&\, \frac{1}{2}(0 + 3) = 1.5.
+\end{align*}
+
+Wir verfizieren nachfolgend mit Monte-Carlo-Simulation für Stichproben von DGP \eqref{eq:dgpatesim} mit $n=150$, dass
+
+- der KQ-Schätzer für $\beta_1$ im Modell $Y=\beta_0 + \beta_1 B + \epsilon$ ein erwartungstreuer Schätzer für den ATE ist und
+
+- kontrollieren für $X$ hier die Präzision der Schätzung des ATE verbessert.
+
+Im nachfolgenden Code-Block erzeugen wir die Simulationsergebnisse in jeder Iteration durch Berechnung der interessierenen Schätzer auf derselben simulierten Stichprobe und geben die Ergebnisse als `tibble()` mit einer Reihe und zwei benannten Einträgen zurück. Die Funktion `map_dfr()` fasst die Ergebnisse nach der Iteration über `1:N` als `tibble()` zusammen. Wir nutzen hier einen Ansatz, bei dem die Schritte für die Simulation dem Argument `.f` über den Syntax `~ { ... }` innerhalb einer *anonymen Funktion* ohne Argumente.^[Anonyme Funktionen in R (auch *Lambda-Funktionen* genannt) sind Funktionen, die ohne Namen definiert werden und in der Regel sofort angwendet werden. `~` ist eine Kurznotation für anonyme Funktionen innerhalb von `purrr`-Funktionen.]
+
+```{webr-r}
+#| autorun: true
+# Parameter
+n <- 150
+N <- 1000
+
+set.seed(1234)
+
+# Iteration mit map_dfr
+sim_res_ATE <- map_dfr(
+  .x = 1:N, 
+  .f = ~ {
+    # Datensatz simulieren
+    df <- tibble(
+      # Behandlungsindikator
+      treat = sample(0:1, size = n, replace = TRUE),
+      # Determinante von Y
+      X = rnorm(n = n, sd = 2), 
+      # Heterogener Behandlungseffekt
+      TE = runif(n = n, 0, 3),
+      # Outcome-Variable
+      Y = 1 + TE * treat + 2 * X + rnorm(n = n, sd = 2) 
+    )
+    
+    # ATE mit Regression schätzen
+    `Modell ohne Kovariable X` = lm(
+      formula = Y ~ treat, 
+      data = df
+    ) %>%
+      coefficients() %>%
+      .["treat"]
+    
+    # Regression mit X
+    `Modell mit Kovariable X` = lm(
+      formula = Y ~ treat + X, 
+      data = df
+    ) %>%
+      coefficients() %>%
+      .["treat"]
+    
+    return(
+      # tibble zurückgeben
+      tibble(
+        `Modell ohne Kovariable X`,
+        `Modell mit Kovariable X`
+      )
+    )
+  }
+  
+)
+```
+
+Für die grafische Auswertung transformieren wir die Simulationsergebnisse in `sim_res_ATE` mit `pivot_longer()` in ein langes Format.
+
+```{webr-r}
+#| autorun: true
+# Vergleich simulierter Dichtefunktionen
+sim_res_ATE %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "variable", 
+    values_to = "hatbeta_1"
+  ) %>%
+  
+  ggplot(
+    mapping = aes(
+      x = hatbeta_1, 
+      col = variable)
+  ) +
+  geom_density() +
+  # ATE einzeichnen
+  geom_vline(
+    xintercept = 1.5, 
+    linetype = "dashed", 
+    col = "red"
+  ) +
+  scale_color_discrete("KQ-Schätzer in") + 
+  theme_cowplot() +
+  theme(legend.position = "top")
+```
+
+Die grafische Auswertung der Stichprobenverteilungen bestätigt, dass der KQ-Schätzer für $\beta_1$ sowohl im Modell mit Kontrolle für $X$ als auch im Modell ohne $X$ erwartungstreu für den ATE von 1.5 ist. Da $X$ gemäß DGP \eqref{eq:dgpatesim} einen größeren Teil der Variation in $Y$ verursacht, verbesserte Kontrolle für $X$ hier die Präzision der Schätzung des ATE mit KQ.
+
+Die Variabilität der Ansätze können wir durch Zusammenfassung der Spalten in `sim_res_ATE ` mit `summarize()` und `across()` quantifizieren, wobei wir `sd` als zusammenfassende Statistik nutzen und `.names = "sd_{.col}"` ein entsprechendes Präfix für die Variablennamen einführt.
+
+```{webr-r}
+#| autorun: true
+# Standardabweichung der Schätzungen
+sim_res_ATE %>% 
+  summarise(
+    across(
+      .cols = everything(), 
+      .fns = sd,
+      .names = "sd_{.col}"
+    )
+  )
+```
+
+
+## Verletzung von Modellannahmen: Heteroskedastizität
+
+Unter der Annahme von *Homoskedastizität* (konstante Varianz) der Fehlerterme des Modells ist die KQ-Schätzung von Behandlungseffekten anhand linearer Regression effizient, d.h. der KQ-Schätzer hat die geringste Varianz unter allen unverzerrten Schätzern des interessierenden Koeffizienten.^[Die ist die Kern-Aussage des [Gauss-Markov-Theorems](https://de.wikipedia.org/wiki/Satz_von_Gau%C3%9F-Markow).] Hängt die Varianz der Fehlerterme von den Regressoren ab, liegt *Heteroskedastizität* vor: Die Fehlerterm-Varianz unterscheided sich zwischen den Beobachtungen, in Abhängigkeit der Ausprägungen der Regressoren. Unter Heteroskedastie ist der KQ-Schätzer nicht länger der effizienteste Schätzer: In Verfahren wie der gewichteten KQ-Methode (WKQ)^[Engl. *weighted least squares*.] haben Beobachtungen mit geringer Fehlerterm-Varianz einen größeren Einfluss als Beobachtungen mit großer Varianz, sodass der WKQ-Schätzer präziser als der KQ-Schätzer sein kann.
+
+Weiterhin sind bei heteroskedastischen Fehlertermen die (aus historischen Gründen) standardmäßig von `summary()` berechneten Standardfehler *ungültig*, und können die Unsicherheit von KQ unterschätzen. Dies ist problematisch, da unter Verwendung von ungültigen Standardfehlern berechnete Inferenzsstatistiken ebenfalls ungültig sind. Als Konsequenz erhöht sich die Gefahr falscher Schlussfolgerungen hinsichtlich des zu schätzenden Behandlungseffekts anhand von Test-Statistiken und Konfidenzintervallen.
+
+Wir zeigen nachfolgend, wie die Konsequenzen von Heteroskedastizität für den KQ-Schätzer mit Simulation untersucht werden können. Hierfür betrachten wir den DGP 
+
+\begin{align}
+  \begin{split}
+    X \sim&\, \chi^2_{50}\\
+    e \sim&\, N(0, \sigma_e^2(X))\\
+    Y =&\, \beta_1 X + e,
+  \end{split}\label{eq:simhetdgp}
+\end{align}
+
+wobei die Fehlerterm-Varianz $\sigma_e^2(X)$ eine Funktion von $X$ ist,
+\begin{align*}
+  \sigma_e^2(X) = \textup{Var}(e\vert X) = \lvert X-50 \rvert^{p}.
+\end{align*}
+Der Parameter $p$ bestimmt die funktionale Form dieser bedingten Varianz.
+
+Der nächste Code-Chunk plottet die Funktion $f(x) = \lvert X-50 \rvert^{p}$ für verschiedene $p$ über den Wertebereich von $X$. Hierfür berechnen wir $f(x)$ für ein mit `expand_grid()` erstelltes Raster von Werten für $X$ und $p$. 
+
+```{webr-r}
+#| autorun: true
+# Raster erstellen, f(x) berechnen
+df <- expand_grid(
+  x = seq(30, 70, by = 0.1), 
+  p = c(0, 1, 1.5, 1.75),
+  ) %>% 
+  mutate(y = abs(x - 50)^p)
+
+# Funktionen plotten
+ggplot(
+  data = df,
+  mapping =  aes(x = x, y = y, color = factor(p))
+) +
+  geom_line() +
+  labs(
+    title = "Plot von |x-50|^p für verschiedene p",
+    y = "|x-50|^p "
+  ) +
+  scale_color_discrete(name = "p") +
+  theme_cowplot() +
+  theme(legend.position = "top")
+```
+
+Für die Simulation heteroskedastischer Daten mit \eqref{eq:simhetdgp} verwenden wir $p = 1.5$ und $\beta_1 = 0$ (kein Effekt). Die nachfolgende Grafik zeigt eine simulierte Stichprobe mit 150 Beobachtungen.
+
+```{webr-r}
+#| autorun: true
+n <- 150
+
+# Daten erzeugen
+df_het <- tibble(
+  # Regressor
+  X = rchisq(n = n, df = 50),
+  # Heteroskedastische Fehler
+  e = abs(X - 50)^(1.5) * rnorm(n),
+  # Outcome-Variable
+  Y = e
+)
+
+# Punkteplot
+ggplot(
+  data = df_het, 
+  mapping = aes(x = X, y = Y)
+) +
+  geom_point(col = "steelblue", alpha = .75) +
+  labs(title = "Heteroskedastische Daten") +
+  theme_cowplot()
+```
+
+In den Simulationsdurchläufen schätzen wir jeweils $\beta_1$ im Modell $Y=\beta_1X+\epsilon$ mit KQ, berechnen den nur bei Homoskedastie gültigen Standardfehler und eine bei Heteroskedastie robuste Schätzung. Für lezteres verwenden wir `sandwich::vcovHC()` und mit `type="HC1"`.^[Der Typ `HC1`, auch bekannt als Huber-White-Schätzer, ist ein häufig genutzter Standardfehler und wird in späteren Kapiteln dieses Companions häufig angewendet.] Wir fassen diese Schritte in der Funktion `sim_function_het()` zusammen.
+
+```{webr-r}
+#| autorun: true
+sim_function_het <- function(n, p) {  
+  
+  # Regressor
+  X <- rchisq(n = n, df = 50)
+  # Heteroskedastische Fehler
+  e <- abs(X - 50)^(1.5) * rnorm(n, mean = 0, sd = 1)
+  # Outcome-Variable
+  Y <- e
+
+  # Modell schätzen
+  model <- lm(Y ~ X - 1)
+  
+  # HC0-Standardfehler mit summary()
+  s <- summary(model)
+  
+  # Wurzel(rob Varianz-Schätzer) = robuster SE
+  sw <- sqrt(
+    sandwich::vcovHC(model, type = "HC1")
+  )
+  
+  # WKQ
+  # Gewichte
+  residuals <- resid(model)
+  weights <- 1 / (residuals^2)
+
+  # WKQ-Schätzung
+  wkq_model <- lm(
+    formula = Y ~ X - 1,
+    weights = weights
+  )
+  
+  tibble(
+    # Koeffizientenschätzung
+    beta = s$coefficients["X", 1],
+    # WKQ-Schätzer
+    beta_wkq = wkq_model$coefficients["X"],
+    # HC0-Standardfehler
+    se = s$coefficients["X", 2],
+    # HC1-Standardfehler
+    se_rob = sw
+  )
+
+}
+```
+
+```{webr-r}
+#| autorun: true
+# Parameter
+N <- 1000
+n <- 150
+p <- 1.5
+
+set.seed(1234)
+
+# Simulation durchführen
+sim_res_het = map_dfr(
+  .x = 1:N,
+  .f = ~ sim_function_het(n = n, p)
+)
+
+# Überblick
+head(sim_res_het)
+```
+
+```{webr-r}
+#| autorun: true
+# Standardabweichung der Stichprobenverteilung
+sd(sim_res_het$beta)
+
+# Von summary() berechneter Standardfehler
+mean(sim_res_het$se)
+
+# Robuster Standardfehler
+mean(sim_res_het$se_rob)
+```
+
+Die quantitative Auswertung der Ergebnisse deuten darauf hin, dass der nur bei Homoskedastie gültige Standardfehler die Standardabweichung von $\widehat{\beta}_1$ deutlich unterschätzt. Der anhand der Simulationsergebnisse geschätzte Erwartungswert des robusten Standardfehlers hingegen liegt nahe bei der Standardabweichung der simulierten Stichprobenverteilung von $\widehat{\beta}_1$.
+
+```{webr-r}
+ggplot(data = sim_res_het) +
+    geom_density(mapping = aes(x = beta, linetype = "KQ")) +
+    geom_density(mapping = aes(x = beta_wkq, linetype = "WKQ")) +
+    scale_linetype_manual(
+        "Schätzer",
+        values = c("KQ" = "solid", 
+                   "WKQ" = "dashed")
+    ) +
+    theme_cowplot() +
+    theme(legend.position = "top")
+```
+
+
+```{webr-r}
+#| autorun: true
+ggplot(data = sim_res_het) +
+  geom_density(mapping = aes(x = se, linetype = "Nicht robust")) +
+  geom_density(mapping = aes(x = se_rob, linetype = "Robust")) +
+  scale_linetype_manual(
+    "Standardfehler",
+    values = c("Nicht robust" = "solid", 
+               "Robust" = "dashed")
+  ) +
+  theme_cowplot() +
+  theme(legend.position = "top")
+```
+
+Eine Konsequenz falscher Standardfehler kann eine Verletzung der nominalen $\alpha$-Fehlerrate in Signifikanztests sein: Der Hypothesentest lehnt eine korrekte Nullhypothese mit einer geringeren oder höheren Fehlerwahrscheinlichkeit (das Signifikanzniveau $\alpha$) als gewünscht ab. 
+
+Inwiefern die für die Simulation gewählte Form von Heteroskedastizität die $\alpha$-Fehlerrate eines t-Tests beeinflusst, können wir anhand der Ergebnisse schätzen: Wir berechnen die Ablehnrate für t-Tests der (wahren) Null-Hypothese $H_0:\beta_1=0$ zum 5\%-Niveau jeweils für robuste und nicht-robuste Standardfehler und vergleichen.
+
+
+```{webr-r}
+#| autorun: true
+# kritischer Wert der t_n-1-Verteilung
+tcrit <- qt(p = .975, df = n - 1)
+
+# Ablehnrate des t-Tests schätzen
+sim_res_het %>%
+  summarise(
+    # alpha-Fehler der Tests schätzen
+    alpha_err_h = mean(abs(beta/se) > tcrit),
+    alpha_err_r = mean(abs(beta/se_rob) > tcrit)
+  )
+```
+
+Die Simulationsergebnisse deuten darauf hin, dass ein Fehler erster Art für den Signifikanztest ohne korrigierte Standardfehler oberhalb des 5\%-Niveaus liegt. Für die robuste Teststatistik hingegen liegt die Schätzung des $\alpha$-Fehlers nahe 5\%.
+
 ## Der Bootstrap
 
-1.**Stichproben mit Zurücklegen ziehen**: Ziehe wiederholt ($B$-mal) Stichproben mit Zurücklegen aus den Originaldaten. Jede dieser Bootstrap-Stichproben hat die gleiche Größe $N$ wie die ursprüngliche Stichprobe.
+1. **Stichproben mit Zurücklegen ziehen**: Ziehe wiederholt ($B$ mal) Stichproben der Größe $N$ (Größe der ursprünglichen Stichprobe) mit Zurücklegen aus den Originaldaten.
 
+2. **Parameterschätzung für jede Bootstrap-Stichprobe**: Wende die Schätzfunktion $\widehat{\beta}$ auf jede der $B$ Bootstrap-Stichproben an und erhalte $B$ Bootstrap-Schätzwerte $\widehat{\beta}^1,\dots,\widehat{\beta}^B$ des interessierenden Koeffizienten $\beta$.
 
-2. **Parameterschätzung für jede Bootstrap-Stichprobe**: Wende die Schätzgunktion auf jede der $B$ Bootstrap-Stichproben an und erhalte $B$ Bootstrap-Schätzwerte des interessierenden Parameters.
+3. **Verteilungsparameter Schätzen**: Anhand der $B$ Bootstrap-Schätzungen aus Schritt 2 können die Eigenschften der Verteilung des Schätzers $\widehat{\beta}$ oder Funktionen davon geschätzt werden:
 
-5. **Konfidenzintervall bestimmen**
-   - Sortiere die berechneten Parameterwerte (z.B. die Mittelwerte) und bestimme das Konfidenzintervall anhand der gewünschten Perzentile. Für ein 95%-Konfidenzintervall werden üblicherweise das 2,5. und 97,5. Perzentil verwendet.
-   - *Erklärung*: Das Konfidenzintervall gibt an, in welchem Bereich der wahre Parameterwert mit hoher Wahrscheinlichkeit liegt.
+    - Das arithmetische Mittel der $B$ Bootstrap-Schätzungen ist ein Schätzer des Erwartungswerts von $\widehat{\beta}$ 
+    - Der Standardfehler des Schätzers kann durch die Standardabweichung der $B$ Bootstrap-Schätzungen geschätzt werden
+    - Ein 95\%-Bootstrap-Konfidenzintervall kann mit den 2.5\%- und 97.5\%-Perzentilen berechnet werden werden
 
-6. **Ergebnis interpretieren**
-   - Das ermittelte Konfidenzintervall und die Verteilung der Bootstrap-Schätzungen helfen dabei, die Unsicherheit in der Schätzung zu verstehen.
-   - *Beispiel*: Wenn das 95%-Konfidenzintervall für den Mittelwert `[5.5, 10.5]` beträgt, kann angenommen werden, dass der wahre Mittelwert der Population mit 95%iger Sicherheit zwischen 5.5 und 10.5 liegt.
+### Interaktive Visualisierung des Bootstraps
 
-<iframe class="obs-soft-box-shadow" width="100%" height="668" frameborder="0"
-  src="https://observablehq.com/embed/62d24833f3dbd27a?cells=svg%2Cviewof+B%2Cviewof+BW%2Cviewof+speed%2Cviewof+n">
+Die nachfolgende interaktive Visualisierung illustriert die Vorgehensweise des oben beschriebenen Bootstrap-Algorithmus für die Schätzung eines 95\%-Konfidenzintervalls für den Erwartungswert einer normalen <span style="color: purple;">Verteilung</span> basierend auf einer <span style="color: red;">Stichprobe</span>, wenn das arithmetische Mittel als Schätzer verwendet wird. Diese <span style="color: purple;">Pupulationsverteilung</span> ist $N(\mu = 50, \sigma^2 = 12^2)$. In jeder Iteration des Bootstraps wird eine <span style="color: orange;">Bootstrap-Stichprobe</span> mit Zurücklegen aus der originalen <span style="color: red;">Stichprobe</span> gezogen. Für jede <span style="color: orange;">Bootstrap-Stichprobe</span> berechnen wird das <span style="color: darkgreen;">Arithmetische Mittel (grüne Punkte)</span>. Für hinreichend viele <span style="color: darkgreen;">Bootstrap-Schätzungen</span> erhalten wir eine <span style="color: darkgreen;">Bootstrap-Verteilung</span> unseres Schätzers.^[Die Grüne Linie zeigt eine Kerndichte-Schätzung der Bootstrap-Verteilung. Die Bandweite dieser Schätzung kann in der Applikation variiert werden.] Basierend auf dieser Verteilung erhalten wir eine Bootstrap-Schätzung des Erwartungswerts (schwarzer Punkt) und ein 95\%-Konfidenzintervall (schwarze Linie).
+
+In der interaktiven Grafik können wir insbesondere folgende Eigenschaften des Bootstrap-Verfahrens verifizieren:
+
+- Größere <span style="color: red;">Stichproben</span> verringern die Unsicherheit des interessierenden Schätzers, sodass die Varianz seiner Verteilung nimmt mit der Stichprobengröße abnimmt. Da der Bootstrap die Verteilung des Schätzers approximiert, spiegelt sich diese Eigenschaft auch in der <span style="color: darkgreen;">Bootstrap-Verteilung</span>.
+
+- Die <span style="color: purple;">Populationsverteilung</span> ist normal. Daher ist auch die Stichproben-Verteilung des arithmetischen Mittels für *jede* Stichprobengröße normal. Die Illustration zeigt, dass die <span style="color: darkgreen;">Bootstrap-Verteilung</span> diese normale Verteilung des Schätzers (die typische Glockenform) tatsächlich gut approximieren kann, wenn $B$ hinreichend groß gewählt wird.
+
+<iframe class="obs-soft-box-shadow" width="100%" height="668" frameborder="0" src="https://observablehq.com/embed/62d24833f3dbd27a?cells=svg%2Cviewof+B%2Cviewof+BW%2Cviewof+speed%2Cviewof+n">
 </iframe>
+
+### Bootstrap-Schätzung mit R
+
+```{webr-r}
+#| autorun: true
+library(boot)
+set.seed(4321)
+
+n <- 200
+B <- 1000
+
+# Stichprobe erzeugen
+stichprobe <- rnorm(
+  n = n, 
+  mean = 50,
+  sd = 12
+)
+
+# Schätzfunktion
+boot_fun <- \(dat, indizes) mean(dat[indizes])
+
+# Bootstrap durchführen
+(
+  boot_est <- boot(
+    data = stichprobe, 
+    statistic = boot_fun, 
+    R = B
+  )
+)
+```
+
+```{webr-r}
+#| autorun: true
+# Stichprobenmittel (originale Stichprobe)
+mean(stichprobe)
+
+# Bootstrap-Schätzer für Erwartungswert
+boot_est$t0
+
+# 'bias'
+boot_est$t0 - mean(stichprobe)
+```
+
+```{webr-r}
+#| autorun: true
+# Verteilung der Bootstrap-Mittelwerte plotten
+tibble(mu_boot = boot_est$t) %>%
+  ggplot(mapping = aes(x = mu_boot)) +
+  #geom_histogram(bins = 30, fill="steelblue") +
+  geom_density() +
+  theme_cowplot()
+```
+
+```{webr-r}
+#| autorun: true
+# 95%-Bootstrap-KI
+boot.ci(
+  boot.out = boot_est, 
+  type = "bca"
+)
+```
+

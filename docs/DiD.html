@@ -2,9 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.553">
+<meta name="generator" content="quarto-1.5.56">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Kausalanalyse mit R - 7&nbsp; Difference-in-Differences</title>
+<title>8&nbsp; Difference-in-Differences – Kausalanalyse mit R</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,7 +30,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -125,6 +125,15 @@ div.csl-indent {
   };
 </script><script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js" integrity="sha512-aoZChv+8imY/U1O7KIHXvO87EOzCuKO0GhFtpD6G2Cyjo/xPeTgdf3/bchB10iB+AojMTDkMHDPLKNxPJVqDcw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
 <style>
+  .panel-tabset .tab-content {
+    border: 0;
+    padding: 1em 0 0 0;
+  }
+  
+  .panel-tabset .nav-item a {
+    border-radius: 5px 5px 0 0;
+  }
+  
   .scientific_borders {
     border: 0;
     border-top: 2px solid black !important; 
@@ -194,7 +203,7 @@ div.csl-indent {
    text-align: center;
 }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/quizdown@latest/public/build/quizdown.js"></script><script>quizdown.init();</script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
+<script src="https://cdn.jsdelivr.net/npm/quizdown@latest/public/build/quizdown.js"></script><script>quizdown.init();</script><script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
 const typesetMath = (el) => {
   if (window.MathJax) {
     // MathJax Typeset
@@ -225,13 +234,13 @@ window.Quarto = {
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./DiD.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./DiD.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
-      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+      <button type="button" class="btn quarto-search-button" aria-label="Suchen" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
@@ -276,56 +285,62 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./Simulation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Simulation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./Matching.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Matching</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Matching</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./FixedEffects.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Panel-Daten</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Panel-Daten</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./IV.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">IV-Regression</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">IV-Regression</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./DiD.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./EventStudies.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Event Studies</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Event Studies</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./RDD.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./RegReg.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Regularisierte Regression</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Regularisierte Regression</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./Machine Learning.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Machine Learning</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Machine Learning</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./SyntheticControl.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Synthetic Control</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Synthetic Control</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -339,35 +354,35 @@ window.Quarto = {
     <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title"><a href="./index.html">Übersicht</a></h2>
    
   <ul>
-<li><a href="#einordnung-im-potential-outcomes-framework" id="toc-einordnung-im-potential-outcomes-framework" class="nav-link active" data-scroll-target="#einordnung-im-potential-outcomes-framework"><span class="header-section-number">7.1</span> Einordnung im Potential Outcomes Framework</a></li>
-  <li><a href="#sch%C3%A4tzung-des-att-mit-did" id="toc-schätzung-des-att-mit-did" class="nav-link" data-scroll-target="#sch%C3%A4tzung-des-att-mit-did"><span class="header-section-number">7.2</span> Schätzung des ATT mit DID</a></li>
-  <li><a href="#sch%C3%A4tzung-von-did-forschungsdesigns-mit-r" id="toc-schätzung-von-did-forschungsdesigns-mit-r" class="nav-link" data-scroll-target="#sch%C3%A4tzung-von-did-forschungsdesigns-mit-r"><span class="header-section-number">7.3</span> Schätzung von DID-Forschungsdesigns mit R</a></li>
+<li><a href="#einordnung-im-potential-outcomes-framework" id="toc-einordnung-im-potential-outcomes-framework" class="nav-link active" data-scroll-target="#einordnung-im-potential-outcomes-framework"><span class="header-section-number">8.1</span> Einordnung im Potential Outcomes Framework</a></li>
+  <li><a href="#sch%C3%A4tzung-des-att-mit-did" id="toc-schätzung-des-att-mit-did" class="nav-link" data-scroll-target="#sch%C3%A4tzung-des-att-mit-did"><span class="header-section-number">8.2</span> Schätzung des ATT mit DID</a></li>
+  <li><a href="#sch%C3%A4tzung-von-did-forschungsdesigns-mit-r" id="toc-schätzung-von-did-forschungsdesigns-mit-r" class="nav-link" data-scroll-target="#sch%C3%A4tzung-von-did-forschungsdesigns-mit-r"><span class="header-section-number">8.3</span> Schätzung von DID-Forschungsdesigns mit R</a></li>
   <li>
-<a href="#case-study-effekt-von-steuererleichterungen-auf-erwerbsbeteilligung" id="toc-case-study-effekt-von-steuererleichterungen-auf-erwerbsbeteilligung" class="nav-link" data-scroll-target="#case-study-effekt-von-steuererleichterungen-auf-erwerbsbeteilligung"><span class="header-section-number">7.4</span> Case Study: Effekt von Steuererleichterungen auf Erwerbsbeteilligung</a>
+<a href="#case-study-effekt-von-steuererleichterungen-auf-erwerbsbeteilligung" id="toc-case-study-effekt-von-steuererleichterungen-auf-erwerbsbeteilligung" class="nav-link" data-scroll-target="#case-study-effekt-von-steuererleichterungen-auf-erwerbsbeteilligung"><span class="header-section-number">8.4</span> Case Study: Effekt von Steuererleichterungen auf Erwerbsbeteilligung</a>
   <ul>
-<li><a href="#sec-didattest" id="toc-sec-didattest" class="nav-link" data-scroll-target="#sec-didattest"><span class="header-section-number">7.4.1</span> Schätzungen des ATT mit linearen Modellen</a></li>
-  <li><a href="#sec-eitc-probit" id="toc-sec-eitc-probit" class="nav-link" data-scroll-target="#sec-eitc-probit"><span class="header-section-number">7.4.2</span> Probit-Spezifikationen</a></li>
+<li><a href="#sec-didattest" id="toc-sec-didattest" class="nav-link" data-scroll-target="#sec-didattest"><span class="header-section-number">8.4.1</span> Schätzungen des ATT mit linearen Modellen</a></li>
+  <li><a href="#sec-eitc-probit" id="toc-sec-eitc-probit" class="nav-link" data-scroll-target="#sec-eitc-probit"><span class="header-section-number">8.4.2</span> Probit-Spezifikationen</a></li>
   </ul>
 </li>
   <li>
-<a href="#case-study-effekt-von-polizeipr%C3%A4senz-auf-autodiebst%C3%A4hle" id="toc-case-study-effekt-von-polizeipräsenz-auf-autodiebstähle" class="nav-link" data-scroll-target="#case-study-effekt-von-polizeipr%C3%A4senz-auf-autodiebst%C3%A4hle"><span class="header-section-number">7.5</span> Case Study: Effekt von Polizeipräsenz auf Autodiebstähle</a>
+<a href="#case-study-effekt-von-polizeipr%C3%A4senz-auf-autodiebst%C3%A4hle" id="toc-case-study-effekt-von-polizeipräsenz-auf-autodiebstähle" class="nav-link" data-scroll-target="#case-study-effekt-von-polizeipr%C3%A4senz-auf-autodiebst%C3%A4hle"><span class="header-section-number">8.5</span> Case Study: Effekt von Polizeipräsenz auf Autodiebstähle</a>
   <ul>
-<li><a href="#trend-vergleich" id="toc-trend-vergleich" class="nav-link" data-scroll-target="#trend-vergleich"><span class="header-section-number">7.5.1</span> Trend-Vergleich</a></li>
-  <li><a href="#two-way-fixed-effects-sch%C3%A4tzungen" id="toc-two-way-fixed-effects-schätzungen" class="nav-link" data-scroll-target="#two-way-fixed-effects-sch%C3%A4tzungen"><span class="header-section-number">7.5.2</span> Two-Way-Fixed-Effects-Schätzungen</a></li>
-  <li><a href="#placebo-tests" id="toc-placebo-tests" class="nav-link" data-scroll-target="#placebo-tests"><span class="header-section-number">7.5.3</span> Placebo-Tests</a></li>
-  <li><a href="#weitere-robustness-checks" id="toc-weitere-robustness-checks" class="nav-link" data-scroll-target="#weitere-robustness-checks"><span class="header-section-number">7.5.4</span> Weitere Robustness-Checks</a></li>
+<li><a href="#trend-vergleich" id="toc-trend-vergleich" class="nav-link" data-scroll-target="#trend-vergleich"><span class="header-section-number">8.5.1</span> Trend-Vergleich</a></li>
+  <li><a href="#two-way-fixed-effects-sch%C3%A4tzungen" id="toc-two-way-fixed-effects-schätzungen" class="nav-link" data-scroll-target="#two-way-fixed-effects-sch%C3%A4tzungen"><span class="header-section-number">8.5.2</span> Two-Way-Fixed-Effects-Schätzungen</a></li>
+  <li><a href="#placebo-tests" id="toc-placebo-tests" class="nav-link" data-scroll-target="#placebo-tests"><span class="header-section-number">8.5.3</span> Placebo-Tests</a></li>
+  <li><a href="#weitere-robustness-checks" id="toc-weitere-robustness-checks" class="nav-link" data-scroll-target="#weitere-robustness-checks"><span class="header-section-number">8.5.4</span> Weitere Robustness-Checks</a></li>
   </ul>
 </li>
-  <li><a href="#zusammenfassung" id="toc-zusammenfassung" class="nav-link" data-scroll-target="#zusammenfassung"><span class="header-section-number">7.6</span> Zusammenfassung</a></li>
+  <li><a href="#zusammenfassung" id="toc-zusammenfassung" class="nav-link" data-scroll-target="#zusammenfassung"><span class="header-section-number">8.6</span> Zusammenfassung</a></li>
   </ul></nav>
 </nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
     </div>
 <!-- main -->
 <main class="content page-columns page-full" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
 <div class="quarto-title-block"><div><h1 class="title">
-<span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span>
+<span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span>
 </h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
 </div>
 
@@ -424,13 +439,10 @@ window.Quarto = {
 }
 
 </style>
-<div class="cell">
-
-</div>
-<p>Der Difference-in-Differences (DID) Ansatz erlaubt die Schätzung kausaler Effekte in quasi-experimentellen Forschungsdesigns, in denen Boebachtungen für Kontroll- und Behandlungsgruppe zu mindestens zwei Zeitpunkten vorliegen und die Behandlung zwischen diesen Zeitpunkten stattfindet: Wir beobachten sowohl die Kontroll- als auch die Behandlungsgruppe vor und nachdem die Behandlung erfolgt ist. Die Motivation für die Anwendung des DID-Ansatzes liegt in der Fähigkeit, typische Risiken einer Verzerrungen zu umgehen, die bei einfachen Vorher-Nachher-Vergleichen oder reinen Querschnittsvergleichen auftreten können. Die Kernidee ist eine Schätzung des ATT durch einen Vergleich durchschnittlicher Differenzen der Outcome-Variable beider Gruppen zwischen den Perdioden vor und nach der Intervention. <a href="#fig-CDDID" class="quarto-xref">Abbildung&nbsp;<span>7.1</span></a> zeigt ein kausales Diagramm für ein Forschungsdesign, in dem DID den ATT identifizieren kann.</p>
+<p>Der Difference-in-Differences (DID) Ansatz erlaubt die Schätzung kausaler Effekte in quasi-experimentellen Forschungsdesigns, in denen Boebachtungen für Kontroll- und Behandlungsgruppe zu mindestens zwei Zeitpunkten vorliegen und die Behandlung zwischen diesen Zeitpunkten stattfindet: Wir beobachten sowohl die Kontroll- als auch die Behandlungsgruppe vor und nachdem die Behandlung erfolgt ist. Die Motivation für die Anwendung des DID-Ansatzes liegt in der Fähigkeit, typische Risiken einer Verzerrungen zu umgehen, die bei einfachen Vorher-Nachher-Vergleichen oder reinen Querschnittsvergleichen auftreten können. Die Kernidee ist eine Schätzung des ATT durch einen Vergleich durchschnittlicher Differenzen der Outcome-Variable beider Gruppen zwischen den Perdioden vor und nach der Intervention. <a href="#fig-CDDID" class="quarto-xref">Abbildung&nbsp;<span>8.1</span></a> zeigt ein kausales Diagramm für ein Forschungsdesign, in dem DID den ATT identifizieren kann.</p>
 <div class="cell page-columns page-full" data-fig-width="5" data-fig-height="3" data-layout-align="center">
 <div class="cell-output-display page-columns page-full">
-<div id="fig-CDDID" class="quarto-figure quarto-figure-center quarto-float anchored page-columns page-full">
+<div id="fig-CDDID" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="quarto-float quarto-float-fig figure page-columns page-full"><div aria-describedby="fig-CDDID-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div>
 <svg width="480" height="288" viewbox="0.00 0.00 384.71 260.00" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none"><g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 256)"><title>Causal Diagramm RDD</title>
@@ -447,19 +459,19 @@ window.Quarto = {
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-CDDID-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;7.1: Kausales Diagramm für DID
+Abbildung&nbsp;8.1: Kausales Diagramm für DID
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p><a href="#fig-CDDID" class="quarto-xref">Abbildung&nbsp;<span>7.1</span></a> illustriert Confounding bei der Bestimmung des Behandlungseffekts durch Backdoors in der Zeit <span class="math inline">\(t\)</span> und der Gruppenzugehörigkeit:</p>
+<p><a href="#fig-CDDID" class="quarto-xref">Abbildung&nbsp;<span>8.1</span></a> illustriert Confounding bei der Bestimmung des Behandlungseffekts durch Backdoors in der Zeit <span class="math inline">\(t\)</span> und der Gruppenzugehörigkeit:</p>
 <ul>
 <li><p><strong>Zeit</strong>: Der Behandlungszustand der behandelten Gruppe ändert sich durch die Intervention zwischen der Vor- und der Nachbehandlungsperiode. Die Outcome-Variable <span class="math inline">\(Y\)</span> ändert sich für beide Gruppen über die Zeit hinweg.</p></li>
 <li><p><strong>Gruppenzugehörigkeit</strong>: Die Gruppenzugehörigkeit legt fest, ob eine Behandlung erfolgt. Systematische Unterschiede zwischen Behandlungs- und Kontrollgruppe wirken sich auf die Outcome-Variable <span class="math inline">\(Y\)</span> aus.</p></li>
 </ul>
 <p>In einem DID-Ansatz ermöglicht die Beobachtung von Kontroll- und Behandlungsgruppen jeweils <em>bevor und nach</em> einer Intervention das Herausrechnen von systematischen Unterschieden zwischen Behandlungs- und Kontrollgruppe und von Zeiteffekten, sodass die Backdoors durch Gruppenzugehörigkeit und Zeit geschlossen. Die Schätzung eines durchschnittlichen Behandlungseffekts erfolgt hierbei unter der Annahme, dass die Outcome-Variable beider Gruppen <em>ohne die Intervention</em> einen hinreichend ähnlichen Verlauf aufweisen würde und damit die Kontrollgruppe ein plausibles Counterfactual für die Behandlungsgruppe darstellt.</p>
-<section id="einordnung-im-potential-outcomes-framework" class="level2" data-number="7.1"><h2 data-number="7.1" class="anchored" data-anchor-id="einordnung-im-potential-outcomes-framework">
-<span class="header-section-number">7.1</span> Einordnung im Potential Outcomes Framework</h2>
+<section id="einordnung-im-potential-outcomes-framework" class="level2" data-number="8.1"><h2 data-number="8.1" class="anchored" data-anchor-id="einordnung-im-potential-outcomes-framework">
+<span class="header-section-number">8.1</span> Einordnung im Potential Outcomes Framework</h2>
 <p>Im Potential Outcomes Framework nehmen wir an, dass jede Einheit <span class="math inline">\(i\)</span> in Abhänigkeit ihres Behandlungsstatus zwei potentielle Ergebnisse hat. Wir unterscheiden zwischen Beobachtungen in Behandlungs- und Kontrollgruppe:</p>
 <ul>
 <li>
@@ -503,8 +515,8 @@ Abbildung&nbsp;7.1: Kausales Diagramm für DID
 <li><p><em>Konsistete Behandlung</em>: Es gibt keine Variation in der Intensität oder Art der Behandlung innerhalb der Behandlungsgruppe.</p></li>
 </ul>
 </li>
-</ol></section><section id="schätzung-des-att-mit-did" class="level2 page-columns page-full" data-number="7.2"><h2 data-number="7.2" class="anchored" data-anchor-id="schätzung-des-att-mit-did">
-<span class="header-section-number">7.2</span> Schätzung des ATT mit DID</h2>
+</ol></section><section id="schätzung-des-att-mit-did" class="level2 page-columns page-full" data-number="8.2"><h2 data-number="8.2" class="anchored" data-anchor-id="schätzung-des-att-mit-did">
+<span class="header-section-number">8.2</span> Schätzung des ATT mit DID</h2>
 <p>Für die Schätzung von <span class="math inline">\(\beta_\text{DID}\)</span> ersetzen wir die Erwartungswerte in <span class="math inline">\(\eqref{eq:DID-ATT1}\)</span> durch ihre Stichprobenmomente. Dies liefert den Schätzer</p>
 <p><span class="math display">\[\begin{align}
   \widehat{\beta}_\textup{DID} = \bigg({\color{red}\overline{Y_B(1)\vert t=1} - \overline{Y_B(0)\vert t=0}} \bigg) -  \bigg({\color{blue}\overline{Y_K(0)\vert t=1} - \overline{Y_K(0)\vert t=0}}\bigg). \label{eq:DIDMOMENTS}
@@ -513,7 +525,7 @@ Abbildung&nbsp;7.1: Kausales Diagramm für DID
 <p><span class="math display">\[\begin{align}
   Y_{i,\,t} = \alpha + \beta_1 B_i + \beta_2 Z_t + \beta_3 (B_i \times Z_t) + \epsilon_{i,\,t}, \quad t\in\{0,1\}, \label{eq:DIDREG}
 \end{align}\]</span></p>
-<p>wobei <span class="math inline">\(\beta_3\)</span> der interessierende Behandlungseffekt ist. Der Regressor <span class="math inline">\(B_i \times Z_t\)</span> ist die Interaktion zwischen der Behandlungsgruppenzugehörigkeit <span class="math inline">\(B_i\)</span> und einem Indikator für den Zeitpunkt <em>nach</em> der Intervention, <span class="math inline">\(Z_i = \mathbb{I}_{\{t=1\}}\)</span>. Beachte, dass wir in Modell <span class="math inline">\(\eqref{eq:DIDREG}\)</span> für Zeiteffekte und Gruppenzugehörig kontrollieren und damit die sich durch das Forschungsdesign ergebenden Backdoors (vgl. <a href="#fig-CDDID" class="quarto-xref">Abbildung&nbsp;<span>7.1</span></a>) schließen.</p>
+<p>wobei <span class="math inline">\(\beta_3\)</span> der interessierende Behandlungseffekt ist. Der Regressor <span class="math inline">\(B_i \times Z_t\)</span> ist die Interaktion zwischen der Behandlungsgruppenzugehörigkeit <span class="math inline">\(B_i\)</span> und einem Indikator für den Zeitpunkt <em>nach</em> der Intervention, <span class="math inline">\(Z_i = \mathbb{I}_{\{t=1\}}\)</span>. Beachte, dass wir in Modell <span class="math inline">\(\eqref{eq:DIDREG}\)</span> für Zeiteffekte und Gruppenzugehörig kontrollieren und damit die sich durch das Forschungsdesign ergebenden Backdoors (vgl. <a href="#fig-CDDID" class="quarto-xref">Abbildung&nbsp;<span>8.1</span></a>) schließen.</p>
 <p>Es ist <span class="math inline">\(\widehat\beta_3 = \widehat{\beta}_\text{DID}\)</span>, d.h. der KQ-Schätzer von <span class="math inline">\(\beta_3\)</span> ist der DID-Schätzer des ATT und numerisch äquivalent zu <span class="math inline">\(\eqref{eq:DIDMOMENTS}\)</span>. Die Berechnung von <span class="math inline">\(\widehat\beta_\text{DID}\)</span> anhand von Modell <span class="math inline">\(\eqref{eq:DIDREG}\)</span> ist praktisch, da wir so Inferenzstatistiken mit etablierten R-Funktionen wie <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> und <code><a href="https://rdrr.io/pkg/lmtest/man/coeftest.html">lmtest::coeftest()</a></code> wie gewohnt berechnen können.</p>
 <p>In empirischen Anwendungen stehen oft Datensätze mit mehreren Gruppen und mehr als zwei Beobachtungsperioden zur Verfügung. Beachte, dass das Modell <span class="math inline">\(\eqref{eq:DIDREG}\)</span> ein Spezialfall des allgemeinen Forschungsdesigns mit <span class="math inline">\(t=1,\dots,T\)</span> für <span class="math inline">\(T\geq2\)</span> Beobachtungsperioden und mehr als zwei Gruppen (mehrere Kontroll- und Behandlungsgruppen) ist. Eine dann häufig genutzte Modellspezifikation für die Schätzung des ATT mit DID ist eine Panel-Regression mit <em>Two-way Fixed Effects</em>,</p>
 <p><span class="math display">\[\begin{align}
@@ -574,8 +586,8 @@ Key Facts zum einfachen DID-Schätzer
 </ul>
 <iframe width="100%" height="813" frameborder="0" src="https://observablehq.com/embed/@mca91/did?cells=didformula%2Cchart%2Cviewof+ptrends%2Cviewof+showTrends%2Cviewof+showData%2Cviewof+treatPeriod%2Cviewof+effect">
 </iframe>
-<hr></section><section id="schätzung-von-did-forschungsdesigns-mit-r" class="level2 page-columns page-full" data-number="7.3"><h2 data-number="7.3" class="anchored" data-anchor-id="schätzung-von-did-forschungsdesigns-mit-r">
-<span class="header-section-number">7.3</span> Schätzung von DID-Forschungsdesigns mit R</h2>
+<hr></section><section id="schätzung-von-did-forschungsdesigns-mit-r" class="level2 page-columns page-full" data-number="8.3"><h2 data-number="8.3" class="anchored" data-anchor-id="schätzung-von-did-forschungsdesigns-mit-r">
+<span class="header-section-number">8.3</span> Schätzung von DID-Forschungsdesigns mit R</h2>
 <p>Wir erläutern nachfolgend die Schätzung von DID-Designs mit zwei Zeitperioden mit R und visualisieren die geschätzten Komponenten von <span class="math inline">\(\widehat{\beta}_\text{DID}\)</span> ähnlich wie in der interaktiven Visualisierung. Hierzu erzeugen wir simulierte Daten gemäß der Vorschrift</p>
 <p><span class="math display">\[\begin{align*}
   Y_{i,t} &amp;= 2 + 3 \cdot Z_t + 5 \cdot B_i + 4 \cdot (Z_t \cdot B_i) + \epsilon_{i,t}\\
@@ -787,18 +799,18 @@ RMSE: 1.00726     Adj. R2: 0.950969
 <span>  <span class="fu">theme_cowplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">theme</span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"top"</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display page-columns page-full">
-<div id="fig-DIDSIMB" class="quarto-figure quarto-figure-center quarto-float anchored page-columns page-full">
+<div id="fig-DIDSIMB" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="quarto-float quarto-float-fig figure page-columns page-full"><div aria-describedby="fig-DIDSIMB-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="DiD_files/figure-html/fig-DIDSIMB-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-DIDSIMB-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;7.2: Einfache DID-Schätzung mit R für simulierte Daten
+Abbildung&nbsp;8.2: Einfache DID-Schätzung mit R für simulierte Daten
 </figcaption></figure>
 </div>
 </div>
 </div>
-</section><section id="case-study-effekt-von-steuererleichterungen-auf-erwerbsbeteilligung" class="level2 page-columns page-full" data-number="7.4"><h2 data-number="7.4" class="anchored" data-anchor-id="case-study-effekt-von-steuererleichterungen-auf-erwerbsbeteilligung">
-<span class="header-section-number">7.4</span> Case Study: Effekt von Steuererleichterungen auf Erwerbsbeteilligung</h2>
+</section><section id="case-study-effekt-von-steuererleichterungen-auf-erwerbsbeteilligung" class="level2 page-columns page-full" data-number="8.4"><h2 data-number="8.4" class="anchored" data-anchor-id="case-study-effekt-von-steuererleichterungen-auf-erwerbsbeteilligung">
+<span class="header-section-number">8.4</span> Case Study: Effekt von Steuererleichterungen auf Erwerbsbeteilligung</h2>
 <p>Der <a href="https://www.irs.gov/credits-deductions/individuals/earned-income-tax-credit-eitc">Earned Income Tax Credit</a> (EITC) ist ein Steuerguthaben für US-Amerkanische Familien, die unterhalb einer gesetztlich festgelegten Einkoemmnsgrenze liegen. Der genaue Betrag des EITC hängt gestaffelt vom Einkommen ab und, ähnlich zum Kindergeld in Deutschland, steigt mit der Anzahl der zu versorgenden Kinder. Ein wichtiger Unterschied zum Kindergeld ist, dass der EITC nicht beantragt werden muss: Qualifizierten Familien wird der Betrag automatisch durch die Behörden im Jahressteuerausgleich gutgeschrieben. Somit kann Selbstselektion in die Behandlungsgruppe ausgeschlossen werden, da sich die Behandlung ausschließlich durch die im Rahmen der EITC-Ausweitung geänderten Anspruchsgrundlagen ergibt.</p>
 <p><span class="citation" data-cites="EissaLiebman1996">Eissa und Liebman (<a href="Literatur.html#ref-EissaLiebman1996" role="doc-biblioref">1996</a>)</span> betrachten Veränderungen in der EITC-Gesetzgebung als Intervention, deren Auswirkungen mit sozio-ökonomischen Paneldaten in einem DID-Ansatz untersucht werden können. Die Studie analysiert die Auswirkungen der ersten Ausweitung des EITC im Jahr 1986 auf die Erwerbsbeteiligung und die Löhne von Müttern im erwerbsfähigen Alter. Diese Erweiterung erhöhte die gewährten Steuererleichterungen und die zur Qualifikation für das Programm zu unterschreitende Einkommensgrenze.</p>
 <p>Ein zentraler Befund der Studie ist, dass die EITC-Ausweitung von 1986 einen statistisch signifikanten Anstieg der Arbeitsbeteiligung alleinerziehender Frauen von geschätzten 3% bewirkt hat. <span class="citation" data-cites="EissaLiebman1996">Eissa und Liebman (<a href="Literatur.html#ref-EissaLiebman1996" role="doc-biblioref">1996</a>)</span> finden weiterhin signifikante positive Effekte auf die geleisteten Arbeitsstunden und Evidenz für Einkommensverbesserungen in dieser Gruppe. Die Studienergebnisse sind starke Evidenz, dass Maßnahmen wie der EITC effektiv dazu beitragen können, die Erwerbssituation in der Zielgruppe zu steigern und somit die wirtsschafts- und sozialpolitische Ziele derartiger Programme realisierbar sind.</p>
@@ -812,12 +824,11 @@ Abbildung&nbsp;7.2: Einfache DID-Schätzung mit R für simulierte Daten
 <span><span class="co"># EITC-Datensatz einlesen</span></span>
 <span><span class="va">eitc_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"datasets/eitc_data.csv"</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Eine Übersicht des Datensatzes <code>eitc_data</code> ist in <a href="#tbl-EITCdata" class="quarto-xref">Tabelle&nbsp;<span>7.1</span></a> dargestellt.</p>
+<p>Eine Übersicht des Datensatzes <code>eitc_data</code> ist in <a href="#tbl-EITCdata" class="quarto-xref">Tabelle&nbsp;<span>8.1</span></a> dargestellt.</p>
 <div class="cell page-columns page-full">
-<div id="tbl-EITCdata" class="cell quarto-float anchored page-columns page-full">
+<div id="tbl-EITCdata" class="cell quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="quarto-float quarto-float-tbl figure page-columns page-full"><div aria-describedby="tbl-EITCdata-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div>
 <div id="fwrduujnuf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>#fwrduujnuf table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
@@ -1257,6 +1268,15 @@ Abbildung&nbsp;7.2: Einfache DID-Schätzung mit R für simulierte Daten
 #fwrduujnuf .gt_indent_5 {
   text-indent: 25px;
 }
+
+#fwrduujnuf .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#fwrduujnuf div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
 </style>
 <table class="gt_table do-not-create-environment cell table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead><tr class="header gt_col_headings">
@@ -1313,9 +1333,8 @@ Abbildung&nbsp;7.2: Einfache DID-Schätzung mit R für simulierte Daten
 </div>
 </div>
 </div>
-</div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-EITCdata-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;7.1: Sozi-ökomonische Variablen zu US-Familien aus dem CPS
+Tabelle&nbsp;8.1: Sozi-ökomonische Variablen zu US-Familien aus dem CPS
 </figcaption></figure>
 </div>
 </div>
@@ -1407,23 +1426,23 @@ $ after1993   &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE
 <span>  <span class="fu">guides</span><span class="op">(</span>color <span class="op">=</span> <span class="fu">guide_legend</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Kinder?"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">theme_cowplot</span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display page-columns page-full">
-<div id="fig-EITCtrends" class="quarto-figure quarto-figure-center quarto-float anchored page-columns page-full">
+<div id="fig-EITCtrends" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="quarto-float quarto-float-fig figure page-columns page-full"><div aria-describedby="fig-EITCtrends-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="DiD_files/figure-html/fig-EITCtrends-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-EITCtrends-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;7.3: Trends in der Erwerbsbeteiligung US-amerikanischer Frauen im CPS-Datensatz
+Abbildung&nbsp;8.3: Trends in der Erwerbsbeteiligung US-amerikanischer Frauen im CPS-Datensatz
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p><a href="#fig-EITCtrends" class="quarto-xref">Abbildung&nbsp;<span>7.3</span></a> zeigt, dass die Beschäftigungsquote für kinderlose Frauen deutlich oberhalb der Quote für Mütter verläuft. Die Trends vor der EITC-Ausweitung im Jahr 1993 sind sehr ähnlich, sodass eine parallele Entwicklung plausibel scheint.</p>
-<section id="sec-didattest" class="level3 page-columns page-full" data-number="7.4.1"><h3 data-number="7.4.1" class="anchored" data-anchor-id="sec-didattest">
-<span class="header-section-number">7.4.1</span> Schätzungen des ATT mit linearen Modellen</h3>
-<p>Wir berechnen Zunächst den Behandlungseffekt der für Frauen mit Kindern relativ zu kinderlosen Frauen gemäß <span class="math inline">\(\eqref{eq:DIDMOMENTS}\)</span>, wobei wir jeweils <em>sämtliche</em> Perioden vor und nach der Behandlung einbeziehen. Dies führt zu den Ergebnissen in <a href="#tbl-EITCSM" class="quarto-xref">Tabelle&nbsp;<span>7.2</span></a>, wobei <span class="math display">\[\begin{align}
+<p><a href="#fig-EITCtrends" class="quarto-xref">Abbildung&nbsp;<span>8.3</span></a> zeigt, dass die Beschäftigungsquote für kinderlose Frauen deutlich oberhalb der Quote für Mütter verläuft. Die Trends vor der EITC-Ausweitung im Jahr 1993 sind sehr ähnlich, sodass eine parallele Entwicklung plausibel scheint.</p>
+<section id="sec-didattest" class="level3 page-columns page-full" data-number="8.4.1"><h3 data-number="8.4.1" class="anchored" data-anchor-id="sec-didattest">
+<span class="header-section-number">8.4.1</span> Schätzungen des ATT mit linearen Modellen</h3>
+<p>Wir berechnen Zunächst den Behandlungseffekt der für Frauen mit Kindern relativ zu kinderlosen Frauen gemäß <span class="math inline">\(\eqref{eq:DIDMOMENTS}\)</span>, wobei wir jeweils <em>sämtliche</em> Perioden vor und nach der Behandlung einbeziehen. Dies führt zu den Ergebnissen in <a href="#tbl-EITCSM" class="quarto-xref">Tabelle&nbsp;<span>8.2</span></a>, wobei <span class="math display">\[\begin{align}
   \textcolor{orange}{\widehat\beta_\text{DID}} = (\textcolor{red}{B} - \textcolor{red}{A}) - (\textcolor{blue}{D} - \textcolor{blue}{C})
 \end{align}\]</span> der geschätzte Behandlungseffekt ist.</p>
-<div id="tbl-EITCSM" class="quarto-float anchored page-columns page-full">
+<div id="tbl-EITCSM" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="quarto-float quarto-float-tbl figure page-columns page-full"><div aria-describedby="tbl-EITCSM-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="table">
 <colgroup>
@@ -1461,7 +1480,7 @@ Abbildung&nbsp;7.3: Trends in der Erwerbsbeteiligung US-amerikanischer Frauen im
 </table>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-EITCSM-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;7.2: <code>eitc_data</code>: Stichprobenmittelwerte für <code>work</code>
+Tabelle&nbsp;8.2: <code>eitc_data</code>: Stichprobenmittelwerte für <code>work</code>
 </figcaption></figure>
 </div>
 <p>Die nachfolgenden Code-Chunks zeigen die Schritte zur Berechnung von <span class="math inline">\(\widehat{\beta}_\text{DID}\)</span> mit R.</p>
@@ -1715,9 +1734,9 @@ RMSE: 0.467886     Adj. R2: 0.119572
 </div>
 </div>
 <p>Die interessierenden geschätzten Koeffizienten von <code>I(onechild * after1993)</code> und <code>I(twomorekids * after1993)</code> sind <span class="math inline">\(0.0405\)</span> und <span class="math inline">\(0.0648\)</span>. Auch hier sind die Koeffizienten signifikant von null verschieden. Der größere Koeffizient für den Effekt auf Mütter mit zwei oder mehr Kinder liefert Evidenz dafür, dass die Einführung der Zahlstufe für größere Familien im Rahmen der EITC-Ausweitung von 1993 tatsächlich einen etwas stärkeren Anreiz auf die Zielgruppe mit mehreren Kindern hatte.</p>
-</section><section id="sec-eitc-probit" class="level3 page-columns page-full" data-number="7.4.2"><h3 data-number="7.4.2" class="anchored" data-anchor-id="sec-eitc-probit">
-<span class="header-section-number">7.4.2</span> Probit-Spezifikationen</h3>
-<p>In sämtlichen Modellen in <a href="#sec-didattest" class="quarto-xref"><span>Kapitel 7.4.1</span></a> haben wir <span class="math inline">\(\text{work}_{i,t}\)</span> als kontinulierliche Variable behandelt und den bedingten Erwartungswert als lineare Funktion modelliert. Da <span class="math inline">\(\text{work}_{i,t}\)</span> eine binäre Variable ist, haben wir damit implizit die bedingte <em>Wahrscheinlichkeit</em> der Erwerbsbeteiligung <span class="math inline">\(P(\text{work}_{i,t} = 1\vert \boldsymbol{x}_{i,t})\)</span> modelliert. Wie in <a href="Reg.html#sec-lpm" class="quarto-xref"><span>Kapitel 3.2.1</span></a> erläutert, kann ein solches lineares Wahrscheinlichkeitsmodell (LPM) einen nicht-linearen Verlauf der Wahrscheinlichkeitsfunktion <span class="math inline">\(P(\text{work}_{i,t} = 1\vert \boldsymbol{x}_{i,t})\)</span> nicht exakt abbilden, wobei tatsächliche Behandlungseffekte unter- oder überschätzt werden können. In manchen Fällen können geschätzte Wahrscheinlichkeiten sogar außerhalb des Intervalls <span class="math inline">\([0,1]\)</span> liegen. Statt eines LPM sollte ein generalisiertes lineares Modell (GLM) verwendet werden.</p>
+</section><section id="sec-eitc-probit" class="level3 page-columns page-full" data-number="8.4.2"><h3 data-number="8.4.2" class="anchored" data-anchor-id="sec-eitc-probit">
+<span class="header-section-number">8.4.2</span> Probit-Spezifikationen</h3>
+<p>In sämtlichen Modellen in <a href="#sec-didattest" class="quarto-xref"><span>Kapitel 8.4.1</span></a> haben wir <span class="math inline">\(\text{work}_{i,t}\)</span> als kontinulierliche Variable behandelt und den bedingten Erwartungswert als lineare Funktion modelliert. Da <span class="math inline">\(\text{work}_{i,t}\)</span> eine binäre Variable ist, haben wir damit implizit die bedingte <em>Wahrscheinlichkeit</em> der Erwerbsbeteiligung <span class="math inline">\(P(\text{work}_{i,t} = 1\vert \boldsymbol{x}_{i,t})\)</span> modelliert. Wie in <a href="Reg.html#sec-lpm" class="quarto-xref"><span>Kapitel 3.2.1</span></a> erläutert, kann ein solches lineares Wahrscheinlichkeitsmodell (LPM) einen nicht-linearen Verlauf der Wahrscheinlichkeitsfunktion <span class="math inline">\(P(\text{work}_{i,t} = 1\vert \boldsymbol{x}_{i,t})\)</span> nicht exakt abbilden, wobei tatsächliche Behandlungseffekte unter- oder überschätzt werden können. In manchen Fällen können geschätzte Wahrscheinlichkeiten sogar außerhalb des Intervalls <span class="math inline">\([0,1]\)</span> liegen. Statt eines LPM sollte ein generalisiertes lineares Modell (GLM) verwendet werden.</p>
 <p>Wir modellieren nachfolgend den Effekt der EITC-Anpassung auf die Wahrscheinlichkeit einer Erwerbsbeteiligung von Müttern mit <a href="#sec-abcd">Probit-Regression</a>. Anstatt <code><a href="https://rdrr.io/r/stats/glm.html">stats::glm()</a></code> verwenden wir <code><a href="https://lrberge.github.io/fixest/reference/feglm.html">fixest::feglm()</a></code>.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> Analog zu <code><a href="https://lrberge.github.io/fixest/reference/feols.html">fixest::feols()</a></code> erlaubt <code><a href="https://lrberge.github.io/fixest/reference/feglm.html">fixest::feglm()</a></code> die Schätzung von Probit-Regressionen mit Fixed Effekts. Partielle Effekte können mit dem Paket <code>marginaleffects</code> berechnet werden. Wir schätzen zunächst eine Fixed-Effects-Probit-Regression analog zu <span class="math inline">\(\eqref{eq:eitcmodfe}\)</span>, d.h.</p>
 <div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;Eine weitere Option ist <code><a href="https://rdrr.io/pkg/alpaca/man/feglm.html">alpaca::feglm()</a></code>.</p></div></div><p><span class="math display">\[\begin{align}
   \begin{split}
@@ -1883,8 +1902,8 @@ Type:  response </code></pre>
 </div>
 </div>
 <p>Ähnlich wie in Modell <span class="math inline">\(\eqref{eq:eitcmodfecd}\)</span> erhalten wir signifikante positive Schätzungen. Der durchschnittliche Effekt für <code>int_twomore</code> ist mit einer Erhöhung der Wahrscheinlichkeit zur Aufnahme einer Beschäftigung von etwa <span class="math inline">\(6.16\%\)</span> etwas höher als die <span class="math inline">\(4.11\%\)</span> für <code>int_onechild</code>.</p>
-</section></section><section id="case-study-effekt-von-polizeipräsenz-auf-autodiebstähle" class="level2 page-columns page-full" data-number="7.5"><h2 data-number="7.5" class="anchored" data-anchor-id="case-study-effekt-von-polizeipräsenz-auf-autodiebstähle">
-<span class="header-section-number">7.5</span> Case Study: Effekt von Polizeipräsenz auf Autodiebstähle</h2>
+</section></section><section id="case-study-effekt-von-polizeipräsenz-auf-autodiebstähle" class="level2 page-columns page-full" data-number="8.5"><h2 data-number="8.5" class="anchored" data-anchor-id="case-study-effekt-von-polizeipräsenz-auf-autodiebstähle">
+<span class="header-section-number">8.5</span> Case Study: Effekt von Polizeipräsenz auf Autodiebstähle</h2>
 <p>Nach einem Terroranschlag auf das größte jüdische Gemeindezentrum in Buenos Aires am 18. Juli 1994 wurden sämtliche jüdische und muslimische Einrichtungen in der Stadt rund um die Uhr von der argentinischen Polizei geschützt. Somit führte dieses Ereignis zu einer geografischen quasi-experimentellen Allokation von Polizeikräften in Gegenden mit entsprechenden Einrichtungen. In einem Forschungsdesign, dass die lokale Straßenkriminalität Kriminalität erklären soll, kann die sich aus der Allokation ergebende Variation in der Polizeipräsenz als exogen angenommen werden. <span class="citation" data-cites="DiTellaSchargrodsky2004">Di Tella und Schargrodsky (<a href="Literatur.html#ref-DiTellaSchargrodsky2004" role="doc-biblioref">2004</a>)</span> nutzen diesen Umstand, um anhand von Polizeistatistiken und Daten zu Autodiebstählen in Buenos Aires vor und nach dem Terroranschlag den Effekt erhöhter Polizeipräsenz auf die Kriminalität in einem Difference-in-Differences-Ansatz zu untersuchen. Die Studienergebnisse deuten darauf hin, dass es einen starken abschreckenden Effekt von Polizeistreifen gibt, der sich nur in einem engen Umkreis um Häuserblocks in denen die Polizeipräsenz erhöht wurde, auswirkt.</p>
 <p>In diesem Kapitel reproduzieren wir Kernergebnisse der Studie mit R. Die benötigten Daten sind auf der <a href="https://www.aeaweb.org/articles?id=10.1257/000282804322970733">Webseite der American Economic Association</a> verfügbar. Die Daten stammen aus drei nicht zusammenhängenden Stadtvierteln von Buenos Aires die etwa <span class="math inline">\(3.2\%\)</span> der Stadtfläche ausmachen und <span class="math inline">\(6.9\%\)</span> der Bevölkerung beherbergen, wobei sich jedem Viertel eine Polizeistation befindet. Bei den untersuchten Stadtvierteln handelt es sich um die Viertel mit der größten Anzahl jüdischer Einrichtungen in der Stadt. Der Großteil der Häuserblocks in diesen Vierteln (insgesamt 876 Blocks) liegen nicht in der Nähe einer geschützten Einrichtung. Blocks die mehr als zwei Blocks von einer geschützten Einrichtung entfernt liegen, bilden die Kontrollgruppe.</p>
 <p>Wir verwenden nachfolgend den modifizierten Datensatz <code>polizeipraesenz.RDS</code>.</p>
@@ -1892,7 +1911,7 @@ Type:  response </code></pre>
 <div class="sourceCode" id="cb52"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Datensatz einlesen</span></span>
 <span><span class="va">polizeipraesenz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span><span class="op">(</span><span class="st">"datasets/polizeipraesenz.RDS"</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="tbl-polpr" class="quarto-float anchored page-columns page-full">
+<div id="tbl-polpr" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="quarto-float quarto-float-tbl figure page-columns page-full"><div aria-describedby="tbl-polpr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="table">
 <thead><tr class="header">
@@ -1928,11 +1947,11 @@ Type:  response </code></pre>
 </table>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-polpr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;7.3: <code>polizeipraesenz</code>: Autodiebstähle in Buenos Aires
+Tabelle&nbsp;8.3: <code>polizeipraesenz</code>: Autodiebstähle in Buenos Aires
 </figcaption></figure>
 </div>
-<section id="trend-vergleich" class="level3 page-columns page-full" data-number="7.5.1"><h3 data-number="7.5.1" class="anchored" data-anchor-id="trend-vergleich">
-<span class="header-section-number">7.5.1</span> Trend-Vergleich</h3>
+<section id="trend-vergleich" class="level3 page-columns page-full" data-number="8.5.1"><h3 data-number="8.5.1" class="anchored" data-anchor-id="trend-vergleich">
+<span class="header-section-number">8.5.1</span> Trend-Vergleich</h3>
 <p>Zur Einschätzung der Annahme paralleler Trends berechnen wir zunächst die Durschnittliche Anzahl an Autodiebstählen Blocks mit bzw. ohne jüdische Institutionen für die Monate April bis Dezember. Beachte, dass die Variable <code>monat</code> zwei Ausprägungen für den Monat des Anschlags aufweist: <code>Juli (1 - 17)</code> für die Juli-Tage vor dem Anschlag und für die verbleibenden Tage <code>Juli (18 - 31)</code>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb53"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Trends berechnen</span></span>
@@ -2001,17 +2020,17 @@ Tabelle&nbsp;7.3: <code>polizeipraesenz</code>: Autodiebstähle in Buenos Aires
 <span>    legend.position <span class="op">=</span> <span class="st">"top"</span></span>
 <span>  <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display page-columns page-full">
-<div id="fig-totrobtrends" class="quarto-figure quarto-figure-center quarto-float anchored page-columns page-full">
+<div id="fig-totrobtrends" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="quarto-float quarto-float-fig figure page-columns page-full"><div aria-describedby="fig-totrobtrends-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="DiD_files/figure-html/fig-totrobtrends-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-totrobtrends-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Abbildung&nbsp;7.4: Geschätzte Trends für Autodiebstähle in Buenos Aires im Jahr 1994
+Abbildung&nbsp;8.4: Geschätzte Trends für Autodiebstähle in Buenos Aires im Jahr 1994
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p><a href="#fig-totrobtrends" class="quarto-xref">Abbildung&nbsp;<span>7.4</span></a> zeigt einen ähnlichen Verlauf der Trends für den Zeitraum unmittelbar vor dem Anschalg am 18. Juli.</p>
+<p><a href="#fig-totrobtrends" class="quarto-xref">Abbildung&nbsp;<span>8.4</span></a> zeigt einen ähnlichen Verlauf der Trends für den Zeitraum unmittelbar vor dem Anschalg am 18. Juli.</p>
 <p>Tabelle 2 in <span class="citation" data-cites="DiTellaSchargrodsky2004">Di Tella und Schargrodsky (<a href="Literatur.html#ref-DiTellaSchargrodsky2004" role="doc-biblioref">2004</a>)</span> präsentiert t-Tests für Unterschiede in der Mittleren Anzahl der Diebstähle pro Monat zwischen Blocks mit jüdischen Einrichtungen und verschiedenen distanz-basierten Untergruppen von Blocks ohne eine jüdische Einrichtungen für jede Periode. Zur Reproduktion dieser Ergebnisse erstellen zunächst eine Listen-Spalten für die beobachteten Diebstähle in Abhängigkeit der Distanz zum nächsten Block mit einer jüdischen Einrichtung.</p>
 <ul>
 <li>
@@ -2052,7 +2071,7 @@ Abbildung&nbsp;7.4: Geschätzte Trends für Autodiebstähle in Buenos Aires im J
 # ℹ 8,750 more rows</code></pre>
 </div>
 </div>
-<p>Mit <code><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise()</a></code> können wir Stichprobenmittel und Standardabweichungen der Diebstähle in Blocks dieser Kategorien für alle Perioden berechnen. Anschließend kombinieren wir die Ergebnisse jeweils mit <code><a href="https://rdrr.io/r/base/sprintf.html">sprintf()</a></code> und formatieren das Ergebnis mit <code>modelsummary::modelsummary_df()</code>.<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a> <a href="#tbl-deskstatdistanz" class="quarto-xref">Tabelle&nbsp;<span>7.4</span></a> Zeit die Spalten A bis D aus Tabelle 2 in <span class="citation" data-cites="DiTellaSchargrodsky2004">Di Tella und Schargrodsky (<a href="Literatur.html#ref-DiTellaSchargrodsky2004" role="doc-biblioref">2004</a>)</span>.</p>
+<p>Mit <code><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise()</a></code> können wir Stichprobenmittel und Standardabweichungen der Diebstähle in Blocks dieser Kategorien für alle Perioden berechnen. Anschließend kombinieren wir die Ergebnisse jeweils mit <code><a href="https://rdrr.io/r/base/sprintf.html">sprintf()</a></code> und formatieren das Ergebnis mit <code>modelsummary::modelsummary_df()</code>.<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a> <a href="#tbl-deskstatdistanz" class="quarto-xref">Tabelle&nbsp;<span>8.4</span></a> Zeit die Spalten A bis D aus Tabelle 2 in <span class="citation" data-cites="DiTellaSchargrodsky2004">Di Tella und Schargrodsky (<a href="Literatur.html#ref-DiTellaSchargrodsky2004" role="doc-biblioref">2004</a>)</span>.</p>
 <div class="no-row-height column-margin column-container"><div id="fn5"><p><sup>5</sup>&nbsp;<code>"%.4f\n(%.4f)"</code> gibt das Format des resultierenden <code>character</code> an: Mittelwerte und SDs (in Klammern), gerundet auf vier Nachkommastellen. <code>\n</code> bewirkt einen Zeilenumbruch.</p></div></div><div class="cell page-columns page-full">
 <div class="sourceCode" id="cb58"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://modelsummary.com">modelsummary</a></span><span class="op">)</span></span>
 <span></span>
@@ -2082,7 +2101,7 @@ Abbildung&nbsp;7.4: Geschätzte Trends für Autodiebstähle in Buenos Aires im J
 <span></span>
 <span><span class="co"># Tabelle mit modelsummary_df() ausgeben</span></span>
 <span><span class="fu">modelsummary</span><span class="fu">::</span><span class="fu"><a href="https://modelsummary.com/man/datasummary_df.html">datasummary_df</a></span><span class="op">(</span><span class="va">formatted_mean_sd</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div id="tbl-deskstatdistanz" class="cell quarto-float anchored page-columns page-full">
+<div id="tbl-deskstatdistanz" class="cell quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="quarto-float quarto-float-tbl figure page-columns page-full"><div aria-describedby="tbl-deskstatdistanz-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
  
@@ -2338,7 +2357,7 @@ window.addEventListener('load', function () { styleCell_tinytable_4lsyopf3r8qwwo
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-deskstatdistanz-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;7.4: Deskriptive Statistiken für Diebstähle nach Entfernung zur nächsten jüdischen Einrichtung
+Tabelle&nbsp;8.4: Deskriptive Statistiken für Diebstähle nach Entfernung zur nächsten jüdischen Einrichtung
 </figcaption></figure>
 </div>
 </div>
@@ -2376,7 +2395,7 @@ Tabelle&nbsp;7.4: Deskriptive Statistiken für Diebstähle nach Entfernung zur n
 <span></span>
 <span><span class="co"># Formatierung der Tabelle mit modelsummary_df()</span></span>
 <span><span class="fu">modelsummary</span><span class="fu">::</span><span class="fu"><a href="https://modelsummary.com/man/datasummary_df.html">datasummary_df</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div id="tbl-ttestsdist" class="cell quarto-float anchored page-columns page-full">
+<div id="tbl-ttestsdist" class="cell quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="quarto-float quarto-float-tbl figure page-columns page-full"><div aria-describedby="tbl-ttestsdist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
  
@@ -2568,13 +2587,13 @@ window.addEventListener('load', function () { styleCell_tinytable_gtsujkfsr04dqv
 </div>
 </div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-ttestsdist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;7.5: Mittelwertdifferenzen in Autodiebstählen und t-Tests
+Tabelle&nbsp;8.5: Mittelwertdifferenzen in Autodiebstählen und t-Tests
 </figcaption></figure>
 </div>
 </div>
-<p><a href="#tbl-ttestsdist" class="quarto-xref">Tabelle&nbsp;<span>7.5</span></a> zeigt eine einschlägige Entwicklung der Differenzen über die Zeit: In den Monaten <em>vor</em> dem Anschlag (und der anschließenden Allokation von Polizeipräsenz) bestehen weder zwischen weit entfernten Blocks und solchen mit einer jüdischen Einrichtung (Spalte E) noch zwischen Blocks ohne eine Einrichtung (Spalten F und G) signifikante unterschiede in der Anzahl der Autodiebstähle. <em>Nach</em> der politischen Intervention ergibt sich ein anderes Bild: In Spalte (E) von <a href="#tbl-ttestsdist" class="quarto-xref">Tabelle&nbsp;<span>7.5</span></a> finden wir signifikante <em>negative</em> Differenzen. Dies ist Evidenz, das die Kriminalität in besonders gut bewachten Blocks (Spalte B in <a href="#tbl-deskstatdistanz" class="quarto-xref">Tabelle&nbsp;<span>7.4</span></a>) in den Folgeperioden des Anschlags geringer war als in Blocks die, mehr als zwei Blocks von einer bewachteten Einrichtung entfernt sind (Spalte A in <a href="#tbl-deskstatdistanz" class="quarto-xref">Tabelle&nbsp;<span>7.4</span></a>). Mit Ausnahme einer Signifikanten Differenz im August 1994 finden wir keine Hinweise auf derartige Unterschiede zwischen Blocks in den Kontrollgruppen (Spalten F und G).</p>
-</section><section id="two-way-fixed-effects-schätzungen" class="level3 page-columns page-full" data-number="7.5.2"><h3 data-number="7.5.2" class="anchored" data-anchor-id="two-way-fixed-effects-schätzungen">
-<span class="header-section-number">7.5.2</span> Two-Way-Fixed-Effects-Schätzungen</h3>
+<p><a href="#tbl-ttestsdist" class="quarto-xref">Tabelle&nbsp;<span>8.5</span></a> zeigt eine einschlägige Entwicklung der Differenzen über die Zeit: In den Monaten <em>vor</em> dem Anschlag (und der anschließenden Allokation von Polizeipräsenz) bestehen weder zwischen weit entfernten Blocks und solchen mit einer jüdischen Einrichtung (Spalte E) noch zwischen Blocks ohne eine Einrichtung (Spalten F und G) signifikante unterschiede in der Anzahl der Autodiebstähle. <em>Nach</em> der politischen Intervention ergibt sich ein anderes Bild: In Spalte (E) von <a href="#tbl-ttestsdist" class="quarto-xref">Tabelle&nbsp;<span>8.5</span></a> finden wir signifikante <em>negative</em> Differenzen. Dies ist Evidenz, das die Kriminalität in besonders gut bewachten Blocks (Spalte B in <a href="#tbl-deskstatdistanz" class="quarto-xref">Tabelle&nbsp;<span>8.4</span></a>) in den Folgeperioden des Anschlags geringer war als in Blocks die, mehr als zwei Blocks von einer bewachteten Einrichtung entfernt sind (Spalte A in <a href="#tbl-deskstatdistanz" class="quarto-xref">Tabelle&nbsp;<span>8.4</span></a>). Mit Ausnahme einer Signifikanten Differenz im August 1994 finden wir keine Hinweise auf derartige Unterschiede zwischen Blocks in den Kontrollgruppen (Spalten F und G).</p>
+</section><section id="two-way-fixed-effects-schätzungen" class="level3 page-columns page-full" data-number="8.5.2"><h3 data-number="8.5.2" class="anchored" data-anchor-id="two-way-fixed-effects-schätzungen">
+<span class="header-section-number">8.5.2</span> Two-Way-Fixed-Effects-Schätzungen</h3>
 <p><span class="citation" data-cites="DiTellaSchargrodsky2004">Di Tella und Schargrodsky (<a href="Literatur.html#ref-DiTellaSchargrodsky2004" role="doc-biblioref">2004</a>)</span> betrachten (Sub-Modelle) der folgenden Regressionsspezifikation für die Schätzung des Effekts von Polizeipräsenz auf die Anzahl der Autodiebstähle.</p>
 <p><span class="math display">\[\begin{align}
   \begin{split}
@@ -2799,10 +2818,9 @@ RMSE: 0.216568     Adj. R2: 0.093304
 <span>  gof_omit <span class="op">=</span> <span class="st">"^(?!(R2|Num.Obs.|FE.*)$).*"</span>, </span>
 <span>  output <span class="op">=</span> <span class="st">"gt"</span></span>
 <span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div id="tbl-ditella3" class="cell quarto-float anchored page-columns page-full">
+<div id="tbl-ditella3" class="cell quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="quarto-float quarto-float-tbl figure page-columns page-full"><div aria-describedby="tbl-ditella3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div>
 <div id="cgulxabkdg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>#cgulxabkdg table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
@@ -3242,6 +3260,15 @@ RMSE: 0.216568     Adj. R2: 0.093304
 #cgulxabkdg .gt_indent_5 {
   text-indent: 25px;
 }
+
+#cgulxabkdg .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#cgulxabkdg div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
 </style>
 <table class="gt_table do-not-create-environment cell table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead><tr class="header gt_col_headings">
@@ -3341,13 +3368,12 @@ RMSE: 0.216568     Adj. R2: 0.093304
 </div>
 </div>
 </div>
-</div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-ditella3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;7.6: Schätzungen des Effekts von Polizeipräsenz auf Autodiebstähle
+Tabelle&nbsp;8.6: Schätzungen des Effekts von Polizeipräsenz auf Autodiebstähle
 </figcaption></figure>
 </div>
 </div>
-<p><a href="#tbl-ditella3" class="quarto-xref">Tabelle&nbsp;<span>7.6</span></a> präsentiert die Ergebnisse. Der Koeffizient von <code>same</code> ist jeweils in den Regressionen (3A), (3B) und (3C) negativ und hoch-signifikant. Die Stärke des geschätzten Effekt (und der Standardfehler) unterscheidet sich kaum zwischen den Modellen. Weiterhin sind die Koeffizienten von <code>oneblock</code> und <code>twoblocks</code> jeweils nicht signifikant von null verschieden. Die Interpretation dieser Ergebnisse ist, dass es einen lokal-beschränkten Effekt der erhöhten Polizeipräsenz auf Autodiebstähle in Blocks mit Polizeischutz gab: Die Polizeipräsenz verringerte die durchschnittliche Anzahl der Diebstähle in diesen Blocks um etwa <span class="math inline">\(.08\)</span> Diebstähle pro Monat.</p>
+<p><a href="#tbl-ditella3" class="quarto-xref">Tabelle&nbsp;<span>8.6</span></a> präsentiert die Ergebnisse. Der Koeffizient von <code>same</code> ist jeweils in den Regressionen (3A), (3B) und (3C) negativ und hoch-signifikant. Die Stärke des geschätzten Effekt (und der Standardfehler) unterscheidet sich kaum zwischen den Modellen. Weiterhin sind die Koeffizienten von <code>oneblock</code> und <code>twoblocks</code> jeweils nicht signifikant von null verschieden. Die Interpretation dieser Ergebnisse ist, dass es einen lokal-beschränkten Effekt der erhöhten Polizeipräsenz auf Autodiebstähle in Blocks mit Polizeischutz gab: Die Polizeipräsenz verringerte die durchschnittliche Anzahl der Diebstähle in diesen Blocks um etwa <span class="math inline">\(.08\)</span> Diebstähle pro Monat.</p>
 <p>Die Ergebnisse für die Modelle (3D) und (3E) zeigen ebenfalls signifikante negative Effekte des Polizeischutz anhand von Querschnitts- und Zeitreihenvariation und untermauern damit die Robustheit des gewählten Forschungsdesigns.</p>
 <p>Zur besseren Interpretation des geschätzten Effekt in Modell (C) vergleichen wir mit der durchschnittlichen Anzahl der Diebstähle pro Monat in der Kontrollgruppe (Blocks mit einer Entfernung von mehr als zwei Blocks zum nächsten geschützten Block) für den Zeitraum von August 1994 bis Dezember 1994:<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a></p>
 <div class="no-row-height column-margin column-container"><div id="fn7"><p><sup>7</sup>&nbsp;Wir berechnen also <span class="math inline">\(\widehat{\alpha}_0 / \overline{\text{Diebstahlrate}} \cdot 100\)</span>.</p></div></div><div class="cell">
@@ -3376,9 +3402,9 @@ Tabelle&nbsp;7.6: Schätzungen des Effekts von Polizeipräsenz auf Autodiebstäh
 </div>
 </div>
 <p>Die Rechnung zeigt, dass es in dem betrachten Zeitraum durch die Behandlung mit zusätzlicher Polizeipräsenz zu einem Rückgang der Anzahl an Autodiebstählen um durchschnittlich <span class="math inline">\(75\%\)</span> in Blocks mit jüdischen Einrichtungen kam.</p>
-</section><section id="placebo-tests" class="level3 page-columns page-full" data-number="7.5.3"><h3 data-number="7.5.3" class="anchored" data-anchor-id="placebo-tests">
-<span class="header-section-number">7.5.3</span> Placebo-Tests</h3>
-<p>Placebo-Tests sind nützlich, um zu überprüfen, ob der geschätzte Zusammenhang zwischen der Erhöhung der Polizeipräsenz und der Verringerung der Kriminalität tatsächlich kausal ist oder ob andere Faktoren eine Rolle spielen. Ein möglicher Einfluss könnte beispielsweise durch zufällige temporäre Schwankungen in den Kriminalitätsraten entstehen. <span class="citation" data-cites="DiTellaSchargrodsky2004">Di Tella und Schargrodsky (<a href="Literatur.html#ref-DiTellaSchargrodsky2004" role="doc-biblioref">2004</a>)</span> wiederholen hierzu die Analyse anhand der Spezifikationen (3A), (3B) und (3C) für fiktive Interventionszeitpunkte <em>vor dem Anschlag</em>. Hierbei werden Ende April (4A), Ende Mai (4B) und Ende Juni (4C) als fiktive Zeitpunkte für die Placebo-Behandlung gewählt. Wenn diese Placebo-Tests ähnliche Ergebnisse (signifikante negative Schätzungen) wie die ursprüngliche Untersuchung liefern, könnte dies darauf hindeuten, dass die in <a href="#tbl-ditella3" class="quarto-xref">Tabelle&nbsp;<span>7.6</span></a> geschätzten Effekte nicht kausal sind.</p>
+</section><section id="placebo-tests" class="level3 page-columns page-full" data-number="8.5.3"><h3 data-number="8.5.3" class="anchored" data-anchor-id="placebo-tests">
+<span class="header-section-number">8.5.3</span> Placebo-Tests</h3>
+<p>Placebo-Tests sind nützlich, um zu überprüfen, ob der geschätzte Zusammenhang zwischen der Erhöhung der Polizeipräsenz und der Verringerung der Kriminalität tatsächlich kausal ist oder ob andere Faktoren eine Rolle spielen. Ein möglicher Einfluss könnte beispielsweise durch zufällige temporäre Schwankungen in den Kriminalitätsraten entstehen. <span class="citation" data-cites="DiTellaSchargrodsky2004">Di Tella und Schargrodsky (<a href="Literatur.html#ref-DiTellaSchargrodsky2004" role="doc-biblioref">2004</a>)</span> wiederholen hierzu die Analyse anhand der Spezifikationen (3A), (3B) und (3C) für fiktive Interventionszeitpunkte <em>vor dem Anschlag</em>. Hierbei werden Ende April (4A), Ende Mai (4B) und Ende Juni (4C) als fiktive Zeitpunkte für die Placebo-Behandlung gewählt. Wenn diese Placebo-Tests ähnliche Ergebnisse (signifikante negative Schätzungen) wie die ursprüngliche Untersuchung liefern, könnte dies darauf hindeuten, dass die in <a href="#tbl-ditella3" class="quarto-xref">Tabelle&nbsp;<span>8.6</span></a> geschätzten Effekte nicht kausal sind.</p>
 <p>Wir replizieren diese Ergebnisse, indem wir die Schätzungen von (3A), (3B) und (3C) mit entsprechender Definition des Behandlungsindikators (<code>group</code>) jeweils für modifizierte Datensätze mit sämtlichen <span class="math inline">\(3504\)</span> Beobachtungen vor dem Anschlag (<code>filter(monat &lt;= "Juli (1 - 17)")</code>) wiederholen.</p>
 <div class="cell">
 <div class="sourceCode" id="cb74"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># (4A)</span></span>
@@ -3500,10 +3526,9 @@ RMSE: 0.182841     Adj. R2: 0.09205
 <span>  notes <span class="op">=</span> <span class="st">"Fiktive Interventionen: (4A) Ende April. (4B): Ende Mai. (4C): Ende Juni."</span>,</span>
 <span>  output <span class="op">=</span> <span class="st">"gt"</span></span>
 <span><span class="op">)</span> </span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div id="tbl-placebopp" class="cell quarto-float anchored page-columns page-full">
+<div id="tbl-placebopp" class="cell quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="quarto-float quarto-float-tbl figure page-columns page-full"><div aria-describedby="tbl-placebopp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div>
 <div id="oqqaeuvoup" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>#oqqaeuvoup table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
@@ -3943,6 +3968,15 @@ RMSE: 0.182841     Adj. R2: 0.09205
 #oqqaeuvoup .gt_indent_5 {
   text-indent: 25px;
 }
+
+#oqqaeuvoup .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#oqqaeuvoup div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
 </style>
 <table class="gt_table do-not-create-environment cell table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead><tr class="header gt_col_headings">
@@ -4025,16 +4059,15 @@ RMSE: 0.182841     Adj. R2: 0.09205
 </div>
 </div>
 </div>
-</div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-placebopp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;7.7: Placebo-Tests für fiktive Anschlagszeitpunkte bis Ende Juni
+Tabelle&nbsp;8.7: Placebo-Tests für fiktive Anschlagszeitpunkte bis Ende Juni
 </figcaption></figure>
 </div>
 </div>
-<p>Die Ergebnisse in <a href="#tbl-placebopp" class="quarto-xref">Tabelle&nbsp;<span>7.7</span></a> stützen die kausale Interpretation der Regressionen in <a href="#tbl-ditella3" class="quarto-xref">Tabelle&nbsp;<span>7.6</span></a>: Für keinen der fiktiven Zeitpunkte einer Intervention vor dem tatsächlichen Anschlag im Juli 1994 finden wir signifikante Unterschiede in der beobachteten Diebstahlrate zwischen Blocks mit einer jüdischen Einrichtung und solchen ohne.</p>
-</section><section id="weitere-robustness-checks" class="level3 page-columns page-full" data-number="7.5.4"><h3 data-number="7.5.4" class="anchored" data-anchor-id="weitere-robustness-checks">
-<span class="header-section-number">7.5.4</span> Weitere Robustness-Checks</h3>
-<p><span class="citation" data-cites="DiTellaSchargrodsky2004">Di Tella und Schargrodsky (<a href="Literatur.html#ref-DiTellaSchargrodsky2004" role="doc-biblioref">2004</a>)</span> betrachten weitere Robustness-Checks. Die Autoren merken zunächst an, dass (positive) Korrelation innerhalb der Block-spezifischen Fehlerterme über die Zeit (und zwischen den Blocks eines Viertels) zu einer Unterschätzung der Unsicherheit der Treatment-Effekt-Schätzer in den DID-Regressionen mit herkömmlichen Standardfehler-Formeln führen kann. In DID-Designs kann dieses Problem durch die Korrelation der Behandlung über die Zeit noch verstärkt werden. Daher werden alternative Spezifikationen betrachtet, um die Robustheit der Interenzstatistiken in <a href="#tbl-ditella3" class="quarto-xref">Tabelle&nbsp;<span>7.6</span></a> hinsichtlich Korrelation in den Fehlerterme zu überprüfen. Dies geschieht in den Regressionen (T5A) bis (T5C). Weitere Modelle kontrollieren für Stadtviertel-spezifische Effekte (T5D), verwenden eine um Blocks ohne gemeldete Diebstähle reduzierten Datensatz (T5E) und nutzen eine Poisson-Spezifikation. Wir fassen diese Ansätze kurz zusammen:</p>
+<p>Die Ergebnisse in <a href="#tbl-placebopp" class="quarto-xref">Tabelle&nbsp;<span>8.7</span></a> stützen die kausale Interpretation der Regressionen in <a href="#tbl-ditella3" class="quarto-xref">Tabelle&nbsp;<span>8.6</span></a>: Für keinen der fiktiven Zeitpunkte einer Intervention vor dem tatsächlichen Anschlag im Juli 1994 finden wir signifikante Unterschiede in der beobachteten Diebstahlrate zwischen Blocks mit einer jüdischen Einrichtung und solchen ohne.</p>
+</section><section id="weitere-robustness-checks" class="level3 page-columns page-full" data-number="8.5.4"><h3 data-number="8.5.4" class="anchored" data-anchor-id="weitere-robustness-checks">
+<span class="header-section-number">8.5.4</span> Weitere Robustness-Checks</h3>
+<p><span class="citation" data-cites="DiTellaSchargrodsky2004">Di Tella und Schargrodsky (<a href="Literatur.html#ref-DiTellaSchargrodsky2004" role="doc-biblioref">2004</a>)</span> betrachten weitere Robustness-Checks. Die Autoren merken zunächst an, dass (positive) Korrelation innerhalb der Block-spezifischen Fehlerterme über die Zeit (und zwischen den Blocks eines Viertels) zu einer Unterschätzung der Unsicherheit der Treatment-Effekt-Schätzer in den DID-Regressionen mit herkömmlichen Standardfehler-Formeln führen kann. In DID-Designs kann dieses Problem durch die Korrelation der Behandlung über die Zeit noch verstärkt werden. Daher werden alternative Spezifikationen betrachtet, um die Robustheit der Interenzstatistiken in <a href="#tbl-ditella3" class="quarto-xref">Tabelle&nbsp;<span>8.6</span></a> hinsichtlich Korrelation in den Fehlerterme zu überprüfen. Dies geschieht in den Regressionen (T5A) bis (T5C). Weitere Modelle kontrollieren für Stadtviertel-spezifische Effekte (T5D), verwenden eine um Blocks ohne gemeldete Diebstähle reduzierten Datensatz (T5E) und nutzen eine Poisson-Spezifikation. Wir fassen diese Ansätze kurz zusammen:</p>
 <ul>
 <li><p>Regression (T5A): Entfernen der Zeitvariation von <span class="math inline">\(\textit{totrob}_{i,t}\)</span> <em>innerhalb</em> der Blocks durch Verwendung von Durchschnittswerten für die Monate vor und nach dem Anschlag. Regression dieser Durchschnittswerte auf die Behandlungsvariablen, wie in <span class="math inline">\(\eqref{eq:ppbaseC}\)</span>.</p></li>
 <li><p>Regression (T5B): Schätzung der Spezifikation <span class="math inline">\(\eqref{eq:ppbaseC}\)</span> und Berechnung von Inferenzstatistiken mit cluster-robusten Standardfehlern (Clustering auf Block-Ebene).</p></li>
@@ -4068,7 +4101,7 @@ Tabelle&nbsp;7.7: Placebo-Tests für fiktive Anschlagszeitpunkte bis Ende Juni
 <span>  <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Die Spezifikationen (T5A) bis (T5E) implementieren wir wie zuvor mit <code><a href="https://lrberge.github.io/fixest/reference/feols.html">fixest::feols()</a></code> unter Anpassung des Datensatzes, sofern relevant. Für cluster-robuste Standardfehler kann das Argument <code>vcov = ~ cluster</code> gesetzt werden, wobei <code>cluster</code> zu verwendende Ebene ist. Die Poisson-Spezifikation <span class="math inline">\(\eqref{eq:pppois}\)</span> in (T5F) schätzen wir mit <code><a href="https://lrberge.github.io/fixest/reference/feglm.html">fixest::feglm()</a></code>.<a href="#fn8" class="footnote-ref" id="fnref8" role="doc-noteref"><sup>8</sup></a></p>
-<div class="no-row-height column-margin column-container"><div id="fn8"><p><sup>8</sup>&nbsp;Der R-Befehl hierfür ist ähnlich wie für die Probit-Regressionen in <a href="#sec-eitc-probit" class="quarto-xref"><span>Kapitel 7.4.2</span></a>.</p></div></div><div class="cell">
+<div class="no-row-height column-margin column-container"><div id="fn8"><p><sup>8</sup>&nbsp;Der R-Befehl hierfür ist ähnlich wie für die Probit-Regressionen in <a href="#sec-eitc-probit" class="quarto-xref"><span>Kapitel 8.4.2</span></a>.</p></div></div><div class="cell">
 <div class="sourceCode" id="cb82"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># (5A)</span></span>
 <span><span class="op">(</span></span>
 <span>  <span class="va">T5A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://lrberge.github.io/fixest/reference/feols.html">feols</a></span><span class="op">(</span></span>
@@ -4256,10 +4289,9 @@ Log-Likelihood: -1,902.7   Adj. Pseudo R2: -0.193316
 <span>  vcov <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"HC1"</span>, <span class="op">~</span><span class="va">observ</span>, <span class="op">~</span><span class="va">mbc</span>, <span class="st">"HC1"</span>, <span class="st">"HC1"</span>, <span class="st">"HC1"</span><span class="op">)</span>,  </span>
 <span>  output <span class="op">=</span> <span class="st">"gt"</span></span>
 <span><span class="op">)</span> </span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div id="tbl-pprobust" class="cell quarto-float anchored page-columns page-full">
+<div id="tbl-pprobust" class="cell quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="quarto-float quarto-float-tbl figure page-columns page-full"><div aria-describedby="tbl-pprobust-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div>
 <div id="mfxsbruobs" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>#mfxsbruobs table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
@@ -4699,6 +4731,15 @@ Log-Likelihood: -1,902.7   Adj. Pseudo R2: -0.193316
 #mfxsbruobs .gt_indent_5 {
   text-indent: 25px;
 }
+
+#mfxsbruobs .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#mfxsbruobs div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
 </style>
 <table class="gt_table do-not-create-environment cell table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead><tr class="header gt_col_headings">
@@ -4827,20 +4868,19 @@ Log-Likelihood: -1,902.7   Adj. Pseudo R2: -0.193316
 </div>
 </div>
 </div>
-</div>
 <figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-tbl margin-caption" id="tbl-pprobust-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Tabelle&nbsp;7.8: Weitere Robustness-Checks
+Tabelle&nbsp;8.8: Weitere Robustness-Checks
 </figcaption></figure>
 </div>
 </div>
-<p>Anhand von <a href="#tbl-pprobust" class="quarto-xref">Tabelle&nbsp;<span>7.8</span></a> finden wir weitere Evidenz für die Robustheit der DID-Schätzung (T3C) in <a href="#tbl-ditella3" class="quarto-xref">Tabelle&nbsp;<span>7.6</span></a>:</p>
+<p>Anhand von <a href="#tbl-pprobust" class="quarto-xref">Tabelle&nbsp;<span>8.8</span></a> finden wir weitere Evidenz für die Robustheit der DID-Schätzung (T3C) in <a href="#tbl-ditella3" class="quarto-xref">Tabelle&nbsp;<span>8.6</span></a>:</p>
 <ul>
 <li><p>Die Schlussfolgerungen anhand der Inferenzstatistiken sind nicht sensibel gegenüber den unterschiedlichen Spezifikationen für die Berechnung der Standardfehler in (T5A) bis (T5C).</p></li>
 <li><p>Die Alternative Spezifikation von Fixed Effects für Kombination von Stadtviertel und Monat (<code>mbc</code>) in (T5D) beeinflusst den Koeffizientenschätzer von <code>same</code> nur marginal. Auch hier ist der geschätzte ATT signifikant.</p></li>
 <li><p>Wie erwartet führt die Verkleinerung der Kontrollgruppe auf Blocks mit gemeldeten Diebstählen in (T5E) zu einer größeren Schätzung des Effekts. Der Effekt bleibt signifikant.</p></li>
-<li><p>In der Poisson-Regression in (T5F) finden wir ebenfalls einen signifikanten Effekt von <code>same</code>. Beachte das dieser Koeffizient den <em>multiplikativen</em> Einfluss von Polizeipräsenz auf die Inzidenzrate (durchschnittliche Anzahl an Diebstählen pro Monat pro Block) angibt. Die Interpretation des Schätzwerts von etwa <span class="math inline">\(0.3\)</span> bedeutet also eine <em>Reduktion</em> der Inzidenz um eta <span class="math inline">\(70\%\)</span> in Blocks mit erhöhter Polizeipräsenz gegenüber der Kontrollgruppe (Blocks mit mehr als zwei Blocks Entfernung zur nächsten jüdischen Einrichtung). Diese Schätzung stimmt also gut überein mit unserer Interpretation der Ergebnisse in <a href="#tbl-ditella3" class="quarto-xref">Tabelle&nbsp;<span>7.6</span></a>.</p></li>
-</ul></section></section><section id="zusammenfassung" class="level2" data-number="7.6"><h2 data-number="7.6" class="anchored" data-anchor-id="zusammenfassung">
-<span class="header-section-number">7.6</span> Zusammenfassung</h2>
+<li><p>In der Poisson-Regression in (T5F) finden wir ebenfalls einen signifikanten Effekt von <code>same</code>. Beachte das dieser Koeffizient den <em>multiplikativen</em> Einfluss von Polizeipräsenz auf die Inzidenzrate (durchschnittliche Anzahl an Diebstählen pro Monat pro Block) angibt. Die Interpretation des Schätzwerts von etwa <span class="math inline">\(0.3\)</span> bedeutet also eine <em>Reduktion</em> der Inzidenz um eta <span class="math inline">\(70\%\)</span> in Blocks mit erhöhter Polizeipräsenz gegenüber der Kontrollgruppe (Blocks mit mehr als zwei Blocks Entfernung zur nächsten jüdischen Einrichtung). Diese Schätzung stimmt also gut überein mit unserer Interpretation der Ergebnisse in <a href="#tbl-ditella3" class="quarto-xref">Tabelle&nbsp;<span>8.6</span></a>.</p></li>
+</ul></section></section><section id="zusammenfassung" class="level2" data-number="8.6"><h2 data-number="8.6" class="anchored" data-anchor-id="zusammenfassung">
+<span class="header-section-number">8.6</span> Zusammenfassung</h2>
 <p>Der DID-Schätzer liefert uns eine Schätzung des ATT, indem er die Veränderung der Ergebnisse in der Behandlungsgruppe vor und nach der Intervention mit der entsprechenden Veränderung in der Kontrollgruppe vergleicht. Die Annahme paralleler Trends ist entscheidend: Nur wenn diese Annahme gilt, können wir sicher sein, dass die Differenz in den Differenzen tatsächlich den kausalen Effekt der Behandlung widerspiegelt und nicht durch andere zeitgleiche Faktoren beeinflusst wird.</p>
 <p>Zusammenfassend bietet der DID-Ansatz im Potential Outcomes Framework eine robuste Methode zur Schätzung kausaler Effekte, insbesondere wenn randomisierte Experimente nicht durchführbar sind. Durch den Vergleich von Zeitverläufen in Behandlungs- und Kontrollgruppen unter der Annahme paralleler Trends können wir verlässliche Schätzungen des ATT gewinnen.</p>
 
@@ -4899,18 +4939,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -4942,7 +4971,29 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
   const viewSource = window.document.getElementById('quarto-view-source') ||
                      window.document.getElementById('quarto-code-tools-source');
   if (viewSource) {
@@ -5001,7 +5052,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -5325,12 +5376,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script><nav class="page-navigation"><div class="nav-page nav-page-previous">
       <a href="./IV.html" class="pagination-link" aria-label="IV-Regression">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">IV-Regression</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">IV-Regression</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./EventStudies.html" class="pagination-link" aria-label="Event Studies">
-        <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Event Studies</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Event Studies</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Quellcode</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
@@ -6896,7 +6947,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb95-1650"><a href="#cb95-1650" aria-hidden="true" tabindex="-1"></a>Der DID-Schätzer liefert uns eine Schätzung des ATT, indem er die Veränderung der Ergebnisse in der Behandlungsgruppe vor und nach der Intervention mit der entsprechenden Veränderung in der Kontrollgruppe vergleicht. Die Annahme paralleler Trends ist entscheidend: Nur wenn diese Annahme gilt, können wir sicher sein, dass die Differenz in den Differenzen tatsächlich den kausalen Effekt der Behandlung widerspiegelt und nicht durch andere zeitgleiche Faktoren beeinflusst wird.</span>
 <span id="cb95-1651"><a href="#cb95-1651" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb95-1652"><a href="#cb95-1652" aria-hidden="true" tabindex="-1"></a>Zusammenfassend bietet der DID-Ansatz im Potential Outcomes Framework eine robuste Methode zur Schätzung kausaler Effekte, insbesondere wenn randomisierte Experimente nicht durchführbar sind. Durch den Vergleich von Zeitverläufen in Behandlungs- und Kontrollgruppen unter der Annahme paralleler Trends können wir verlässliche Schätzungen des ATT gewinnen.</span>
-</code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</code><button title="In die Zwischenablage kopieren" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 
