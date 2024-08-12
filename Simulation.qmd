@@ -264,7 +264,7 @@ tibble(est = sim_est) %>%
             mean = 50, 
             sd = 12/sqrt(n)
         ), 
-        color = "purple",
+        color = "red",
         lty = 2
     ) +
     theme_cowplot()
@@ -977,21 +977,7 @@ mean(sim_res_het$se)
 mean(sim_res_het$se_rob)
 ```
 
-Die quantitative Auswertung der Ergebnisse deuten darauf hin, dass der nur bei Homoskedastie gültige Standardfehler die Standardabweichung von $\widehat{\beta}_1$ deutlich unterschätzt. Der anhand der Simulationsergebnisse geschätzte Erwartungswert des robusten Standardfehlers hingegen liegt nahe bei der Standardabweichung der simulierten Stichprobenverteilung von $\widehat{\beta}_1$.
-
-```{webr-r}
-ggplot(data = sim_res_het) +
-    geom_density(mapping = aes(x = beta, linetype = "KQ")) +
-    geom_density(mapping = aes(x = beta_wkq, linetype = "WKQ")) +
-    scale_linetype_manual(
-        "Schätzer",
-        values = c("KQ" = "solid", 
-                   "WKQ" = "dashed")
-    ) +
-    theme_cowplot() +
-    theme(legend.position = "top")
-```
-
+Die quantitative Auswertung der Ergebnisse deuten darauf hin, dass der nur bei Homoskedastie gültige Standardfehler die Standardabweichung von $\widehat{\beta}_1$ deutlich unterschätzt. Der anhand der Simulationsergebnisse geschätzte Erwartungswert des robusten Standardfehlers hingegen liegt nahe bei der Standardabweichung der simulierten Stichprobenverteilung von $\widehat{\beta}_1$. Die Tendenz des nur bei Homoskedastie gültigen Standardfehlers, kleinere Schätzungen der Unsicherheit von $\widehat{\beta}_1$ zu liefern, können wir anhand der geschätzten Dichtefunktionen für `se` und `se_rob` grafisch zeigen.
 
 ```{webr-r}
 #| autorun: true
@@ -1004,12 +990,13 @@ ggplot(data = sim_res_het) +
                "Robust" = "dashed")
   ) +
   theme_cowplot() +
+  labs(title = "Standardfehler bei Heteroskedastizität") +
   theme(legend.position = "top")
 ```
 
-Eine Konsequenz falscher Standardfehler kann eine Verletzung der nominalen $\alpha$-Fehlerrate in Signifikanztests sein: Der Hypothesentest lehnt eine korrekte Nullhypothese mit einer geringeren oder höheren Fehlerwahrscheinlichkeit (das Signifikanzniveau $\alpha$) als gewünscht ab. 
+Als Konsequenz falscher Standardfehler die nominale $\alpha$-Fehlerrate von Signifikanztests verletzt sein: Der Hypothesentest lehnt dann eine korrekte Nullhypothese mit einer geringeren oder höheren Fehlerwahrscheinlichkeit (das nominale Signifikanzniveau $\alpha$) als gewünscht ab. 
 
-Inwiefern die für die Simulation gewählte Form von Heteroskedastizität die $\alpha$-Fehlerrate eines t-Tests beeinflusst, können wir anhand der Ergebnisse schätzen: Wir berechnen die Ablehnrate für t-Tests der (wahren) Null-Hypothese $H_0:\beta_1=0$ zum 5\%-Niveau jeweils für robuste und nicht-robuste Standardfehler und vergleichen.
+Inwiefern die in der Simulation gewählte Form von Heteroskedastizität die $\alpha$-Fehlerrate eines t-Tests beeinflusst, können wir anhand der Simulationsergebnisse schätzen: Wir berechnen die Ablehnrate für t-Tests der (wahren) Null-Hypothese $H_0:\beta_1=0$ zum 5\%-Niveau jeweils für robuste und nicht-robuste Standardfehler und vergleichen. Wir vergleichen die so berechneten Test-Statistiken mit dem entsprechenden kritischen Wert der t-Verteilung mit $n-1$ Freiheitsgraden.
 
 
 ```{webr-r}
@@ -1030,38 +1017,67 @@ Die Simulationsergebnisse deuten darauf hin, dass ein Fehler erster Art für den
 
 ## Der Bootstrap
 
-1. **Stichproben mit Zurücklegen ziehen**: Ziehe wiederholt ($B$ mal) Stichproben der Größe $N$ (Größe der ursprünglichen Stichprobe) mit Zurücklegen aus den Originaldaten.
+In den zuvor diskutierten Simulationsstudien haben wir iterativ Stichproben basierend auf einem bekannten DGP generiert, um die Eigenschaften der Stichprobenverteilung eines Schätzers (für bestimmte Parameterwerte) zu untersuchen. Der Bootstrap [@Efron1979] ist eine Methode zur Approximation der unbekannten Stichprobenverteilung eines Schätzers. Hierfür werden aus einer vorhandenen Stichprobe viele zufällige Stichproben mit Zurücklegen gezogen.^[Diese Vorgehensweise wird auch als *resampling* bezeichnet.] Bootstrapping approximiert die Verteilung eines Schätzers aus beobachteten Datenpunkten und *ohne Kenntnis des wahren DGP*. Der Bootstrap ist daher eine Simulationsmethode, die in empirischen Anwendungen für die Schätzung einer unbekannten Stichprobenverteilungen verwendet werden kann. Bootstrapping ist hilfreich, wenn die beobachtete Stichprobe klein oder untypisch ist, was dazu führen kann, dass herkömmliche Inferenzmethoden für Behandlungseffekte nicht zuverlässig anwendbar oder ungültig sind. Insbesondere wenn Modellannahmen verletzt sind wird bootstrapping häufig in empirischen Studien eingesetzt, um Konfidenzintervalle, Standardfehler oder p-Werte für Hypothesentests zu berechnen. 
+
+Wir fassen wesentliche Eigenschaften des Bootstraps und die grundsätzliche Vorgehensweise zusammen.
+
+::: callout-note
+#### Key Facts zum Bootstrap
+
+- Der Bootstrap ist eine statistische Methode, die durch wiederholtes Ziehen von Stichproben mit Zurücklegen aus einer beobachteten Stichprobe die Verteilung eines Schätzers approximiert. 
+
+- Bootstrap ermöglicht die Berechnung gültiger Inferenzstatistiken, ohne starke Annahmen über den zugrundeliegenden DGP zu treffen.
+
+- Bootstrapping wird häufig genutzt, um die Unsicherheit eines Schätzers zu ermitteln. Dies ist insbesondere dann hilfreich, wenn keine analytische Darstellung für die Verteilung eines Schätzers existiert oder "starke" Verteilungsannahmen (z.B. Normalverteilung) unplausibel sind.
+
+- Ein Bootstrap-Schätzer ist im Allgemeinen *nicht erwartungstreu* für den interessierenden Effekt, selbst wenn ein erwartungstreuer Schätzer verwendet wird. Bootstrap-Schätzer sind jedoch in vielen Fällen unter schwachen Annahmen *konsistent* für den wahren Parameter.
+
+**Vorgehensweise**
+
+1. **Stichproben mit Zurücklegen ziehen**: Ziehe wiederholt ($B$ mal) Stichproben der Größe $N$ (Größe der ursprünglichen Stichprobe) mit Zurücklegen aus der originalen Stichprobe.
 
 2. **Parameterschätzung für jede Bootstrap-Stichprobe**: Wende die Schätzfunktion $\widehat{\beta}$ auf jede der $B$ Bootstrap-Stichproben an und erhalte $B$ Bootstrap-Schätzwerte $\widehat{\beta}^1,\dots,\widehat{\beta}^B$ des interessierenden Koeffizienten $\beta$.
 
-3. **Verteilungsparameter Schätzen**: Anhand der $B$ Bootstrap-Schätzungen aus Schritt 2 können die Eigenschften der Verteilung des Schätzers $\widehat{\beta}$ oder Funktionen davon geschätzt werden:
+3. **Verteilungsparameter Schätzen**: Anhand der $B$ Bootstrap-Schätzungen aus Schritt 2 können die Eigenschaften der Verteilung des Schätzers $\widehat{\beta}$ oder für Funktionen von $\widehat{\beta}$  geschätzt werden:
 
-    - Das arithmetische Mittel der $B$ Bootstrap-Schätzungen ist ein Schätzer des Erwartungswerts von $\widehat{\beta}$ 
-    - Der Standardfehler des Schätzers kann durch die Standardabweichung der $B$ Bootstrap-Schätzungen geschätzt werden
-    - Ein 95\%-Bootstrap-Konfidenzintervall kann mit den 2.5\%- und 97.5\%-Perzentilen berechnet werden werden
+    - Das arithmetische Mittel der $B$ Bootstrap-Schätzungen ist ein konsistenter Schätzer des Erwartungswerts von $\widehat{\beta}$ 
+    - Der Standardfehler des Schätzers $\widehat{\beta}$ kann durch die Standardabweichung der $B$ Bootstrap-Schätzungen approximiert werden
+    - Ein $1-\alpha\%$-Bootstrap-Konfidenzintervall für $\beta_1$ kann anhand des $\alpha/2\%$- und des $1-\alpha/2\%$-Perzentils der Bootstrap-Verteilung approximiert werden
+
+:::
+
+Der nächste Abschnitt diskutiert Bootstrapping der Stichprobenverteilung von $\overline{X}$ anhand des Beispiels aus @sec-simspv.
 
 ### Interaktive Visualisierung des Bootstraps
 
-Die nachfolgende interaktive Visualisierung illustriert die Vorgehensweise des oben beschriebenen Bootstrap-Algorithmus für die Schätzung eines 95\%-Konfidenzintervalls für den Erwartungswert einer normalen <span style="color: purple;">Verteilung</span> basierend auf einer <span style="color: red;">Stichprobe</span>, wenn das arithmetische Mittel als Schätzer verwendet wird. Diese <span style="color: purple;">Pupulationsverteilung</span> ist $N(\mu = 50, \sigma^2 = 12^2)$. In jeder Iteration des Bootstraps wird eine <span style="color: orange;">Bootstrap-Stichprobe</span> mit Zurücklegen aus der originalen <span style="color: red;">Stichprobe</span> gezogen. Für jede <span style="color: orange;">Bootstrap-Stichprobe</span> berechnen wird das <span style="color: darkgreen;">Arithmetische Mittel (grüne Punkte)</span>. Für hinreichend viele <span style="color: darkgreen;">Bootstrap-Schätzungen</span> erhalten wir eine <span style="color: darkgreen;">Bootstrap-Verteilung</span> unseres Schätzers.^[Die Grüne Linie zeigt eine Kerndichte-Schätzung der Bootstrap-Verteilung. Die Bandweite dieser Schätzung kann in der Applikation variiert werden.] Basierend auf dieser Verteilung erhalten wir eine Bootstrap-Schätzung des Erwartungswerts (schwarzer Punkt) und ein 95\%-Konfidenzintervall (schwarze Linie).
+Die nachfolgende interaktive Visualisierung illustriert die Vorgehensweise des oben beschriebenen Bootstrap-Algorithmus für die Schätzung eines $95\%$-Konfidenzintervalls für den Erwartungswert einer normalen <span style="color: purple;">Verteilung</span> basierend auf einer <span style="color: red;">Stichprobe</span>, wenn das arithmetische Mittel als Schätzer verwendet wird. Diese <span style="color: purple;">Pupulationsverteilung</span> ist $N(\mu = 50, \sigma^2 = 12^2)$. In jeder Iteration des Bootstraps wird eine <span style="color: orange;">Bootstrap-Stichprobe</span> mit Zurücklegen aus der originalen <span style="color: red;">Stichprobe</span> gezogen. Für jede <span style="color: orange;">Bootstrap-Stichprobe</span> berechnen wir das <span style="color: darkgreen;">Arithmetische Mittel (grüne Punkte)</span>. Für hinreichend viele <span style="color: darkgreen;">Bootstrap-Schätzungen</span> erhalten wir eine repräsentative <span style="color: darkgreen;">Bootstrap-Verteilung</span> unseres Schätzers.^[Die Grüne Linie zeigt eine Kerndichte-Schätzung der Bootstrap-Verteilung. Die Bandweite dieser Schätzung kann in der Applikation variiert werden.] Basierend auf dieser Verteilung berechnen wir eine <span style="color: black;">Bootstrap-Schätzung des Erwartungswerts</span> $\mu$ (schwarzer Punkt) und ein <span style="color: black;">$95\%$-Konfidenzintervall</span> (schwarze Linie).
 
-In der interaktiven Grafik können wir insbesondere folgende Eigenschaften des Bootstrap-Verfahrens verifizieren:
-
-- Größere <span style="color: red;">Stichproben</span> verringern die Unsicherheit des interessierenden Schätzers, sodass die Varianz seiner Verteilung nimmt mit der Stichprobengröße abnimmt. Da der Bootstrap die Verteilung des Schätzers approximiert, spiegelt sich diese Eigenschaft auch in der <span style="color: darkgreen;">Bootstrap-Verteilung</span>.
+In der interaktiven Grafik können wir insbesondere folgende Eigenschaften des Bootstrap-Verfahrens überprüfen:
 
 - Die <span style="color: purple;">Populationsverteilung</span> ist normal. Daher ist auch die Stichproben-Verteilung des arithmetischen Mittels für *jede* Stichprobengröße normal. Die Illustration zeigt, dass die <span style="color: darkgreen;">Bootstrap-Verteilung</span> diese normale Verteilung des Schätzers (die typische Glockenform) tatsächlich gut approximieren kann, wenn $B$ hinreichend groß gewählt wird.
+
+- Der Bootstrap-Schätzer von $\mu$ ist nicht erwartungstreu für $\mu$, da wir mit Zurückziehen aus einer <span style="color: red;">Stichprobe</span> ziehen und so die zentrale Tendenz in den beobachteten Daten reproduzieren. Diese Verzerrung verringert sich mit der Größe der <span style="color: red;">originalen Stichprobe</span>. 
+
+- Größere <span style="color: red;">Stichproben</span> verringern die Unsicherheit des interessierenden Schätzers $\overline{X}$: Die Varianz der Stichprobenverteilung von $\overline{X}$ nimmt mit der Stichprobengröße ab. Da der Bootstrap die Verteilung von $\overline{X}$ approximiert, spiegelt sich diese Eigenschaft auch in der <span style="color: darkgreen;">Bootstrap-Verteilung</span>.
 
 <iframe class="obs-soft-box-shadow" width="100%" height="668" frameborder="0" src="https://observablehq.com/embed/62d24833f3dbd27a?cells=svg%2Cviewof+B%2Cviewof+BW%2Cviewof+speed%2Cviewof+n">
 </iframe>
 
 ### Bootstrap-Schätzung mit R
 
+Mit dem R-Paket `boot` kann Bootstrapping komfortabel für eine durch den Anwender definierte Schätzfunktion durchgeführt werden. Diese Funktion (`boot_fun` im nachfolgenden Code-Beispiel) muss den Schätzer unter Angabe einer Indexmenge für die beobachteten Daten berechnen und zurückgeben.^[`boot::boot()` zieht in jeder Bootstrap-Iteration mit Zurücklegen aus der Indexmenge der originalen Stichprobe, um die Bootstrap-Stichprobe festzulegen.] 
+
+Der nächste Code-Chunk zeigt, wie `boot::boot()` angewendet werden kann, um den Bootstrap von @Efron1979 für $\overline{X}$ anhand einer Stichprobe mit $n=250$ aus der in @sec-simspv betrachteten $N(\mu = 50, \sigma^2 = 12^2)$-Populationsverteilung für $B=999$ Iterationen zu berechnen.
+
 ```{webr-r}
 #| autorun: true
 library(boot)
-set.seed(4321)
 
-n <- 200
-B <- 1000
+set.seed(1234)
+
+# Parameter festlegen
+n <- 250
+B <- 999
 
 # Stichprobe erzeugen
 stichprobe <- rnorm(
@@ -1070,7 +1086,7 @@ stichprobe <- rnorm(
   sd = 12
 )
 
-# Schätzfunktion
+# Schätzfunktion definieren
 boot_fun <- \(dat, indizes) mean(dat[indizes])
 
 # Bootstrap durchführen
@@ -1083,34 +1099,85 @@ boot_fun <- \(dat, indizes) mean(dat[indizes])
 )
 ```
 
+Der Output in `boot_est` beinhaltet die Schätzung von $\mu$ mit $\overline{X}$ anhand der originalen Stichprobe (`original`), eine Schätzung der Verzerrung von $\overline{X}$ (`bias`) sowie den Bootstrap-Standardfehler (`std. error`). Wir können die Berechnung dieser Maße mit der originalen Stichprobe sowie den Bootstrap-Berechnungen von $\overline{X}$ (`boot_est$t`) nachvollziehen.
+
 ```{webr-r}
 #| autorun: true
 # Stichprobenmittel (originale Stichprobe)
-mean(stichprobe)
+mean(stichprobe) # äquiv. zu boot_est$t0
 
 # Bootstrap-Schätzer für Erwartungswert
-boot_est$t0
+mean(boot_est$t)
 
 # 'bias'
-boot_est$t0 - mean(stichprobe)
+mean(boot_est$t) - mean(stichprobe)
+
+# Bootstrap-Standardfehler
+sd(boot_est$t)
 ```
+
+Die Bootstrap-Verteilung von $\overline{X}$ ist recht gut mit der tatsächlichen $N(\mu=50,\sigma^2 = 12^2/250)$-Stichprobenverteilung vergleichbar.
 
 ```{webr-r}
 #| autorun: true
 # Verteilung der Bootstrap-Mittelwerte plotten
 tibble(mu_boot = boot_est$t) %>%
-  ggplot(mapping = aes(x = mu_boot)) +
-  #geom_histogram(bins = 30, fill="steelblue") +
-  geom_density() +
+  ggplot() +
+  # Kerndichteschätzung der Bootstrap-Verteilung
+  geom_density(
+    mapping = aes(x = mu_boot)
+  ) +
+  # Wahre Stichprobenverteilung
+  stat_function(
+    fun = dnorm, 
+    args = list(
+      mean = 50, 
+      sd = 12/sqrt(n)
+    ), 
+    color = "red",
+    lty = 2
+  ) +
+  labs(title = "Vergleich von Bootstrap- und wahrer Stichprobenverteilung") +
   theme_cowplot()
 ```
+
+Mit `boot::boot.ci()` erhalten wir ein symmetrisches 95\%-Bootstrap-Konfidenzintervall für $\mu$,
+\begin{align}
+  95\%\textup{-KI}_\textup{boot} = \big[2\cdot \overline{X}_o - q_{.975,\,\textup{boot}}, \ 2\cdot \overline{X}_o - q_{.025,\,\textup{boot}}\big].\label{eq:95bootci}
+\end{align}
 
 ```{webr-r}
 #| autorun: true
 # 95%-Bootstrap-KI
 boot.ci(
   boot.out = boot_est, 
-  type = "bca"
+  type = "basic"
 )
 ```
+
+Für die Berechnung per Hand mit der Formel \eqref{eq:95bootci} bestimmen wir die Quantile der Bootstrap-Verteilung mit der Funktion `quantile()`.
+
+```{webr-r}
+#| autorun: true
+# 95%-Bootstrap-KI 'per Hand' berechnen
+(
+  KI_boot <- 2 * boot_est$t0 - quantile(boot_est$t, probs = c(.975, .025))
+)
+```
+
+Anhand dieses Konfidenzintervalls können wir Hypothesen zum 5\%-Niveau testen.
+
+```{webr-r}
+#| autorun: true
+# H_0: mu = 50 testen
+between(50, KI_boot[1], KI_boot[2])
+```
+
+Wir können die (wahre) Nullhypothese $H_0: \mu = 50$ also zum 5\%-Niveau nicht ablehnen.
+
+# Zusammenfassung
+
+In diesem Kapitel haben wir Simulation zur Analyse der Eigenschaften von Koeffizientenschätzern in ökonometrischen Modellen betrachtet. In Simulationen können die Eigenschaften eines datenerzeugenden Prozesses vollständig kontrolliert und variiert werden, um deren Auswirkungen auf das Verhalten des Schätzers systematisch zu untersuchen:  ermöglichen es, die Verteilungen von Schätzern näherungsweise zu bestimmen. Eine solche Approximation ist hilfreich, wenn analytische Lösungen für die Verteilungseigenschaften von Schätzfunktionen nicht verfügbar sind, zum Beispiel aufgrund schwacher oder verletzter Modellannahmen. Insbesondere für die Analyse unbekannter Stichprobenverteilungen sind Simulationen hilfreich und bieten eine Möglichkeit, verschiedene Schätzer hinsichtlich ihrer Güte für bestimmme  zu bewerten.
+
+Ein weiterer Schwerpunkt war der Bootstrap, eine Methode, die es ermöglicht, die Unsicherheit eines Schätzers ohne strenge Verteilungsannahmen abzuschätzen. Der Bootstrap ist besonders nützlich in Situationen, in denen herkömmliche Inferenzmethoden versagen, etwa bei kleinen Stichproben oder unbekannten Verteilungen. Die in diesem Kapitel gezeigten R-Beispiele illustrieren die praktische Anwendung dieser Techniken, die entscheidend sind, um in empirischen Studien verlässliche Schätzungen und Konfidenzintervalle für kausale Effekte zu erhalten.
 
