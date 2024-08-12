@@ -55,6 +55,7 @@ format:
     theme: cosmo
     cap-location: margin
     code-link: true
+    linkcolor: darkgreen
     toc: true
     toc-depth: 4
     toc-location: left
