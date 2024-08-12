@@ -171,6 +171,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       block.classList.remove("bg-white");
     });
     
+const elements = document.querySelectorAll('[id^="qwebr-interactive-area"]');
+
+    elements.forEach(element => {
+        element.classList.add('box-shadow');
+    });
+    
   });
 </script><style>
 .qwebr-code-output-stdout {background-color: powderblue;}
