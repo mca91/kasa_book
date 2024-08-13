@@ -1,21 +1,209 @@
+---
+webr: 
+  show-startup-message: true
+  packages: [
+            'broom',
+            'cowplot',
+            'dplyr',
+            'ggplot2',
+            'palmerpenguins',
+            'tidyr',
+            'readr'
+            ]
+  cell-options:
+    editor-font-scale: .85
+    autorun: true
+    out-width: "80%"
+---
+
 # Regression {#sec-regression}
+
+Eine Vielzahl der in diesem Companion behandelten Methoden basiert auf dem Konzept der Schätzung kausaler Effekte mit *Regression*. Als Regressionsansatz bezeichnet man eine Methode, welche die Beziehungen zwischen Variablen durch einen funktionalen Zusammenhang beschreibt und die Parameter der gewählten funktionalen Form anhand von beobachteten Daten schätzt. *Lineare Regression* nimmt eine lineare funktionale Form der Beziehung zwischen einer abhängigen Variable (Outcome-Varibale) und erklärenden Variablen (Regressoren) an. *Nicht-lineare Regressionsmethoden* modellieren die Beziehung etwa durch Polynome höherer Ordnung, exponentielle Funktionen oder andere komplexere Formen. Die Wahl der funktionalen Form hängt von der Natur des datenerzeugenden Prozesses (DGP) und somit stets von der spezifischen Beziehung ab, die untersucht wird. 
+
+Regressionsansätze gehören zu den am häufigsten verwendeten Methoden für Kausalanalysen, da so in vielen Forschungsdesigns kausale Effekte identifiziert werden können, indem Backdoors geschlossen werden: Regression kann die durch die Behandlungsvariable verursachte Variation in der Outcome-Variable isolieren, indem für gemeinsame Einflussfaktoren von Behandlungs- *und* Outcome-Variable kontrolliert wird. In diesem Kapitel erläutern wir Grundlagen der Spezifikation und Schätzung von Regressionsansätzen, die für spätere Kapitel relevant sind. Neben einer Motivation für multiple Regression betrachten wir Modelle für verschiedene Typen von Outcome-Variablen und diskutieren deren Implementierung mit R.
 
 ```{r}
 library(tidyverse)
 library(cowplot)
 ```
 
-## Frish-Waugh-Lovell-Theorem
+## Regression schließt Backdoors: Frish-Waugh-Lovell-Theorem
 
-## Binäre Abhängige Variable
+Das Frisch-Waugh-Lovell-Theorem (FWL) besagt, dass in einer multiplen linearen Regression die geschätzten Koeffizienten für eine Teilmenge der Regressoren numerisch identisch zu Koeffizientenschätzungen aus folgenden Schritten sind 
 
-### Das Lineare Wahrscheinlichkeitsmodell {#sec-lpm}
+1. Rechne die Effekte der übrigen Variablen auf (a) die Outcome-Variable und (b) die Teilmenge der erklärenden Variablen mit Regression heraus und 
+
+2. regressiere anschließend die Residuen von Schritt (a) auf Schritt (b). 
+
+In einem multiplen Modell mit zwei Regressoren $X_1,\ X_2$,
+\begin{align}
+  Y = \beta_0 + \beta_1 X + \beta_2 X_2 + \epsilon \label{eq:fwlfullreg}
+\end{align}
+kann der Effekt von $X_1$ auf $Y$ also mit der Regression
+\begin{align*}
+  \widehat{u}_{Y,X_2} = \beta_1 \widehat{u}_{X_1,X_2} + e \label{eq:fwl2reg}
+\end{align*}
+geschätzt werden, wobei $\widehat{u}_{Y,X_2}$ und $\widehat{u}_{X_1,X_2}$ die Residuen der Regression von $Y$ auf $X_2$ und von $X_1$ auf $X_2$ sind.
+
+FWL ermöglicht daher eine Vereinfachung der Schätzung komplexer Modelle durch die Zerlegung der Schätzung in Teilschritte. 
+
+Für das Verständnis der Schätzung kausaler Effekte mit linearer Regression ist FWL hilfreich, denn es zeigt, wie sowohl die Variation in der Outcome-Variable ($\widehat{u}_{Y,X_2}$) als auch die Variation in der Behandlungsvariable ($\widehat{u}_{X_1,X_2}$), die jeweils *nicht* durch Kovariablen ($X_2$) verursacht wird, mit multipler Regression isoliert werden kann, sodass Backdoors geschlossen werden.
+
+Wir illustrieren dieses Konzept anhand einer multiplen Regression für die Schnabeltiefe (`body_mass`) von Pinguinen aus dem Datensatz `palmerpenguins::penguins`,
+
+\begin{align}
+  \textup{body\_mass} = \beta_0 + \beta_1\cdot\textup{bill\_length} + \beta_2\cdot \textup{flipper\_length} + \epsilon,\label{eq:billdepthmodel}
+\end{align}
+unter der Annahme, dass $\beta_1$ der interessierende Effekt ist: Die erwartete Änderung des Gewichts eines Pinguins (in Gramm) für eine Änderung der Schnabel-Länge um 1mm.
+
+Vor der Schätzung von Modell \eqref{eq:billdepthmodel} lesen wir den Datensatz ein und erstellen eine bereinigte Variante `penguins_cleaned`, analog zur Vorgehensweise in @sec-pp.
+
+```{webr-r}
+library(palmerpenguins)
+data(penguins)
+
+# Datensatz bereinigen
+penguins_cleaned <- penguins %>% 
+  rename(
+    bill_length = bill_length_mm,
+    flipper_length = flipper_length_mm,
+    body_mass = body_mass_g
+  ) %>% 
+  drop_na() %>% 
+  filter(
+    body_mass < quantile(body_mass, .95)
+  )
+
+# Überblick
+slice_head(penguins_cleaned, n = 10)
+```
+
+Wir schätzen nun Modell \eqref{eq:billdepthmodel} mit `lm()` und erhalten eine Zusammenfassung der geschätzen Koeffizienten mit `broom::tidy()`.
+
+```{webr-r}
+library(broom)
+
+# "Großes" Modell schätzen
+lm(
+  formula = body_mass ~ bill_length + flipper_length, 
+  data = penguins_cleaned
+) %>%
+  tidy()
+```
+
+Das Ergebnis der Schätzung ist $\widehat{\beta}_1\approx3.80$. Der nächste Code-Block berechnet die Residuen aus den Regressionen
+\begin{align*}
+  \textup{body\_mass} =&\, \alpha_0 + \alpha_1 \textup{flipper\_length} + u_{\textup{body\_mass},\,\textup{flipper\_length}},\\
+  \textup{bill\_length} =&\, \delta_0 + \delta_1 \textup{flipper\_length} + u_{\textup{bill\_length},\,\textup{flipper\_length}},
+\end{align*}
+
+und speichert diese in `body_mass_res` und `bill_length_res`.
+
+```{webr-r}
+# FWL-Schritt 1 (a)
+peng_mod_fwl1a <- lm(
+  formula = body_mass ~ flipper_length, 
+  data = penguins_cleaned
+)
+
+body_mass_res <- residuals(peng_mod_fwl1a)
+
+# FWL-Schritt 1 (b)
+peng_mod_fwl1b <- lm(
+  formula = bill_length ~ flipper_length, 
+  data = penguins_cleaned
+)
+
+bill_length_res <- residuals(peng_mod_fwl1b)
+```
+
+```{webr-r}
+# FWL-Schritt 2
+lm(formula = body_mass_res ~ bill_length_res - 1) %>% 
+  tidy()
+```
+
+Der geschätzte Koeffizient aus der Regression der Residuen stimmt mit dem geschätzten Koeffizienten von `bill_length` aus der großen Regression \eqref{eq:billdepthmodel} überein.
+
+Wir können den Effekt der Kontrolle für `flipper_length` visualisieren. Wir plotten hierzu:
+
+- Die originalen Datenpunkte für `bill_length` und `body_mass`^[Für eine bessere Lesbarkeit der Grafik zentrieren wir beide Variablen um den jeweiligen Stichprobenmittelwert.] gemeinsam mit der geschätzten Regressionslinie für das Modell $$ \textup{body\_mass} = \beta_0 + \beta_1\textup{bill\_length} + u $$ (keine Kontrolle für `flipper_length`!)^[Der R-Befehl für diese Regression ist `lm(I(body_mass - mean(body_mass)) ~ I(bill_length - mean(bill_length)) - 1, data = penguins_cleaned)`.].
+ 
+- Die um `flipper_length` bereinigten Datenpunkte und die zugehörige geschätzte Regressionslinie.
+
+```{webr-r}
+# Residuen in tibble sammeln
+tibble(
+  body_mass_res, 
+  bill_length_res
+) %>%
+  
+  ggplot() +
+  # Bereinigte Datenpunkte plotten
+  geom_point(
+    mapping = aes(
+      x = bill_length_res, 
+      y = body_mass_res,
+      color = "Um flipper_length bereinigte Daten"
+    )
+  ) +
+  # Regressionslinie für bereinigte Datenpunkte
+  geom_smooth(
+    mapping = aes(x = bill_length_res, y = body_mass_res),
+    method = "lm", 
+    formula = "y ~ x - 1",
+    se = F,
+    col = "purple"
+  ) +
+  # Ursprüngliche Datenpunkte plotten
+  geom_point(
+    data = penguins_cleaned, 
+    mapping = aes(
+      x = bill_length - mean(bill_length), 
+      y = body_mass - mean(body_mass),
+      color = "Ursprüngliche Datenpunkte"
+    ),
+    alpha = .5,
+  ) +
+  # Regressionslinie für ursprüngliche Datenpunkte
+  geom_smooth(
+    data = penguins_cleaned, 
+    mapping = aes(
+      x = bill_length - mean(bill_length), 
+      y = body_mass - mean(body_mass)
+    ),
+    method = "lm", 
+    formula = "y ~ x - 1",
+    se = F,
+    col = alpha("black", .5)
+  ) +
+  scale_color_manual(
+    name = "",
+    values = c(
+      "Um flipper_length bereinigte Daten" = "purple",
+      "Ursprüngliche Datenpunkte" = "black"
+    )
+  ) +
+  labs(
+    title = "Penguins: Anwendung von FWL",
+    x = "bill_length",
+    y = "body_mass"
+  ) +
+  theme_cowplot() +
+  theme(legend.position = "top")
+```
+
+Der grafische Vergleich beider Vorgehensweisen zeigt den Effekt der Kontrolle für `flipper_length`: Die geschätzte (schwarze) Regressionslinie für die bereinigten Daten hat eine deutlich geringere Steigung als die anhand der ursprünglichen Daten geschätzte (lilane) Linie. Der Effekt von `bill_length` auf `body_mass` wird mit der einfachen Regression `lm(body_mass ~ bill_length)` vermutlich *überschätzt*, weil es andere Faktoren (wie `flipper_length` gibt, die mit `bill_length` und `body_mass` korrelieren. Kontrollieren für `flipper_length` in der multiplen Regression `lm(body_mass ~ bill_length + flipper_length)` schließt die Backdoor durch `flipper_length`. Die Konsequenz ist eine deutlich geringere Steigung der lilanen Regressionslinie.
+
+## Binäre Outcome-Variable
+
+### Das lineare Wahrscheinlichkeitsmodell {#sec-lpm}
 
 Das lineare Regressionsmodell
 
 $$Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \dots + \beta_k X_{ki} + u_i$$
 
-mit einer binären abhängigen Variablen $Y_i\in\{0,1\}$ wird als *lineares Wahrscheinlichkeitsmodell* bezeichnet. Wie üblich modllieren wie den Erwartungswert der abhängigen Variable gegeben der Regressoren $X_1,\dots,X_k$ als lineare Funktion, d.h.
+mit einer binären abhängigen Variablen $Y_i\in\{0,1\}$ wird als *lineares Wahrscheinlichkeitsmodell* bezeichnet. Wie üblich modellieren wir den Erwartungswert der abhängigen Variable gegeben der Regressoren $X_1,\dots,X_k$ als lineare Funktion,
 
 $$E(Y\vert X_1,X_2,\dots,X_k) = P(Y=1\vert X_1, X_2,\dots, X_3).$$ Da $Y$ eine binäre Variable ist, gilt hier
 
@@ -27,7 +215,7 @@ Aufgrund der Beschränktheit der $Y_i$ auf $\{0,1\}$ sind die $u_i$ heteroskedas
 
 Das lineare Wahrscheinlichkeitsmodell hat einen wesentlichen Nachteil: Wir nehmen an, dass die bedingte Wahrscheinlichkeitsfunktion linear ist. Daher ist $P(Y=1\vert X_1,\dots,X_k)$ nicht auf das für Wahrscheinlichkeiten definierte Intervall $[0,1]$ beschränkt, sodass das angepasste Modell für extreme Regressorwerte keine sinnvolle Interpretation haben kann.
 
-Diese Gegebenheit verlangt nach einem Ansatz, der eine nichtlineare Funktion verwendet, um die bedingte Wahrscheinlichkeitsfunktion einer binären abhängigen Variable zu modellieren. Häufig verwendete Methoden sind Probit- und Logit-Regression.
+Diese Gegebenheit verlangt nach einem Ansatz, der eine nicht-lineare Funktion verwendet, um die bedingte Wahrscheinlichkeitsfunktion einer binären abhängigen Variable zu modellieren. Häufig verwendete Methoden sind Probit- und Logit-Regression.
 
 ### Probit-Regression
 

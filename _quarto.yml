@@ -64,6 +64,7 @@ format:
     include-in-header:
       file: 'mathjax.html'
     code-tools: true
+    css: custom_styles.css
 
   pdf:
     pdf-engine: pdflatex

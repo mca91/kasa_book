@@ -1,0 +1,114 @@
+div.sidebar-item-container .active {
+  color: darkgreen;
+  font-weight: 550;
+}
+
+div.sidebar-item-container:hover {
+  color: darkgreen;
+}
+
+.sidebar nav[role=doc-toc] ul>li>a.active,
+.sidebar nav[role=doc-toc] ul>li>ul>li>a.active,
+.sidebar nav[role=doc-toc] ul>li>ul>li>ul>li>a.active {
+  border-left: 1px solid darkgreen !important;
+  color: darkgreen !important;
+  font-weight: 550;
+}
+
+.sidebar nav[role=doc-toc] ul>li>a:hover,
+.sidebar nav[role=doc-toc] ul>li>ul>li>a:hover,
+.sidebar nav[role=doc-toc] ul>li>ul>li>ul>li>a:hover {
+  color: darkgreen !important;
+}
+
+.qwebr-icon-run-code {
+  color: white;
+  padding-right: 2px;
+}
+
+.qwebr-button-run, .qwebr-button-reset, .qwebr-button-copy {
+  background-color:  rgba(0, 0, 0, 0) !important;
+  border-style: none;
+  font-weight: 400;
+  color: white !important; 
+  transition: none;
+}
+
+.qwebr-button-run:hover, .qwebr-button-reset:hover, .qwebr-button-copy:hover {
+    border-radius: 6px 6px 6px 6px;
+    border-color: darkgreen !important;
+    border: 1px 1px 1px 1px;
+}
+
+.qwebr-button-run {
+  font-weight: 600;
+}
+
+.qwebr-editor-toolbar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+  border-radius: 6px 6px 0 0;
+  background-color: darkgreen !important;
+  border: 1px solid darkgreen !important;
+  padding: 0 0; 
+  transition: color .1s ease-in-out, background-color .1s ease-in-out,border-color .1s ease-in-out,box-shadow .1s ease-in-out !important;
+}
+
+.qwebr-editor-toolbar:hover {
+  background-color: white !important;
+  border-color: darkgreen;
+  border: 1px 1px 0px 1px;
+}
+
+.qwebr-editor-toolbar:hover * {
+  color: darkgreen !important;
+}
+
+/*
+.qwebr-editor {
+  border-radius: 0 0 6px 6px !important;
+  border: 1px solid darkgreen !important;
+}
+*/
+
+.qwebr-output-code-area {
+  border-radius: 0 0 6px 6px !important;
+  padding-left: .5em;
+  padding-top: .5em;
+  margin-bottom: 1em;
+  /*background-color:rgba(250,250,250,.9) !important;*/
+}
+
+.qwebr-output-code-area div {
+  padding-bottom: 12px;
+}
+
+.qwebr-output-graph-area {
+  margin-bottom: 1.5em;
+}
+
+.monaco-editor .lines-content {
+  background: none;
+}
+
+.monaco-editor {
+  outline-width: 0;
+  background: none !important;
+}
+
+.monaco-editor .margin {
+  background: none !important;
+}
+
+.monaco-editor .line-numbers {
+  color:black !important;
+}
+
+.box-shadow {
+    box-shadow: 0px 1px 2px rgba(0,0,0,.1),
+                0px 3px 7px rgba(0,0,0,.1),
+                0px 12px 30px rgba(0,0,0,.08);
+    border-radius: 0 0 6px 6px;
+}

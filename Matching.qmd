@@ -13,51 +13,6 @@ webr:
             ]
 ---
 
-```{=html}
-<style>
-.qwebr-code-output-stdout {background-color: powderblue;}
-
-.qwebr-button-run, .qwebr-button-reset, .qwebr-button-copy {
-  background-color:  rgba(0, 0, 0, 0);
-  border-style: none;
-  font-weight: 400;
-  color: white; 
-  transition: none;
-}
-
-.qwebr-editor-toolbar {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  box-sizing: border-box;
-  border-radius: 0 0 6px 6px;
-  background-color: darkgreen;
-  border-color: darkgreen;
-  border-width: 1px;
-  border-style: solid;
-  padding: 0 0; 
-  transition: color .1s ease-in-out, background-color .1s ease-in-out,border-color .1s ease-in-out,box-shadow .1s ease-in-out;
-}
-
-.qwebr-editor-toolbar:hover {
-  background-color: white;
-  border-color: darkgreen;
-  border-width: 1px;
-}
-
-.qwebr-editor-toolbar:hover * {
-  color: darkgreen;
-}
-
-.overflow-guard, .qwebr-editor, .monaco-editor {
-  border-radius: 6px 6px 0 0;
-  border-width: 1px 1px 0 1px;
-  border-color: darkgreen;
-}
-
-</style>
-```
-
 # Matching
 
 ```{r, echo=F, message=FALSE}
