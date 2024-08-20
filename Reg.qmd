@@ -7,6 +7,7 @@ webr:
             'dplyr',
             'ggplot2',
             'palmerpenguins',
+            'purrr',
             'tidyr',
             'readr'
             ]
@@ -18,9 +19,9 @@ webr:
 
 # Regression {#sec-regression}
 
-Eine Vielzahl der in diesem Companion behandelten Methoden basiert auf dem Konzept der Schätzung kausaler Effekte mit *Regression*. Als Regressionsansatz bezeichnet man eine Methode, welche die Beziehungen zwischen Variablen durch einen funktionalen Zusammenhang beschreibt und die Parameter der gewählten funktionalen Form anhand von beobachteten Daten schätzt. *Lineare Regression* nimmt eine lineare funktionale Form der Beziehung zwischen einer abhängigen Variable (Outcome-Varibale) und erklärenden Variablen (Regressoren) an. *Nicht-lineare Regressionsmethoden* modellieren die Beziehung etwa durch Polynome höherer Ordnung, exponentielle Funktionen oder andere komplexere Formen. Die Wahl der funktionalen Form hängt von der Natur des datenerzeugenden Prozesses (DGP) und somit stets von der spezifischen Beziehung ab, die untersucht wird. 
+Viele der in diesem Companion behandelten Methoden basiert auf dem Konzept der Schätzung kausaler Effekte mit *Regression*. Als Regressionsansatz bezeichnet man eine Methode, welche die Beziehungen zwischen Variablen durch einen funktionalen Zusammenhang beschreibt und die Parameter der gewählten funktionalen Form anhand von beobachteten Daten schätzt. *Lineare Regression* nimmt eine lineare funktionale Form der Beziehung zwischen einer abhängigen Variable (Outcome-Varibale) und erklärenden Variablen (Regressoren) an. *Nicht-lineare Regressionsmethoden* modellieren die Beziehung etwa durch Polynome höherer Ordnung, exponentielle Funktionen oder andere komplexere Formen. Die Wahl der funktionalen Form hängt von der Natur des datenerzeugenden Prozesses (DGP) und somit stets von der spezifischen Beziehung ab, die untersucht wird. 
 
-Regressionsansätze gehören zu den am häufigsten verwendeten Methoden für Kausalanalysen, da so in vielen Forschungsdesigns kausale Effekte identifiziert werden können, indem Backdoors geschlossen werden: Regression kann die durch die Behandlungsvariable verursachte Variation in der Outcome-Variable isolieren, indem für gemeinsame Einflussfaktoren von Behandlungs- *und* Outcome-Variable kontrolliert wird. In diesem Kapitel erläutern wir Grundlagen der Spezifikation und Schätzung von Regressionsansätzen, die für spätere Kapitel relevant sind. Neben einer Motivation für multiple Regression betrachten wir Modelle für verschiedene Typen von Outcome-Variablen und diskutieren deren Implementierung mit R.
+Regressionsansätze gehören zu den am häufigsten verwendeten Methoden für Kausalanalysen, da so in vielen Forschungsdesigns kausale Effekte identifiziert werden können, indem Backdoors geschlossen werden: Regression kann die durch die Behandlungsvariable verursachte Variation in der Outcome-Variable isolieren, indem für gemeinsame Einflussfaktoren von Behandlungs- *und* Outcome-Variable kontrolliert wird. In diesem Kapitel erläutern wir Grundlagen der Spezifikation und Schätzung von Regressionsansätzen, die für spätere Kapitel relevant sind. Neben einer Motivation der Schätzung kausaler Effekte mit multipler Regression betrachten wir Modelle für verschiedene Kategorien von Outcome-Variablen und diskutieren deren Implementierung mit R.
 
 ```{r}
 library(tidyverse)
@@ -33,7 +34,7 @@ Das Frisch-Waugh-Lovell-Theorem (FWL) besagt, dass in einer multiplen linearen R
 
 1. Rechne die Effekte der übrigen Variablen auf (a) die Outcome-Variable und (b) die Teilmenge der erklärenden Variablen mit Regression heraus und 
 
-2. regressiere anschließend die Residuen von Schritt (a) auf Schritt (b). 
+2. regressiere anschließend die Residuen von Schritt (a) auf die Residuen aus Schritt (b). 
 
 In einem multiplen Modell mit zwei Regressoren $X_1,\ X_2$,
 \begin{align}
@@ -65,6 +66,7 @@ data(penguins)
 # Datensatz bereinigen
 penguins_cleaned <- penguins %>% 
   rename(
+    bill_depth = bill_depth_mm,
     bill_length = bill_length_mm,
     flipper_length = flipper_length_mm,
     body_mass = body_mass_g
@@ -197,25 +199,37 @@ Der grafische Vergleich beider Vorgehensweisen zeigt den Effekt der Kontrolle f�
 
 ## Binäre Outcome-Variable
 
+Eine binäre Variable, auch als dichotome Variable oder Indikator-Variable bezeichnet, ist eine Variable, die nur zwei Ausprägungen annehmen kann. Diese beiden Ausprägungen werden typischerweise durch die Werte 0 und 1 repräsentiert und dienen dazu, zwei verschiedene Zustände oder Kategorien zu unterscheiden. Formal kann eine binäre Variable $B$ wie folgt definiert werden:
+
+\begin{align}
+  B = \begin{cases} 
+  1, & \text{Eigenschaft trifft zu,} \\
+  0, & \text{Eigenschaft trifft nicht zu.}
+  \end{cases}
+\end{align}
+
+Eine in späteren Kapiteln dieses Companions als verwendeter *binärer Regressor* ist der Indikator für die Zuordnung von Beobachtungen in Behandlungs- oder Kontrollgruppe (1 = Behandlungsgruppe, 0 = Kontrollgruppe). 
+
+Für viele ökonomische Forschungsfragen ist es hilfreich, eine *binäre Outcome-Variable* mit Regression zu modellieren. Hierzu gibt es verschiedene Ansätze, die wir nachfolgend zusammenfassen und ihre Anwendung mit R zeigen.
+
 ### Das lineare Wahrscheinlichkeitsmodell {#sec-lpm}
 
 Das lineare Regressionsmodell
 
-$$Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \dots + \beta_k X_{ki} + u_i$$
-
+$$Y = \beta_0 + \beta_1 X_{1} + \beta_2 X_{2} + \dots + \beta_k X_{k} + u$$
 mit einer binären abhängigen Variablen $Y_i\in\{0,1\}$ wird als *lineares Wahrscheinlichkeitsmodell* bezeichnet. Wie üblich modellieren wir den Erwartungswert der abhängigen Variable gegeben der Regressoren $X_1,\dots,X_k$ als lineare Funktion,
 
 $$E(Y\vert X_1,X_2,\dots,X_k) = P(Y=1\vert X_1, X_2,\dots, X_3).$$ Da $Y$ eine binäre Variable ist, gilt hier
 
 $$ P(Y = 1 \vert X_1, X_2, \dots, X_k) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_k X_k.$$
 
-Das lineare Wahrscheinlichkeitsmodell beschreibt also die *Wahrscheinlichkeit*, dass $Y=1$ als lineare Funktion der Regressoren: $\beta_j$ misst die Änderung in der Wahrscheinlichkeit das $Y_i=1$, unter der Bedingung, dass die anderen $k-1$ Regressoren konstant gehalten werden. Genau wie in der gewöhnlichen multiplen Regression können die $\beta_j$ mit der KQ-Methode geschätzt werden.
+Das lineare Wahrscheinlichkeitsmodell beschreibt also die *Wahrscheinlichkeit*, dass $Y=1$ als lineare Funktion der Regressoren: $\beta_j$ misst die Änderung in der Wahrscheinlichkeit für das Ereignis $Y_i=1$, unter der Bedingung, dass die anderen $k-1$ Regressoren konstant gehalten werden. Genau wie bei multipler Regression mit einer kontinuierlichen abhängigen Variablen können die $\beta_j$ mit der KQ-Methode geschätzt werden.
 
 Aufgrund der Beschränktheit der $Y_i$ auf $\{0,1\}$ sind die $u_i$ heteroskedastisch. Folglich sollten Inferenzstatistiken mit robusten Standardfehlern berechnet werden. Weiterhin ist zu beachten, dass $R^2$ in den meisten Anwendungen von linearen Wahrscheinlichkeitsmodellen keine hilfreiche Interpretation hat, da das geschätzte Modell die Daten nicht perfekt erklären kann, wenn die abhängige Variable binär, aber die Regressoren kontinuierlich verteilt sind.
 
-Das lineare Wahrscheinlichkeitsmodell hat einen wesentlichen Nachteil: Wir nehmen an, dass die bedingte Wahrscheinlichkeitsfunktion linear ist. Daher ist $P(Y=1\vert X_1,\dots,X_k)$ nicht auf das für Wahrscheinlichkeiten definierte Intervall $[0,1]$ beschränkt, sodass das angepasste Modell für extreme Regressorwerte keine sinnvolle Interpretation haben kann.
+Das lineare Wahrscheinlichkeitsmodell hat einen wesentlichen Nachteil: Das Modell nimmt an, dass die bedingte Wahrscheinlichkeitsfunktion linear ist und $P(Y=1\vert X_1,\dots,X_k)$ nicht auf das für Wahrscheinlichkeiten definierte Intervall $[0,1]$ beschränkt ist. Ein angepasstes Modell hat dann für Regressorwerte, die zu Vorhersagen von $Y$ jenseits von $[0,1]$ führen keine sinnvolle Interpretation.
 
-Diese Gegebenheit verlangt nach einem Ansatz, der eine nicht-lineare Funktion verwendet, um die bedingte Wahrscheinlichkeitsfunktion einer binären abhängigen Variable zu modellieren. Häufig verwendete Methoden sind Probit- und Logit-Regression.
+Dieser Umstand verlangt nach Regressionsansätzen, die $P(Y=1)$ durch eine auf $[0,1]$ beschränkte (nicht-lineare) Funktion der Regressoren modellieren. Häufig verwendete Methoden sind Probit- und Logit-Regression.
 
 ### Probit-Regression
 
@@ -228,11 +242,9 @@ $\beta_0 + \beta_1 X$ in \eqref{eq:probitmodel} ist hier ein *Quantil* $z$ der S
 \begin{align}
 \Phi(z) = P(Z \leq z) \ , \ Z \sim \mathcal{N}(0,1),
 \end{align}
-sodass der Koeffizient $\beta_1$ in \eqref{eq:probitmodel} die Änderung in $z$ misst, die mit einer Änderung von einer Einheit in $X$ verbunden ist. Obwohl der Effekt einer Änderung in $X$ auf $z$ linear ist, ist der Zusammenhang zwischen $z$ und der abhängigen Variable $Y$ *nicht linear*: $\Phi$ ist eine nicht-lineare Funktion von $X$ (vgl. @fig-snvf)!
+sodass der Koeffizient $\beta_1$ in \eqref{eq:probitmodel} die Änderung in $z$ misst, die mit einer Änderung von einer Einheit in $X$ verbunden ist. Obwohl der Effekt einer Änderung in $X$ auf $z$ linear ist, ist der Zusammenhang zwischen $z$ und der abhängigen Variable $Y$ *nicht linear*, denn $\Phi(\cdot)$ ist eine nicht-lineare Funktion von $X$ (vgl. @fig-snvf)!
 
-```{r}
-#| label: fig-snvf
-#| fig-cap: "Verteilungsfunktion einer N(0,1)-Zufallsvariable"
+```{webr-r}
 # N(0,1)-Verteilungsfunktion
 ggplot() +
   geom_function(fun = pnorm) +
@@ -241,10 +253,11 @@ ggplot() +
     limits = c(-4, 4)
   ) +
   scale_y_continuous(name = "P(Z<z)") +
+  labs(title = "Verteilungsfunktion einer N(0,1)-Zufallsvariable") +
   theme_cowplot()
 ```
 
-Da die abhängige Variable eine nichtlineare Funktion der Regressoren ist, hat der Koeffizient von $X$ keine einfache Interpretation. Die Änderung in der Wahrscheinlichkeit, dass $Y=1$ ist, durch eine Änderung in $X$ (partieller Effekt) kann berechnet werden als:
+Aufgrund der Nicht-Linearität hat der Koeffizient von $X$ keine einfache Interpretation hinsichtlich des Effekts auf $Y$. Die Änderung in der Wahrscheinlichkeit, dass $Y=1$ ist, durch eine Änderung in $X$ (partieller Effekt) kann berechnet werden als:
 
 \begin{align}
   \frac{\partial\textup{E}(Y\vert X)}{\partial X} = \frac{\partial\textup{P}(Y=1\vert X)}{\partial X} = \frac{\partial\Phi(\beta_0 + \beta_1 X)}{\partial X} = \phi(\beta_0 + \beta_1 X) \beta_1,
@@ -257,33 +270,40 @@ wobei $\phi(\cdot)$ die Dichtefunktion der Standardnormalverteilung ist. In empi
 
 Wie im linearen Wahrscheinlichkeitsmodell kann das Modell \eqref{eq:probitmodel} auf eine Probit-Regression mit mehreren Regressoren $X_j$, $j=1,\dots,k$ verallgemeinert werden, um das Risiko einer Verzerrung durch ausgelassene Variablen zu mindern. Die Schritte 1 bis 3 für die Berechnung des partiellen Effekts einer Änderung in $X_j$ erfolgen dann unter der Annahme, dass die übrigen $k-1$ Regressoren konstant gehalten werden, wobei der partielle Effekt von den jeweiligen Regressorwerten abhängt. 
 
-### Logistische Regression
-
-
-### Schätzung mit R
-
-```{r}
+```{webr-r}
 # Daten simulieren
 set.seed(1234)
 
-n <- 2000 # Stichprobengröße
+# Stichprobengröße
+n <- 1000 
 
 simdata <- tibble(
   X = rnorm(n = n, mean = 5, sd = 2), # Regressor
-  P = pnorm(0.75 * X - 4 + rnorm(n)), # + Rauschen
+  P = pnorm(0.7 * X - 4 + rnorm(n)), # + Rauschen
 )
 
 # Binäre Outcome-Variable hinzufügen
 simdata <- simdata %>%
-  mutate(Y = as.integer(runif(n) < P))
+  mutate(
+    Y = as.integer(runif(n) < P)
+    )
 ```
 
-```{r}
+```{webr-r}
 # lineares Wahrscheinlichkeitsmodell schätzen
 mod_lp <- lm(formula = Y ~ X, data = simdata)
 ```
 
-```{r}
+```{webr-r}
+# Probit-Modell schätzen
+mod_probit <- glm(
+  formula = Y ~ X,
+  data = simdata, 
+  family = binomial(link = "probit")
+)
+```
+
+```{webr-r}
 # geschätzte Wahrscheinlichkeitsfunktion
 # für lineares Modell
 X <- seq(0, 11, 0.01)
@@ -293,11 +313,16 @@ pred <- tibble(
   LP = predict(
     object = mod_lp, 
     newdata = tibble(X)
+  ),
+  probit = predict(
+    object = mod_probit,
+    newdata = tibble(X),
+    type = "response"
   )
 )
 ```
 
-```{r}
+```{webr-r}
 # geschätztes lineares Modell plotten
 simdata %>%
   ggplot(mapping = aes(x = X, y = Y)) +
@@ -314,19 +339,59 @@ simdata %>%
     mapping = aes(y = LP),
     lwd = .75
   ) +
+  geom_line(
+    data = pred, 
+    mapping = aes(y = probit),
+    lwd = .75
+  ) +
+  lims(x = c(-2, 14)) +
   theme_cowplot()
 ```
 
-```{r}
-# Probit-Modell schätzen
-mod_probit <- glm(
-  formula = Y ~ X,
-  data = simdata, 
-  family = binomial(link = "probit")
-)
+### Logistische Regression
+
+Bei der logistischen Regression wird die logistische Funktion $\Lambda(\cdot)$ 
+\begin{align}
+\Lambda(z) = \frac{1}{1 + \exp(-z)},
+\end{align}
+genutzt, um die Wahrscheinlichkeitsfunktion von $Y$ zu modellieren. Ähnlich wie im Probit-Modell nehmen wir hier an, dass
+\begin{align}
+E(Y\vert X) = P(Y=1\vert X) = \Lambda(\beta_0 + \beta_1 X). \label{eq:logitmodel}
+\end{align}
+In diesem Modell entspricht $\beta_0 + \beta_1 X$ dem sogenannten *Logit*, dem logarithmierten Verhältnis von $p = P(Y=1\vert X)$ und $1-p = P(Y=0\vert X)$,
+\begin{align*}
+  \textup{Logit(p)} = \log\bigg(\frac{p}{1-p}\bigg) = \beta_0 + \beta_1 X.
+\end{align*}
+wobei $\beta_1$ die Veränderung des Logits pro Einheit Änderung im Regressor $X$ angibt. Wie bereits im Probit-Fall ist der Einfluss von $X$ auf den Logit linear, jedoch besteht auch hier eine nicht-lineare Beziehung zwischen dem Logit und der Wahrscheinlichkeit $P(Y=1)$, da $\Lambda(\cdot)$, ähnlich wie die Normalverteilungsfunktion im Probit-Modell, eine nicht-lineare Funktion mit dem Wertebereich $[0,1]$ ist.
+
+```{webr-r}
+# Plot der logistischen Funktion
+ggplot() +
+  geom_function(fun = function(x) {1 / (1 + exp(-x))}) +
+  scale_x_continuous(
+    name = "Logit", 
+    limits = c(-6, 6)
+  ) +
+  scale_y_continuous(name = "P(Y=1)") +
+  labs(title = "Logistische Funktion") +
+  theme_cowplot()
 ```
 
-```{r}
+Aufgrund dieser Nicht-Linearität lässt sich der Koeffizient $\beta_1$ ebenso wie im Probit-Modell nicht direkt als einfacher Effekt auf die Wahrscheinlichkeit $P(Y=1)$ interpretieren. Um den partiellen Effekt einer Änderung in $X$ auf $P(Y=1)$ zu ermitteln, berechnet man die Ableitung:
+
+\begin{align}
+\frac{\partial\textup{E}(Y\vert X)}{\partial X} = \frac{\partial\textup{P}(Y=1\vert X)}{\partial X} = \frac{\partial\Lambda(\beta_0 + \beta_1 X)}{\partial X} = \lambda(\beta_0 + \beta_1 X) \beta_1,
+\end{align}
+wobei $\lambda(\cdot)$, ähnlich wie die Dichtefunktion der Normalverteilung im Probit-Modell, die Dichtefunktion der logistischen Verteilung darstellt. Diese ist gegeben durch
+\begin{align}
+\lambda(z) = \Lambda(z) \cdot (1 - \Lambda(z)).
+\end{align}
+
+### Schätzung mit R
+
+
+
+```{webr-r}
 # Logit-Modell schätzen
 mod_logit <- glm(
   formula = Y ~ X,
@@ -335,7 +400,7 @@ mod_logit <- glm(
 )
 ```
 
-```{r}
+```{webr-r}
 # gesch. WSK-Funktion für Probit- und Logit-Modelle
 pred <- pred %>%
   mutate(
@@ -349,7 +414,7 @@ pred <- pred %>%
 )
 ```
 
-```{r}
+```{webr-r}
 # Vergleich mit linearem Modell
 simdata %>%
   ggplot(mapping = aes(x = X, y = Y) ) +
@@ -410,6 +475,130 @@ ggplot(
         color = "red"
     ) +
     theme_cowplot()
+```
+
+
+### Beispiel: Klassifikation für Palmer-Piniguinen
+
+```{webr-r}
+penguins_cleaned <- penguins_cleaned %>% 
+  mutate(
+    # sex in 0,1-codierte Variable umwandeln
+    sex = if_else(sex == "female", 1, 0)
+    )
+
+penguins_cleaned %>% 
+  slice_head(n = 10)
+```
+
+```{webr-r}
+penguins_lp <- lm(
+  formula = sex ~ bill_depth, 
+  data = penguins_cleaned
+) 
+
+penguins_lp %>%
+  tidy()
+```
+
+```{webr-r}
+penguins_probit <- glm(
+  formula = sex ~ bill_depth, 
+  data = penguins_cleaned, 
+  family = binomial("probit")
+)
+
+penguins_probit %>% 
+  tidy()
+```
+
+```{webr-r}
+penguins_logit <- glm(
+  formula = sex ~ bill_depth, 
+  data = penguins_cleaned, 
+  family = binomial("logit")
+)
+
+penguins_logit %>% 
+  tidy()
+```
+
+```{webr-r}
+bill_depth_new <- seq(10, 25, .01)
+
+preds <- tibble(
+  bill_depth = bill_depth_new,
+  lp = predict(
+    object = penguins_lp, 
+    newdata = tibble(bill_depth = bill_depth_new)
+  ),
+  probit = predict(
+    object = penguins_probit,
+    newdata = tibble(bill_depth = bill_depth_new),
+    type = "response"
+  ),
+  logit = predict(
+    object = penguins_logit,
+    newdata = tibble(bill_depth = bill_depth_new),
+    type = "response"
+  )
+)
+```
+
+
+```{webr-r}
+penguins_cleaned %>%
+  ggplot(
+    mapping = aes(x = bill_depth, y = sex)
+  ) +
+  geom_point(
+    position = position_jitter(
+      height = .025,
+      seed = 1234
+    ),
+    alpha = .25,
+    color = "blue"
+  ) +
+  geom_line(
+    data = preds, 
+    mapping = aes(y = lp, color = "lineares WSK-Modell")) +
+  geom_line(
+    data = preds, 
+    mapping = aes(y = probit, color = "Probit-Modell")) +
+  geom_line(
+    data = preds, 
+    mapping = aes(y = logit, color = "Logit-Modell")) +
+  labs(title = "Modellierung v. Pinguin-Geschlecht mit Regression") +
+  theme_cowplot()
+```
+
+```{webr-r}
+(
+  WSK <- penguins_cleaned %>%
+  select(sex) %>%
+  mutate(
+    list(
+      linear = penguins_lp, 
+      probit = penguins_probit,
+      logit = penguins_logit
+    ) %>% 
+      map_dfc(.f = ~ .$fitted)     
+  )
+)
+```
+
+```{webr-r}
+vorh <- WSK %>%
+  mutate(
+    across(c(linear:logit), 
+           .fns = ~ (. > 0.5) == sex,
+           .names = "{.col}_pred")
+    )
+
+vorh %>% 
+  summarise(
+    across(linear_pred:probit_pred, mean)
+  )
 ```
 
 

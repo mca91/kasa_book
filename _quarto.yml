@@ -1,15 +1,6 @@
 lang: "de"
 
-engine: knitr
-
-webr: 
-  show-startup-message: false 
-  packages: ['dplyr']
-  cell-options:
-    editor-font-scale: .5
-    autorun: true
-    dpi: 150
-    out-width: "50%"
+engine: jupyter
 
 project:
   type: book
@@ -22,18 +13,25 @@ book:
   date: "November 2023"
   chapters:
     - index.qmd
-    - R_Einfuehrung.qmd
-    - Reg.qmd
-    - Simulation.qmd
-    - Matching.qmd
-    - FixedEffects.qmd
-    - IV.qmd
-    - DiD.qmd
-    - EventStudies.qmd
-    - RDD.qmd
-    - RegReg.qmd
-    - Machine Learning.qmd
-    - SyntheticControl.qmd
+    - part: "Grundlagen"
+      chapters:
+        - R_Einfuehrung.qmd
+        - ex.qmd
+        - Reg.qmd
+        - Simulation.qmd
+    - part: "Kausale Inferenz"
+      chapters:
+        - Matching.qmd
+        - FixedEffects.qmd
+        - IV.qmd
+        - DiD.qmd
+        - EventStudies.qmd
+        - RDD.qmd
+        - SyntheticControl.qmd
+    - part: "Machine Learning"
+      chapters:
+        - RegReg.qmd
+        - Machine Learning.qmd
     - Literatur.qmd
   repo-branch: main
   repo-actions: [edit, issue]
@@ -47,7 +45,7 @@ execute:
   warning: false
 
 format:
-  html:
+  live-html:
     grid: 
       body-width: 920px
       margin-width: 350px
@@ -108,7 +106,4 @@ format:
           }
           
 editor: visual
-
-filters: 
-  - webr
   

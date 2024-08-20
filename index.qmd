@@ -1,4 +1,8 @@
-# Start
+---
+format: live-html
+---
+
+# Einführung
 
 ```{r}
 #| echo: false
@@ -15,3 +19,49 @@ tabopts <- function(x) {
              table.font.color = "black", table.font.size = 14)
 }
 ```
+
+```{webr-r}
+library(palmerpenguins)
+data(penguins)
+
+penguins_cleaned <- penguins %>% 
+  rename(
+    bill_length = bill_length_mm,
+    bill_depth  = bill_depth_mm,
+    flipper_length = flipper_length_mm,
+    body_mass = body_mass_g
+  ) %>% 
+  drop_na() %>% 
+  filter(
+    body_mass < quantile(body_mass, .95)
+  )
+
+# Überblick
+slice_head(penguins_cleaned, n = 10)
+```
+
+```{webr-r}
+# Zusatz: Globale Regression
+penguins_cleaned %>%
+  ggplot(
+    mapping = aes(
+      x = body_mass, 
+      y = bill_depth, 
+      color = species
+    )
+  ) +
+  geom_point() +
+  geom_smooth(method = "lm", se = F) +
+  # Regression für alle Datenpunkte
+  geom_smooth(
+    mapping = aes(
+      x = body_mass, 
+      y = bill_depth
+    ),
+    method = "lm", 
+    se = F, 
+    inherit.aes = F
+  )
+```
+
+just some test.

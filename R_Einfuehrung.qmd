@@ -1,7 +1,18 @@
 ---
 webr: 
   show-startup-message: true
-  packages: ['tidyverse', 'palmerpenguins']
+  packages: [
+            'broom',
+            'cowplot',
+            'dplyr',
+            'ggplot2',
+            'palmerpenguins',
+            'tidyr',
+            'readr'
+            ]
+  cell-options:
+    editor-font-scale: .85
+    autorun: true
 ---
 
 # Statistische Programmierung mit R
@@ -163,7 +174,7 @@ long %>%
   drop_na()
 ```
 
-## Pinguine und Pipes
+## Pinguine und Pipes {#sec-pp}
 
 In diesem Abschnitt zeigen wir die Verwendung häufig verwendeter `dplyr`-Funktionen (s.g. *Verben*) für die Transformation von Datensätzen: `mutate()`, `select()`, `filter()`,` summarise()` und `arrange()`.
 
@@ -511,7 +522,7 @@ penguins_sample %>%
 
 Bei gruppierten Daten berechnet `mutate()` das Stichprobenmittel *pro Gruppe* und weist die Mittelwerte entsprechend zu.
 
-## Eine explorative Analyse mit `ggplot2`
+## Eine explorative Analyse mit ggplot2
 
 Der bereinigte Datensatz `penguins_cleaned` eignet sich gut für eine graphische Auswertung mit dem R-Paket `ggplot2`, welches Bestandteil des `tidyverse` ist. Nachfolgend untersuchen wir Zusammenhänge zwischen den Körpermaßen der Pinguine.
 

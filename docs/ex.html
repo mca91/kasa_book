@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>14&nbsp; Machine Learning – Kausalanalyse mit R</title>
+<title>3&nbsp; Übungsaufgaben – Kausalanalyse mit R</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./Literatur.html" rel="next">
-<link href="./RegReg.html" rel="prev">
+<link href="./Reg.html" rel="next">
+<link href="./R_Einfuehrung.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -69,35 +69,6 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 </head>
 
@@ -110,7 +81,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./RegReg.html">Machine Learning</a></li><li class="breadcrumb-item"><a href="./Machine Learning.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Machine Learning</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./R_Einfuehrung.html">Grundlagen</a></li><li class="breadcrumb-item"><a href="./ex.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Übungsaufgaben</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Seitenleiste umschalten" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Suchen" onclick="window.quartoOpenSearch();">
@@ -165,7 +136,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./ex.html" class="sidebar-item-text sidebar-link">
+  <a href="./ex.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Übungsaufgaben</span></span></a>
   </div>
 </li>
@@ -253,7 +224,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./Machine Learning.html" class="sidebar-item-text sidebar-link active">
+  <a href="./Machine Learning.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Machine Learning</span></span></a>
   </div>
 </li>
@@ -276,9 +247,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./RegReg.html">Machine Learning</a></li><li class="breadcrumb-item"><a href="./Machine Learning.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Machine Learning</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./R_Einfuehrung.html">Grundlagen</a></li><li class="breadcrumb-item"><a href="./ex.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Übungsaufgaben</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Machine Learning</span></h1>
+<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Übungsaufgaben</span></h1>
 </div>
 
 
@@ -295,23 +266,16 @@ window.Quarto = {
 </header>
 
 
-<p>Das Gradientenabstiegsverfahren (Gradient Descent) ist ein iteratives Optimierungsverfahren zur Minimierung einer differenzierbaren Zielfunktion <span class="math inline">\(f(x)\)</span>. Es wird häufig eingesetzt, um die Verlustfunktionen in maschinellen Lernmodellen zu minimieren. Der Algorithmus aktualisiert die Variablen schrittweise in die entgegengesetzte Richtung des Gradienten der Funktion an der aktuellen Position. Der Gradient gibt dabei die Richtung des <em>steilsten Anstiegs</em> an, wodurch die entgegengesetzte Richtung zum schnellsten <em>Abstieg</em> (Descent) führt.</p>
-<p>Der folgende Pseudocode zeigt die grundlegende Vorgehensweise des Gradientenabstiegsverfahrens unter Einbeziehung eines Momentum-Terms, der dazu dient, das Konvergenzverhalten zu verbessern und lokale Minima effektiver zu überwinden.</p>
-<p><span class="math display">\[\begin{align*}
-&amp; \textbf{Algorithmus: Gradientenabstiegsverfahren mit Momentum} \\
-&amp; \textup{Initialisiere: }\\
-&amp; \quad x_0 \text{ (Startpunkt) }\\
-&amp; \quad \eta \text{ (Lernrate) }\\
-&amp; \quad \alpha \text{ (Momentum-Faktor) }\\
-&amp; \quad v_0 = 0 \text{ (Anfangsmomentum) } \\[1em]
-&amp; \text{Für } t = 0, 1, 2, \dots \text{ bis Konvergenz} \\
-&amp; \quad \text{1. Berechne den Gradienten: } \nabla f(x_t) \\
-&amp; \quad \text{2. Aktualisiere den Momentum-Term: } v_{t+1} = \alpha v_t - \eta \nabla f(x_t) \\
-&amp; \quad \text{3. Aktualisiere die Position: } x_{t+1} = x_t + v_{t+1} \\
-&amp; \quad \text{4. Überprüfe das Abbruchkriterium (z.B. } \| \nabla f(x_t) \| &lt; \epsilon\text{)} \\
-\end{align*}\]</span></p>
-<iframe class="obs-soft-box-shadow" width="100%" height="1172" frameborder="0" src="https://observablehq.com/embed/@mca91/gradient-descent-in-3d-three-js?cells=renderer%2Cviewof+restart%2Cviewof+gridinit%2Cviewof+themin%2Cviewof+themin2%2Cviewof+themin3%2Cviewof+themin4%2Cviewof+themin5%2Cviewof+themin6%2Cscene%2Ccamera">
-</iframe>
+<p>Calculate the average of all of the integers from 1 to 10.</p>
+<pre class="{webr}"><code>#| exercise: ex_1_r
+#| check: true
+if (identical(.result, mean(1:10))) {
+  list(correct = TRUE, message = "Nice work!")
+} else {
+  list(correct = FALSE, message = "That's incorrect, sorry.")
+}</code></pre>
+<pre class="{webr}"><code>#| exercise: ex_1_r
+______(1:10)</code></pre>
 
 
 
@@ -738,13 +702,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./RegReg.html" class="pagination-link" aria-label="Regularisierte Regression">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Regularisierte Regression</span></span>
+      <a href="./R_Einfuehrung.html" class="pagination-link" aria-label="Statistische Programmierung mit R">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Statistische Programmierung mit R</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./Literatur.html" class="pagination-link" aria-label="Literatur">
-        <span class="nav-page-text">Literatur</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./Reg.html" class="pagination-link" aria-label="Regression">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Regression</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

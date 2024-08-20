@@ -112,3 +112,34 @@ div.sidebar-item-container:hover {
                 0px 12px 30px rgba(0,0,0,.08);
     border-radius: 0 0 6px 6px;
 }
+
+/* quarto-live overrides */
+.card.exercise-editor {
+  border-top: none;
+  border-right: none;
+  border-left: none;
+}
+
+.card.exercise-editor .card-header {
+    font-weight: 500;
+    color: white;
+    background-color: darkgreen;
+    border-radius: 5px 5px 0 0;
+}
+
+.card.exercise-editor .card-header a.btn {
+    background: darkgreen;
+    border: 1px solid white;
+    border-radius: 4px;
+    color: white;
+}
+
+.cm-editor {
+  font-size: large;
+}
+
+.ojs-in-a-box-waiting-for-module-import {
+  margin-bottom: 2rem;
+}
+
+
