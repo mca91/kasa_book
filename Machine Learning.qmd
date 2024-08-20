@@ -14,7 +14,7 @@ Das Gradientenabstiegsverfahren (Gradient Descent) ist ein iteratives Optimierun
 
 Der folgende Pseudocode zeigt die grundlegende Vorgehensweise des Gradientenabstiegsverfahrens unter Einbeziehung eines Momentum-Terms, der dazu dient, das Konvergenzverhalten zu verbessern und lokale Minima effektiver zu überwinden.
 
-\begin{align}
+\begin{align*}
 & \textbf{Algorithmus: Gradientenabstiegsverfahren mit Momentum} \\
 & \textup{Initialisiere: }\\ 
 & \quad x_0 \text{ (Startpunkt) }\\
@@ -26,7 +26,7 @@ Der folgende Pseudocode zeigt die grundlegende Vorgehensweise des Gradientenabst
 & \quad \text{2. Aktualisiere den Momentum-Term: } v_{t+1} = \alpha v_t - \eta \nabla f(x_t) \\
 & \quad \text{3. Aktualisiere die Position: } x_{t+1} = x_t + v_{t+1} \\
 & \quad \text{4. Überprüfe das Abbruchkriterium (z.B. } \| \nabla f(x_t) \| < \epsilon\text{)} \\
-\end{align}
+\end{align*}
 
-<iframe width="100%" height="1172" frameborder="0"
+<iframe class="obs-soft-box-shadow" width="100%" height="1172" frameborder="0"
   src="https://observablehq.com/embed/@mca91/gradient-descent-in-3d-three-js?cells=renderer%2Cviewof+restart%2Cviewof+gridinit%2Cviewof+themin%2Cviewof+themin2%2Cviewof+themin3%2Cviewof+themin4%2Cviewof+themin5%2Cviewof+themin6%2Cscene%2Ccamera"></iframe>

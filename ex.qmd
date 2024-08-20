@@ -1,0 +1,24 @@
+---
+format: live-html
+---
+
+## Übungsaufgaben
+
+Calculate the average of all of the integers from 1 to 10.
+
+```{webr}
+#| exercise: ex_1_r
+#| check: true
+if (identical(.result, mean(1:10))) {
+  list(correct = TRUE, message = "Nice work!")
+} else {
+  list(correct = FALSE, message = "That's incorrect, sorry.")
+}
+```
+
+```{webr}
+#| exercise: ex_1_r
+______(1:10)
+```
+
+
