@@ -1,23 +1,40 @@
 ---
+format: live-html
 webr: 
-  show-startup-message: true
   packages: [
             'broom',
             'cowplot',
+            'lmtest',
             'dplyr',
             'ggplot2',
+            'gt',
+            'modelsummary',
             'palmerpenguins',
+            'pROC',
             'purrr',
             'tidyr',
-            'readr'
+            'readr',
+            'sandwich'
             ]
-  cell-options:
-    editor-font-scale: .85
-    autorun: true
-    out-width: "80%"
 ---
 
 # Regression {#sec-regression}
+
+```{webr}
+#| echo: false
+#| eval: true
+tabopts <- function(x) {
+    fmt_number(x, decimals = 3, drop_trailing_zeros = T) %>%
+    tab_options(table_body.hlines.color = "white",
+              column_labels.border.bottom.color = "black", 
+             column_labels.border.top.color = "black",
+             table_body.border.bottom.color = "black", 
+             table.border.bottom.color = "black",
+             column_labels.font.weight = "bold", 
+             table.font.color = "black", 
+             table.font.size = 16)
+}
+```
 
 Viele der in diesem Companion behandelten Methoden basiert auf dem Konzept der Schätzung kausaler Effekte mit *Regression*. Als Regressionsansatz bezeichnet man eine Methode, welche die Beziehungen zwischen Variablen durch einen funktionalen Zusammenhang beschreibt und die Parameter der gewählten funktionalen Form anhand von beobachteten Daten schätzt. *Lineare Regression* nimmt eine lineare funktionale Form der Beziehung zwischen einer abhängigen Variable (Outcome-Varibale) und erklärenden Variablen (Regressoren) an. *Nicht-lineare Regressionsmethoden* modellieren die Beziehung etwa durch Polynome höherer Ordnung, exponentielle Funktionen oder andere komplexere Formen. Die Wahl der funktionalen Form hängt von der Natur des datenerzeugenden Prozesses (DGP) und somit stets von der spezifischen Beziehung ab, die untersucht wird. 
 
@@ -231,6 +248,9 @@ Das lineare Wahrscheinlichkeitsmodell hat einen wesentlichen Nachteil: Das Model
 
 Dieser Umstand verlangt nach Regressionsansätzen, die $P(Y=1)$ durch eine auf $[0,1]$ beschränkte (nicht-lineare) Funktion der Regressoren modellieren. Häufig verwendete Methoden sind Probit- und Logit-Regression.
 
+Ein lineares Wahrscheinlichkeitsmodell kann mit `lm()` geschätzt werden, wobei die abhängige Variable den Typ `numeric` oder `integer` haben muss.
+
+
 ### Probit-Regression
 
 Bei der Probit-Regression wird die Standardnormalverteilungsfunktion $\Phi(\cdot)$ verwendet, um die Regressionsfunktion bei einer binären abhängigen Variable zu modellieren. Wir nehmen an, dass
@@ -242,7 +262,7 @@ $\beta_0 + \beta_1 X$ in \eqref{eq:probitmodel} ist hier ein *Quantil* $z$ der S
 \begin{align}
 \Phi(z) = P(Z \leq z) \ , \ Z \sim \mathcal{N}(0,1),
 \end{align}
-sodass der Koeffizient $\beta_1$ in \eqref{eq:probitmodel} die Änderung in $z$ misst, die mit einer Änderung von einer Einheit in $X$ verbunden ist. Obwohl der Effekt einer Änderung in $X$ auf $z$ linear ist, ist der Zusammenhang zwischen $z$ und der abhängigen Variable $Y$ *nicht linear*, denn $\Phi(\cdot)$ ist eine nicht-lineare Funktion von $X$ (vgl. @fig-snvf)!
+sodass der Koeffizient $\beta_1$ in \eqref{eq:probitmodel} die Änderung in $z$ misst, die mit einer Änderung von einer Einheit in $X$ verbunden ist. Obwohl der Effekt einer Änderung in $X$ auf $z$ linear ist, ist der Zusammenhang zwischen $z$ und der abhängigen Variable $Y$ *nicht linear*, denn $\Phi(\cdot)$ ist eine nicht-lineare Funktion von $X$.
 
 ```{webr-r}
 # N(0,1)-Verteilungsfunktion
@@ -268,31 +288,71 @@ wobei $\phi(\cdot)$ die Dichtefunktion der Standardnormalverteilung ist. In empi
 2. Berechne die geschätzte Wahrscheinlichkeit, dass $Y=1$ für $X + \Delta X$.
 3. Berechne die Differenz zwischen der geschätzten Wahrscheinlichkeiten.
 
-Wie im linearen Wahrscheinlichkeitsmodell kann das Modell \eqref{eq:probitmodel} auf eine Probit-Regression mit mehreren Regressoren $X_j$, $j=1,\dots,k$ verallgemeinert werden, um das Risiko einer Verzerrung durch ausgelassene Variablen zu mindern. Die Schritte 1 bis 3 für die Berechnung des partiellen Effekts einer Änderung in $X_j$ erfolgen dann unter der Annahme, dass die übrigen $k-1$ Regressoren konstant gehalten werden, wobei der partielle Effekt von den jeweiligen Regressorwerten abhängt. 
+Wie im linearen Wahrscheinlichkeitsmodell kann das Modell \eqref{eq:probitmodel} auf eine Probit-Regression mit $k$ Regressoren $\boldsymbol{X} := (X_1, \dots, X_k)$ verallgemeinert werden, um das Risiko einer Verzerrung durch ausgelassene Variablen zu mindern. Die Schritte 1 bis 3 für die Berechnung des partiellen Effekts einer Änderung in $X_j$ erfolgen dann unter der Annahme, dass die übrigen $k-1$ Regressoren konstant gehalten werden, wobei der partielle Effekt von den jeweiligen Regressorwerten abhängt. 
+
+#### Schätzung
+
+Die Likelihood-Funktion für Probit-Regression ist
+
+\begin{align*}
+  L(\boldsymbol{\beta}) = \prod_{i=1}^n \Phi(\mathbf{X}_i^\top \boldsymbol{\beta})^{y_i} \left[1 - \Phi(\mathbf{X}_i^\top \boldsymbol{\beta})\right]^{1-y_i}
+\end{align*}
+
+Hierbei ist $\Phi(\mathbf{X}_i^\top \boldsymbol{\beta})$ die Wahrscheinlichkeit, dass $ Y_i = 1 $ ist und $1 - \Phi(\mathbf{X}_i^\top \boldsymbol{\beta})$ ist die Wahrscheinlichkeit, dass $Y_i = 0$ ist.
+
+Die Log-Likelihood-Funktion ergibt sich als
+
+\begin{align*}
+  \mathcal{L}(\boldsymbol{\beta}) = \sum_{i=1}^n \left[ y_i \log \Phi(\mathbf{X}_i^\top \boldsymbol{\beta}) + (1 - y_i) \log \left(1 - \Phi(\mathbf{X}_i^\top \boldsymbol{\beta})\right) \right]
+\end{align*}
+
+Um den Maximum-Likelihood-Schätzer $\widehat{\boldsymbol{\beta}}$ zu finden, muss die Log-Likelihood-Funktion $\mathcal{L}(\boldsymbol{\beta})$ maximiert werden. In der Praxis erfolgt dies häufig durch numerische Optimierung, da die Log-Likelihood-Funktion der Probit-Regression im Allgemeinen keine geschlossene Form hat damit eine analytische Lösung nicht möglich ist.
+
+Für eine Anwendung in R und einen Vergleich mit dem linearen Wahrscheinlichkeitsmodell erzeugen wir einen Beispieldatensatz `simdata` für einen datenerzeugenden Prozess (DGP)^[Siehe @sec-sim für Erläuterungen von Simulationsmethoden in R.] mit einem normalverteilten Regressor $X\sim N(5,2^2)$ und
+\begin{align*}
+  P(Y=1\vert X) = \Phi(z), \quad z = -4 + 0.7 X.
+\end{align*}
 
 ```{webr-r}
 # Daten simulieren
 set.seed(1234)
 
 # Stichprobengröße
-n <- 1000 
+n <- 500 
 
 simdata <- tibble(
   X = rnorm(n = n, mean = 5, sd = 2), # Regressor
-  P = pnorm(0.7 * X - 4 + rnorm(n)), # + Rauschen
+  P = pnorm(-4 + 0.7 * X), # + Rauschen
 )
 
 # Binäre Outcome-Variable hinzufügen
 simdata <- simdata %>%
   mutate(
     Y = as.integer(runif(n) < P)
-    )
+  )
+
+# Überblick
+slice_head(simdata, n = 10)
 ```
+
+Das lineare Wahrscheinlichkeitsmodell schätzen wir wie gewohnt mit `lm()` und berechnen robuste Standardfehler mit `lmtest::coeftest()`.
 
 ```{webr-r}
 # lineares Wahrscheinlichkeitsmodell schätzen
-mod_lp <- lm(formula = Y ~ X, data = simdata)
+mod_lp <- lm(
+  formula = Y ~ X, 
+  data = simdata
+)
+
+# Zusammenfassung
+mod_lp %>% 
+  coeftest(vcov = vcovHC, type = "HC1") %>%
+  tidy()
 ```
+
+Beachte, dass lediglich die Vorzeichen der geschätzten Koeffizienten mit denen der wahren Werten übereinstimmmen. Da das lineare Modell fehlspezifiziert ist, sind die KQ-Schätzer der Koeffizienten hier inkonsistent.
+
+Ein Probit-Modell kann mit `glm()` geschätzt werden. Hierbei ist `formula` die Formel für den linearen Prädiktor $z$ und `family` eine Verknüpfungsfunktion (Link) für den Zusammenhang von $z$ und $Y$. Mit `family = binomial(link = "probit")` wählen wir die Link-Funktion `probit`. 
 
 ```{webr-r}
 # Probit-Modell schätzen
@@ -301,7 +361,16 @@ mod_probit <- glm(
   data = simdata, 
   family = binomial(link = "probit")
 )
+
+# Zusammenfassung
+mod_probit %>%
+  coeftest(vcov = vcovHC, type = "HC1") %>%
+  tidy()
 ```
+
+Die geschätzten Koeffizienten in der Probit-Regression liegen, wie erwartet, nahe bei Parametern des DGPs.
+
+Um beide Schätzungen gemeinsam zu plotten, erzeugen wir mit `predict()` Vorhersagen für eine Menge von Werten `X` im Intervall $[0,11]$. Beachte, dass bei Vorhersagen für das Probit-Modell die gewünschte Transformation der vorherzusagenden Variable über `type` gewählt werden muss.^[Dies gilt für jedes Modell mit einer anderen Link-Funktion als $f(x) = x$ ist (lineare Regression).] Der Standardfall ist `type = "link"`, d.h. wir erhalten Vorhersagen für den linearen Prädiktor: $\widehat{z} = \widehat\beta_0 + \widehat{\beta}_1X$. Mit `type = "response"` werden diese Werte mit der Link-Funktion, hier $\Phi(\cdot)$ zu vorhergesagten Wahrscheinlichkeiten $\widehat{P}(Y=1\vert X = x)$ transformiert.
 
 ```{webr-r}
 # geschätzte Wahrscheinlichkeitsfunktion
@@ -320,11 +389,16 @@ pred <- tibble(
     type = "response"
   )
 )
+
+# Überblick verschaffen
+slice_head(pred, n = 10)
 ```
 
+Der nachfolgende Code-Chunk erstellt einen Punkte-Plot mit Jitter-Effekt (`position_jitter`), wobei die Beobachtungen zufällig leicht vertikal verschoben werden, um Überlappungen zu vermeiden. Zusätzlich zeichnen wir die geschätzten Regressionslinien für `mod_lp` (LPM) und `mod_probit` (Probit) sowie die tatsächliche Wahrscheinlichkeitsfunktion $P(Y=1\vert X)$ ein.
+
 ```{webr-r}
-# geschätztes lineares Modell plotten
-simdata %>%
+# Daten und geschätzte Modelle plotten
+p <- simdata %>%
   ggplot(mapping = aes(x = X, y = Y)) +
   geom_point(
     position = position_jitter(
@@ -332,42 +406,81 @@ simdata %>%
       seed = 1234
     ),
     alpha = .25,
-    color = "blue"
+    color = "gray"
   ) +
   geom_line(
     data = pred, 
-    mapping = aes(y = LP),
+    mapping = aes(y = LP, color = "LPM"),
     lwd = .75
   ) +
   geom_line(
     data = pred, 
-    mapping = aes(y = probit),
+    mapping = aes(y = probit, color = "Probit"),
     lwd = .75
   ) +
-  lims(x = c(-2, 14)) +
-  theme_cowplot()
+  geom_function(
+    fun = \(x) pnorm(-4 + .7 * x), 
+    mapping = aes(color = "Wahrheit")
+  ) +
+  scale_color_manual(
+    name = "",
+    values = c(
+      "Wahrheit" = "black",
+      "LPM" = "steelblue", 
+      "Probit" = "orange"
+    )
+  ) +
+  labs(title = "Gesch. Modelle für binäre abhängige Variable") +
+  theme_cowplot() +
+  theme(legend.position = "top")
+
+p
 ```
 
-### Logistische Regression
+Die Grafik zeigt, dass beide Modelle den positiven Zusammenhang für $X$ und $P(Y=1\vert X)$ erfassen. Das lineare Wahrscheinlichkeitsmodell approximiert die tatsächliche nicht-lineare Wahrscheinlichkeitsfunktion nur schlecht und liefert insbesondere in den Rändern der Verteilung von $X$ (kleine und große Werte) unzulässige Vorhersagen außerhalb des Intervalls $[0,1]$. Die Probit-Spezifikation hingegen erfasst den nicht-linearen Verlauf gut.
 
-Bei der logistischen Regression wird die logistische Funktion $\Lambda(\cdot)$ 
+### Logistische Regression {#sec-logreg}
+
+Bei logistischer Regression wird die logistische Funktion $\Lambda(\cdot)$ 
 \begin{align}
 \Lambda(z) = \frac{1}{1 + \exp(-z)},
 \end{align}
-genutzt, um die Wahrscheinlichkeitsfunktion von $Y$ zu modellieren. Ähnlich wie im Probit-Modell nehmen wir hier an, dass
+als Link-Funktion genutzt, um die Wahrscheinlichkeitsfunktion von $Y$ gegeben $X$ zu modellieren. Ähnlich wie im Probit-Modell nehmen wir hier an, dass
 \begin{align}
 E(Y\vert X) = P(Y=1\vert X) = \Lambda(\beta_0 + \beta_1 X). \label{eq:logitmodel}
 \end{align}
-In diesem Modell entspricht $\beta_0 + \beta_1 X$ dem sogenannten *Logit*, dem logarithmierten Verhältnis von $p = P(Y=1\vert X)$ und $1-p = P(Y=0\vert X)$,
+In diesem Modell entspricht $\beta_0 + \beta_1 X$ dem sogenannten *Logit*, dem logarithmierten Verhältnis von $p = P(Y=1\vert X)$ und $1 - p = P(Y=0\vert X)$,
 \begin{align*}
   \textup{Logit(p)} = \log\bigg(\frac{p}{1-p}\bigg) = \beta_0 + \beta_1 X.
 \end{align*}
-wobei $\beta_1$ die Veränderung des Logits pro Einheit Änderung im Regressor $X$ angibt. Wie bereits im Probit-Fall ist der Einfluss von $X$ auf den Logit linear, jedoch besteht auch hier eine nicht-lineare Beziehung zwischen dem Logit und der Wahrscheinlichkeit $P(Y=1)$, da $\Lambda(\cdot)$, ähnlich wie die Normalverteilungsfunktion im Probit-Modell, eine nicht-lineare Funktion mit dem Wertebereich $[0,1]$ ist.
+wobei $\beta_1$ die Veränderung des Logits pro Einheit Änderung im Regressor $X$ angibt. Logistische Regression basiert also nicht auf der Annahme einer normalen Link-Funktion.
+
+Ähnlich wie im Probit-Fall ist der Einfluss von $X$ auf den Logit linear, jedoch besteht auch hier eine nicht-lineare Beziehung zwischen dem Logit und der Wahrscheinlichkeit $P(Y=1\vert X)$, da $\Lambda(\cdot)$, wie $\Phi(\cdot)$ im Probit-Modell, eine nicht-lineare Funktion mit dem Wertebereich $[0,1]$ ist.
+
+### Schätzung
+
+Ähnlich wie bei Probit-Regressionen können Logit-Modelle mit Maximum-Likelihood geschätzt werden. Die Likelihood-Funktion für Logit-Regression lautet
+
+\begin{align}
+  L(\boldsymbol{\beta}) &= \prod_{i=1}^n \left(\frac{1}{1 + \exp(-\mathbf{X}_i^\top \boldsymbol{\beta})}\right)^{y_i} \left(1 - \frac{1}{1 + \exp(-\mathbf{X}_i^\top \boldsymbol{\beta})}\right)^{1-y_i},
+\end{align}
+
+mit $$\frac{1}{1 + \exp(-\mathbf{X}_i^\top \boldsymbol{\beta})}$$ der Wahrscheinlichkeit, dass $Y_i = 1$. Für das Ereignis $Y_i = 0$ ist die  Wahrscheinlichkeit entsprechend $$1 - \frac{1}{1 + \exp(-\mathbf{X}_i^\top \boldsymbol{\beta})}.$$
+
+Die Log-Likelihood-Funktion lautet
+
+\begin{align*}
+  \mathcal{L}(\boldsymbol{\beta}) &= \sum_{i=1}^n \left[ y_i \log \left(\frac{1}{1 + \exp(-\mathbf{X}_i^\top \boldsymbol{\beta})}\right) + (1 - y_i) \log \left(1 - \frac{1}{1 + \exp(-\mathbf{X}_i^\top \boldsymbol{\beta})}\right) \right]
+\end{align*}
+
+und erlaubt die Schätzung von $\boldsymbol{\beta}$ durch Maximierung mit numerischen Methoden.
 
 ```{webr-r}
 # Plot der logistischen Funktion
 ggplot() +
-  geom_function(fun = function(x) {1 / (1 + exp(-x))}) +
+  geom_function(
+    fun = \(x) 1 / (1 + exp(-x))
+  ) +
   scale_x_continuous(
     name = "Logit", 
     limits = c(-6, 6)
@@ -377,19 +490,24 @@ ggplot() +
   theme_cowplot()
 ```
 
-Aufgrund dieser Nicht-Linearität lässt sich der Koeffizient $\beta_1$ ebenso wie im Probit-Modell nicht direkt als einfacher Effekt auf die Wahrscheinlichkeit $P(Y=1)$ interpretieren. Um den partiellen Effekt einer Änderung in $X$ auf $P(Y=1)$ zu ermitteln, berechnet man die Ableitung:
+Aufgrund dieser Nicht-Linearität lässt sich der Koeffizient $\beta_1$ ebenso wie im Probit-Modell nicht direkt als einfacher Effekt auf die Wahrscheinlichkeit $P(Y=1)$ interpretieren. Die Interpretation ist aufgrund der Modellierung des Logits jedoch einfacher als für Probit-Regression:
 
-\begin{align}
+Angenommen ein Unternehmen möchte die Wahrscheinlichkeit modellieren, dass ein Kunde einen Kredit nicht zurückzahlt ($P(Y = 1\vert X)$), basierend auf dem Verhältnis von aktuellem Schuldenstand und Monatseinkommen ($X$). Die Schätzung des Logit-Modells ist, dass ein Anstieg von $X$ um 0.1 (z.B. von 0.1 auf 0.2) den Logit für die Wahrscheinlichkeit eines Kreditausfalls um 0.4 erhöht. Das Logit-Modell besagt dann, dass die Wahrscheinlichkeit der Zahlungsunfähigkeit etwa um den Faktor 1.5 ansteigt,
+\begin{align*}
+  \exp(0.4) \approx 1.50.
+\end{align*}
+
+Um den partiellen Effekt einer Änderung in $X$ am Punkt $X$ auf $P(Y=1)$ zu ermitteln, berechnet man die Ableitung:
+
+\begin{align*}
 \frac{\partial\textup{E}(Y\vert X)}{\partial X} = \frac{\partial\textup{P}(Y=1\vert X)}{\partial X} = \frac{\partial\Lambda(\beta_0 + \beta_1 X)}{\partial X} = \lambda(\beta_0 + \beta_1 X) \beta_1,
-\end{align}
+\end{align*}
 wobei $\lambda(\cdot)$, ähnlich wie die Dichtefunktion der Normalverteilung im Probit-Modell, die Dichtefunktion der logistischen Verteilung darstellt. Diese ist gegeben durch
-\begin{align}
+\begin{align*}
 \lambda(z) = \Lambda(z) \cdot (1 - \Lambda(z)).
-\end{align}
+\end{align*}
 
-### Schätzung mit R
-
-
+Für die Schätzung mit R nutzen wir `glm()` und wählen die logistische Link-Funktion mit `family = binomial(link = "logit")`. Für die simulierten Daten `simdata`:
 
 ```{webr-r}
 # Logit-Modell schätzen
@@ -398,39 +516,288 @@ mod_logit <- glm(
   data = simdata, 
   family = binomial(link = "logit")
 )
+
+# Robuste Zusammenfassung
+mod_logit %>%
+  coeftest(vcov = vcovHC, type = "HC1")
+  tidy()
+```
+
+Wir erweitern nun `pred` um die anhand von `predict()` für `mod_logit` geschätzten Wahrscheinlichkeiten von $Y=1\vert X$ für die Regressorwerte in `X`.
+
+```{webr-r}
+# gesch. WSK-Funktion gem. Logit-Modell hinzufügen
+pred <- pred %>%
+  mutate(
+    Logit = predict(mod_logit, tibble(X), type = "response")
+  )
+```
+
+Anhand der Vorhersagen in `pred` können wir die im Objekt `p` gespeicherte Grafik um die geschätzte Regressionsfunktion für das Logit-Modell erweitern.
+
+```{webr-r}
+# Grafik mit Logit-fit erweitern
+p + 
+  geom_line(
+    data = pred, 
+    mapping = aes(y = Logit, color = "Logit"),
+    lwd = .75
+  ) +
+    scale_color_manual(
+    name = "",
+    values = c(
+      "Wahrheit" = "black",
+      "LPM" = "steelblue", 
+      "Probit" = "orange",
+      "Logit" = "darkred"
+    )
+  )
+```
+
+Die Logit-Regression kann den wahren Zusammenhang gut abbilden und ist praktisch nicht von der Probit-Schätzung unterscheidbar. 
+
+### Modellgüte
+
+Ähnlich wie bei linearer Regression kann die Anpassung von generalisierten linearen Modellen an die Daten mit Anpassungsmaßen verglichen werden. In generalisierten linearen Modellen für binäre Outcome-Variablen kann hierzu die *Deviance* verwendet werden. Für eine Schätzung anhand der Beobachtungen $i=1,\dots,n$ berechnet man die Deviance $D$ als
+\begin{align*}
+  D = -2 \sum_{i=1}^{n} \left[ y_i \cdot \log\left(\widehat{P}_i\right) + (1 - y_i) \cdot \log\left(1 - \widehat{P}_i\right) \right].
+\end{align*}
+$D$ quantifiziert die Abweichung eines geschätzten Modells von einem perfekt passenden Modell.^[Im Allgemeinen vergleicht Deviance die Log-Likelihood des geschätzten Modells mit der Log-Likelihood des perfekten Modells.] Eine geringere Deviance deutet darauf hin, dass das Modell die Daten besser erklärt. Eine R-Funktion zur Anwendung für Objekte des Typs `glm` ist `deviance()`.
+
+```{webr}
+# Deviance berechnen
+list(
+  "Probit" = mod_probit, 
+  "Logit" = mod_logit
+) %>% 
+  map_dbl(.f = deviance)
+```
+
+Die Deviance für das Probit-Modell ist tatsächlich etwas geringer als für das Logit-Modell. 
+
+Ähnlich wie $R^2$ für lineare Regression misst Deviance lediglich die Anpassung des Modells an die beobachteten Daten. Daher eignet sich Deviance nur bedingt als Maß zur Einschätzung der Tauglichkeit eines Modells für Out-of-sample-Vorhersagen. Je nach Ziel der Modellierung kann es hilfreich sein, eine robuste Einschätzung der Vorhersage-Güte unter Berücksichtigung der Modellkomplexität vorzunehmen. Hierfür werden oft Informationskriterien verwendet. Das Akaike-Informationskriterium (AIC) 
+\begin{align*}
+  \text{AIC} = 2k - 2 \log(\widehat{\mathcal{L}})
+\end{align*}
+ist ein Maß zur Bewertung der Güte eines Modells unter Berücksichtigung der Modellkomplexität. Das AIC wägt die Anpassung des Modells an die Daten (gemessen durch die maximierte Likelihood-Funktion $\widehat{\mathcal{L}}$^[$\widehat{\mathcal{L}}$ meint die Likelihood-Funktion für die geschätzen Koeffizienten.]) und die Komplexität (gemessen als Funktion der Regressoranzahl $k$) gegeneinander ab. Hierbei werden Modelle mit weniger Parametern bevorzugt, wenn sie die Daten ähnlich gut erklären, sodass eine Überanpassung und damit eine schlechte Vorhersage-Fähigkeit vermieden werden. In R können wir das AIC für Modell-Objekte mit `AIC()` berechnen. 
+
+```{webr}
+# AIC berechnen
+list(
+  Probit = mod_probit, 
+  Logit = mod_logit
+) %>% 
+  map_dbl(.f = AIC)
+```
+
+Auch das AIC zeigt an, dass die Schätzung des Probit-Modells in `mod_probit` besser geeignet für die Modiellierung von `simdata` ist als das Logit-Modell `mod_logit`.
+
+### Beispiel: Klassifikation von Palmer-Piniguinen
+
+Anhand der in diesem Kapitel betrachteten Methoden können wir Modelle zur Klassifikation von Pinguinen in `palmerpenguins::penguins` hinsichtlich ihres Geschlechts konstruieren. Hierfür nutzen wir den bereinigten Datensatz `penguins_cleaned` und transformieren zunächst die abhängige Variable `sex` in ein numerisches Format.
+
+```{webr}
+# 'sex' transformieren
+penguins_cleaned <- penguins_cleaned %>% 
+  mutate(
+    # sex in 0,1-codierte Variable umwandeln
+    sex = if_else(sex == "female", 1, 0)
+    )
+
+# Überprüfen
+penguins_cleaned %>%
+  select(sex) %>%
+  slice_head(n = 10)
+```
+
+Wir schätznen nachfolgend ein lineares Wahrscheinlichkeitsmodell `penguins_lp`, ein Probit-Modell `penguins_probit` sowie ein Logit-Modell `penguins_logit` die jeweils `sex` anhand der simplen Spezikation des linearen Prädiktors $$z = \beta_0 + \beta_1 \textup{bill\_depth}$$ erklären.
+
+```{webr}
+# Lineares Modell
+penguins_lp <- lm(
+  formula = sex ~ bill_depth, 
+  data = penguins_cleaned
+) 
+
+# Robuste Zusammenfassung
+penguins_lp %>%
+  coeftest(vcov = vcovHC, type = "HC1") %>%
+  tidy()
+```
+
+```{webr}
+# Probit-Modell
+penguins_probit <- glm(
+  formula = sex ~ bill_depth, 
+  data = penguins_cleaned, 
+  family = binomial("probit")
+)
+
+# Robuste Zusammenfassung
+penguins_probit %>% 
+    coeftest(vcov = vcovHC, type = "HC1") %>%
+  tidy()
+```
+
+```{webr}
+# Logit-Modell
+penguins_logit <- glm(
+  formula = sex ~ bill_depth, 
+  data = penguins_cleaned, 
+  family = binomial("logit")
+)
+
+# Robuste Zusammenfassung
+penguins_logit %>% 
+  coeftest(vcov = vcovHC, type = "HC1") %>%
+  tidy()
+```
+
+Mit `modelsummary::modelsummary()` können wir die wichtigsten Ergebnisse der Regressionen in einer pubplikationsfähigen Tabelle darstellen. Hierzu übergeben wir dem Argument `models` eine (benannte) Liste der geschätzten Modelle. Bei Angabe von `vcov = "HC1"` werden robuste Standardfehler ausgegeben.
+
+```{webr}
+library(modelsummary)
+
+# Geschätzte Modelle
+modelsummary(
+  models = 
+    list(
+      "LPM" = penguins_lp,
+      "Probit" = penguins_probit,
+      "Logit" = penguins_logit
+    ), 
+  output = "gt", 
+  vcov = "HC1", 
+  stars = TRUE, 
+) %>%
+  tabopts() %>%
+  tab_header(
+    title = "Modelle für Geschlecht v. Pinguinen",
+  )
+```
+
+Die geschätzten negativen und signifikanten Koeffizienten von $bill\_depth$ erfassen den Zusammenhang, dass Pinguine mit größeren Schnäbeln tendenziell männlich sind: Je größer $bill\_depth$, desto geringer die geschätzte Wahrscheinlichkeit, dass ein Pinguin weiblich ist. Ein Vergleich anhand des AIC zeigt, dass das Probit-Modell `penguins_probit` am besten geeignet ist.
+
+Analog zur Vorgehensweise in @sec-logreg können wir die geschätzten Modelle vergleichen, in dem wir geschätzte Wahrscheinlichkeiten $P(Y=\textup{weiblich}\vert\textup{bill\_depth})$ für eine Menge repräsentativer Werte des Regressors `bill_depth` berechnen und gemeinsam mit den Beobachtungen plotten.
+
+```{webr}
+# Sequenz für bill_depth erstellen
+bill_depth_new <- seq(
+  from = min(penguins_cleaned$bill_depth), 
+  to = max(penguins_cleaned$bill_depth), 
+  by = .1
+)
+
+# Vorhersagen WSK mit 'bill_depth_new'
+preds <- tibble(
+  bill_depth = bill_depth_new,
+  lp = predict(
+    object = penguins_lp, 
+    newdata = tibble(bill_depth = bill_depth_new)
+  ),
+  probit = predict(
+    object = penguins_probit,
+    newdata = tibble(bill_depth = bill_depth_new),
+    type = "response"
+  ),
+  logit = predict(
+    object = penguins_logit,
+    newdata = tibble(bill_depth = bill_depth_new),
+    type = "response"
+  )
+)
+
+# Prüfen:
+slice_head(preds, n = 10)
 ```
 
 ```{webr-r}
-# gesch. WSK-Funktion für Probit- und Logit-Modelle
-pred <- pred %>%
+# Geschätzte bedingte WSK plotten
+penguins_cleaned %>%
+  ggplot(
+    mapping = aes(x = bill_depth, y = sex)
+  ) +
+  geom_point(
+    position = position_jitter(
+      height = .025,
+      seed = 1234
+    ),
+    alpha = .25,
+    color = "blue"
+  ) +
+  geom_line(
+    data = preds, 
+    mapping = aes(y = lp, color = "LPM")) +
+  geom_line(
+    data = preds, 
+    mapping = aes(y = probit, color = "Probit")) +
+  geom_line(
+    data = preds, 
+    mapping = aes(y = logit, color = "Logit")) +
+  scale_color_manual(
+    name = "Modelle",
+    values = c(
+      "LPM" = "steelblue", 
+      "Probit" = "orange",
+      "Logit" = "darkred"
+    )
+  )
+  labs(title = "Modellierung v. Pinguin-Geschlecht mit Regression") +
+  theme_cowplot() +
+  theme(legend.position = "top")
+```
+
+Die geschätzten Regressionsfunktionen unterscheiden sich für den Bereich beobachteter Werte von $bill\_depth$ nur wenig. Die Grafik zeigt, dass die Schätzungen mit Probit- und Logit-Ansatz nur wenig Nicht-Linearität aufweisen, sodass eine (leichter interpretierbare) Modellierung mit dem linearen Wahrscheinlichkeitsmodell `penguins_lp` hier zulässig scheint.
+
+Die Klassifizierung der Pinguine im Datensatz hinsichtlich ihres Geschlechts anhand vorhergesagter Wahrscheinlichkeiten $\widehat{P}_i$ kann durch Abgleich mit einem Grenzwert erfolgen. Ein Beispiel ist
+\begin{align}
+  \widehat{Y}_i = \begin{cases}
+    \textup{weiblich}, & \widehat{P}_i \geq .5,\\
+    \textup{männlich}, & \textup{sonst.}
+  \end{cases}\label{eq:pengclass}
+\end{align}
+
+Wir können diesen Ansatz in R implementieren, indem wir zunächst die für den Datensatz angepassten Wahrscheinlichkeiten `fitted` aus den Modell-Objekten auslesen.
+
+```{webr}
+(
+  WSK <- penguins_cleaned %>%
+  select(sex) %>%
   mutate(
-    Probit = predict(mod_probit, tibble(X), type = "response"),
-    Logit = predict(mod_logit, tibble(X), type = "response")
-  ) %>%
-  pivot_longer(
-  cols = LP:Logit, 
-  names_to = "Methode", 
-  values_to = "Wsk"
+    list(
+      linear = penguins_lp, 
+      probit = penguins_probit,
+      logit = penguins_logit
+    ) %>% 
+      map_dfc(.f = ~ .$fitted)     
+  )
 )
 ```
 
-```{webr-r}
-# Vergleich mit linearem Modell
-simdata %>%
-  ggplot(mapping = aes(x = X, y = Y) ) +
-  geom_point(
-    position = position_jitter(
-      height = .01, 
-      seed = 1234
+Für die Klassifikation der Pinguine anhand der jeweiligen geschätzten Wahrscheinlichkeiten wenden wir die Regel \eqref{eq:pengclass} mit `across()` spaltenweise für die Modelle an und erzeugen neue Spalten mit vorhersagen des Geschlechts. Mit `.names = "{.col}_pred"` erhalten die neuen Spalten das Suffix `_pred`.
+
+```{webr}
+# Klassifikation f. Geschlecht durchführen
+vorh <- WSK %>%
+  mutate(
+    across(
+      c(linear:logit), 
+      .fns = ~ (. > 0.5) == sex,
+      .names = "{.col}_pred")
     )
-  ) +
-  geom_line(
-    data = pred, 
-    mapping = aes(y = Wsk, color = Methode)
-  ) +
-  scale_y_continuous(breaks = c(0, 1)) +
-  theme_cowplot()
 ```
+
+Mit `summarise()` berechnen wir nun den Anteil korrekter Vorhersagen.
+
+```{webr}
+# Genauigkeit der Vorhersage berechnen
+vorh %>% 
+  summarise(
+    across(linear_pred:logit_pred, mean)
+  )
+```
+
+In diesem Beispiel unterscheiden sich die Vorhersagen der drei Modelle für den Grenzwert 0.5 nicht.
 
 ## Modellierung von Zählvariablen mit Poisson-Regression {#sec-poissonreg}
 
@@ -477,131 +844,6 @@ ggplot(
     theme_cowplot()
 ```
 
-
-### Beispiel: Klassifikation für Palmer-Piniguinen
-
-```{webr-r}
-penguins_cleaned <- penguins_cleaned %>% 
-  mutate(
-    # sex in 0,1-codierte Variable umwandeln
-    sex = if_else(sex == "female", 1, 0)
-    )
-
-penguins_cleaned %>% 
-  slice_head(n = 10)
-```
-
-```{webr-r}
-penguins_lp <- lm(
-  formula = sex ~ bill_depth, 
-  data = penguins_cleaned
-) 
-
-penguins_lp %>%
-  tidy()
-```
-
-```{webr-r}
-penguins_probit <- glm(
-  formula = sex ~ bill_depth, 
-  data = penguins_cleaned, 
-  family = binomial("probit")
-)
-
-penguins_probit %>% 
-  tidy()
-```
-
-```{webr-r}
-penguins_logit <- glm(
-  formula = sex ~ bill_depth, 
-  data = penguins_cleaned, 
-  family = binomial("logit")
-)
-
-penguins_logit %>% 
-  tidy()
-```
-
-```{webr-r}
-bill_depth_new <- seq(10, 25, .01)
-
-preds <- tibble(
-  bill_depth = bill_depth_new,
-  lp = predict(
-    object = penguins_lp, 
-    newdata = tibble(bill_depth = bill_depth_new)
-  ),
-  probit = predict(
-    object = penguins_probit,
-    newdata = tibble(bill_depth = bill_depth_new),
-    type = "response"
-  ),
-  logit = predict(
-    object = penguins_logit,
-    newdata = tibble(bill_depth = bill_depth_new),
-    type = "response"
-  )
-)
-```
-
-
-```{webr-r}
-penguins_cleaned %>%
-  ggplot(
-    mapping = aes(x = bill_depth, y = sex)
-  ) +
-  geom_point(
-    position = position_jitter(
-      height = .025,
-      seed = 1234
-    ),
-    alpha = .25,
-    color = "blue"
-  ) +
-  geom_line(
-    data = preds, 
-    mapping = aes(y = lp, color = "lineares WSK-Modell")) +
-  geom_line(
-    data = preds, 
-    mapping = aes(y = probit, color = "Probit-Modell")) +
-  geom_line(
-    data = preds, 
-    mapping = aes(y = logit, color = "Logit-Modell")) +
-  labs(title = "Modellierung v. Pinguin-Geschlecht mit Regression") +
-  theme_cowplot()
-```
-
-```{webr-r}
-(
-  WSK <- penguins_cleaned %>%
-  select(sex) %>%
-  mutate(
-    list(
-      linear = penguins_lp, 
-      probit = penguins_probit,
-      logit = penguins_logit
-    ) %>% 
-      map_dfc(.f = ~ .$fitted)     
-  )
-)
-```
-
-```{webr-r}
-vorh <- WSK %>%
-  mutate(
-    across(c(linear:logit), 
-           .fns = ~ (. > 0.5) == sex,
-           .names = "{.col}_pred")
-    )
-
-vorh %>% 
-  summarise(
-    across(linear_pred:probit_pred, mean)
-  )
-```
-
-
 ### Der Regressionsansatz
 
 In der Poisson-Regression modellieren wir den Erwartungswert der abhängigen Variable $Y$ als eine Funktion der unabhängigen Variablen $\mathbf{X} = (X_1, X_2, \ldots, X_k)$. Der Erwartungswert von $Y$ wird durch den Parameter $\lambda$ repräsentiert, der wiederum eine Funktion der unabhängigen Variablen ist. Die Beziehung wird typischerweise durch eine logarithmische Verknüpfungsfunktion beschrieben:
@@ -624,7 +866,7 @@ geschrieben werden, wobei:
 
 - $\boldsymbol{\beta}$ der Vektor der Regressionskoeffizienten ist.
 
-### Modellanpassung
+### Schätzung
 
 Die Parameter $\boldsymbol{\beta}$ werden durch Maximum-Likelihood-Schätzung (MLE) geschätzt. Die Likelihood-Funktion für $n$ Beobachtungen ist gegeben durch
 
