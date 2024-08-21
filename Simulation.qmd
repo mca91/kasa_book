@@ -138,7 +138,7 @@ div.sidebar-item-container:hover {
 </style>
 ```
 
-# Simulation
+# Simulation {#sec-sim}
 
 Bei der Analyse quantitativer Methoden treten häufig Fragestellungen auf, die sich rein mathematisch nur schwer oder gar nicht lösen lassen. So ist es sogar in einfachsten ökonometrischen Modellen oft unmöglich, die exakte Verteilung von Koeffizientenschätzern unter “realistischen” Bedingungen (etwa eine endliche Stichprobengröße und schwache Annahmen über die Verteilung der Fehlerterme) formal zu bestimmen. Asymptotische Theorie kann dann helfen, indem eine Approximation der Stichproben-Eigenschaften eines Schätzers aus Eigenschaften der asymptotischen Verteilung abgeleitet werden. Häufig sind solche Approximationen jedoch nur bei großen Stichproben verlässlich. Wichtige Eigenschaften von Schätzern kausaler Effekte in empirischen Anwendungen, wie die Varianz der Schätzung oder das zu erwartende Außmaß der Verzerrung bei Verletzungen von Modellannahmen hingegen können mit asymptotischer Theorie oftmals gar nicht approximiert werden.
 
