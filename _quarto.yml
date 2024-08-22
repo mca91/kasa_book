@@ -1,6 +1,6 @@
 lang: "de"
 
-engine: jupyter
+engine: knitr
 
 project:
   type: book
@@ -16,7 +16,6 @@ book:
     - part: "Grundlagen"
       chapters:
         - R_Einfuehrung.qmd
-        - ex.qmd
         - Reg.qmd
         - Simulation.qmd
     - part: "Kausale Inferenz"
@@ -32,6 +31,7 @@ book:
       chapters:
         - RegReg.qmd
         - Machine Learning.qmd
+    - ex.qmd
     - Literatur.qmd
   repo-branch: main
   repo-actions: [edit, issue]

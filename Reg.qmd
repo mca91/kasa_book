@@ -1,5 +1,6 @@
 ---
 format: live-html
+engine: knitr
 webr: 
   packages: [
             'broom',
@@ -18,11 +19,13 @@ webr:
             ]
 ---
 
+{{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
+{{< include ./_extensions/r-wasm/live/_gradethis.qmd >}}
+
 # Regression {#sec-regression}
 
 ```{webr}
 #| echo: false
-#| eval: true
 tabopts <- function(x) {
     fmt_number(x, decimals = 3, drop_trailing_zeros = T) %>%
     tab_options(table_body.hlines.color = "white",
@@ -76,7 +79,7 @@ unter der Annahme, dass $\beta_1$ der interessierende Effekt ist: Die erwartete 
 
 Vor der Schätzung von Modell \eqref{eq:billdepthmodel} lesen wir den Datensatz ein und erstellen eine bereinigte Variante `penguins_cleaned`, analog zur Vorgehensweise in @sec-pp.
 
-```{webr-r}
+```{webr}
 library(palmerpenguins)
 data(penguins)
 
@@ -99,7 +102,7 @@ slice_head(penguins_cleaned, n = 10)
 
 Wir schätzen nun Modell \eqref{eq:billdepthmodel} mit `lm()` und erhalten eine Zusammenfassung der geschätzen Koeffizienten mit `broom::tidy()`.
 
-```{webr-r}
+```{webr}
 library(broom)
 
 # "Großes" Modell schätzen
@@ -118,7 +121,7 @@ Das Ergebnis der Schätzung ist $\widehat{\beta}_1\approx3.80$. Der nächste Cod
 
 und speichert diese in `body_mass_res` und `bill_length_res`.
 
-```{webr-r}
+```{webr}
 # FWL-Schritt 1 (a)
 peng_mod_fwl1a <- lm(
   formula = body_mass ~ flipper_length, 
@@ -136,7 +139,7 @@ peng_mod_fwl1b <- lm(
 bill_length_res <- residuals(peng_mod_fwl1b)
 ```
 
-```{webr-r}
+```{webr}
 # FWL-Schritt 2
 lm(formula = body_mass_res ~ bill_length_res - 1) %>% 
   tidy()
@@ -150,7 +153,7 @@ Wir können den Effekt der Kontrolle für `flipper_length` visualisieren. Wir pl
  
 - Die um `flipper_length` bereinigten Datenpunkte und die zugehörige geschätzte Regressionslinie.
 
-```{webr-r}
+```{webr}
 # Residuen in tibble sammeln
 tibble(
   body_mass_res, 
@@ -251,44 +254,48 @@ Dieser Umstand verlangt nach Regressionsansätzen, die $P(Y=1)$ durch eine auf $
 Ein lineares Wahrscheinlichkeitsmodell kann mit `lm()` geschätzt werden, wobei die abhängige Variable den Typ `numeric` oder `integer` haben muss.
 
 
-### Probit-Regression
+### Probit-Regression {#sec-probitreg}
 
-Bei der Probit-Regression wird die Standardnormalverteilungsfunktion $\Phi(\cdot)$ verwendet, um die Regressionsfunktion bei einer binären abhängigen Variable zu modellieren. Wir nehmen an, dass
+Bei der Probit-Regression wird die Standardnormalverteilungsfunktion $\Phi(\cdot)$ verwendet, um die Regressionsfunktion einer binären abhängigen Variable zu modellieren. Wir nehmen an, dass
 \begin{align}
-  E(Y\vert X) = P(Y=1\vert X) = \Phi(\beta_0 + \beta_1 X). \label{eq:probitmodel}
+  E(Y\vert X) = P(Y=1\vert X) = \Phi(\beta_0 + \beta_1 X), \label{eq:probitmodel}
 \end{align}
+sodass der mit der Verknüfungsfunktion (Link) $$\textup{probit}(\cdot) = \Phi^{-1}(\cdot)$$ transformierte Erwartungswert $P(Y=1\vert X)$ dem linearen Prädiktor $z=\beta_0 + \beta_1 X$ entspricht,
+\begin{align*}
+  \Phi^{-1}\big[P(Y=1\vert X)\big] = \beta_0 + \beta_1 X.
+\end{align*}
 
-$\beta_0 + \beta_1 X$ in \eqref{eq:probitmodel} ist hier ein *Quantil* $z$ der Standardnormalverteilung,
-\begin{align}
-\Phi(z) = P(Z \leq z) \ , \ Z \sim \mathcal{N}(0,1),
-\end{align}
-sodass der Koeffizient $\beta_1$ in \eqref{eq:probitmodel} die Änderung in $z$ misst, die mit einer Änderung von einer Einheit in $X$ verbunden ist. Obwohl der Effekt einer Änderung in $X$ auf $z$ linear ist, ist der Zusammenhang zwischen $z$ und der abhängigen Variable $Y$ *nicht linear*, denn $\Phi(\cdot)$ ist eine nicht-lineare Funktion von $X$.
+$z=\beta_0 + \beta_1 X$ in \eqref{eq:probitmodel} modelliert hier also ein *Quantil* der Standardnormalverteilung,
+\begin{align*}
+\Phi(z) = P(Z \leq z) \ , \ Z \sim \mathcal{N}(0,1).
+\end{align*}
+Der Koeffizient $\beta_1$ in \eqref{eq:probitmodel} misst die Änderung in $z$, die mit einer Änderung von $X$ um eine Einheit verbunden ist. Obwohl der Effekt einer Änderung in $X$ auf $z$ linear ist, ist der Zusammenhang zwischen $z$ und $\textup{E}(Y\vert X) = P(Y=1\vert X)$ *nicht linear*, denn $\Phi(\cdot)$ ist eine nicht-lineare Funktion von $X$.
 
-```{webr-r}
-# N(0,1)-Verteilungsfunktion
+```{webr}
+# N(0,1)-Quantilsfunktion / Probit-Link
 ggplot() +
-  geom_function(fun = pnorm) +
+  geom_function(fun = qnorm) +
   scale_x_continuous(
     name = "z", 
-    limits = c(-4, 4)
+    limits = c(0, 1)
   ) +
-  scale_y_continuous(name = "P(Z<z)") +
-  labs(title = "Verteilungsfunktion einer N(0,1)-Zufallsvariable") +
+  scale_y_continuous(name = "Quantil") +
+  labs(title = "Probit-Funktion") +
   theme_cowplot()
 ```
 
-Aufgrund der Nicht-Linearität hat der Koeffizient von $X$ keine einfache Interpretation hinsichtlich des Effekts auf $Y$. Die Änderung in der Wahrscheinlichkeit, dass $Y=1$ ist, durch eine Änderung in $X$ (partieller Effekt) kann berechnet werden als:
+Aufgrund der Nicht-Linearität der Link-Funktion hat der Koeffizient von $X$ keine einfache Interpretation hinsichtlich des Effekts auf $P(Y=1\vert X)$. Die Änderung in der Wahrscheinlichkeit, dass $Y=1$ ist, durch eine Änderung in $X$ (partieller Effekt von $X$) kann berechnet werden als:
 
-\begin{align}
+\begin{align*}
   \frac{\partial\textup{E}(Y\vert X)}{\partial X} = \frac{\partial\textup{P}(Y=1\vert X)}{\partial X} = \frac{\partial\Phi(\beta_0 + \beta_1 X)}{\partial X} = \phi(\beta_0 + \beta_1 X) \beta_1,
-\end{align}
+\end{align*}
 wobei $\phi(\cdot)$ die Dichtefunktion der Standardnormalverteilung ist. In empirischen Anwendungen wird der partielle Effekt häufig als Differenz in geschätzten Wahrscheinlichkeiten angegeben:
 
 1. Berechne die geschätzte Wahrscheinlichkeit, dass $Y=1$ für einen Bezugswert $X$.
 2. Berechne die geschätzte Wahrscheinlichkeit, dass $Y=1$ für $X + \Delta X$.
 3. Berechne die Differenz zwischen der geschätzten Wahrscheinlichkeiten.
 
-Wie im linearen Wahrscheinlichkeitsmodell kann das Modell \eqref{eq:probitmodel} auf eine Probit-Regression mit $k$ Regressoren $\boldsymbol{X} := (X_1, \dots, X_k)$ verallgemeinert werden, um das Risiko einer Verzerrung durch ausgelassene Variablen zu mindern. Die Schritte 1 bis 3 für die Berechnung des partiellen Effekts einer Änderung in $X_j$ erfolgen dann unter der Annahme, dass die übrigen $k-1$ Regressoren konstant gehalten werden, wobei der partielle Effekt von den jeweiligen Regressorwerten abhängt. 
+Wie im linearen Wahrscheinlichkeitsmodell kann das Modell \eqref{eq:probitmodel} auf eine Probit-Regression mit $k+1$ Regressoren $\boldsymbol{X} := (1, X_1, \dots, X_k)$ verallgemeinert werden, um das Risiko einer Verzerrung durch ausgelassene Variablen zu mindern. Die Schritte 1 bis 3 für die Berechnung des partiellen Effekts einer Änderung in $X_j$ erfolgen dann unter der Annahme, dass die übrigen $k-1$ Regressoren konstant gehalten werden, wobei der partielle Effekt von den jeweiligen Regressorwerten abhängt. Im nächsten Abschnitt erläutern wir die Schätzung von Probit-Modellen mit $k+1$ Regressoren.
 
 #### Schätzung
 
@@ -298,7 +305,7 @@ Die Likelihood-Funktion für Probit-Regression ist
   L(\boldsymbol{\beta}) = \prod_{i=1}^n \Phi(\mathbf{X}_i^\top \boldsymbol{\beta})^{y_i} \left[1 - \Phi(\mathbf{X}_i^\top \boldsymbol{\beta})\right]^{1-y_i}
 \end{align*}
 
-Hierbei ist $\Phi(\mathbf{X}_i^\top \boldsymbol{\beta})$ die Wahrscheinlichkeit, dass $ Y_i = 1 $ ist und $1 - \Phi(\mathbf{X}_i^\top \boldsymbol{\beta})$ ist die Wahrscheinlichkeit, dass $Y_i = 0$ ist.
+Hierbei ist $\Phi(\mathbf{X}_i^\top \boldsymbol{\beta})$ die Wahrscheinlichkeit, dass $Y_i = 1$ ist und $1 - \Phi(\mathbf{X}_i^\top \boldsymbol{\beta})$ ist die Wahrscheinlichkeit, dass $Y_i = 0$ ist.
 
 Die Log-Likelihood-Funktion ergibt sich als
 
@@ -313,7 +320,7 @@ Für eine Anwendung in R und einen Vergleich mit dem linearen Wahrscheinlichkeit
   P(Y=1\vert X) = \Phi(z), \quad z = -4 + 0.7 X.
 \end{align*}
 
-```{webr-r}
+```{webr}
 # Daten simulieren
 set.seed(1234)
 
@@ -337,7 +344,7 @@ slice_head(simdata, n = 10)
 
 Das lineare Wahrscheinlichkeitsmodell schätzen wir wie gewohnt mit `lm()` und berechnen robuste Standardfehler mit `lmtest::coeftest()`.
 
-```{webr-r}
+```{webr}
 # lineares Wahrscheinlichkeitsmodell schätzen
 mod_lp <- lm(
   formula = Y ~ X, 
@@ -352,9 +359,9 @@ mod_lp %>%
 
 Beachte, dass lediglich die Vorzeichen der geschätzten Koeffizienten mit denen der wahren Werten übereinstimmmen. Da das lineare Modell fehlspezifiziert ist, sind die KQ-Schätzer der Koeffizienten hier inkonsistent.
 
-Ein Probit-Modell kann mit `glm()` geschätzt werden. Hierbei ist `formula` die Formel für den linearen Prädiktor $z$ und `family` eine Verknüpfungsfunktion (Link) für den Zusammenhang von $z$ und $Y$. Mit `family = binomial(link = "probit")` wählen wir die Link-Funktion `probit`. 
+Ein Probit-Modell kann mit `stats::glm()` geschätzt werden. Hierbei ist `formula` die Formel für den linearen Prädiktor $z$ und `family` eine Link-Funktion für den Zusammenhang von $z$ und $P(Y\vert X)$. Mit `family = binomial(link = "probit")` wählen wir die Link-Funktion `probit`.
 
-```{webr-r}
+```{webr}
 # Probit-Modell schätzen
 mod_probit <- glm(
   formula = Y ~ X,
@@ -372,7 +379,7 @@ Die geschätzten Koeffizienten in der Probit-Regression liegen, wie erwartet, na
 
 Um beide Schätzungen gemeinsam zu plotten, erzeugen wir mit `predict()` Vorhersagen für eine Menge von Werten `X` im Intervall $[0,11]$. Beachte, dass bei Vorhersagen für das Probit-Modell die gewünschte Transformation der vorherzusagenden Variable über `type` gewählt werden muss.^[Dies gilt für jedes Modell mit einer anderen Link-Funktion als $f(x) = x$ ist (lineare Regression).] Der Standardfall ist `type = "link"`, d.h. wir erhalten Vorhersagen für den linearen Prädiktor: $\widehat{z} = \widehat\beta_0 + \widehat{\beta}_1X$. Mit `type = "response"` werden diese Werte mit der Link-Funktion, hier $\Phi(\cdot)$ zu vorhergesagten Wahrscheinlichkeiten $\widehat{P}(Y=1\vert X = x)$ transformiert.
 
-```{webr-r}
+```{webr}
 # geschätzte Wahrscheinlichkeitsfunktion
 # für lineares Modell
 X <- seq(0, 11, 0.01)
@@ -396,7 +403,7 @@ slice_head(pred, n = 10)
 
 Der nachfolgende Code-Chunk erstellt einen Punkte-Plot mit Jitter-Effekt (`position_jitter`), wobei die Beobachtungen zufällig leicht vertikal verschoben werden, um Überlappungen zu vermeiden. Zusätzlich zeichnen wir die geschätzten Regressionslinien für `mod_lp` (LPM) und `mod_probit` (Probit) sowie die tatsächliche Wahrscheinlichkeitsfunktion $P(Y=1\vert X)$ ein.
 
-```{webr-r}
+```{webr}
 # Daten und geschätzte Modelle plotten
 p <- simdata %>%
   ggplot(mapping = aes(x = X, y = Y)) +
@@ -437,7 +444,7 @@ p <- simdata %>%
 p
 ```
 
-Die Grafik zeigt, dass beide Modelle den positiven Zusammenhang für $X$ und $P(Y=1\vert X)$ erfassen. Das lineare Wahrscheinlichkeitsmodell approximiert die tatsächliche nicht-lineare Wahrscheinlichkeitsfunktion nur schlecht und liefert insbesondere in den Rändern der Verteilung von $X$ (kleine und große Werte) unzulässige Vorhersagen außerhalb des Intervalls $[0,1]$. Die Probit-Spezifikation hingegen erfasst den nicht-linearen Verlauf gut.
+Die Grafik zeigt, dass beide Modelle den positiven Zusammenhang für $X$ und $P(Y=1\vert X)$ erfassen. Das lineare Wahrscheinlichkeitsmodell approximiert die tatsächliche nicht-lineare Wahrscheinlichkeitsfunktion nur schlecht und liefert insbesondere in den Rändern der Verteilung von $X$ (kleine und große Werte) unzulässige Vorhersagen außerhalb des Intervalls $[0,1]$. Die Probit-Spezifikation hingegen erfasst den nicht-linearen Verlauf der tatsächlichen Wahrscheinlichkeitsfunktion gut.
 
 ### Logistische Regression {#sec-logreg}
 
@@ -449,13 +456,69 @@ als Link-Funktion genutzt, um die Wahrscheinlichkeitsfunktion von $Y$ gegeben $X
 \begin{align}
 E(Y\vert X) = P(Y=1\vert X) = \Lambda(\beta_0 + \beta_1 X). \label{eq:logitmodel}
 \end{align}
-In diesem Modell entspricht $\beta_0 + \beta_1 X$ dem sogenannten *Logit*, dem logarithmierten Verhältnis von $p = P(Y=1\vert X)$ und $1 - p = P(Y=0\vert X)$,
+In diesem Modell ist die Link-Funktion $\Lambda^{-1}(\cdot)$. Für $z=\beta_0 + \beta_1 X$ ist $\Lambda^{-1}(t)$ der sogenannte *logit*: Dass logarithmierte Verhältnis von $p := P(Y=1\vert X)$ und $1 - p = P(Y=0\vert X)$,
 \begin{align*}
-  \textup{Logit(p)} = \log\bigg(\frac{p}{1-p}\bigg) = \beta_0 + \beta_1 X.
+  \textup{logit(p)} = \log\bigg(\frac{p}{1-p}\bigg) = \beta_0 + \beta_1 X.
 \end{align*}
-wobei $\beta_1$ die Veränderung des Logits pro Einheit Änderung im Regressor $X$ angibt. Logistische Regression basiert also nicht auf der Annahme einer normalen Link-Funktion.
+Der Koeffizient $\beta_1$ misst also die Veränderung des Logits pro Einheit Änderung im Regressor $X$. 
 
-Ähnlich wie im Probit-Fall ist der Einfluss von $X$ auf den Logit linear, jedoch besteht auch hier eine nicht-lineare Beziehung zwischen dem Logit und der Wahrscheinlichkeit $P(Y=1\vert X)$, da $\Lambda(\cdot)$, wie $\Phi(\cdot)$ im Probit-Modell, eine nicht-lineare Funktion mit dem Wertebereich $[0,1]$ ist.
+Ähnlich wie bei Probit-Regression ist der Einfluss von $X$ auf den Logit linear, jedoch besteht auch hier eine nicht-lineare Beziehung zwischen dem linearen Prädiktor und der Wahrscheinlichkeit $P(Y=1\vert X)$: $\Lambda(\cdot)$ ist eine nicht-lineare Funktion mit dem Wertebereich $[0,1]$.
+
+```{webr}
+# Plot: Logistische Funktion
+ggplot() +
+  stat_function(
+    fun = \(x) 1 / (1 + exp(-x))
+    ) +
+  scale_x_continuous(
+    name = "z", 
+    limits = c(-4, 4)
+  ) +
+  scale_y_continuous(name = "Lambda(z)") +
+  labs(title = "Logistische Funktion") +
+  theme_cowplot()
+```
+
+```{webr}
+# Plot: Logit
+ggplot() +
+  stat_function(
+    fun = \(x) log(x / (1 - x))
+    ) +
+  scale_x_continuous(
+    name = "p", 
+    limits = c(0, 1)
+  ) +
+  scale_y_continuous(name = "Logit(p)") +
+  labs(title = "Logit-Funktion") +
+  theme_cowplot()
+```
+
+Aufgrund der Nicht-Linearität von $\Lambda(z)$ kann der Koeffizient $\beta_1$ wie im Probit-Modell nicht direkt als Effekt auf die Wahrscheinlichkeit $P(Y=1\vert X)$ interpretiert werden.
+
+Um den partiellen Effekt einer Änderung in $X$ am Punkt $X$ auf $P(Y=1\vert X)$ zu ermitteln, berechnen wir die Ableitung des bedingten Erwartungswerts:
+
+\begin{align*}
+\frac{\partial\textup{E}(Y\vert X)}{\partial X} = \frac{\partial\textup{P}(Y=1\vert X)}{\partial X} = \frac{\partial\Lambda(\beta_0 + \beta_1 X)}{\partial X} = \lambda(\beta_0 + \beta_1 X) \beta_1,
+\end{align*}
+wobei $\lambda(\cdot)$, ähnlich wie die Dichtefunktion der Normalverteilung im Probit-Modell, die Dichtefunktion der logistischen Verteilung darstellt. Diese ist gegeben durch
+\begin{align*}
+\lambda(z) = \Lambda(z) \cdot (1 - \Lambda(z)).
+\end{align*}
+
+Die Interpretation des angepassten Modells ist aufgrund der Modellierung des Logits intuitiver als für Probit-Regression. Angenommen eine Bank möchte die Wahrscheinlichkeit modellieren, dass ein Kunde einen Kredit nicht zurückzahlt:  $P(Y=\textup{Zahlungsausfall}\vert X)$, wobei der Regressor $X$ das Verhältnis von aktuellem Schuldenstand und Monatseinkommen ist. Die Schätzung einer logistischen Regression ergibt, dass ein Anstieg von $X =x$ um 0.1 den Logit für die Wahrscheinlichkeit eines Kreditausfalls $p(x)$ um 0.4 erhöht:
+\begin{align*}
+  \textup{logit} \big[P(Y=\textup{Zahlungsausfall}\vert X = x + 0.1)\big] = \textup{logit}[p(x)] + 0.4. 
+\end{align*}
+
+Das Modell besagt dann, dass die Wahrscheinlichkeit der Zahlungsunfähigkeit etwa um den *Faktor* 1.5 ansteigt, denn
+\begin{align*}
+  \exp\big(\textup{logit}[p(x)] + 0.4\big) = \frac{p(x)}{1-p(x)} \cdot \exp(0.4)
+\end{align*}
+mit
+\begin{align*}
+  \exp(0.4) \approx 1.50.
+\end{align*}
 
 ### Schätzung
 
@@ -475,41 +538,9 @@ Die Log-Likelihood-Funktion lautet
 
 und erlaubt die Schätzung von $\boldsymbol{\beta}$ durch Maximierung mit numerischen Methoden.
 
-```{webr-r}
-# Plot der logistischen Funktion
-ggplot() +
-  geom_function(
-    fun = \(x) 1 / (1 + exp(-x))
-  ) +
-  scale_x_continuous(
-    name = "Logit", 
-    limits = c(-6, 6)
-  ) +
-  scale_y_continuous(name = "P(Y=1)") +
-  labs(title = "Logistische Funktion") +
-  theme_cowplot()
-```
+Für Anwendungen mit R nutzen wir `stats::glm()` und wählen die logistische Link-Funktion mit `family = binomial(link = "logit")`. Für die simulierten Daten `simdata` aus @sec-probitreg:
 
-Aufgrund dieser Nicht-Linearität lässt sich der Koeffizient $\beta_1$ ebenso wie im Probit-Modell nicht direkt als einfacher Effekt auf die Wahrscheinlichkeit $P(Y=1)$ interpretieren. Die Interpretation ist aufgrund der Modellierung des Logits jedoch einfacher als für Probit-Regression:
-
-Angenommen ein Unternehmen möchte die Wahrscheinlichkeit modellieren, dass ein Kunde einen Kredit nicht zurückzahlt ($P(Y = 1\vert X)$), basierend auf dem Verhältnis von aktuellem Schuldenstand und Monatseinkommen ($X$). Die Schätzung des Logit-Modells ist, dass ein Anstieg von $X$ um 0.1 (z.B. von 0.1 auf 0.2) den Logit für die Wahrscheinlichkeit eines Kreditausfalls um 0.4 erhöht. Das Logit-Modell besagt dann, dass die Wahrscheinlichkeit der Zahlungsunfähigkeit etwa um den Faktor 1.5 ansteigt,
-\begin{align*}
-  \exp(0.4) \approx 1.50.
-\end{align*}
-
-Um den partiellen Effekt einer Änderung in $X$ am Punkt $X$ auf $P(Y=1)$ zu ermitteln, berechnet man die Ableitung:
-
-\begin{align*}
-\frac{\partial\textup{E}(Y\vert X)}{\partial X} = \frac{\partial\textup{P}(Y=1\vert X)}{\partial X} = \frac{\partial\Lambda(\beta_0 + \beta_1 X)}{\partial X} = \lambda(\beta_0 + \beta_1 X) \beta_1,
-\end{align*}
-wobei $\lambda(\cdot)$, ähnlich wie die Dichtefunktion der Normalverteilung im Probit-Modell, die Dichtefunktion der logistischen Verteilung darstellt. Diese ist gegeben durch
-\begin{align*}
-\lambda(z) = \Lambda(z) \cdot (1 - \Lambda(z)).
-\end{align*}
-
-Für die Schätzung mit R nutzen wir `glm()` und wählen die logistische Link-Funktion mit `family = binomial(link = "logit")`. Für die simulierten Daten `simdata`:
-
-```{webr-r}
+```{webr}
 # Logit-Modell schätzen
 mod_logit <- glm(
   formula = Y ~ X,
@@ -525,7 +556,7 @@ mod_logit %>%
 
 Wir erweitern nun `pred` um die anhand von `predict()` für `mod_logit` geschätzten Wahrscheinlichkeiten von $Y=1\vert X$ für die Regressorwerte in `X`.
 
-```{webr-r}
+```{webr}
 # gesch. WSK-Funktion gem. Logit-Modell hinzufügen
 pred <- pred %>%
   mutate(
@@ -535,7 +566,7 @@ pred <- pred %>%
 
 Anhand der Vorhersagen in `pred` können wir die im Objekt `p` gespeicherte Grafik um die geschätzte Regressionsfunktion für das Logit-Modell erweitern.
 
-```{webr-r}
+```{webr}
 # Grafik mit Logit-fit erweitern
 p + 
   geom_line(
@@ -575,7 +606,7 @@ list(
 
 Die Deviance für das Probit-Modell ist tatsächlich etwas geringer als für das Logit-Modell. 
 
-Ähnlich wie $R^2$ für lineare Regression misst Deviance lediglich die Anpassung des Modells an die beobachteten Daten. Daher eignet sich Deviance nur bedingt als Maß zur Einschätzung der Tauglichkeit eines Modells für Out-of-sample-Vorhersagen. Je nach Ziel der Modellierung kann es hilfreich sein, eine robuste Einschätzung der Vorhersage-Güte unter Berücksichtigung der Modellkomplexität vorzunehmen. Hierfür werden oft Informationskriterien verwendet. Das Akaike-Informationskriterium (AIC) 
+Ähnlich wie $R^2$ für lineare Regression misst die Deviance $D$ lediglich die Anpassung des Modells an die beobachteten Daten. Daher eignet sich $D$ nur bedingt als Maß zur Einschätzung der Tauglichkeit eines Modells für Out-of-sample-Vorhersagen. Je nach Ziel der Modellierung kann es hilfreich sein, eine robuste Einschätzung der Vorhersage-Güte unter Berücksichtigung der Modellkomplexität vorzunehmen. Hierfür werden oft Informationskriterien verwendet. Das Akaike-Informationskriterium (AIC) 
 \begin{align*}
   \text{AIC} = 2k - 2 \log(\widehat{\mathcal{L}})
 \end{align*}
@@ -676,7 +707,7 @@ modelsummary(
   )
 ```
 
-Die geschätzten negativen und signifikanten Koeffizienten von $bill\_depth$ erfassen den Zusammenhang, dass Pinguine mit größeren Schnäbeln tendenziell männlich sind: Je größer $bill\_depth$, desto geringer die geschätzte Wahrscheinlichkeit, dass ein Pinguin weiblich ist. Ein Vergleich anhand des AIC zeigt, dass das Probit-Modell `penguins_probit` am besten geeignet ist.
+Die geschätzten negativen und signifikanten Koeffizienten von $\textup{bill\_depth}$ erfassen den Zusammenhang, dass Pinguine mit größeren Schnäbeln tendenziell männlich sind: Je größer $\textup{bill\_depth}$, desto geringer die geschätzte Wahrscheinlichkeit, dass ein Pinguin weiblich ist. Ein Vergleich anhand des AIC zeigt, dass das Probit-Modell `penguins_probit` am besten geeignet ist.
 
 Analog zur Vorgehensweise in @sec-logreg können wir die geschätzten Modelle vergleichen, in dem wir geschätzte Wahrscheinlichkeiten $P(Y=\textup{weiblich}\vert\textup{bill\_depth})$ für eine Menge repräsentativer Werte des Regressors `bill_depth` berechnen und gemeinsam mit den Beobachtungen plotten.
 
@@ -711,7 +742,7 @@ preds <- tibble(
 slice_head(preds, n = 10)
 ```
 
-```{webr-r}
+```{webr}
 # Geschätzte bedingte WSK plotten
 penguins_cleaned %>%
   ggplot(
@@ -727,13 +758,16 @@ penguins_cleaned %>%
   ) +
   geom_line(
     data = preds, 
-    mapping = aes(y = lp, color = "LPM")) +
+    mapping = aes(y = lp, color = "LPM")
+  ) +
   geom_line(
     data = preds, 
-    mapping = aes(y = probit, color = "Probit")) +
+    mapping = aes(y = probit, color = "Probit")
+  ) +
   geom_line(
     data = preds, 
-    mapping = aes(y = logit, color = "Logit")) +
+    mapping = aes(y = logit, color = "Logit")
+  ) +
   scale_color_manual(
     name = "Modelle",
     values = c(
@@ -741,7 +775,7 @@ penguins_cleaned %>%
       "Probit" = "orange",
       "Logit" = "darkred"
     )
-  )
+  ) +
   labs(title = "Modellierung v. Pinguin-Geschlecht mit Regression") +
   theme_cowplot() +
   theme(legend.position = "top")
@@ -799,76 +833,72 @@ vorh %>%
 
 In diesem Beispiel unterscheiden sich die Vorhersagen der drei Modelle für den Grenzwert 0.5 nicht.
 
-## Modellierung von Zählvariablen mit Poisson-Regression {#sec-poissonreg}
+## Modellierung von Zählvariablen {#sec-poissonreg}
 
-Die Poisson-Regression ist ein statistisches Modell, das verwendet wird, um Zählvariablen (d.h. Variablen, die diskrete, nicht-negative Werte annehmen) zu modellieren, insbesondere wenn die Zählwerte eine Poisson-Verteilung aufweisen. Dieses Modell wird häufig in Fällen verwendet, in denen die abhängige Variable die Anzahl der Ereignisse in einem bestimmten Zeitraum oder Raum beschreibt, wie z.B. die Anzahl der Verkehrsunfälle in einer Stadt innerhalb eines Monats.
+Eine weitere Klasse von $Y$ für die sich der Regressionsansatz von einfacher linearer Regression unterscheidet, sind *Zählvariablen*: Variablen, die diskrete, nicht-negative Werte annehmen. Wenn die abhängige Variable $Y$ Ereignisse in einem bestimmten Zeitraum misst (wie z.B. die Anzahl der Verkehrsunfälle in Essen innerhalb eines Monats) und weitere Bedingungen erfüllt sind, folgt $Y$ einer Poisson-Verteilung und kann mit Poisson-Regression modelliert werden. Wir erläutern nachfolgend die wesentlichen Komponenten von Poisson-Regression und diskutieren ein R-Beispiel mit fiktiven Daten.
 
 ### Poisson-Verteilung
 
-Eine Zufallsvariable $Y$ folgt einer Poisson-Verteilung mit Parameter $\lambda$, wenn ihre Wahrscheinlichkeitsverteilung gegeben ist durch:
+Die Zufallsvariable $Y$ folgt einer Poisson-Verteilung mit Parameter $\lambda$, wenn:
+
+1. **Ereignisse unabhängig voneinander auftreten:** Das Auftreten eines Ereignisses beeinflusst nicht die Wahrscheinlichkeit, dass ein weiteres Ereignis auftritt.
+
+2. **Ereignisse einzeln auftreten:** Die Wahrscheinlichkeit, dass in einem sehr kleinen Intervall (im Sinne von $[a,b]$ für $a \to b$) mehr als ein Ereignis auftritt, ist vernachlässigbar.
+
+3. **die Rate der Ereignisse konstant ist:** Die durchschnittliche Anzahl der Ereignisse pro Zeiteinheit oder pro Raumeinheit $\lambda$ ist konstant.
+
+Die Wahrscheinlichkeitsfunktion von $Y$ ist
 
 \begin{align}
-P(Y = y) = \frac{\lambda^y e^{-\lambda}}{y!} \quad \text{für} \quad y = 0, 1, 2, \ldots
+P(Y = y) = \frac{\lambda^y e^{-\lambda}}{y!} \quad \text{für} \quad y = 0, 1, 2, \ldots,\label{eq:poissonpmf}
 \end{align}
+wobei $\lambda$ sowohl der Erwartungswert als auch die Varianz der Verteilung ist, $$\textup{E}(Y) = \textup{Var}(Y) = \lambda.$$
 
-Hierbei ist $\lambda$ sowohl der Mittelwert als auch die Varianz der Verteilung ($\mathbb{E}[Y] = \text{Var}(Y) = \lambda$).
+Die nächste Grafik zeigt die diskrete (Wahrscheinlichkeitsmasse-)Funktion \eqref{eq:poissonpmf} für eine Poisson-verteilte Zufallsvariable $Y$ mit $\lambda = 5$ für den Wertebereich von 0 bis 15.
 
-```{r}
-n <- 500
-dat <- tibble(
-  Y = rpois(n = n, lambda = 5)
-)
-```
-
-
-```{r}
-#| fig-cap: "Stichprobenverteilung und Poisson-Dichtefunktion"
-#| label: fig-poissonexample
-ggplot(
-    data = dat, 
-    mapping = aes(x = Y)
-) +
-    geom_histogram(
-        mapping = aes(y = after_stat(density)), 
-        binwidth = 1, 
-        color = "white"
+```{webr}
+#| label: fig-poissondensity
+tibble(
+    x = 0:15,
+    dens = dpois(x, lambda = 5)
+) %>%
+    
+    ggplot( 
+        mapping = aes(x = x, y = dens)
     ) +
-    geom_line(
-        data = tibble(
-            X = 0:13,
-            Y = dpois(x = X, lambda = 5)
-        ),
-        mapping = aes(x = X, y = Y),
-        color = "red"
+    geom_bar(
+      stat = "identity", 
+      fill = "steelblue",
+      color = "white"
+    ) +
+    scale_x_continuous(breaks = 0:15) + 
+    labs(
+        title = "Poisson-Dichtefunktion für lambda = 5", 
+        y = "Dichte"
     ) +
     theme_cowplot()
 ```
 
-### Der Regressionsansatz
+### Poisson-Regression
 
-In der Poisson-Regression modellieren wir den Erwartungswert der abhängigen Variable $Y$ als eine Funktion der unabhängigen Variablen $\mathbf{X} = (X_1, X_2, \ldots, X_k)$. Der Erwartungswert von $Y$ wird durch den Parameter $\lambda$ repräsentiert, der wiederum eine Funktion der unabhängigen Variablen ist. Die Beziehung wird typischerweise durch eine logarithmische Verknüpfungsfunktion beschrieben:
+Wie für die bisher betrachteten Regressionsansätzen modelliert Poisson-Regression den Erwartungswert (und damit gleichzeitig die Varianz) $\lambda$ der abhängigen Variable $Y$ als eine Funktion der Regressoren $\mathbf{X} = (X_1, X_2, \ldots, X_k)$. Unter Annahme einer Poisson-Verteilung kann Poisson-Regression als generalisiertes lineares Modell verstanden werden, wobei eine logarithmische Verknüpfungsfunktion für den linearen Prädiktor $\mathbf{X}_i^\top \boldsymbol{\beta}$ verwendet wird:
 
-\begin{align}
-\log(\lambda_i) = \mathbf{X}_i^\top \boldsymbol{\beta}
-\end{align}
+\begin{align*}
+\log(\lambda_i) &= \mathbf{X}_i^\top \boldsymbol{\beta},
+\end{align*}
+sodass
+\begin{align*}
+\lambda_i &= \exp(\mathbf{X}_i^\top \boldsymbol{\beta}),
+\end{align*}
+wobei
 
-Dies kann auch als
-
-\begin{align}
-\lambda_i = \exp(\mathbf{X}_i^\top \boldsymbol{\beta})
-\end{align}
-
-geschrieben werden, wobei:
-
-- $\lambda_i$ der Erwartungswert von $Y$ für Beobachtung $i$,
-
-- $\mathbf{X}_i$ der Vektor der unabhängigen Variablen für Beobachtung $i$ und
-
+-	$\lambda_i = \textup{E}(Y_i\vert \mathbf{X}_i) = \textup{Var}(Y_i\vert \mathbf{X}_i)$ für Beobachtung $i$,
+- $\mathbf{X}_i$ der Vektor der unabhängigen Variablen für Beobachtung $i$ ist, und
 - $\boldsymbol{\beta}$ der Vektor der Regressionskoeffizienten ist.
 
 ### Schätzung
 
-Die Parameter $\boldsymbol{\beta}$ werden durch Maximum-Likelihood-Schätzung (MLE) geschätzt. Die Likelihood-Funktion für $n$ Beobachtungen ist gegeben durch
+Die Likelihood-Funktion für $n$ Beobachtungen ist 
 
 \begin{align}
 L(\boldsymbol{\beta}) = \prod_{i=1}^n \frac{\lambda_i^{y_i} e^{-\lambda_i}}{y_i!}.
@@ -886,100 +916,146 @@ Da $\lambda_i = \exp(\mathbf{X}_i^\top \boldsymbol{\beta})$, wird die Log-Likeli
 \mathcal{L}(\boldsymbol{\beta}) = \sum_{i=1}^n \left( y_i (\mathbf{X}_i^\top \boldsymbol{\beta}) - \exp(\mathbf{X}_i^\top \boldsymbol{\beta}) - \log(y_i!) \right)
 \end{align}
 
-Den Maximum-Likelihood-Schätzer $\widehat{\boldsymbol{\beta}}$ erhalten wir durch Maximierung der Log-Likelihoodfunktion $\mathcal{L}(\boldsymbol{\beta})$. Eine R-Implementierung finden wir in `stats::glm()`.
+Den ML-Schätzer $\widehat{\boldsymbol{\beta}}$ erhalten wir durch Maximierung der Log-Likelihoodfunktion $\mathcal{L}(\boldsymbol{\beta})$. Die R-Implementierung von Poisson-Regression in `stats::glm()` wird mit `family = poisson(link = "log")`
+aufgerufen.
 
 ### Interpretation der Koeffizienten
 
 Die Koeffizienten $\boldsymbol{\beta}$ in der Poisson-Regression haben eine log-lineare Beziehung zur Zählvariable. Für einen bestimmten Koeffizienten $\beta_j$ ist die Interpretation wiefolgt:
 
-- Ein Anstieg der unabhängigen Variable $X_j$ um eine Einheit führt zu einer Änderung des *Logarithmus* des Erwartungswertes von $Y$ um $\beta_j$.
+Eine Änderung der unabhängigen Variable $X_j$ um eine Einheit führt zu einer Änderung des *Logarithmus* des Erwartungswertes von $Y$ um $\beta_j$. Der Erwartungswert $\lambda$ ändert sich also *multiplikativ* um den Faktor $\exp(\beta_j)$.
 
-- Der Erwartungswert $\lambda$ ändert sich *multiplikativ* um $\exp(\beta_j)$.
+Als Beispiel betrachten wir den linearen Prädiktor
 
-Angenommen, wir haben eine unabhängige Variable $X$ (z.B. die Anzahl der durchgeführten Werbekampagnen) und eine Zählvariable $Y$ (z.B. die Anzahl der Verkäufe). Das Modell könnte wie folgt aussehen:
+\begin{align*}
+  \log(\lambda) = \beta_0 + \beta_1 X.
+\end{align*}
 
-\begin{align}
-\log(\lambda) = \beta_0 + \beta_1 X
-\end{align}
+Für eine Änderung von $X$ um $\Delta X$ erhalten wir
 
-Wenn $\beta_1 = 0.5$, bedeutet dies, dass jede zusätzliche Werbekampagne die erwartete Anzahl der Verkäufe um einen Faktor von $\exp(0.5) \approx 1.65$ erhöht. Das heißt, die *Rate* der Verkäufe steigt um 65\% für jede zusätzliche Werbekampagne.
+\begin{align*}
+   \lambda =&\, \exp(\beta_0 + \beta_1 X) \\
+    \lambda + \delta\lambda =&\, \exp(\beta_0 + \beta_1 (X + \Delta X)) \\
+    =&\, \exp(\beta_0 + \beta_1 X) \cdot exp(\beta\Delta X) \\
+    =&\, \lambda \cdot \cdot exp(\beta\Delta X)
+\end{align*}
 
-```{r}
+Angenommen $X$ ist die Anzahl durchgeführter Werbekampagnen und die abhängige Zählvariable $Y$ misst die Anzahl der Verkäufe des beworbenen Produkts pro Monat.
+
+Wenn $\beta_1 = 0.5$, bedeutet dies, dass jede zusätzliche Werbekampagne ($\Delta X = 1$) die erwartete Anzahl der Verkäufe pro Monat um einen Faktor von $\exp(0.5) \approx 1.65$ erhöht:
+
+Das heißt, die *Rate* der Verkäufe steigt um 65\% für jede zusätzliche Werbekampagne.
+
+Zur Veranschaulichung der Schätzung einer Poisson-Regression für dieses Beispiel erzeugen wir Poisson-verteilte Daten für
+\begin{align*}
+  \log(\lambda) = 2 + 0.4 \cdot X
+\end{align*}
+und ziehen $X$ gleichverteilt aus $\{1,2,\dots,8\}$.
+
+```{webr}
 # Setze den Zufallszahlengenerator für Reproduzierbarkeit
-#set.seed(1234)
+set.seed(1234)
 
 # Anzahl der Beobachtungen
 n <- 500
 
-# Simuliere die unabhängige Variable X (Anzahl der Werbekampagnen)
+# Züge für unabhängige Variable X (Anzahl der Werbekampagnen)
 X <- sample(1:8, replace = T, size = n)
 
-# Setze die wahren Parameter für das Modell
-beta_1 <- 0.4  # Koeffizient für X
+# Erwartungswerte
+lambda <- exp(2 + 0.4 * X)
 
-# Berechne den Erwartungswert lambda basierend auf dem Modell
-lambda <- exp(2 + beta_1 * X)
+# Abhängige Variable Y (Anzahl der Verkäufe) als Poisson-verteilte Zufallsvariable, gegeben lambda
+Y <- map_dbl(
+  .x = 1:n, 
+  .f = ~ rpois(
+    n = 1, lambda = lambda[.x]
+  )
+)
+  
+# Danten in tibble sammeln
+dat <- tibble(
+  Kampagnen = X, 
+  Verkaeufe = Y
+  )
 
-# Simuliere die abhängige Variable Y (Anzahl der Verkäufe) als Poisson-verteilte Zufallsvariable
-Y <- rpois(n, lambda = lambda)
-
-dat <- tibble(X = X, Y = Y)
+# Überblick
+slice_head(dat, n = 10)
 ```
 
-```{r}
+Die Züge aus der abhängigen Variablen visualieren wir mit einem Häufigkeits-Histogramm.
+
+```{webr}
+# Histogramm der Abh. Variable
 ggplot(
   data = dat, 
-  mapping = aes(x = Y)
+  mapping = aes(x = Verkaeufe)
   ) +
   geom_histogram(binwidth = 2) +
+  labs(
+    title = "Poisson-verteilte Daten"
+  ) +
   theme_cowplot()
 ```
 
+Wir schätzen das Modell und extrahieren die robuste Zusammenfassung mit `broom::tidy()`.
 
-```{r}
+```{webr}
 # Poisson-Regression schätzen
-model <- glm(
-  formula = Y ~ X, 
+mod_poisson <- glm(
+  formula = Verkaeufe ~ Kampagnen, 
   family = poisson(link = "log"), 
   data = dat
 )
 
 # Zusammenfassung des gesch. Modells
-summary(model)
+mod_poisson %>%
+  coeftest(vcov = vcovHC, type = "HC1") %>%
+  tidy()
 ```
 
-```{r}
-#| fig-cap: "Simulierte Daten und angepasstes Poisson-Modell"
-#| label: fig-poissonregexample
+Die ML-Schätzung des Poisson-Modells liefert für die verwendete Stichprobe von 500 Beobachtungen Koeffizienten-Schätzungen nahe der wahren Parameter. Zur Veranschaulichung des geschätzten Modells überlagern wir die simulierten Datenpunkte aus `dat` mit der anhand von `mod_poisson` geschätzten Anzahl der Verkäufe je Anzahl an Werbekampagnen. 
 
-# Vorhersagen
-dat$predicted <- predict(model, type = "response")
+```{webr}
+# Vektor für Kampagnen
+Kampagnen_new <- tibble(Kampagnen = 1:8)
+
+# Vorhersagen mit Modell
+pred <- tibble(
+  Kampagnen = 1:8,
+  predicted = predict(
+    mod_poisson, 
+    newdata = Kampagnen_new,
+    type = "response"
+  )
+)
 
 # Simulierte Daten und Schätzungen
-ggplot(
-  data = dat, 
-  mapping = aes(x = X, y = Y)
-) +
+ggplot() +
   geom_point(
-    mapping = aes(color = "Simulierte Daten"), 
-    alpha = 0.5, 
+    data = dat,
+    mapping = aes(
+      x = Kampagnen, 
+      y = Verkaeufe
+    ), 
+    color = "gray",
+    alpha = 0.25, 
     position = position_jitter(width = .1)
   ) +
-  geom_line(
-    aes(y = predicted, color = "Geschätztes Modell")
-    ) +
-  labs(
-    x = "Anzahl der Werbekampagnen",
-    y = "Anzahl der Eisverkäufe"
+    geom_point(
+    data = pred,
+    mapping = aes(
+      x = Kampagnen,
+      y = predicted
+    ),
+    color = "red"
   ) +
-  scale_color_manual(
-    "",
-    values = c(
-      "Simulierte Daten" = "blue", 
-      "Geschätztes Modell" = "red"
-    )
+  scale_x_continuous(breaks = 1:8) +
+  labs(
+    title = "Datensatz und Poisson-Schätzungen der Verkäufe",
+    x = "Anzahl der Werbekampagnen",
+    y = "Anzahl der Verkäufe"
   ) +
   theme_cowplot() +
   theme(legend.position = "top")
 ```
-
