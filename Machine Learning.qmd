@@ -1,14 +1,330 @@
 ---
-webr: 
-  show-startup-message: true
-  packages: [
-            'dplyr',
-            'ggplot2',
-            'tidyr',
-            ]
+format: live-html
+engine: knitr
 ---
 
 # Machine Learning
+
+## Neuronale Netzwerke  lernen funktionale Zusammenhänge
+
+Neuronale Netze sind leistungsstarke Modelle, die darauf spezialisiert sind, komplexe Muster in Daten zu erkennen und Vorhersagen zu treffen. Allerdings können sie keine direkten kausalen Schlüsse ziehen. Diese Unfähigkeit ist eine wesentliche Einschränkung, insbesondere in Kontexten, in denen kausale Zusammenhänge wichtig sind.
+
+Ein zentraler Punkt ist der Unterschied zwischen Korrelation und Kausalität. Neuronale Netze sind hervorragend darin, Korrelationen zwischen Variablen zu erkennen, aber eine Korrelation bedeutet nicht zwangsläufig, dass eine kausale Beziehung besteht. Kausalität erfordert, dass eine Veränderung in einer Variablen tatsächlich eine Veränderung in einer anderen verursacht. Neuronale Netze verfügen jedoch nicht über Mechanismen, um Kausalität direkt zu modellieren oder zu erkennen.
+
+Ein weiteres Problem ist die fehlende Berücksichtigung von Störfaktoren (Confoundern). Diese sind Variablen, die sowohl die Ursache als auch die Wirkung beeinflussen können. Neuronale Netze übersehen oder missinterpretieren oft solche Störfaktoren, was zu falschen Schlussfolgerungen führen kann. Da sie auf historischen Daten basieren, können sie auch keine Interventionsanalysen durchführen, die für kausale Schlüsse notwendig sind.
+
+Die „Black-Box“-Natur von neuronalen Netzen stellt ein weiteres Hindernis dar. Es ist oft schwer nachvollziehbar, wie das Modell zu seinen Vorhersagen gelangt, was die Interpretation und das Verständnis von kausalen Beziehungen erschwert.
+
+Zusammengefasst sind Neuronale Netze zwar mächtige Werkzeuge zur Mustererkennung, aber sie sind nicht geeignet, um kausale Zusammenhänge zu erkennen oder zu verifizieren. Für kausale Inferenz sind spezialisierte Methoden erforderlich, die über das hinausgehen, was neuronale Netze leisten können.
+
+- **Input**: Die Eingangsdaten oder Merkmale, die in das neuronale Netzwerk eingespeist werden. Jeder Input wird durch ein oder mehrere Neuronen in der Eingabeschicht repräsentiert.
+
+- **Output**: Das Ergebnis, das das neuronale Netzwerk nach der Verarbeitung der Inputs liefert. Der Output wird durch die Neuronen in der Ausgabeschicht des Netzwerks dargestellt.
+
+- **Layer**: Eine Ebene von Neuronen im neuronalen Netzwerk. Es gibt Eingabeschichten, versteckte Schichten (Hidden Layers) und Ausgabeschichten. Jede Schicht nimmt Eingaben, verarbeitet sie und gibt Ausgaben an die nächste Schicht weiter.
+
+- **Units**: Die Neuronen in einem Layer. Jedes Neuron empfängt Inputs, multipliziert sie mit Gewichten, addiert einen Bias und gibt das Ergebnis nach Anwendung einer Aktivierungsfunktion weiter.
+
+- **Aktivierungsfunktion**: Eine mathematische Funktion, die auf die gewichtete Summe der Eingaben eines Neurons angewendet wird. Sie bestimmt, ob ein Neuron aktiviert wird. Beispiele sind *Sigmoid*, *ReLU* und *Tanh*.
+
+
+Neuronale Netze lernen, indem sie ihre internen Parameter (Gewichte) so anpassen, dass der Fehler zwischen den vorhergesagten und den tatsächlichen Werten minimiert wird. Dieser Lernprozess basiert auf einem Optimierungsverfahren namens Gradientenabstieg. Hier ist, wie das Lernen im Wesentlichen funktioniert:
+
+1. Forward Pass: Ein neuronales Netz nimmt Eingabedaten auf und leitet diese durch die Schichten des Netzes weiter. Jede Schicht transformiert die Daten mit Hilfe von Gewichten und Aktivierungsfunktionen, um eine Vorhersage zu erzeugen.
+
+2. Berechnung des Loss: Der Fehler (Loss) wird berechnet, indem die Vorhersage mit dem tatsächlichen Wert verglichen wird. Typische Fehlerfunktionen sind der quadratische Fehler oder der Kreuzentropieverlust.
+
+3. Gradientenabstieg: Um die Gewichte anzupassen und den Fehler zu minimieren, berechnet der Gradientenabstieg (Gradient Descent) den Gradienten der Loss-Funktion in Bezug auf die Gewichte. Der Gradientenabstieg zeigt an, in welche Richtung die Gewichte verändert werden müssen, um den Fehler zu verringern.
+
+4. Gewichtsaktualisierung: Die Gewichte werden in kleinen Schritten, die durch die Lernrate bestimmt werden, in Richtung des negativen Gradienten angepasst. Dies bedeutet, dass die Gewichte so verändert werden, dass der Fehler nach der nächsten Vorhersage kleiner ist.
+
+5. Erweiterte Optimierung (z.B. Adam): Um den Lernprozess effizienter und stabiler zu machen, verwenden moderne Algorithmen wie Adam zusätzliche Techniken. Adam kombiniert den Gradientenabstieg mit Momentum, um die Anpassung der Gewichte zu beschleunigen und stabile Lernschritte zu gewährleisten, sowie mit adaptiven Lernraten, die die Schrittgröße für jedes Gewicht individuell anpassen.
+
+6. Iterativer Prozess: Dieser Prozess des Vorwärtsdurchlaufs, der Fehlerberechnung, der Gradientenberechnung und der Gewichtsaktualisierung wird für viele Iterationen wiederholt, bis der Fehler ausreichend klein ist oder keine signifikanten Verbesserungen mehr erzielt werden.
+
+Durch diesen iterativen Lernprozess passen neuronale Netze ihre Gewichte so an, dass sie komplexe Muster in den Daten erkennen und genaue Vorhersagen machen können.
+
+## Neuronale Netze
+
+\begin{align*}
+  Y = w_1 X + b
+\end{align*}
+
+```{dot}
+//| fig-width: 6
+//| fig-height: 2
+//| fig-cap: "Neuronales Netzwerk: Lineare Regression mit einer Variable und Bias"
+//| label: "fig-nn-lreg"
+digraph NEURALNET {
+    layout=neato
+    fontname="Helvetica,Arial,sans-serif"
+    node [fontname="Helvetica,Arial,sans-serif", shape="circle"]
+    edge [fontname="Helvetica,Arial,sans-serif"]
+
+    X [label="X", pos="0,0!"];
+    Y [label="Y", pos="4,0!", style=filled, fillcolor=lightgreen];
+    B [label="1", pos="2,2!", fontcolor=gray];
+
+    X -> Y [headlabel = "w1", labeldistance=12.5, labelangle=10];
+    B -> Y [headlabel = "bias (b)", labeldistance=9, labelangle=-15, color=gray];
+}
+```
+
+```{r}
+library(dplyr)
+library(cowplot)
+library(tensorflow)
+library(keras)
+
+set.seed(123)
+n <- 1000
+x <- runif(n, min = 0, max = 10)
+y <- 5 + 3 * x + rnorm(n) 
+```
+
+```{r}
+model <- keras_model_sequential() %>%
+  layer_dense(
+    units = 1, 
+    input_shape = 1, 
+    activation = 'linear'
+    )
+```
+
+```{r}
+# kompilieren
+model %>% compile(
+  optimizer = optimizer_adam(learning_rate = 0.01),
+  loss = 'mean_absolute_error'
+)
+```
+
+
+```{r}
+# Modell trainieren
+model %>% fit(
+  x = x, 
+  y = y, 
+  epochs = 100, 
+  verbose = 0, 
+  validation_split = .2
+)
+```
+
+
+```{r}
+# lineares Modell
+lm_model <- lm(y ~ x)
+summary(lm_model)
+```
+
+```{r}
+# Koeffizienten der linearen Regression
+coef(lm_model)
+
+# Gewichtung und Bias des neuronalen Netzwerks
+weights <- model %>% get_weights()
+weights[[1]]  # Gewichtung
+weights[[2]]  # Bias
+```
+
+### Multiple
+
+```{dot}
+//| fig-width: 6
+//| fig-height: 3
+//| fig-cap: "Neuronales Netzwerk: Multiple lineare Regression"
+//| label: "fig-nn-mlreg"
+digraph NEURALNET {
+    layout=neato
+    fontname="Helvetica,Arial,sans-serif"
+    node [fontname="Helvetica,Arial,sans-serif", shape="circle"]
+    edge [fontname="Helvetica,Arial,sans-serif"]
+
+    X1 [label="X1", pos="0,1!"];
+    X2 [label="X2", pos="0,0!"];
+    X3 [label="X3", pos="0,-1!"];
+    Y [label="Y", pos="5,0!"];
+    B [label="1", pos="0,2!", fontcolor=gray];
+
+    X1 -> Y [headlabel = "w1", labeldistance=18, labelangle=-5];
+    X2 -> Y [headlabel = "w2", labeldistance=18, labelangle=-5];
+    X3 -> Y [headlabel = "w3", labeldistance=18, labelangle=-5];
+
+    B -> Y [headlabel = "bias (b)", labeldistance=18, labelangle=-8];
+}
+```
+
+```{r}
+# Erstellen von Trainingsdaten
+set.seed(42)
+
+n <- 250
+k <- 3
+
+X <- matrix(rnorm(n = n * k), ncol = k)
+w <- c(3, 2, -1.5)
+
+Y <- 5 + X %*% w + rnorm(n)
+```
+
+
+```{r}
+# Erstellen und Kompilieren des Modells
+model <- keras_model_sequential() %>%
+  layer_dense(
+    units = 1, 
+    input_shape = k, 
+    activation = 'linear'
+  )
+
+model %>% compile(
+  loss = 'mean_squared_error',
+  optimizer = optimizer_sgd(learning_rate = 0.01)
+)
+
+# Training des Modells
+model %>% fit(
+  x = X, 
+  y = Y, 
+  epochs = 100, 
+  verbose = 0
+)
+```
+
+```{r}
+# Gewichte und Bias extrahieren
+weights <- model %>% get_weights()
+weights[[1]]  # Gewicht für jede Variablen
+weights[[2]]  # Bias-Term
+```
+
+```{r}
+# lineares Modell
+lm_model <- lm(Y ~ X)
+summary(lm_model)
+```
+
+## Logistisch
+
+```{r}
+# Erstellen von Trainingsdaten
+set.seed(42)
+
+n <- 500
+X <- rnorm(n = n, mean = 5, sd = 2) # Regressor
+P <- pnorm(-4 + 0.7 * X)
+Y <- as.integer(runif(n) < P)
+```
+
+```{dot}
+//| fig-width: 6
+//| fig-height: 4
+//| fig-cap: "Neuronales Netzwerk mit Sigmoid-Aktivierungsfunktion"
+//| label: "fig-neuralnet-logistic-regression"
+digraph NEURALNET {
+    layout=neato
+    fontname="Helvetica,Arial,sans-serif"
+    node [fontname="Helvetica,Arial,sans-serif", shape="circle"]
+    edge [fontname="Helvetica,Arial,sans-serif"]
+
+    // Eingangsvariablen
+    X1 [label="X1", pos="0,1!"];
+    X2 [label="X2", pos="0,0!"];
+    X3 [label="X3", pos="0,-1!"];
+
+    // Output
+    Y [label="Y", pos="6,0!", style=filled, fillcolor=lightgreen];
+
+    // Sigmoid-Aktivierungsfunktion
+    sigmoid [label="σ", pos="4,0!", shape="ellipse", style=filled, fillcolor=lightblue];
+
+    // Bias
+    B [label="1", pos="0,2!", fontcolor=gray];
+
+    // Verbindungen
+    X1 -> sigmoid [headlabel = "w1", labeldistance=12.5, labelangle=-10];
+    X2 -> sigmoid [headlabel = "w2", labeldistance=12.5, labelangle=-10];
+    X3 -> sigmoid [headlabel = "w3", labeldistance=12.5, labelangle=-10];
+    B -> sigmoid [headlabel = "bias (b)", labeldistance=12.5, labelangle=-10, color=gray];
+    sigmoid -> Y [headlabel = "", labeldistance=12.5, labelangle=10];
+}
+```
+
+
+```{r}
+# Erstellen und Kompilieren des Modells
+model <- keras_model_sequential() %>%
+  layer_dense(units = 1, input_shape = 1, activation = 'sigmoid')
+
+model %>% compile(
+  loss = 'binary_crossentropy',
+  optimizer = optimizer_adam(learning_rate = 0.01),
+  metrics = c('accuracy')
+)
+
+# Training des Modells
+model %>% 
+  fit(X, Y, epochs = 200, verbose = 0)
+
+# Gewichte und Bias extrahieren
+weights <- model %>% 
+  get_weights()
+w <- weights[[1]]  # Gewicht für jede der 5 Variablen
+bias <- weights[[2]]  # Bias-Term
+
+# Ergebnisse anzeigen
+print(w)
+print(bias)
+```
+
+```{r}
+glm(Y ~ X, family = binomial(link = "logit"))
+```
+
+```{r}
+# Vorhersagen auf den Trainingsdaten erstellen
+predictions <- model %>% 
+  predict(X)
+
+# In einen DataFrame zusammenfassen
+results <- data.frame(
+  Regressor = X,
+  Actual = Y,
+  Predicted_Probability = predictions
+)
+```
+
+```{r}
+library(ggplot2)
+
+# Plot der tatsächlichen Werte gegen die vorhergesagten Wahrscheinlichkeiten
+ggplot(
+  data = results,
+  mapping =  aes(x = X, y = Actual)
+  ) +
+  geom_point(
+    position = position_jitter(height = 0.05), 
+    alpha = 0.5) +
+  geom_line(
+     mapping = aes(y = Predicted_Probability),
+    col = "darkred"
+  ) +
+  geom_smooth(
+    method = "glm", 
+    method.args = list(family = "binomial"), 
+    se = FALSE
+  ) +
+  labs(
+    title = "Logistische Regression vs. NN",
+       x = "x",
+       y = "Schätzung P(Y=1|X=x)"
+  ) +
+  theme_minimal()
+```
+
+
+## Gradientenabstiegsverfahren
 
 Das Gradientenabstiegsverfahren (Gradient Descent) ist ein iteratives Optimierungsverfahren zur Minimierung einer differenzierbaren Zielfunktion $f(x)$. Es wird häufig eingesetzt, um die Verlustfunktionen in maschinellen Lernmodellen zu minimieren. Der Algorithmus aktualisiert die Variablen schrittweise in die entgegengesetzte Richtung des Gradienten der Funktion an der aktuellen Position. Der Gradient gibt dabei die Richtung des *steilsten Anstiegs* an, wodurch die entgegengesetzte Richtung zum schnellsten *Abstieg* (Descent) führt.
 
@@ -30,3 +346,171 @@ Der folgende Pseudocode zeigt die grundlegende Vorgehensweise des Gradientenabst
 
 <iframe class="obs-soft-box-shadow" width="100%" height="1172" frameborder="0"
   src="https://observablehq.com/embed/@mca91/gradient-descent-in-3d-three-js?cells=renderer%2Cviewof+restart%2Cviewof+gridinit%2Cviewof+themin%2Cviewof+themin2%2Cviewof+themin3%2Cviewof+themin4%2Cviewof+themin5%2Cviewof+themin6%2Cscene%2Ccamera"></iframe>
+  
+## Case Study: Immobilienpreise
+
+```{r}
+library(AmesHousing)
+housing <- make_ames()
+```
+
+```{r}
+# Load the necessary libraries
+library(ggplot2)
+library(sf)
+library(tigris)
+
+# Retrieve basemap for Ames, Iowa using the tigris package
+places_map <- places(
+  state = 'IA', 
+  cb = TRUE, 
+  progress = F
+) %>%
+  st_as_sf()
+
+# Filter for Ames city
+ames_map <- places_map %>% 
+  filter(NAME == "Ames")
+
+houses <- housing %>%
+    select(Latitude, Longitude, Sale_Price) %>%
+    mutate(
+      Sale_Price = cut(log(Sale_Price, base = 2), breaks = 5, labels = FALSE)
+    ) %>%
+    st_as_sf(coords = c("Longitude", "Latitude"), 
+             crs = 4326, agr = "constant")
+
+rainbow_colors <- rainbow(5, rev = TRUE)
+```
+
+```{r}
+# Plot the map with just the outline of Ames
+ggplot() +
+  geom_sf(data = ames_map, color = "black", fill = alpha("black", alpha = 0)) +
+  geom_sf(data = houses, mapping = aes(color = factor(Sale_Price)), size = .2) +
+  theme_map() +
+  scale_color_manual(
+    name = "log(Verkaufspreis)", 
+    values = rainbow_colors, 
+    labels = levels(factor(houses$Sale_Price))
+  ) +
+  theme(legend.position = "bottom", legend.direction = "horizontal") +
+  ggtitle("Verkaufte Häuser in Ames, Iowa")
+```
+
+
+```{r}
+housing %>%
+  ggplot(mapping = aes(x = Year_Built, y = Sale_Price)) +
+  geom_point(alpha = .5) +
+  theme_cowplot()
+```
+
+```{r}
+# Split the data into training and testing sets
+set.seed(1234)
+
+library(tidymodels)
+
+split <- initial_split(housing, prop = 0.8)
+
+housing_train <- training(split)
+housing_test <- testing(split)
+
+# Separate the predictors and the outcome
+housing_train_x <- housing_train %>% select(-Sale_Price)
+housing_train_y <- housing_train$Sale_Price
+
+housing_test_x <- housing_test %>% select(-Sale_Price)
+housing_test_y <- housing_test$Sale_Price
+```
+
+```{r}
+blueprint <- recipe(Sale_Price ~ ., data = housing_train) %>%
+  step_nzv(all_nominal()) %>%
+  step_other(all_nominal(), threshold = .01, other = "other") %>%
+  step_integer(matches("(Qual|Cond|QC|Qu)$")) %>%
+  step_YeoJohnson(all_numeric(), -all_outcomes()) %>%
+  step_center(all_numeric(), -all_outcomes()) %>%
+  step_scale(all_numeric(), -all_outcomes()) %>%
+  step_dummy(all_nominal(), -all_outcomes(), one_hot = TRUE)
+
+prepare <- prep(blueprint, training = housing_train)
+prepare
+```
+
+```{r}
+baked_train <- bake(prepare, new_data = housing_train)
+baked_test <- bake(prepare, new_data = housing_test)
+
+baked_train
+```
+
+
+
+```{r}
+library(glmnet)
+
+# Prepare the data for glmnet (which requires matrices)
+x_train_glmnet <- as.matrix(baked_train %>% select(-Sale_Price))
+y_train_glmnet <- log10(baked_train$Sale_Price)
+
+x_test_glmnet <- as.matrix(baked_test %>% select(-Sale_Price))
+
+# Fit a Ridge Regression model
+ridge_model <- glmnet(x_train_glmnet, y_train_glmnet, alpha = 0)
+
+# Use cross-validation to find the optimal lambda
+cv_ridge <- cv.glmnet(x_train_glmnet, y_train_glmnet, alpha = 0)
+best_lambda <- cv_ridge$lambda.min
+
+# Predict on the test set using the best lambda
+ridge_preds_log <- predict(cv_ridge, s = best_lambda, newx = x_test_glmnet)
+
+# Convert predictions back from log scale
+ridge_preds <- as.numeric(10^ridge_preds_log)
+
+# Evaluate the performance
+ridge_rmse <- mae_vec(truth = housing_test_y, estimate = ridge_preds)
+print(ridge_rmse)
+```
+
+
+```{r}
+x_train <- select(baked_train, -Sale_Price) %>% as.matrix()
+y_train <- baked_train %>% pull(Sale_Price)
+
+x_test <- select(baked_test, -Sale_Price) %>% as.matrix()
+y_test <- baked_test %>% pull(Sale_Price)
+
+network <- keras_model_sequential() %>% 
+  layer_dense(units = 512, activation = "relu", input_shape = ncol(x_train)) %>%
+  layer_dense(units = 512, activation = "relu") %>%
+  layer_dense(units = 512, activation = "relu") %>%
+  layer_dense(units = 512, activation = "relu") %>%
+  layer_dense(units = 512, activation = "relu") %>%
+  layer_dense(units = 1)
+
+network %>%
+  compile(
+    optimizer = optimizer_rmsprop(lr = 0.01),
+    loss = "msle",
+    metrics = c("mae")
+  )
+
+history <- network %>% fit(
+  x_train,
+  y_train,
+  epochs = 30,
+  batch_size = 32,
+  validation_split = 0.2,
+  callbacks = list(
+        callback_early_stopping(patience = 10, restore_best_weights = TRUE),
+        callback_reduce_lr_on_plateau(factor = 0.2, patience = 4)
+    )
+)
+
+plot(history) + 
+  scale_y_log10()
+```
+

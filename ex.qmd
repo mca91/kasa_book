@@ -1,12 +1,28 @@
 ---
 format: live-html
+webr: 
+  packages: [
+            'broom',
+            'gradethis',
+            'cowplot',
+            'lmtest',
+            'dplyr',
+            'ggplot2',
+            'palmerpenguins',
+            'tidyr',
+            'readr',
+            'sandwich'
+            ]
 ---
+
+{{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
+{{< include ./_extensions/r-wasm/live/_gradethis.qmd >}}
 
 # Übungsaufgaben
 
 ## Regression
 
-### 1. Lineare Link-Funktion in `glm()` {.no-number}
+### Lineare Link-Funktion in `glm()` {.no-number}
 
 ```{webr}
 #| exercise: ex_1
