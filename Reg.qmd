@@ -11,7 +11,6 @@ webr:
             'gt',
             'modelsummary',
             'palmerpenguins',
-            'pROC',
             'purrr',
             'tidyr',
             'readr',
@@ -26,6 +25,7 @@ webr:
 
 ```{webr}
 #| echo: false
+#| completion: true
 tabopts <- function(x) {
     fmt_number(x, decimals = 3, drop_trailing_zeros = T) %>%
     tab_options(table_body.hlines.color = "white",
@@ -329,7 +329,7 @@ n <- 500
 
 simdata <- tibble(
   X = rnorm(n = n, mean = 5, sd = 2), # Regressor
-  P = pnorm(-4 + 0.7 * X), # + Rauschen
+  P = pnorm(-4 + 0.7 * X),
 )
 
 # Binäre Outcome-Variable hinzufügen
@@ -462,7 +462,7 @@ In diesem Modell ist die Link-Funktion $\Lambda^{-1}(\cdot)$. Für $z=\beta_0 + 
 \end{align*}
 Der Koeffizient $\beta_1$ misst also die Veränderung des Logits pro Einheit Änderung im Regressor $X$. 
 
-Ähnlich wie bei Probit-Regression ist der Einfluss von $X$ auf den Logit linear, jedoch besteht auch hier eine nicht-lineare Beziehung zwischen dem linearen Prädiktor und der Wahrscheinlichkeit $P(Y=1\vert X)$: $\Lambda(\cdot)$ ist eine nicht-lineare Funktion mit dem Wertebereich $[0,1]$.
+Ähnlich wie bei Probit-Regression ist der Einfluss von $X$ auf den Logit linear, jedoch besteht auch hier eine nicht-lineare Beziehung zwischen dem linearen Prädiktor und der Wahrscheinlichkeit $P(Y=1\vert X)$, denn $\Lambda(\cdot)$ ist eine nicht-lineare Funktion mit dem Wertebereich $[0,1]$.
 
 ```{webr}
 # Plot: Logistische Funktion
@@ -493,6 +493,12 @@ ggplot() +
   labs(title = "Logit-Funktion") +
   theme_cowplot()
 ```
+
+Die nachstehende interaktive Grafik zeigt, wie die Wahscheinlichkeitsfunktion der latenten Variable $z=\beta_0 + \beta_1 X$ von den Parametern $\beta_0$ und $\beta_1$ jeweils für Logit- und Probit-Regression beeinflusst wird.
+
+<iframe class="obs-soft-box-shadow" width="100%" height="700" frameborder="0"
+  src="https://observablehq.com/embed/@mca91/latent-variable-cdf?cells=plot%2Cviewof+beta0%2Cviewof+beta%2CMathJax"></iframe>
+
 
 Aufgrund der Nicht-Linearität von $\Lambda(z)$ kann der Koeffizient $\beta_1$ wie im Probit-Modell nicht direkt als Effekt auf die Wahrscheinlichkeit $P(Y=1\vert X)$ interpretiert werden.
 
@@ -586,6 +592,7 @@ p +
 ```
 
 Die Logit-Regression kann den wahren Zusammenhang gut abbilden und ist praktisch nicht von der Probit-Schätzung unterscheidbar. 
+
 
 ### Modellgüte
 
@@ -936,8 +943,8 @@ Für eine Änderung von $X$ um $\Delta X$ erhalten wir
 \begin{align*}
    \lambda =&\, \exp(\beta_0 + \beta_1 X) \\
     \lambda + \delta\lambda =&\, \exp(\beta_0 + \beta_1 (X + \Delta X)) \\
-    =&\, \exp(\beta_0 + \beta_1 X) \cdot exp(\beta\Delta X) \\
-    =&\, \lambda \cdot \cdot exp(\beta\Delta X)
+    =&\, \exp(\beta_0 + \beta_1 X) \cdot \exp(\beta\Delta X) \\
+    =&\, \lambda \cdot \exp(\beta\Delta X)
 \end{align*}
 
 Angenommen $X$ ist die Anzahl durchgeführter Werbekampagnen und die abhängige Zählvariable $Y$ misst die Anzahl der Verkäufe des beworbenen Produkts pro Monat.
