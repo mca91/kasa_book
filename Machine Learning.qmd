@@ -3,57 +3,220 @@ format: live-html
 engine: knitr
 ---
 
-# Machine Learning
+# Neuronale Netzwerke
 
-## Neuronale Netzwerke  lernen funktionale Zusammenhänge
+Neuronale Netze (NN) sind leistungsstarke Modelle, die darauf spezialisiert sind, komplexe Muster in Daten zu erkennen und sind damit insbesondere ein hilfeiches Tool für Prognosen. Ein Nachteil neuronaler Netze ist die mangelnde Fähigkeit, kausale Zusammenhänge zu identifizieren und abzuleiten. Diese Limitation stellt eine signifikante Einschränkung dar, insbesondere für den Einsatz in empirischen Disziplinen, in denen das Verständnis kausaler Beziehungen von entscheidender Bedeutung ist. Während NN effektiv komplizierte Strukturen abbilden können, sind sie nicht mit den notwendigen Mechanismen ausgestattet, um Kausalität zu modellieren oder gar zu identifizieren. Grund hierfür ist die fehlende explizite Berücksichtigung kausaler Beziehungen und des zugrunde liegenden datenerzeugenden Prozesses: NN lernen lediglich funktionale Zusammenhänge in den Trainingsdaten. Auch wenn hierdurch komplexeste Relationen abgebildet werden können, erlaubt ein angepasstes Netz keine Differenzierung zwischen einer Korrelation und einer tatsächlichen kausalen Beziehung zwischen Variablen.
 
-Neuronale Netze sind leistungsstarke Modelle, die darauf spezialisiert sind, komplexe Muster in Daten zu erkennen und Vorhersagen zu treffen. Allerdings können sie keine direkten kausalen Schlüsse ziehen. Diese Unfähigkeit ist eine wesentliche Einschränkung, insbesondere in Kontexten, in denen kausale Zusammenhänge wichtig sind.
+In diesem Kapitel erläutern wir die Funktionsweise und Anpassung neuronaler Netze mit Keras und TensorFlow in R und diskutieren deren Anwendung zur Prognose von Zielvariablen in Datensätzen mit vielen Variablen und Beobachtungen. Die hier erläuterten Grundlagen basieren  auf den einleitenden Kapiteln in @Bishop2007 und @Goodfellowetal2016. Für ausführliche Erläuterungen der R-API `keras` für die gleichnamige Python-Bibliothek empfehlen wir @Allaire2018.
 
-Ein zentraler Punkt ist der Unterschied zwischen Korrelation und Kausalität. Neuronale Netze sind hervorragend darin, Korrelationen zwischen Variablen zu erkennen, aber eine Korrelation bedeutet nicht zwangsläufig, dass eine kausale Beziehung besteht. Kausalität erfordert, dass eine Veränderung in einer Variablen tatsächlich eine Veränderung in einer anderen verursacht. Neuronale Netze verfügen jedoch nicht über Mechanismen, um Kausalität direkt zu modellieren oder zu erkennen.
+## Grundlagen und Vokabeln {#sec-nn-basics}
 
-Ein weiteres Problem ist die fehlende Berücksichtigung von Störfaktoren (Confoundern). Diese sind Variablen, die sowohl die Ursache als auch die Wirkung beeinflussen können. Neuronale Netze übersehen oder missinterpretieren oft solche Störfaktoren, was zu falschen Schlussfolgerungen führen kann. Da sie auf historischen Daten basieren, können sie auch keine Interventionsanalysen durchführen, die für kausale Schlüsse notwendig sind.
+NN bestehen aus einer (often großen) Anzahl so genannter *künstlicher Neuronen*. Ein Neuron ist eine mathematische Funktion, die mehrere Eingaben empfängt, diese unter Verwendung von Gewichten linear kombiniert und eine Ausgabe durch Verwendung einer Aktivierungsfunktion generiert.
 
-Die „Black-Box“-Natur von neuronalen Netzen stellt ein weiteres Hindernis dar. Es ist oft schwer nachvollziehbar, wie das Modell zu seinen Vorhersagen gelangt, was die Interpretation und das Verständnis von kausalen Beziehungen erschwert.
+Die Neuronen eines NN sind in Schichten (*Layers*) organisiert. Jedes Layer verarbeitet die Eingabedaten und gibt die Ergebnisse an das nächste Layer weiter, wobei die Neuronen verschiedener Layer miteinander verknüpft werden. Während das Eingabe-Layer (*Input*) die "Rohdaten" (bspw. beobachtete Regressorwerte) aufnimmt und sie an die erste versteckte Schicht (*Hidden Layer*) weiterleitet, ist die Hauptaufgabe der Neuronen in den Hidden Layers, komplexe Muster und Merkmale in den Daten zu erkennen und zu verarbeiten. Jedes Hidden Layer transformiert die empfangenen Daten anhand seiner Neuronen, bevor diese an das nächste Layer weitergeleitet werden. Das letzte Layer in einem neuronalen Netzwerk ist das Ausgabe-Layer (*Output Layer*), das die endgültige Vorhersage für die Outcome-Variable basierend auf den verarbeiteten Daten liefert.
 
-Zusammengefasst sind Neuronale Netze zwar mächtige Werkzeuge zur Mustererkennung, aber sie sind nicht geeignet, um kausale Zusammenhänge zu erkennen oder zu verifizieren. Für kausale Inferenz sind spezialisierte Methoden erforderlich, die über das hinausgehen, was neuronale Netze leisten können.
+Die Stärke der Verknüpfungen zwischen den Neuronen wird durch die Gewichte $w$ bestimmt, welche während des Trainingsprozesses angepasst werden, um das Modell hinsichtlich der (Vorhersage) einer Zielvariable zu optimieren. Die $w$ bestimmen, wie stark die Aktivierung eines Neurons in einer Schicht die Aktivierung der Neuronen in der nächsten Schicht beeinflusst. Das Netzwerk kann so tiefe und abstrakte Strukturen eines Datensatzes abbilden. 
 
-- **Input**: Die Eingangsdaten oder Merkmale, die in das neuronale Netzwerk eingespeist werden. Jeder Input wird durch ein oder mehrere Neuronen in der Eingabeschicht repräsentiert.
+```{dot}
+//| fig-width: 6
+//| fig-height: 4
+//| fig-align: 'center'
+//| label: fig-nnex
+//| fig-cap: "Neuronales Netzwerk mit einem Hidden Layer"
+digraph NNEX {
+    layout=neato;
+    fontname="Helvetica,Arial,sans-serif";
+    node [fontname="Helvetica,Arial,sans-serif", shape="circle", style=filled, fontsize=16];
+    edge [fontname="Helvetica,Arial,sans-serif", fontsize=12];
 
-- **Output**: Das Ergebnis, das das neuronale Netzwerk nach der Verarbeitung der Inputs liefert. Der Output wird durch die Neuronen in der Ausgabeschicht des Netzwerks dargestellt.
+    // Eingabeschicht
+    X1 [label="X1", pos="0,1!", fillcolor=lightblue];
+    X2 [label="X2", pos="0,-1!", fillcolor=lightblue];
 
-- **Layer**: Eine Ebene von Neuronen im neuronalen Netzwerk. Es gibt Eingabeschichten, versteckte Schichten (Hidden Layers) und Ausgabeschichten. Jede Schicht nimmt Eingaben, verarbeitet sie und gibt Ausgaben an die nächste Schicht weiter.
+    // Versteckte Schicht
+    V1 [label="V1\n(A)", pos="3,2!", fillcolor=lightyellow];
+    V2 [label="V2\n(A)", pos="3,0!", fillcolor=lightyellow];
+    V3 [label="V3\n(A)", pos="3,-2!", fillcolor=lightyellow];
 
-- **Units**: Die Neuronen in einem Layer. Jedes Neuron empfängt Inputs, multipliziert sie mit Gewichten, addiert einen Bias und gibt das Ergebnis nach Anwendung einer Aktivierungsfunktion weiter.
+    // Ausgabeneuron
+    Y [label="Y\n(A)", pos="6,0!", fillcolor=lightgreen];
 
-- **Aktivierungsfunktion**: Eine mathematische Funktion, die auf die gewichtete Summe der Eingaben eines Neurons angewendet wird. Sie bestimmt, ob ein Neuron aktiviert wird. Beispiele sind *Sigmoid*, *ReLU* und *Tanh*.
+    // Kanten von Eingabeschicht zur versteckten Schicht
+    X1 -> V1 [label="w11"];
+    X1 -> V2 [label="w12"];
+    X1 -> V3 [label="w13"];
+    X2 -> V1 [label="w21"];
+    X2 -> V2 [label="w22"];
+    X2 -> V3 [label="w23"];
 
+    // Kanten von der versteckten Schicht zur Ausgabeschicht
+    V1 -> Y [label="w31"];
+    V2 -> Y [label="w32"];
+    V3 -> Y [label="w33"];
+}
+```
 
-Neuronale Netze lernen, indem sie ihre internen Parameter (Gewichte) so anpassen, dass der Fehler zwischen den vorhergesagten und den tatsächlichen Werten minimiert wird. Dieser Lernprozess basiert auf einem Optimierungsverfahren namens Gradientenabstieg. Hier ist, wie das Lernen im Wesentlichen funktioniert:
-
-1. Forward Pass: Ein neuronales Netz nimmt Eingabedaten auf und leitet diese durch die Schichten des Netzes weiter. Jede Schicht transformiert die Daten mit Hilfe von Gewichten und Aktivierungsfunktionen, um eine Vorhersage zu erzeugen.
-
-2. Berechnung des Loss: Der Fehler (Loss) wird berechnet, indem die Vorhersage mit dem tatsächlichen Wert verglichen wird. Typische Fehlerfunktionen sind der quadratische Fehler oder der Kreuzentropieverlust.
-
-3. Gradientenabstieg: Um die Gewichte anzupassen und den Fehler zu minimieren, berechnet der Gradientenabstieg (Gradient Descent) den Gradienten der Loss-Funktion in Bezug auf die Gewichte. Der Gradientenabstieg zeigt an, in welche Richtung die Gewichte verändert werden müssen, um den Fehler zu verringern.
-
-4. Gewichtsaktualisierung: Die Gewichte werden in kleinen Schritten, die durch die Lernrate bestimmt werden, in Richtung des negativen Gradienten angepasst. Dies bedeutet, dass die Gewichte so verändert werden, dass der Fehler nach der nächsten Vorhersage kleiner ist.
-
-5. Erweiterte Optimierung (z.B. Adam): Um den Lernprozess effizienter und stabiler zu machen, verwenden moderne Algorithmen wie Adam zusätzliche Techniken. Adam kombiniert den Gradientenabstieg mit Momentum, um die Anpassung der Gewichte zu beschleunigen und stabile Lernschritte zu gewährleisten, sowie mit adaptiven Lernraten, die die Schrittgröße für jedes Gewicht individuell anpassen.
-
-6. Iterativer Prozess: Dieser Prozess des Vorwärtsdurchlaufs, der Fehlerberechnung, der Gradientenberechnung und der Gewichtsaktualisierung wird für viele Iterationen wiederholt, bis der Fehler ausreichend klein ist oder keine signifikanten Verbesserungen mehr erzielt werden.
-
-Durch diesen iterativen Lernprozess passen neuronale Netze ihre Gewichte so an, dass sie komplexe Muster in den Daten erkennen und genaue Vorhersagen machen können.
-
-## Neuronale Netze
+Angenommen wir interessieren uns für die Vorhersage einer Outcome-Variable $Y$ mit den Regressoren $X_1$ und $X_2$. @fig-nnex zeigt ein mögliches NN mit 3 Neuronen $V_1$, $V_2$, $V_3$ in einem Hidden Layer. Die Neuronen im Hidden Layer empfangen Eingaben aus dem Input Layer, bestehend aus Beobachtungen der Variablen $X_1$ und $X_2$, und gewichten diese Informationen gemäß der Vorschrift
 
 \begin{align*}
-  Y = w_1 X + b
+  h_i = A\left(\sum_{j=1}^{2} w_{ji} \cdot x_j + b_i\right) \quad \text{für } i = 1, 2, 3.
 \end{align*}
+
+Hierbei sind $w_{ji}$ die Gewichte der Verbindung von Input $j$ zu Neuron $i$ und $b_i$ ist ein *Bias*.^[Der Bias ist analog zur Konstante in einer Regression.] $A(\cdot)$ ist eine Aktivierungsfunktion, die in Abhängigkeit der zu modellierenden Daten gewählt wird.
+
+Das Ausgabe-Neuron für $Y$ verarbeitet die Informationen aus dem Hidden Layer ebenfalls anhand einer Linearkombination, die mit einer Aktivierungsfunktion transformiert wird,
+
+\begin{align*}
+  y = A\left(\sum_{i=1}^{3} w_{i} \cdot h_i + b_y\right).
+\end{align*}
+
+Ein solches NN "lernt" Relationen zwischen $Y$ und den Regressoren $X_1$ und $X_2$, indem die Gewichte anhand eines Algorithmus derart gewählt werden, dass der Fehler zwischen den vorhergesagten und den tatsächlichen Werten von $Y$ --- gemessen mit einer Verlustfunktion (*Loss-Funktion*) --- minimiert wird. Dieser Lernprozess erfolgt unter Verwendung numerischer Optimierungsverfahren wie *Gradientenabstieg* (*Gradient Descent*).
+
+
+### Training Neuronaler Netze
+
+Der Anpassungsprozess eines NN an einen Datensatz (*Training*) wird grob durch folgende Schritte bestimmt:
+
+1. Das Netz (Gewichte) wird initialisiert. 
+
+2. Die Inputs jeder Beobachtung im Trainingsdatensatz werden durch das NN geleitet (*Forward Pass*): Jedes Layer transformiert die Daten mit Hilfe von Gewichten und Aktivierungsfunktionen, um eine Vorhersage von $Y$ zu erzeugen.
+
+3. Der Loss wird berechnet, indem die Vorhersage von $Y$ mit dem tatsächlichen Wert verglichen wird. Die Verlustfunktion wird entsprechend der Definition von $Y$ gewählt. Typische Verlustfunktionen sind *Quadratic Loss* (analog zur Schätzung von linearen Regressionsmodellen mit KQ) oder *Logistic Loss* (analog zu logistischer Regression).
+
+4. Zur Anpassung der Gewichte wird der Gradient^[Der Gradient einer Funktion $f(\boldsymbol{x}) = f(x_1, x_2, \ldots, x_k)$ ist der Vektor der partiellen Ableitungen: $\nabla f = \left( \frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \ldots, \frac{\partial f}{\partial x_k} \right)$. $\nabla f(\boldsymbol{x})$ zeigt die Richtung und Stärke der steilsten Änderung von $f$ am Punkt $\boldsymbol{x}$ an.] der Verlustfunktion hinsichtlich der Gewichte des NN ermittelt.^[$\nabla f$ ist in NN grundsätzlich unbekannt. Gradient-Desenct-Algorithmen verwenden numerische Verfahren, um den Gradienten anhand von $f$ zu approximieren.] Ein Gradient-Descent-Algorithmus bestimmt, in welche Richtung die Gewichte verändert werden müssen, um den Vorhersagefehler zu verringern.
+
+    Für diese Berechnung wird ein *Backward Pass* (auch *Backpropagation* genannt) genutzt. Hierbei wird der anhand des Ausgabelayers ermittelte Loss rückwärts durch das Netzwerk propagiert, um die Gewichte so anzupassen, dass der Fehler bei der Vorhersage von $Y$ minimiert wird.
+
+5. Die Gewichte werden in kleinen Schritten, die durch die so genannte *Lernrate* bestimmt werden, in Richtung des negativen Gradienten angepasst. Dies bewirkt, dass die Gewichte so verändert werden, dass der Loss im Vergleich zur letzten Iteration verringert wird.
+
+    Um den Lernprozess effizienter und stabiler zu machen, nutzen moderne Algorithmen weitere Schritte, bspw. eine Kombination von Gradientenabstieg mit *Momentum*. Dies beschleunigt die Anpassung der Gewichte und stabilisiert den Lernprozess. Fortgeschrittene Methoden verwenden adaptiven Lernraten, die die Schrittgröße für jedes Gewicht individuell anpassen können.
+
+Die Schritte 4 und 5 werden wiederholt, bis ein Abbruchkriterium erfüllt ist: Der Fehler ist ausreichend klein, oder weitere Iterationen bewirken keine signifikante Änderung des Gradienten. 
+
+**Epochen und Iterationen**
+
+Der Gesamte Prozess wird für mehrere Epochen (*Epocs*) durchlaufen, in denen jeweils der gesamte Trainingsdatensatz durch das NN geleitet wird. Um das Training auch für große Datensätze durchführen zu können, werden die Trainingsdaten hierbei üblicherweise in zufällig zusammengesetzen, kleineren Datensätzen (*Batches*) gruppiert. In jeder Epoche erfolgt die Anpassung der Gewichte für jedes durch das Netz geleitete Batch (jede *Iteration*):
+
+1. **Epoche**
+
+    1. **Batch**
+
+        *Forward Pass* $\rightarrow$ *Loss-Berechnung* $\rightarrow$ *Backpropagation* $\rightarrow$ *Gradient-Descent-Update*
+    
+    2. **Batch**
+  
+        *Forward Pass* $\rightarrow$ *Loss-Berechnung* $\rightarrow$ *Backpropagation* $\rightarrow$ *Gradient-Descent-Update*
+  
+        ...
+    
+2. **Epoche**
+
+            ...
+    
+    ...
+
+Für das Training eines NN sind mehrere Epochen notwendig, weil ein einzelner Durchlauf der Daten oft nicht ausreicht, um die zugrundeliegenden Muster zu lernen. Durch Anpassung über mehrere Epochen können die Gewichte des Modells verfeinert werden, was insbesondere die Fähigkeit zur Generalisierung für ungesehene Daten verbessert. Die zufällige Einteilung der Daten in Batches zu Beginn jeder Epoche verhindert unter anderem, dass das NN lediglich die Reihenfolge der durchgeleiteten Datenpunkte lernt. 
+
+Die Anzahl an zu durchlaufender Epochen ist ein Tuning-Parameter: Zu wenige Epochen führen zu einer schlechten Anpassung an die Daten, während zu viele Epochen das Risiko von Overfitting erhöhen. Um den Vorhersagefehler für ungesehene Daten einzuschätzen, wird ein Testdatensatz vorbehalten. Dieser Datensatz wird während des Trainings nicht zum Anpassen der Gewichte genutzt, sondern erst nach Abschluss einer Epoche für die Berechnung der Vorhersagequalität herangezogen. So kann jeweils nach dem Durchlauf einer Epoche beurteilt werden, wie gut das Modell auf neue, unbekannte Daten generalisiert. Hierbei können ein hoher Vorhersagefehler für den Testdatensatz und ein (viel) geringerer Fehler für den Trainingsdatensatz nach mehreren Epochen auf Overfitting hinweisen. Im empirischen Teil dieses Kapitels diskutieren wir (grafische) Methoden zur Beurteilung der Anpassung des Modells.
+
+Beim Training von NN können sogenannte *Callback-Funktionen* eingesetzt werden, um den Anpassungsprozess unter Einbezug von Zwischenergebnissen zu bestimmten Zeitpunkten während des Trainingsprozesses, z. B. am Ende jeder Epoche oder nach einer bestimmten Anzahl von Iterationen, zu evaluieren. Callbacks werden verwendet, um bestimmte Aktionen auszuführen, wie das Anpassen der Lernrate oder das Überwachen der Trainingsleistung: Ein Callback kann das Training automatisch stoppen (*Early Stopping*), wenn Anzeichen von Overfitting erkannt werden, beispielsweise wenn die Vorhersagegüte auf dem Test-Datensatz über mehrere Epochen hinweg stagniert. Dadurch wird ein unnötiges Fortsetzen des Trainings vermieden und ein Verlust der Generalisierungsfähigkeit auf neuen Daten verhindert.
+
+Wir fassen die wichtigsten Begriffe für die Beschreibung von NN nachfolgend kurz zusammen.
+
+**Wesentliche Definitionen**
+
+- **Layer**: Eine Ebene von Neuronen im neuronalen Netzwerk. Es gibt das Eingabe-Layer, versteckte Layers (Hidden Layers) und das Ausgabe-Layer. Jedes Layer verarbeitet Informationen aus dem vorangegangenen Layer und gibt die Ergebnisse an das nächste Layer weiter.
+
+- **Input**: Die Eingangsdaten oder Merkmale, die in das NN eingespeist werden. Jeder Input wird durch ein oder mehrere Neuronen im Eingabe-Layer repräsentiert.
+
+- **Output**: Das Ergebnis, welches das NN nach der Verarbeitung der Inputs liefert. Der Output wird durch die Neuronen im Output-Layer des NN erstellt.
+
+- **Neuron**: Die kleinste Komponente eines NN. Jedes Neuron empfängt Inputs, multipliziert sie mit Gewichten, addiert einen Bias und gibt das Ergebnis nach Anwendung einer Aktivierungsfunktion weiter: Ein Neuron ist also eine *mathematische Funktion*, die Inputs aus dem vorherigen Layer mit einer transformierten Linearkombination verarbeitet und das Ergebnis das nächste Layers weiterleitet. 
+
+- **Forward Pass**: Leitung der Trainingsdaten durch das NN und Berechnung der Vorhersage des Outcomes.
+
+- **Loss-Funktion**: Mathematische Funktion, welche die Güte der Vorhersage des NN für das Outcome quantifiziert. Der Loss ist eine Funktion der zu trainierenden Parameter des NN.
+
+- **Backward Pass / Backpropagation**: Ermittlung des Gradienten der Loss-Funktion durch Verkettung des Effekts der Gewichte über die Layers des NN.
+
+- **Aktivierungsfunktion**: Eine mathematische Funktion, die auf die gewichtete Summe der Eingaben eines Neurons angewendet wird. Die Aktivierungsfunktion bestimmt, ob ein Neuron aktiviert wird. Beispiele sind 
+
+    \begin{align*}
+      \text{ReLU}(z) =& \max(0, z), \\[.5ex]
+      \sigma(z) =&\, \frac{1}{1 + e^{-z}}, \\[.5ex]
+      \tanh(z) =&\, \frac{e^z - e^{-z}}{e^z + e^{-z}}.
+    \end{align*}
+
+- **Epoche**: Ein Trainingszyklus, bei dem der gesamte Trainingsdatensatz, aufgeteilt in Batches, das NN durchläuft.
+
+- **Batches**: Zufällig eingeteilte Teilmengen der Beobachtungen des Trainingsdatensatzes.
+
+- **Callback**: Eine Funktion, die im Zuge der Überwachung des des Trainings-Prozesses automatisch ausgeführt wird, um Aktionen wie Lernratenanpassung oder Trainingsstopp zu auszulösen.
+
+Im nächsten Abschnitt erläutern wir die Optimierung der Gewichte mit Gradient Descent beispielhaft anhand interaktiver Visualisierungen.
+
+## Optimierung mit Gradient Descent
+
+Gradient Descent ist ein iteratives Optimierungsverfahren zur Minimierung einer differenzierbaren Zielfunktion $f(w)$. Ausgehend von einem Startwert $w_0$ aktualisiert der Algorithmus die Variable $w$ schrittweise gemäß einer Lernrate $\eta$ in die entgegengesetzte Richtung des Gradienten $\nabla f(w)$ der Funktion an der aktuellen $w$. Mit $\nabla f(w)$ wird mathematisch die Richtung des *steilsten Anstiegs* von $f(w)$ im Punkt $w$ ermittelt. Der Algorithmus vollzieht eine Veränderung von $w$ in die entgegengesetzten Richtung -- die Richtung mit dem schnellsten *Abstieg* (Descent) der Zielfunktion.
+
+Der folgende Algorithmus zeigt die grundlegende Vorgehensweise des Gradientenabstiegsverfahrens für einen einziegen zu optimierenden Parameter $w$ unter Einbeziehung eines Momentum-Terms $v_t$.^[In der Literatur wird $v_t$ häufig auch als *Velocity* bezeichnet.] Der Momentum-Term dient dazu, das Konvergenzverhalten zu verbessern und lokale Minima effektiver zu überwinden. Die Stärke des Momentums $v_t$ wird durch den Momentum-Faktor $\alpha \in [0,1)$ bestimmt. 
+
+\begin{align*}
+  \small
+  & \textbf{Algorithmus: Gradientenabstiegsverfahren mit Momentum} \\
+  & \textup{Initialisiere: }\\[.5ex]
+  & \quad w_0 \text{ (Startpunkt) }\\
+  & \quad \eta \text{ (Lernrate) }\\
+  & \quad \alpha \text{ (Momentum-Faktor) }\\ 
+  & \quad v_0 = 0 \text{ (Anfangsmomentum) } \\[1em]
+  & \text{Iteriere für } t = 0, 1, 2, \dots \text{ bis Konvergenz:} \\[.5ex]
+  & \quad \text{1. Berechne den Gradienten: } \nabla f(w_t) \\
+  & \quad \text{2. Aktualisiere den Momentum-Term: } v_{t+1} = \alpha v_t - \eta \nabla f(w_t) \\
+  & \quad \text{3. Aktualisiere die Position: } w_{t+1} = w_t + v_{t+1} \\
+  & \quad \text{4. Überprüfe das Abbruchkriterium } |\nabla f(w_t)| < \epsilon\text{ (für ein kleines $\epsilon>0$)} \\
+\end{align*}
+
+In der nachfolgenden interaktiven Visualisierung illustrieren wir die Minimierung einer univariaten Funktion $\color{blue}{f(w_t)}$ über $w_t$ anhand des obigen Algorithmus mit Lernrate $\eta = .001$ und Momentum-Faktor $\alpha = .925$.
+
+Der <span style="color:orange">Gradient</span>$\color{orange}{\nabla f(w_t)}$ ist hier die 1. Ableitung von $\color{blue}{f(w_t)}$ nach $w_t$. Die Richtung der Änderung von $\color{blue}{f(w_t)}$ in $w_t$ wird durch den <span style="color:orange">orangenen Pfeil</span> angezeigt. Beachte, wie sich der Gradient bei Variation des Start-Punkts mit dem Slider ändert. Während die Animation der Optimierung mit Gradient Descent läuft, zeigt der  <span style="color:purple">lilane Pfeil</span> das <span style="color:purple">Momentum</span> (<span style="color:purple">Velocity $v_t$</span>) für Schirtt $t$ an.^[Unterschiedliche Längen der Pfeile zeigen hier nicht Änderungen der tatsächlichen Beträge, sondern dienen lediglich der Interpretierbakeit der Grafik.] Der Algorithmus iteriert die Schritte 1. bis 3. solange, bis das Abbruchkriterium $|\textcolor{orange}{\nabla f(w_t)}| < \epsilon = 0.001$ erreicht ist, die Änderung in $\color{orange}{\nabla f(w_t)}$ also hinreichend klein ist, dass ein Parameterwert $w_t$ mit $\color{blue}{f(w_t)}$ nahe des (globalen) Minimums von $f$ plausibel ist.
+
+Folgende Eigenschaften der Optimierung mit Gradient Descent können anhand der Parameter geprüft werden:
+
+- Für Startpunkte mit großen Werten des Gradienten beginnt der Algorithmus mit einem starken Momentum: Der Abstieg in Richtung des negativen Gradients erfolgt also in großen Schritten, sodass die Optimierung schneller erfolgt als für Startpunkte in flachen Regionen von $\color{blue}{f}$.
+
+    Dieser Effekt des Momentum auf den Pfad der zu optimierenden Parameter bei Gradient Descent ist vergleichbar mit dem Effekt der Schwerkraft auf eine Murmel, die auf einer hügeligen Oberfläche rollt: Anfangs gewinnt die Murmel an Geschwindigkeit und bewegt sich beschleunigt in Richtung des steilsten Gefälles. In flacheren Regionen wird die Bewegung langsamer und die Murmel kann in Tälern stecken bleiben, ähnlich wie der Optimierungsprozess in flachen Regionen von $\color{blue}{f}$ langsamer verläuft oder gar stoppt, weil ein Abbruchkriterium erfüllt ist (geringe Änderung des Gradienten). Das Momentum hilft, auch in solchen flachen Bereichen weiter voranzukommen, indem es dem Parameterpfad eine gewisse "Trägheit" verleiht, die es ermöglicht, flache Stellen schneller zu durchqueren und die Optimierung effizienter zu gestalten.
+
+- Bei ungünstiger Wahl der Parameter konvergiert der Algorithmus nicht zum globalen Minimum, sondern stoppt im lokalen Minimum bei $w = -0.5$. Dies unterstreicht die Notwendigkeit, die Hyperparameter Lernrate $\eta$ und Momentum-Faktor $\alpha$ sorgfältig zu wählen, beispielsweise indem die Modellgüte nach erfolgter Anpassung für verschiedene Parameter-Kombinationen verglichen wird. 
+
+In empirischen Anwendungen ist es für eine hohe Modellgüte eines neuronalen Netzwerks nicht unbedingt erforderlich, das globale Minimum zu finden: Viele Optimierungsprobleme weisen zahlreiche lokale Minima auf, die eine ausreichend gute Annäherung an das Optimum bieten können. Besonders bei hochdimensionalen Optimierungsproblemen mit komplexen Loss-Funktionen können diese lokalen Minima zufriedenstellende Lösungen darstellen. In einigen Fällen existiert möglicherweise kein globales Minimum, und der Algorithmus konvergiert zwangsläufig zu einem stabilen lokalen Minimum, das dennoch eine gute Performance gewährleistet. Daher kann es sinnvoller sein, Algorithmen zu verwenden, die das Erreichen einer robusten Lösung legen, anstatt strikt nach dem globalen Minimum zu suchen.
+
+In Software-Implementierungen für Machine und Deep Learning wie `tensorflow` und `keras` werden fortgeschrittene Techniken wie Momentum Tuning oder Stochastic [Gradient Descent](https://en.wikipedia.org/wiki/Stochastic_gradient_descent) (SGD) eingesetzt, um die Wahrscheinlichkeit zu erhöhen, dass der Algorithmus nicht in einem (ungünstigen) lokalen Minimum endet. Ein für die Anpassung von NN häufig verwendeter Algorithmus, der SGD verwendet, ist [Adaptive Moment Estimation (Adam)](https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Adam). Wir verwenden u.a. den Adam-Optimizer in den empirischen Beispielen. 
+
+<iframe class="obs-soft-box-shadow" width="100%" height="761" frameborder="0"
+  src="https://observablehq.com/embed/@mca91/gradient-descent-in-2d?cells=plot%2Cviewof+startAnimation%2Cviewof+startPoint%2Cviewof+alpha%2Cviewof+eta%2CoptimalReached%2CMathJax%2Cstyles"></iframe>
+
+In empirischen Anwendungen sind die zu lernenden Zusammenhänge komplex und damit die Anzahl der zu optimierenden Parameter eines NN häufig groß. Der oben erläuterte Algorithmus für Gradient Descent mit Momentum kann einfach auf Optimierungsprobleme mit $k$ Parametern generalisiert werden. Dann ist $\boldsymbol{w}_t$ ein Vektor mit $k$ Gewichten, $\boldsymbol{v}_{t+1}$ eine vektorwertige Funktion von $\boldsymbol{v}_t$ und $\nabla f(\boldsymbol{w}_t)$ mit Dimension $k$ und $f(\boldsymbol{w}_t)$ ist eine Oberfläche in einem $k+1$-dimensionalen Raum. 
+
+Die nachfolgende interaktive Grafik illustriert Gradient Descent mit Momentum für $k=2$ zu optimierende Gewichte. Statt der Parameter des Algorithmus kann hier die Form der zu optimierenden Funktion manipuliert werden, sodass bis zu 6 Extremstellen vorliegen können. Der <span style="color:red">rote Punkt</span> zeigt den Verlauf der Optimierung von $\boldsymbol{w}_t$.
+
+Die Animation verdeutlicht, dass lokale Minima insbesondere in höheren Dimensionen herausfordernd für Optimierungsalgorithmen sind: Durch Variation der Extrema lassen sich leicht Funktionen $f(w_1,w_1)$ konstruieren, für die Gradient Descent mit den voreingestellten Parametern nicht gegen das globale Minimum konvergiert, sofern vorhanden. Ein günstiger Initialwert für $\boldsymbol{w}_t$ kann die Wahrscheinlichkeit von Stops in lokalen Minima verringern: *Grid Search Initialization* wertet die Funktion über ein gleichmäßiges Gitter von Werten für $\boldsymbol{w}_t$ aus und wählt als Startwert $\boldsymbol{w}_{0,\textup{init}}$ den Punkt mit dem minimalen Funktionswert von $f$ über alle Punkte im Gitter.
+
+<iframe class="obs-soft-box-shadow" width="100%" height="1172" frameborder="0"
+  src="https://observablehq.com/embed/@mca91/gradient-descent-in-3d-three-js?cells=renderer%2Cviewof+restart%2Cviewof+gridinit%2Cviewof+themin%2Cviewof+themin2%2Cviewof+themin3%2Cviewof+themin4%2Cviewof+themin5%2Cviewof+themin6%2Cscene%2Ccamera"></iframe>
+
+
+## Funktionale Zusammenhänge lernen: Regression
+
+Für einen leichten Einstieg in die Modellierung funktionaler Zusammenhänge durch NN mit statistischer Programmierung in R betrachten wir zunächst den einfachsten Zusammenhang zwischen einer Outcome-Variable $Y$ und einem Regressor $X$: Die einfache lineare Funktion
+\begin{align*}
+  Y = w_1 X + b,
+\end{align*}
+wobei der Regressionskoeffizient $w_1$ den Einfluss von $X$ auf $Y$ misst und $b$ eine Konstante ist. Gemäß der Definitionen in @sec-nn-basics kann dieser Funktionale Zusammenhang als NN ohne Hidden Layer dargestellt werden, wobei $X$ ein Input-Neuron ist, dessen Information mit $w_1$ gewichtet an das Output Layer mit einem einzigen Neuron für $Y$ weitergegeben wird. Die Konstante $b$ ist ein *Bias*, der als von $X$ unabhängiger Einfluss von $Y$ behandelt wird, vgl. @fig-nn-lreg.
 
 ```{dot}
 //| fig-width: 6
 //| fig-height: 2
-//| fig-cap: "Neuronales Netzwerk: Lineare Regression mit einer Variable und Bias"
+//| fig-cap: "Neuronales Netzwerk: Lineare Regression mit einer Variable und Konstante"
 //| label: "fig-nn-lreg"
 digraph NEURALNET {
     layout=neato
@@ -63,54 +226,117 @@ digraph NEURALNET {
 
     X [label="X", pos="0,0!"];
     Y [label="Y", pos="4,0!", style=filled, fillcolor=lightgreen];
-    B [label="1", pos="2,2!", fontcolor=gray];
+    B [label="1", pos="2,2!"];
 
     X -> Y [headlabel = "w1", labeldistance=12.5, labelangle=10];
-    B -> Y [headlabel = "bias (b)", labeldistance=9, labelangle=-15, color=gray];
+    B -> Y [headlabel = "Bias (b)", labeldistance=9, labelangle=-15];
 }
 ```
 
-```{r}
-library(dplyr)
-library(cowplot)
-library(tensorflow)
-library(keras)
+Für die Illustration der Schätzung des in @sec-nn-basics dargestellten NN verwenden wir $n=1000$ simulierte Datenpunkte gemäß der Vorschrift
+\begin{align}
+  Y = 5 + 3 \cdot X + u
+\end{align}
+mit $X\sim U[0,10]$ und $u\sim N(0,1)$.
 
-set.seed(123)
+```{r}
+# Daten simulieren
+set.seed(1234)
+
 n <- 1000
 x <- runif(n, min = 0, max = 10)
 y <- 5 + 3 * x + rnorm(n) 
 ```
 
+Für das Training von NN verwenden wir das Python-Paket [keras](https://keras.io/). Hierzu muss lediglich eine lokale Python-Installation vorhanden sein.
+
+Die in diesem Kapitel betrachteten NN sind *sequentielle* NN. Solche Modelle können in `keras` mit der Funktion `keras_model_sequential()` definiert werden. Die Struktur des Modells kann über eine Verkettung von Funktionen für Layers (`keras::layer_dense()`) und Aktivierungen (`keras::layer_activation()`) definiert werden.
+
+Für die Implementierung des Modells in @fig-nn-lreg wählen wir mit `units = 1` und `input_shape = 1` ein Modell mit einem Neuron im Output Layer, das skalare Informationen verarbeitet. `activation = 'linear'` in `layer_dense()` führt zu der Aktivierungsfunktion $A(x) = x$, d.h. die Ausgabe des Input Layers ist die gewichtete Summe der Eingaben plus Bias, *ohne* eine zusätzliche Transformation.
+
 ```{r}
+library(dplyr)
+library(keras)
+
+# NN für einfache Regression
 model <- keras_model_sequential() %>%
   layer_dense(
     units = 1, 
     input_shape = 1, 
     activation = 'linear'
     )
+
+# Modell-Definition prüfen
+model
 ```
 
+Die Übersicht zeigt, dass `model` aus einem Layer für skalare Inputs und Outputs sowie zwei trainierbaren Parameters ($w_1$ und $b$) besteht.
+
+Bevor das im Objekt `model` definierte Modell trainiert werden kann, muss der Code *kompiliert* werden. Dieser Vorgang ist notwendig, da sämtliche Berechnungen in Python durchgeführt werden. Der Python-Code wird beim kompilieren in eine Zwischendarstellung (*Bytecode*) übersetzt, die dann von der Python-Interpreter-Laufzeitumgebung ausgeführt wird.^[Im Gegensatz zu Python ist R eine *interpretierte Programmiersprache*. Kompilierung von R-Ccode ist daher nicht notwendig.]
+
+Mit `keras::compile()` kompilieren wir das Modell und wählen als Optimierungsfunktion Adam mit einer Lernrate von $.01$. Die Loss-Funktion wird über das Argument `loss` festgelegt, hier der mittlere absolute Fehler,
+\begin{align*}
+  \textup{MAE} = \frac{1}{n} \sum_{i=1}^{n} \lvert y_i - \widehat{y}_i\rvert.
+\end{align*}
+
 ```{r}
-# kompilieren
-model %>% compile(
-  optimizer = optimizer_adam(learning_rate = 0.01),
-  loss = 'mean_absolute_error'
+# Modell kompilieren
+model %>% 
+  compile(
+    optimizer = optimizer_adam(learning_rate = 0.01),
+    loss = 'mean_absolute_error'
 )
 ```
 
+Die Kompilierung erfolgt meist innerhalb von Sekundenbruchteilen und geschieht *in-place*: Eine Zuweisung des kompilierten Modells in `model` ist *nicht* notwendig.
+
+Um das Modell zu trainieren verwenden wir `keras::fit()`. Neben den (simulierten) Daten übergeben wir die Anzahl der zudurchlaufenden Epochen `epocs`. Über das Argument `validation_split` legen wir fest, dass 20\% der Datensatzes zufällig ausgewählt und als Test-Datensatz für die Modell-Validierung während des Trainings genutzt werden sollen.
 
 ```{r}
 # Modell trainieren
-model %>% fit(
-  x = x, 
-  y = y, 
-  epochs = 100, 
-  verbose = 0, 
-  validation_split = .2
+history_snn <- model %>% 
+  fit(
+    x = x, 
+    y = y, 
+    epochs = 50, 
+    validation_split = .2
 )
 ```
 
+Der Output zeigt die Enwicklung des Loss (MAE) für Vorhersagen des Trainingsdatensatzes (`loss`) und für den Test-Datensatz (`val_loss`) für alle 25 Epochen. Diese Informationen können mit `plot()` einfach visualisiert werden.
+
+```{r}
+#| label: fig-snn-loss
+#| fig-cap: "Einfaches lineares NN: Entwicklung des Loss für 25 Epochen"
+library(ggplot2)
+library(cowplot)
+library(purrr)
+
+# Entwicklung des Loss über Epochen plotten
+plot(history_snn) +
+  labs(
+    x = "Epoche",
+    y = "Wert der Verlustfunktion"
+  ) +
+  theme_cowplot() +
+  theme(legend.position = "top")
+```
+
+@fig-snn-loss zeigt, dass sich sowohl die Anpassung des NN auf dem Trainingsdatenstz als auch die Generalisierung auf dem Testdatensatz innerhalb der ersten Epochen dramatisch verbessert. Jenseits der 15. Epoche hingegen bewirken weitere Trainingszyklen keine weitere Verbesserung des Loss.
+
+Mit `keras::get_weights()` können wir die optimierten Parameter aus dem Modell-Objekt auslesen.
+
+```{r}
+# Gewichtung und Bias des trainierten NN auslesen
+model %>% 
+  keras::get_weights() %>% 
+  flatten_dbl() %>% 
+  set_names(
+    c("w_1", "bias")
+  )
+```
+
+Das NN hat den funktionalen Zusammengang zwischen `x` und `y` erfolgreich gelernt: Die optimierten Parameter-Werte `bias` und `w_1` liegen nahe der wahren Parameter. Bei Parameter sind mit ihren KQ-Schätzungen vergleichbar.^[Beachte, dass die KQ-Schätzung der Einfachheit halber hier den gesamten Datensatz nutzt und daher präziser sein kann als das NN.]
 
 ```{r}
 # lineares Modell
@@ -119,16 +345,33 @@ summary(lm_model)
 ```
 
 ```{r}
-# Koeffizienten der linearen Regression
+# Koeffizienten der KQ-Schätzung auslesen
 coef(lm_model)
-
-# Gewichtung und Bias des neuronalen Netzwerks
-weights <- model %>% get_weights()
-weights[[1]]  # Gewichtung
-weights[[2]]  # Bias
 ```
 
-### Multiple
+Mit `predict()` erhalten wir Vorhersagen des NN und können so beispielsweise die Residuen für den gesamten Datensatz mit denen der KQ-Schätzung vergleichen.
+
+```{r}
+#| fig-cap: "Vergleich von Residuen für NN und KQ-Schätzung"
+#| label: fig-res-nn
+# Residuen vergleichen
+ tibble(
+   NN = y - model %>% predict(x),
+   lm = lm_model$residuals
+ ) %>%
+  
+  ggplot(mapping = aes(x = NN, y = lm)) +
+  geom_point(alpha = .5, color = "steelblue") +
+  theme_cowplot()
+```
+
+@fig-res-nn zeigt eine gute Korrespondenz der Anpassung des NN mit der Anpassung des linearen, mit KQ geschätzten Modells.
+
+## Multiple Regression
+
+Ein neuronales Netz für multiple Regression kann als eine Erweiterung des Netzes für einfache Regression betrachtet werden. Das Netz enthält nun mehrere Input-Neuronen, von denen jedes eine der unabhängigen Variablen $X_1, X_2, \dots, X_k$ repräsentiert. Diese Input-Neuronen sind mit einem einzigen Output-Neuron verbunden, das die Vorhersage für $Y$  liefert. Jede dieser Verbindungen wird mit einem Gewicht $w_i$  multipliziert, das die Stärke des Einflusses der jeweiligen unabhängigen Variable  $X_i$  auf die abhängige Variable  $Y$  repräsentiert. Wie im einfachen Modell gibt es einen Bias-Term $b$, der ähnlich wie in der einen konstanten Einfluss darstellt.
+
+Die Struktur eines NN für multiple Regression ist in @fig-nn-mlreg dargestellt. In diesem Beispiel gibt es drei unabhängige Variablen $X_1$, $X_2$ und $X_3$, die jeweils ein eigenes Input-Neuron haben und mit dem Output-Neuron $Y$ verbunden sind. $Y$ ist eine Linear-Kombination der Inputs, gewichtet mit den jeweiligen Gewichten $w_1$, $w_2$ und $w_3$, sowie dem Bias $b$.
 
 ```{dot}
 //| fig-width: 6
@@ -141,19 +384,38 @@ digraph NEURALNET {
     node [fontname="Helvetica,Arial,sans-serif", shape="circle"]
     edge [fontname="Helvetica,Arial,sans-serif"]
 
+    // Eingangsneuronen
     X1 [label="X1", pos="0,1!"];
     X2 [label="X2", pos="0,0!"];
     X3 [label="X3", pos="0,-1!"];
-    Y [label="Y", pos="5,0!"];
-    B [label="1", pos="0,2!", fontcolor=gray];
+    
+    // Summationsneuron
+    SUM [label="∑", shape="circle", pos="3,0!", width=0.5, height=0.5, style=filled, fillcolor=lightgray];
 
-    X1 -> Y [headlabel = "w1", labeldistance=18, labelangle=-5];
-    X2 -> Y [headlabel = "w2", labeldistance=18, labelangle=-5];
-    X3 -> Y [headlabel = "w3", labeldistance=18, labelangle=-5];
+    // Ausgabeneuron
+    Y [label="Y", pos="5,0!", style=filled, fillcolor=lightgreen];
+    
+    // Bias
+    B [label="1", pos="3,2!", fontcolor=gray, style=filled, fillcolor=lightblue];
+    
+    // Verbindungen von Eingangsneuronen zur Summation
+    X1 -> SUM [label = "w1"];
+    X2 -> SUM [label = "w2"];
+    X3 -> SUM [label = "w3"];
+    
+    // Verbindung vom Bias zur Summation
+    B -> SUM [label = "b"];
 
-    B -> Y [headlabel = "bias (b)", labeldistance=18, labelangle=-8];
+    // Verbindung von der Summation zum Ausgabeneuron
+    SUM -> Y [label = ""];
 }
 ```
+
+Um die Vorgehensweise in R zu zeigen, generieren wir zunächst $n=250$ Datenpunkte gemäß der Vorschrift
+\begin{align}
+  Y = 5 + 3 \cdot X_1 + 2\cdot X_2 - 1.5 \cdot X_k + u
+\end{align}
+mit $X_1,X_2,X_3 \sim\textup{u.i.v.} N(0, 1)$ und $u\sim N(0,1)$.
 
 ```{r}
 # Erstellen von Trainingsdaten
@@ -168,6 +430,7 @@ w <- c(3, 2, -1.5)
 Y <- 5 + X %*% w + rnorm(n)
 ```
 
+Anschließend definieren wir ein einfaches NN und fügen ein Layer hinzu. Da wir eine multiple Regression durchführen, wählen wir `input_shape = k`, wobei `k` die Anzahl der unabhängigen Variablen ist. Wie im einfachen Modell ist die Aktivierungsfunktion linear, da wir an der Anpassung von $Y$ mit einer linearen Kombination der Inputs interessiert sind.
 
 ```{r}
 # Erstellen und Kompilieren des Modells
@@ -178,24 +441,55 @@ model <- keras_model_sequential() %>%
     activation = 'linear'
   )
 
-model %>% compile(
-  loss = 'mean_squared_error',
-  optimizer = optimizer_sgd(learning_rate = 0.01)
-)
+# Modelldefinition prüfen
+model
+```
 
+Wir kompilieren das Modell mit dem mittleren quadratischen Fehler (mean squared error, MSE) und SGD als Loss-Funktion mit einer moderaten Lernrate.
+
+```{r}
+model %>% 
+  compile(
+    loss = 'mean_squared_error',
+    optimizer = optimizer_sgd(learning_rate = 0.01)
+  )
+```
+
+Die Anpassung des Modells erfolgt wie bei einfacher Regression mit `keras::fit()`.
+
+```{r}
 # Training des Modells
-model %>% fit(
-  x = X, 
-  y = Y, 
-  epochs = 100, 
-  verbose = 0
-)
+history_mnn <- model %>% 
+  fit(
+    x = X, 
+    y = Y, 
+    validation_split = .2,
+    epochs = 25
+  )
 ```
 
 ```{r}
+#| label: fig-mnn-loss
+#| fig-cap: "NN für mult. Regression: Entwicklung des Loss für 25 Epochen"
+
+# Entwicklung des Loss über Epochen plotten
+plot(history_mnn) +
+  labs(
+    x = "Epoche",
+    y = "Wert der Verlustfunktion"
+  ) +
+  theme_cowplot() +
+  theme(legend.position = "top")
+```
+
+Wie bei der einfachen Regression können wir die angepassten Gewichte auslesen und mit ihren KQ-Schätzungen vergleichen.
+
+```{r}
 # Gewichte und Bias extrahieren
-weights <- model %>% get_weights()
-weights[[1]]  # Gewicht für jede Variablen
+weights <- model %>% 
+  keras::get_weights()
+
+weights[[1]]  # Gewicht für die Regressoren
 weights[[2]]  # Bias-Term
 ```
 
@@ -205,11 +499,15 @@ lm_model <- lm(Y ~ X)
 summary(lm_model)
 ```
 
-## Logistisch
+## Nicht-Lineare Zusammenhänge
+
+In diesem Abschnitt verwenden trainieren wir ein NN, um eine logistische Regression durchzuführen. Dieser Ansatz wird häufig verwendet, um eine binäre Outcome-Variablen $Y$ zu modellieren, also Variablen, die zwei mögliche Ausgänge haben (oft als 0 oder 1 dargestellt), siehe @sec-logreg für Details. Anstatt die Eingaben lediglich linear zu kombinieren, verwenden wir eine Sigmoid-Aktivierungsfunktion^[Die Sigmoid-Aktivierungsfunktion entspricht der logistischen Funktion $\Lambda(z)$ aus @sec-logreg.], welche die Ausgaben auf einen Wertebereich zwischen 0 und 1 abbildet. Dadurch kann das NN Wahrscheinlichkeiten $P(Y=1\vert \boldsymbol{X} = \boldsymbol{x})$ vorhersagen, die für die *Klassifikation* von Beobachtungen verwendet werden können.
+
+Für die Illustration der Schätzung mit `keras` verwenden wir den DGP aus @sec-probitreg.
 
 ```{r}
 # Erstellen von Trainingsdaten
-set.seed(42)
+set.seed(1234)
 
 n <- 500
 X <- rnorm(n = n, mean = 5, sd = 2) # Regressor
@@ -217,62 +515,85 @@ P <- pnorm(-4 + 0.7 * X)
 Y <- as.integer(runif(n) < P)
 ```
 
+@fig-nn-log-reg zeigt ein einfaches NN für eine binäre Outcome-Variable.
+
 ```{dot}
 //| fig-width: 6
 //| fig-height: 4
 //| fig-cap: "Neuronales Netzwerk mit Sigmoid-Aktivierungsfunktion"
-//| label: "fig-neuralnet-logistic-regression"
-digraph NEURALNET {
+//| label: "fig-nn-log-reg"
+digraph NNlogit {
     layout=neato
     fontname="Helvetica,Arial,sans-serif"
     node [fontname="Helvetica,Arial,sans-serif", shape="circle"]
     edge [fontname="Helvetica,Arial,sans-serif"]
 
     // Eingangsvariablen
-    X1 [label="X1", pos="0,1!"];
-    X2 [label="X2", pos="0,0!"];
-    X3 [label="X3", pos="0,-1!"];
+    X [label="X1", pos="0,0!"];
 
-    // Output
-    Y [label="Y", pos="6,0!", style=filled, fillcolor=lightgreen];
+    // Summationsneuron
+    SUM [label="∑", shape="circle", pos="3,0!", width=0.5, height=0.5, style=filled];
 
     // Sigmoid-Aktivierungsfunktion
-    sigmoid [label="σ", pos="4,0!", shape="ellipse", style=filled, fillcolor=lightblue];
+    sigmoid [label="σ", pos="5,0!", style=filled, fillcolor=lightblue];
+
+    // Output
+    Y [label="Y", pos="7,0!", style=filled, fillcolor=lightgreen];
 
     // Bias
-    B [label="1", pos="0,2!", fontcolor=gray];
+    B [label="1", pos="3,2!"];
 
-    // Verbindungen
-    X1 -> sigmoid [headlabel = "w1", labeldistance=12.5, labelangle=-10];
-    X2 -> sigmoid [headlabel = "w2", labeldistance=12.5, labelangle=-10];
-    X3 -> sigmoid [headlabel = "w3", labeldistance=12.5, labelangle=-10];
-    B -> sigmoid [headlabel = "bias (b)", labeldistance=12.5, labelangle=-10, color=gray];
-    sigmoid -> Y [headlabel = "", labeldistance=12.5, labelangle=10];
+    // Verbindungen von Eingangsneuronen zur Summation
+    X -> SUM [label = "w1"];
+    B -> SUM [label = "b"];
+
+    // Verbindung von der Summation zur Sigmoid-Funktion
+    SUM -> sigmoid [label = ""];
+
+    // Verbindung von der Sigmoid-Funktion zum Output
+    sigmoid -> Y [label = ""];
 }
 ```
+
 
 
 ```{r}
 # Erstellen und Kompilieren des Modells
 model <- keras_model_sequential() %>%
-  layer_dense(units = 1, input_shape = 1, activation = 'sigmoid')
+  layer_dense(
+    units = 1, 
+    input_shape = 1, 
+    activation = 'sigmoid' # <= für Logit-Modell
+  )
+```
 
+\begin{align*}
+  \textup{Binary Crossentropy} = -\frac{1}{N} \sum_{i=1}^{N} \left[ y_i \cdot \log(\widehat{y}_i) + (1 - y_i) \cdot \log(1 - \widehat{y}_i) \right]
+\end{align*}
+
+```{r}
 model %>% compile(
   loss = 'binary_crossentropy',
   optimizer = optimizer_adam(learning_rate = 0.01),
   metrics = c('accuracy')
 )
+```
 
+```{r, cache=TRUE}
 # Training des Modells
 model %>% 
   fit(X, Y, epochs = 200, verbose = 0)
+```
 
+```{r}
 # Gewichte und Bias extrahieren
 weights <- model %>% 
   get_weights()
 w <- weights[[1]]  # Gewicht für jede der 5 Variablen
 bias <- weights[[2]]  # Bias-Term
+```
 
+```{r}
 # Ergebnisse anzeigen
 print(w)
 print(bias)
@@ -297,6 +618,7 @@ results <- data.frame(
 
 ```{r}
 library(ggplot2)
+library(cowplot)
 
 # Plot der tatsächlichen Werte gegen die vorhergesagten Wahrscheinlichkeiten
 ggplot(
@@ -324,28 +646,7 @@ ggplot(
 ```
 
 
-## Gradientenabstiegsverfahren
 
-Das Gradientenabstiegsverfahren (Gradient Descent) ist ein iteratives Optimierungsverfahren zur Minimierung einer differenzierbaren Zielfunktion $f(x)$. Es wird häufig eingesetzt, um die Verlustfunktionen in maschinellen Lernmodellen zu minimieren. Der Algorithmus aktualisiert die Variablen schrittweise in die entgegengesetzte Richtung des Gradienten der Funktion an der aktuellen Position. Der Gradient gibt dabei die Richtung des *steilsten Anstiegs* an, wodurch die entgegengesetzte Richtung zum schnellsten *Abstieg* (Descent) führt.
-
-Der folgende Pseudocode zeigt die grundlegende Vorgehensweise des Gradientenabstiegsverfahrens unter Einbeziehung eines Momentum-Terms, der dazu dient, das Konvergenzverhalten zu verbessern und lokale Minima effektiver zu überwinden.
-
-\begin{align*}
-& \textbf{Algorithmus: Gradientenabstiegsverfahren mit Momentum} \\
-& \textup{Initialisiere: }\\ 
-& \quad x_0 \text{ (Startpunkt) }\\
-& \quad \eta \text{ (Lernrate) }\\
-& \quad \alpha \text{ (Momentum-Faktor) }\\ 
-& \quad v_0 = 0 \text{ (Anfangsmomentum) } \\[1em]
-& \text{Für } t = 0, 1, 2, \dots \text{ bis Konvergenz} \\
-& \quad \text{1. Berechne den Gradienten: } \nabla f(x_t) \\
-& \quad \text{2. Aktualisiere den Momentum-Term: } v_{t+1} = \alpha v_t - \eta \nabla f(x_t) \\
-& \quad \text{3. Aktualisiere die Position: } x_{t+1} = x_t + v_{t+1} \\
-& \quad \text{4. Überprüfe das Abbruchkriterium (z.B. } \| \nabla f(x_t) \| < \epsilon\text{)} \\
-\end{align*}
-
-<iframe class="obs-soft-box-shadow" width="100%" height="1172" frameborder="0"
-  src="https://observablehq.com/embed/@mca91/gradient-descent-in-3d-three-js?cells=renderer%2Cviewof+restart%2Cviewof+gridinit%2Cviewof+themin%2Cviewof+themin2%2Cviewof+themin3%2Cviewof+themin4%2Cviewof+themin5%2Cviewof+themin6%2Cscene%2Ccamera"></iframe>
   
 ## Case Study: Immobilienpreise
 
@@ -402,7 +703,7 @@ ggplot() +
 ```{r}
 housing %>%
   ggplot(mapping = aes(x = Year_Built, y = Sale_Price)) +
-  geom_point(alpha = .5) +
+  geom_point(alpha = .5, fill = "steelblue") +
   theme_cowplot()
 ```
 
@@ -471,12 +772,15 @@ ridge_preds_log <- predict(cv_ridge, s = best_lambda, newx = x_test_glmnet)
 ridge_preds <- as.numeric(10^ridge_preds_log)
 
 # Evaluate the performance
-ridge_rmse <- mae_vec(truth = housing_test_y, estimate = ridge_preds)
-print(ridge_rmse)
+mae_vec(
+  truth = housing_test_y, 
+  estimate = ridge_preds
+)
 ```
 
 
 ```{r}
+#| message: false
 x_train <- select(baked_train, -Sale_Price) %>% as.matrix()
 y_train <- baked_train %>% pull(Sale_Price)
 
@@ -493,10 +797,12 @@ network <- keras_model_sequential() %>%
 
 network %>%
   compile(
-    optimizer = optimizer_rmsprop(lr = 0.01),
+    optimizer = optimizer_rmsprop(learning_rate = 0.01),
     loss = "msle",
     metrics = c("mae")
   )
+
+set.seed(1234)
 
 history <- network %>% fit(
   x_train,
@@ -509,8 +815,16 @@ history <- network %>% fit(
         callback_reduce_lr_on_plateau(factor = 0.2, patience = 4)
     )
 )
+```
 
+```{r}
+history
+```
+
+```{r}
 plot(history) + 
-  scale_y_log10()
+  scale_y_log10() +
+  theme_cowplot() +
+  theme(legend.position = "top")
 ```
 

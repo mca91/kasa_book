@@ -1,5 +1,6 @@
 ---
 format: live-html
+engine: knitr
 webr: 
   packages: [
             'broom',
@@ -18,16 +19,32 @@ webr:
 {{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
 {{< include ./_extensions/r-wasm/live/_gradethis.qmd >}}
 
-# Übungsaufgaben
+```{css}
+#lineare-link-funktion-in-glm ol[type="a"] {
+  padding-left: 1rem;
+}
 
-## Regression
+#lineare-link-funktion-in-glm ol[type="a"] li::marker {
+  font-weight: 600;
+}
+```
 
-### Lineare Link-Funktion in `glm()` {.no-number}
+# Lineare Regression
+
+### 1. Lineare Link-Funktion in `glm()` {.unnumbered}
+
+In @sec-bov haben wir gelernt, wie generalisierte lineare Modell mit `stats::glm()` geschätzt werden können. In dieser Aufgabe prüfen wir anhand des Datensatzes `penguins_cleaned`, dass lineare Regression ein Spezialfall im generalisierten linearen Modell (GLM) für $Y$ mit linearem Prediktor $z$ und Link-Funktion $g(z)$ ist, wobei
+\begin{align*}
+  Y\sim N(z, \sigma^2), \qquad z = \beta_0 + \beta_1 X, \qquad g(z) = z.
+\end{align*}
 
 ```{webr}
-#| exercise: ex_1
+#| envir: ex_reg
+#| exercise: ex_2
 #| setup: true
 library(palmerpenguins)
+library(purrr)
+library(broom)
 data(penguins)
 
 # Datensatz bereinigen
@@ -43,26 +60,120 @@ penguins_cleaned <- penguins %>%
     body_mass < quantile(body_mass, .95)
   ) %>%
   mutate(sex = if_else(sex == "female", 1, 0))
-```
 
-```{webr}
-#| caption: Linearer Link
-#| exercise: ex_1
-glm(
+mod_glm <- glm(
   formula = sex ~ bill_depth, 
   data = penguins_cleaned,
-  family = _____
+  family = gaussian(link = "identity")
 ) 
+
+mod_lp <- lm(
+  formula = sex ~ bill_depth, 
+  data = penguins_cleaned
+)
+
+# Logit-Modell schätzen
+mod_peng_logit <- glm(
+  formula = sex ~ ., 
+  family = binomial(link = "logit"), 
+  data = penguins_cleaned
+)
+
+# Probit-Modell schätzen
+mod_peng_probit <- glm(
+  formula = sex ~ ., 
+  family = binomial(link = "probit"), 
+  data = penguins_cleaned
+)
+```
+
+(a) Schätze zunächst das einfache lineare Wahrscheinlichkeitsmodell
+\begin{align*}
+  \textup{sex} = \beta_0 + \beta_1 \textup{bill\_depth} + u.
+\end{align*}
+
+```{webr}
+#| envir: ex_reg
+#| caption: lm()
+#| exercise: ex_1
+mod_lp <- lm(
+  formula = _____, 
+  data = _____
+)
+
+mod_lp
 ```
 
 ::: {.solution exercise="ex_1"}
 
 #### Solution
 
+Nutze die Formel `sex ~ bill_depth` und übergebe den Datensatz `penguins_cleaned`
+
+```{webr}
+#| envir: ex_reg
+#| exercise: ex_1
+#| solution: true
+# lineares Modell für 'sex' schätzen
+mod_lp <- lm(
+  formula = sex ~ bill_depth, 
+  data = penguins_cleaned
+) 
+
+mod_lp
+```
+
+:::
+
+::: { .hint exercise="ex_1"}
+::: { .callout-note collapse="false"}
+## Hinweis 1
+
+Das Schema der Formel für eine Regression von `y` auf `x` ist `y ~ x`.
+
+:::
+:::
+
+::: { .hint exercise="ex_1"}
+::: { .callout-note collapse="false"}
+## Hinweis 2
+
+Der Datensatz `penguins_cleaned` muss dem Argument `data` übergeben werden.
+
+:::
+:::
+
+```{webr}
+#| envir: ex_reg
+#| exercise: ex_1
+#| check: true
+gradethis::grade_this_code()
+```
+
+
+(b) Spezifiziere nun ein GLM für $\textup{sex}\sim N(z,\sigma^2)$ mit Link-Funktion $g(z)=z$, wobei $z=\beta_0 + \beta_1\textup{bill\_depth}$.
+
+```{webr}
+#| envir: ex_reg
+#| caption: glm()
+#| exercise: ex_2
+# glm für 'sex' schätzen
+glm(
+  formula = _____, 
+  data = _____,
+  family = _____
+) 
+```
+
+::: {.solution exercise="ex_2"}
+
+#### Lösung
+
 Setze `family = gaussian(link = "identity")`.
 
 ```{webr}
-#| exercise: ex_1
+#| envir: ex_reg
+#| exercise: ex_2
 #| solution: true
 glm(
   formula = sex ~ bill_depth, 
@@ -73,9 +184,183 @@ glm(
 
 :::
 
+::: { .hint exercise="ex_2"}
+::: { .callout-note collapse="false"}
+## Hinweis 1
+
+Über das Argument `family` kann `stats::glm()` die Verteilungsfamilie sowie eine Link-Funktion übergeben werden.
+:::
+:::
+
 ```{webr}
-#| exercise: ex_1
+#| envir: ex_reg
+#| exercise: ex_2
 #| check: true
 gradethis::grade_this_code()
 ```
 
+(c) Die geschätzten Modelle sind in den Objekten `mod_lm` und `mod_glm` verfügbar. Überprüfe mit `coefficients()`, dass die geschätzten Koeffizienten beider Modelle übereinstimmen.
+
+
+```{webr}
+#| envir: ex_reg
+#| caption: Vergleich
+#| exercise: ex_3
+# Koeffizienten aus `mod_lm` auslesen
+coefficients(_____)
+
+# Koeffizienten aus `mod_glm` auslesen
+coefficients(_____)
+```
+
+::: {.solution exercise="ex_3"}
+
+#### Solution
+
+```{webr}
+#| envir: ex_reg
+#| exercise: ex_3
+#| solution: true
+# Koeffizienten aus `mod_lm` auslesen
+coefficients(mod_lm)
+
+# Koeffizienten aus `mod_glm` auslesen
+coefficients(mod_glm)
+```
+
+:::
+
+::: { .hint exercise="ex_3"}
+::: { .callout-note collapse="false"}
+## Hinweis 1
+
+Übergebe der Funktion `coefficients()` jeweils das Modell-Objekt.
+
+:::
+:::
+
+```{webr}
+#| envir: ex_reg
+#| exercise: ex_3
+#| check: true
+gradethis::grade_this_code()
+```
+
+### 2. Logit vs. Probit {.unnumbered}
+
+(a) Schätze zunächst ein Logit-Modell und ein Probit-Modell, die beide `sex` als abhängige Variable verwenden und *alle übrigen Variablen* im Datensatz als Prädiktoren. Vervollständige die folgenden Codezeilen, um die Modelle zu schätzen.
+
+```{webr}
+#| envir: ex_reg
+#| caption: glm()
+#| exercise: ex_2_1
+mod_peng_logit <- glm(
+  formula = _____, 
+  family = _____, 
+  data = penguins_cleaned
+)
+
+mod_peng_probit <- glm(
+  formula = _____, 
+  family = _____, 
+  data = penguins_cleaned
+)
+```
+
+::: {.solution exercise="ex_2_1"}
+
+### Lösung
+
+```{webr}
+#| envir: ex_reg
+#| exercise: ex_2_1
+#| solution: true
+# Logit-Modell schätzen
+mod_peng_logit <- glm(
+  formula = sex ~ ., 
+  family = binomial(link = "logit"), 
+  data = penguins_cleaned
+)
+
+# Probit-Modell schätzen
+mod_peng_probit <- glm(
+  formula = sex ~ ., 
+  family = binomial(link = "probit"), 
+  data = penguins_cleaned
+)
+```
+
+:::
+
+::: { .hint exercise="ex_2_1"}
+::: { .callout-note collapse="false"}
+## Hinweis 1
+
+`formula = Y ~ .` spezifiziert eine Regression von `Y` auf alle übrigen verfügbaren Variablen im Datensatz.
+
+:::
+:::
+
+::: { .hint exercise="ex_2_1"}
+::: { .callout-note collapse="false"}
+## Hinweis 2
+
+Mit `family = binomial(link = _____)` wird eine Likelihood-Funktion für GLMs mit einer binären abhängigen Variable festgelegt. Wähle `link = "logit"` für das Logit-Modell und `link = "probit"` für das Probit-Modell.
+
+:::
+:::
+
+```{webr}
+#| envir: ex_reg
+#| exercise: ex_2_1
+#| check: true
+gradethis::grade_this_code()
+```
+
+(b) Verwende das Akaike-Informationskriterium (AIC) und das Bayes'sche Informationskriterium (BIC), um die beiden Modelle zu vergleichen. Vervollständige den Code, um beide Modelle mithilfe dieser Kriterien zu bewerten.^[Sowohl für das AIC als auch für das BIC deuten niedrige Werte auf eine adäquate Modellwahl hin.]
+
+```{webr}
+#| envir: ex_reg
+#| caption: glm()
+#| exercise: ex_2_2
+models <- list(
+  logit_m = mod_peng_logit,
+  probit_m = mod_peng_probit
+)
+
+map(
+  .x = ___,
+  .f =  ~ .x %>% glance() %>% select(AIC, ___)
+)
+```
+
+::: {.solution exercise="ex_2_2"}
+
+### Lösung
+
+Beide Informationskriterien sprechend für das Logit-Modell: 
+
+```{webr}
+#| envir: ex_reg
+#| exercise: ex_2_2
+#| solution: true
+
+models <- list(
+  logit_m = mod_peng_logit,
+  probit_m = mod_peng_probit
+)
+
+map(
+  .x = models,
+  .f =  ~ .x %>% glance() %>% select(AIC, BIC)
+)
+```
+
+:::
+
+```{webr}
+#| envir: ex_reg
+#| exercise: ex_2_2
+#| check: true
+gradethis::grade_this_code()
+```

@@ -1,2 +1,6 @@
 tensorflow
 keras
+dplyr
+cowplot
+ggplot2
+purrr
