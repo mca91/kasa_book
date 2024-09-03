@@ -482,14 +482,14 @@ plot(history_mnn) +
   theme(legend.position = "top")
 ```
 
-Wie bei der einfachen Regression können wir die angepassten Gewichte auslesen und mit ihren KQ-Schätzungen vergleichen.
+Wie bei der einfachen Regression zeigt ein Vergleich der angepassten Gewichte mit den KQ-Schätzungen eines entsprechenden linearen Regressionsmodells ähnliche Ergebnisse beider Ansätze.
 
 ```{r}
 # Gewichte und Bias extrahieren
 weights <- model %>% 
   keras::get_weights()
 
-weights[[1]]  # Gewicht für die Regressoren
+weights[[1]]  # Gewichte der Regressoren
 weights[[2]]  # Bias-Term
 ```
 
@@ -501,7 +501,11 @@ summary(lm_model)
 
 ## Nicht-Lineare Zusammenhänge
 
-In diesem Abschnitt verwenden trainieren wir ein NN, um eine logistische Regression durchzuführen. Dieser Ansatz wird häufig verwendet, um eine binäre Outcome-Variablen $Y$ zu modellieren, also Variablen, die zwei mögliche Ausgänge haben (oft als 0 oder 1 dargestellt), siehe @sec-logreg für Details. Anstatt die Eingaben lediglich linear zu kombinieren, verwenden wir eine Sigmoid-Aktivierungsfunktion^[Die Sigmoid-Aktivierungsfunktion entspricht der logistischen Funktion $\Lambda(z)$ aus @sec-logreg.], welche die Ausgaben auf einen Wertebereich zwischen 0 und 1 abbildet. Dadurch kann das NN Wahrscheinlichkeiten $P(Y=1\vert \boldsymbol{X} = \boldsymbol{x})$ vorhersagen, die für die *Klassifikation* von Beobachtungen verwendet werden können.
+In diesem Abschnitt verwenden trainieren wir ein NN, um eine logistische Regression durchzuführen. Dieser Ansatz wird häufig verwendet, um eine binäre Outcome-Variablen $Y$ zu modellieren, also Variablen, die zwei mögliche Ausgänge haben (oft als 0 oder 1 dargestellt), siehe @sec-logreg für Details. Anstatt die Eingaben lediglich linear zu kombinieren, verwenden wir eine Sigmoid-Aktivierungsfunktion^[Die Sigmoid-Aktivierungsfunktion entspricht der logistischen Funktion $\Lambda(z)$ aus @sec-logreg.], 
+\begin{align*}
+  \sigma(z) = \frac{1}{1 + \exp(-z)},
+\end{align*}
+welche die Ausgaben auf einen Wertebereich zwischen 0 und 1 abbildet. Dadurch kann das NN Wahrscheinlichkeiten $P(Y=1\vert \boldsymbol{X} = \boldsymbol{x})$ vorhersagen, die anschließend für die *Klassifikation* von Beobachtungen verwendet werden können.
 
 Für die Illustration der Schätzung mit `keras` verwenden wir den DGP aus @sec-probitreg.
 
@@ -555,40 +559,81 @@ digraph NNlogit {
 }
 ```
 
+Nach der Definition des NN wird das Modell mit dem Binary-Cross-Entropy-Loss (BCEL) und dem Adam-Optimierer kompiliert. BCEL ist für binäre Klassifikationsprobleme geeignet: Diese Loss-Funktion misst die die Unterschiede zwischen den vorhergesagten Wahrscheinlichkeiten $\widehat{p}_i$ und den tatsächlichen binären Zielen $y_i$,
+\begin{align*}
+  \textup{BCEL} = -\frac{1}{N} \sum_{i=1}^{N} \left[ y_i \cdot \log(\widehat{p}_i) + (1 - y_i) \cdot \log(1 - \widehat{p}_i) \right].
+\end{align*}
+Als weitere zu berechnende Metrik wählen wir $\textup{Accuracy}$, ein geläufiges Maß zur Bewertung der Leistung von Klassifikationsmodellen. $\textup{Accuracy}$ gibt an, wie oft das Modell korrekte Vorhersagen getroffen hat, ausgedrückt als Verhältnis der Anzahl der korrekten Vorhersagen zur Gesamtzahl der Vorhersagen,
+\begin{align*}
+  \text{Accuracy} = \frac{\textup{TP} + \textup{TN} }{ \textup{TP} + \textup{TN} + \textup{FP} + \textup{FN} } = \frac{\textup{Anz. korrekte Vorhersagen}}{\textup{Anz. alle Vorhersagen}}.
+\end{align*}
+Hierbei sind $\textup{TP}$ und $\textup{FP}$ die Anazhl korrekter (*true positive*) und falscher (*false positiv*) Vorhersagen für Beobachtungen mit $y_i = 1$. $\textup{TN}$ und $\textup{FN}$ sind analog für Beobachtungen mit tatsächlichen Werten $y_i = 0$ definiert.
 
+Die Vorhersage von $y_i$ erfolgt standardmäßig nach der Regel
+\begin{align*}
+  \hat{y}_i =
+  \begin{cases}
+    1 & \text{wenn } \hat{p}_i \geq 0.5, \\
+    0 & \text{wenn } \hat{p}_i < 0.5.
+  \end{cases}
+\end{align*}
 
 ```{r}
 # Erstellen und Kompilieren des Modells
-model <- keras_model_sequential() %>%
+model_nn_logit <- keras_model_sequential() %>%
   layer_dense(
     units = 1, 
     input_shape = 1, 
     activation = 'sigmoid' # <= für Logit-Modell
   )
-```
 
-\begin{align*}
-  \textup{Binary Crossentropy} = -\frac{1}{N} \sum_{i=1}^{N} \left[ y_i \cdot \log(\widehat{y}_i) + (1 - y_i) \cdot \log(1 - \widehat{y}_i) \right]
-\end{align*}
+model_nn_logit
+```
 
 ```{r}
-model %>% compile(
-  loss = 'binary_crossentropy',
-  optimizer = optimizer_adam(learning_rate = 0.01),
-  metrics = c('accuracy')
-)
+model_nn_logit %>% 
+  compile(
+    loss = 'binary_crossentropy', # BCEL
+    optimizer = optimizer_adam(learning_rate = 0.01),
+    metrics = 'accuracy'
+  )
 ```
 
-```{r, cache=TRUE}
+```{r}
 # Training des Modells
-model %>% 
-  fit(X, Y, epochs = 200, verbose = 0)
+history_nn_logit <- model_nn_logit %>% 
+  fit(
+    x = X, 
+    y = Y, 
+    validation_split = .2,
+    epochs = 150,
+    verbose = F
+  )
 ```
+
+```{r}
+history_nn_logit
+```
+
+```{r}
+#| label: fig-mnn-logithist
+#| fig-cap: "NN für Logit-Regression: Entwicklung der Metriken für 25 Epochen"
+
+# Entwicklung des Loss über Epochen plotten
+plot(history_nn_logit) +
+  labs(
+    x = "Epoche",
+    y = ""
+  ) +
+  theme_cowplot() +
+  theme(legend.position = "top")
+```
+
 
 ```{r}
 # Gewichte und Bias extrahieren
-weights <- model %>% 
-  get_weights()
+weights <- model_nn_logit %>% 
+  keras::get_weights()
 w <- weights[[1]]  # Gewicht für jede der 5 Variablen
 bias <- weights[[2]]  # Bias-Term
 ```
@@ -600,19 +645,27 @@ print(bias)
 ```
 
 ```{r}
-glm(Y ~ X, family = binomial(link = "logit"))
+# Logistisches Modell mit glm() anpassen
+glm_mod <- glm(
+  formula = Y ~ X, 
+  family = binomial(link = "logit")
+)
+
+summary(glm_mod)
 ```
 
 ```{r}
-# Vorhersagen auf den Trainingsdaten erstellen
-predictions <- model %>% 
-  predict(X)
+# Vorhersagen für Trainingsdaten erstellen
+predictions_nn_logit <- model_nn_logit %>% 
+  predict(X) %>% 
+  c()
 
-# In einen DataFrame zusammenfassen
-results <- data.frame(
+# Zusammenfassen
+results <- tibble(
   Regressor = X,
   Actual = Y,
-  Predicted_Probability = predictions
+  nn_logit = predictions_nn_logit,
+  glm_logit = predict(glm_mod, type = "response")
 )
 ```
 
@@ -627,9 +680,10 @@ ggplot(
   ) +
   geom_point(
     position = position_jitter(height = 0.05), 
-    alpha = 0.5) +
+    alpha = 0.5
+  ) +
   geom_line(
-     mapping = aes(y = Predicted_Probability),
+     mapping = aes(y = nn_logit),
     col = "darkred"
   ) +
   geom_smooth(
@@ -640,15 +694,33 @@ ggplot(
   labs(
     title = "Logistische Regression vs. NN",
        x = "x",
-       y = "Schätzung P(Y=1|X=x)"
+       y = "Schätzung v. P(Y=1|X=x)"
   ) +
-  theme_minimal()
+  theme_cowplot()
 ```
 
 
+```{r}
+library(plotROC)
+
+results %>%
+  pivot_longer(
+    cols = glm_logit:nn_logit,
+    names_to = "model", 
+    values_to = "pp"
+    ) %>%
+
+# Generate ROC curve using ggplot2
+ggplot(aes(m = pp, d = Actual, colour = model)) +
+  geom_roc() +
+  style_roc() + 
+  facet_wrap(~ model) +
+  theme(legend.position = "top")
+```
+
 
   
-## Case Study: Immobilienpreise
+## Case Study: Vorhersage von Immobilienpreisen
 
 ```{r}
 library(AmesHousing)
