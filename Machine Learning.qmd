@@ -7,7 +7,9 @@ engine: knitr
 
 Neuronale Netze (NN) sind leistungsstarke Modelle, die darauf spezialisiert sind, komplexe Muster in Daten zu erkennen und sind damit insbesondere ein hilfeiches Tool für Prognosen. Ein Nachteil neuronaler Netze ist die mangelnde Fähigkeit, kausale Zusammenhänge zu identifizieren und abzuleiten. Diese Limitation stellt eine signifikante Einschränkung dar, insbesondere für den Einsatz in empirischen Disziplinen, in denen das Verständnis kausaler Beziehungen von entscheidender Bedeutung ist. Während NN effektiv komplizierte Strukturen abbilden können, sind sie nicht mit den notwendigen Mechanismen ausgestattet, um Kausalität zu modellieren oder gar zu identifizieren. Grund hierfür ist die fehlende explizite Berücksichtigung kausaler Beziehungen und des zugrunde liegenden datenerzeugenden Prozesses: NN lernen lediglich funktionale Zusammenhänge in den Trainingsdaten. Auch wenn hierdurch komplexeste Relationen abgebildet werden können, erlaubt ein angepasstes Netz keine Differenzierung zwischen einer Korrelation und einer tatsächlichen kausalen Beziehung zwischen Variablen.
 
-In diesem Kapitel erläutern wir die Funktionsweise und Anpassung neuronaler Netze mit Keras und TensorFlow in R und diskutieren deren Anwendung zur Prognose von Zielvariablen in Datensätzen mit vielen Variablen und Beobachtungen. Die hier erläuterten Grundlagen basieren  auf den einleitenden Kapiteln in @Bishop2007 und @Goodfellowetal2016. Für ausführliche Erläuterungen der R-API `keras` für die gleichnamige Python-Bibliothek empfehlen wir @Allaire2018.
+Weiterhin ist statistische Inferenz, etwa mit Konfidenzintervallen oder p-Werten, bei neuronalen Netzen grundsätzlich nicht wie gewohnt anwendbar: Das liegt insbesondere an der komplexen nicht-linearen Struktur und der Interaktion vieler Parameter, die schwer isoliert (und interpretiert) werden können.
+
+In diesem Kapitel erläutern wir die Funktionsweise und Anpassung von NN und diskutieren deren Anwendung zur Prognose von Zielvariablen in Datensätzen mit vielen Variablen und Beobachtungen in R mit `keras`. Die hier erläuterten Grundlagen basieren auf den einleitenden Kapiteln in @Bishop2007 und @Goodfellowetal2016. Für ausführliche Erläuterungen der R-API `keras` für die gleichnamige Python-Bibliothek empfehlen wir @Allaire2018.
 
 ## Grundlagen und Vokabeln {#sec-nn-basics}
 
@@ -142,7 +144,7 @@ Wir fassen die wichtigsten Begriffe für die Beschreibung von NN nachfolgend kur
 - **Aktivierungsfunktion**: Eine mathematische Funktion, die auf die gewichtete Summe der Eingaben eines Neurons angewendet wird. Die Aktivierungsfunktion bestimmt, ob ein Neuron aktiviert wird. Beispiele sind 
 
     \begin{align*}
-      \text{ReLU}(z) =& \max(0, z), \\[.5ex]
+      \textup{ReLU}(z) =& \max(0, z), \\[.5ex]
       \sigma(z) =&\, \frac{1}{1 + e^{-z}}, \\[.5ex]
       \tanh(z) =&\, \frac{e^z - e^{-z}}{e^z + e^{-z}}.
     \end{align*}
@@ -340,7 +342,10 @@ Das NN hat den funktionalen Zusammengang zwischen `x` und `y` erfolgreich gelern
 
 ```{r}
 # lineares Modell
-lm_model <- lm(y ~ x)
+lm_model <- lm(
+  formula = y ~ x
+  )
+
 summary(lm_model)
 ```
 
@@ -365,7 +370,7 @@ Mit `predict()` erhalten wir Vorhersagen des NN und können so beispielsweise di
   theme_cowplot()
 ```
 
-@fig-res-nn zeigt eine gute Korrespondenz der Anpassung des NN mit der Anpassung des linearen, mit KQ geschätzten Modells.
+@fig-res-nn zeigt eine gute Korrespondenz zwischen der Anpassung des NN und der KQ-Schätzung des einfachen linearen Modells.
 
 ## Multiple Regression
 
@@ -485,17 +490,21 @@ plot(history_mnn) +
 Wie bei der einfachen Regression zeigt ein Vergleich der angepassten Gewichte mit den KQ-Schätzungen eines entsprechenden linearen Regressionsmodells ähnliche Ergebnisse beider Ansätze.
 
 ```{r}
-# Gewichte und Bias extrahieren
-weights <- model %>% 
-  keras::get_weights()
-
-weights[[1]]  # Gewichte der Regressoren
-weights[[2]]  # Bias-Term
+# Gewichtung und Bias des trainierten NN auslesen
+model %>% 
+  keras::get_weights() %>% 
+  flatten_dbl() %>% 
+  set_names(
+    c("w_1", "w_2", "w_3", "bias")
+  )
 ```
 
 ```{r}
-# lineares Modell
-lm_model <- lm(Y ~ X)
+# Multiples lineares Modell mit KQ schätzen
+lm_model <- lm(
+  formula = Y ~ X
+)
+
 summary(lm_model)
 ```
 
@@ -569,7 +578,7 @@ Als weitere zu berechnende Metrik wählen wir $\textup{Accuracy}$, ein geläufig
 \end{align*}
 Hierbei sind $\textup{TP}$ und $\textup{FP}$ die Anazhl korrekter (*true positive*) und falscher (*false positiv*) Vorhersagen für Beobachtungen mit $y_i = 1$. $\textup{TN}$ und $\textup{FN}$ sind analog für Beobachtungen mit tatsächlichen Werten $y_i = 0$ definiert.
 
-Die Vorhersage von $y_i$ erfolgt standardmäßig nach der Regel
+Die Vorhersage von $y_i$ zur Berechnung von $\textup{Accuracy}$ erfolgt durch `keras::fit()` standardmäßig nach der Regel
 \begin{align*}
   \hat{y}_i =
   \begin{cases}
@@ -577,6 +586,8 @@ Die Vorhersage von $y_i$ erfolgt standardmäßig nach der Regel
     0 & \text{wenn } \hat{p}_i < 0.5.
   \end{cases}
 \end{align*}
+
+Wir definieren nachchfolgend das Modell-Objekt und passen das NN über 150 Epochen an.
 
 ```{r}
 # Erstellen und Kompilieren des Modells
@@ -591,16 +602,17 @@ model_nn_logit
 ```
 
 ```{r}
+# Modell kompilieren
 model_nn_logit %>% 
   compile(
-    loss = 'binary_crossentropy', # BCEL
+    loss = 'binary_crossentropy', # Für BCEL
     optimizer = optimizer_adam(learning_rate = 0.01),
     metrics = 'accuracy'
   )
 ```
 
 ```{r}
-# Training des Modells
+# Anpassen des Modells
 history_nn_logit <- model_nn_logit %>% 
   fit(
     x = X, 
@@ -610,6 +622,8 @@ history_nn_logit <- model_nn_logit %>%
     verbose = F
   )
 ```
+
+Die Zusammenfassung der Anpassung für die letzte Epoche in `history_nn_logit` zeigt ergibt eine Genauigkeit von über 80\% auf dem Validierungsdatensatz.
 
 ```{r}
 history_nn_logit
@@ -631,18 +645,16 @@ plot(history_nn_logit) +
 
 
 ```{r}
-# Gewichte und Bias extrahieren
-weights <- model_nn_logit %>% 
-  keras::get_weights()
-w <- weights[[1]]  # Gewicht für jede der 5 Variablen
-bias <- weights[[2]]  # Bias-Term
+# Gewicht und Bias extrahieren
+model_nn_logit %>% 
+  keras::get_weights() %>% 
+  flatten_dbl() %>% 
+  set_names(
+    c("w_1", "bias")
+  )
 ```
 
-```{r}
-# Ergebnisse anzeigen
-print(w)
-print(bias)
-```
+Für einen Vergleich der Vorhersagegüter mit logistischer Regression schätzen wir zunächst ein entsprechendes GLM mit `glm()`. 
 
 ```{r}
 # Logistisches Modell mit glm() anpassen
@@ -654,20 +666,44 @@ glm_mod <- glm(
 summary(glm_mod)
 ```
 
+Wir erzeugen nun einen Testdatensatz mit 250 Beobachtungen gemäß des oben gewählten DGP.
+
+```{r}
+set.seed(4321)
+
+n <- 250
+data_new <- tibble(
+  X = rnorm(n = n, mean = 5, sd = 2),
+  P = pnorm(-4 + 0.7 * X),
+  Y = as.integer(runif(n) < P)
+)
+```
+
+Für die neuen Datenpunkte `data_new` erzeugen wir Vorhersagen von $P(Y=1\vert X=x)$ mit `model_nn_logit` und `glm_mod` und erweitern `data_new` um diese.
+
 ```{r}
 # Vorhersagen für Trainingsdaten erstellen
 predictions_nn_logit <- model_nn_logit %>% 
-  predict(X) %>% 
+  predict(data_new$X) %>% 
   c()
 
+predictions_glm_logit <- predict(
+    glm_mod, 
+    newdata = data_new, 
+    type = "response"
+  )
+
 # Zusammenfassen
-results <- tibble(
-  Regressor = X,
-  Actual = Y,
-  nn_logit = predictions_nn_logit,
-  glm_logit = predict(glm_mod, type = "response")
+results <- data_new %>% 
+  mutate(
+    nn_logit = predictions_nn_logit,
+    glm_logit = predictions_glm_logit
 )
+
+slice_head(results, n = 10)
 ```
+
+Für eine erste Beurteilung anhand der Vorhersagen auf dem Testdatensatz plotten wir die vorhergesagten Wahrscheinlichkeiten als Funktion von `X` gemeinsam mit den tatsächlichen Ausprägungen der Outcome-Variable `Y`.
 
 ```{r}
 library(ggplot2)
@@ -676,7 +712,7 @@ library(cowplot)
 # Plot der tatsächlichen Werte gegen die vorhergesagten Wahrscheinlichkeiten
 ggplot(
   data = results,
-  mapping =  aes(x = X, y = Actual)
+  mapping =  aes(x = X, y = Y)
   ) +
   geom_point(
     position = position_jitter(height = 0.05), 
@@ -699,27 +735,262 @@ ggplot(
   theme_cowplot()
 ```
 
+Die geschätzten Wahrscheinlichkeitsfunktionen zeigen eine gute Übereinstimmung. Um die Vorhersagegüte von `model_nn_logit` und `model_glm_logit` genauer zu untersuchen, erstellen wir Plots der jeweilgen *Receiver Operating Characteristic* (ROC). ROC zeigt den Zusammenhang zwischen der *True Positive Rate* (TPR), dem Anteil korrekter Vorhersagen für $y_i=1$ (auch *Sensitivität* gennant) und der *False Positive Rate* (FPR), dem Anteil falscher Vorhersagen für $y_i=1$ in Abhängigkeit des Schwellenwerts von $\widehat{p}$ für die Klassifikation des Outcomes einer Beobachtung $y_i = 1$. Es gilt
+
+\begin{align*}
+  TPR =&\, \frac{TP}{TP + FN},\\
+  \\
+  FPR =&\, \frac{FP}{FP + TN}.
+\end{align*}
+
+Der Schwellenwert $\widehat{p}$ reguliert den Trade-Off zwischen $\textup{FPR}$ und $\textup{TPR}$: Kleine $\widehat{p}$ führen tendenziell zu großer $\textup{TPR}$ (gut), aber auch zu großer $\textup{FPR}$ (schlecht). Für ein Modell, das zufällig klassifiziert, entspricht die ROC-Kurve der Winkelhalbierenden. Wünschenwert ist ein verlauf der ROC-Kurve möglichst oberhalb der Winkelhalbierenden. 
+
+Eine ROC-Kurve kann in R mit dem `plotROC` anhand der Vorhergesagten und tatsächlichen Werte der Outcome-Varibale berechnet und geplottet werden. Hierzu transformieren wir `results` in langes Format und verwenden `ggplot()` mit dem Layer `geom_roc()`.
 
 ```{r}
+#| label: fig-nnlogit-roc
+#| fig-cap: "ROC-Kurve für logistische Modelle"
 library(plotROC)
+library(tidyr)
 
-results %>%
+roc_data <- results %>%
   pivot_longer(
     cols = glm_logit:nn_logit,
     names_to = "model", 
     values_to = "pp"
-    ) %>%
+    )
 
-# Generate ROC curve using ggplot2
-ggplot(aes(m = pp, d = Actual, colour = model)) +
+# ROC-Kurve plotten
+  ggplot(
+    data = roc_data, 
+    mapping = aes(
+      m = pp, 
+      d = Y, 
+      colour = model
+    )
+  ) +
   geom_roc() +
   style_roc() + 
   facet_wrap(~ model) +
   theme(legend.position = "top")
 ```
 
+@fig-nnlogit-roc zeigt sehr ähnliche ROC-Kurven für `model_nn_logit` und `model_glm_logit`.^[Beide Plots enthalten Indikatoren des ROC für bestimmte Schwellenwerte $\widehat{p}$.] Für die Quantifizierung der Vorhersageleistung wird *Area under the Curve* (AUC), die Fläche unterhalb der ROC-Kurve, herangezogen. Mit `plotROC::calc_auc()` kann AUC aus dem `geom_roc()`-Layer berechnet werden. Für ein geschätztes Modell $\widehat{M}$ gilt $0\leq\textup{AUC}(\widehat{M})\leq1$.^[Ein geschätzes, dass nicht besser als raten ist, gilt $\textup{AUC}(\widehat{M})=.5$.]
 
-  
+```{r}
+# AUC berechnen
+roc_data %>%
+  group_by(model) %>%
+  summarise(
+    AUC = calc_auc(
+      ggplot(mapping = aes(m = pp, d = Y)) +
+        geom_roc()
+    )$AUC
+  )
+```
+
+Der Vergleich der AUC-Statistiken beider Modelle für den Testdatensatz zeigt, dass das NN ähnlich gut klassifizert, wie das GLM mit logistischer Link-Funktion.
+
+## Empirisches Beispiel: Boston Housing
+
+In diesem Beispiel illustrieren wir die Anwendung von (NN) für den Boston Housing-Datensatz `MASS::Boston`. `Boston` enthält enthält verschiedene Charakteristika von Häusern in Boston, wie z.B. Kriminalitätsrate, Anzahl der Räume und Alter der Gebäude. Ziel ist esm den Medianpreis der Häuser (`medv`) vorherzusagen.
+
+Für die Analyse verwenden wir insbesondere die Pakete `tidymodels` und `recipes`. Das `recipes`-Paket erlaubt eine automatisierte und leicht reproduzierbare Vorbereitung  von Datensätzen für statistische Modellierung mit `tidymodels`. Es stellt Verben zur Konstruktion von Pipelines mit Schritten wie Skalierung, Kodierung und Handling fehlender Werte bereit. Diese Schritte werden mit einem Rezept (`recipe()`) definiert, vorbereitet (`prep()`) und dann auf Trainings- und/oder Testdaten angewendet (`bake()`).
+
+Zunächst laden wir den Boston Housing-Datensatz und teilen `boston_tbl` in Trainings- und Testdaten auf. Hierbei verwenden wir 80% der Daten für das Training und reservieren 20% zum Testen.
+
+```{r}
+library(tidymodels)
+
+# Datensatz in tibble umwandeln 
+boston_tbl <- as_tibble(MASS::Boston)
+
+# Trainings- und Testdaten einteilen 
+# (80% / 20%)
+set.seed(1234)
+
+split <- initial_split(boston_tbl, prop = 0.8)
+train_data <- training(split)
+test_data <- testing(split)
+
+# Zielvariable und Prädiktoren aufteilen
+train_x <- select(train_data, -medv)
+train_y <- train_data$medv
+
+test_x <- select(test_data, -medv)
+test_y <- test_data$medv
+```
+
+Da neuronale Netze empfindlich auf unterschiedlich skalierte Eingabedaten reagieren (ähnlich wie regularisierte Schätzer, vgl. @sec-regreg), normalisieren wir sämtliche (numerischen) Prädiktoren, ausgenommen `chas` und `rad`, mit `recipes::step_normalize()`.
+
+```{r}
+# Daten normalisieren
+
+# Rezept
+recipe_obj <- recipe(
+  formula = medv ~ ., 
+  data = train_data
+  ) %>%
+  step_normalize(
+    all_predictors(), -chas, -rad
+  )
+
+# Vorbreiten
+data_prep <- prep(
+  x = recipe_obj, 
+  training = train_data
+)
+
+# Anwenden
+train_x <- bake(
+  object = data_prep, 
+  new_data = train_data
+  ) %>% 
+  select(-medv)
+
+test_x <- bake(
+  object = data_prep, 
+  new_data = test_data) %>% 
+  select(-medv)
+```
+
+Zunächst führen wir eine KQ-Regression durch, um den Zusammenhang zwischen sämtlichen verfügbaren Prädiktoren und dem Zielwert `medv` zu schätzen. Hierfür nutzen wir das linear_reg()-Modell aus tidymodels und passen es mit der Methode der kleinsten Quadrate (KQ) an.
+
+```{r}
+# Lineare Regression mit KQ
+kq_spec <- linear_reg() %>%
+  set_engine("lm")
+
+kq_fit <- fit(
+  object = kq_spec, 
+  formula = medv ~ ., 
+  data = train_data
+)
+
+# KQ-Vorhersagen für Testdaten
+kq_predictions <- predict(
+  object = kq_fit, 
+  new_data = test_data
+  ) %>%
+  bind_cols(test_data) %>%
+  rename(kq_pred = .pred)
+```
+
+Für das NN wählen wir eine Spezifikation mit zwei Hidden Layers, die jeweils 64 Neuronen haben. Mit `input_shape = ncol(train_x)` verarbeitet das 1. Hidden Layer die Inputs sämtlicher Prädiktoren in `boston_tbl`. Als Aktivierungsfunktion verwenden wir *Recified Linear Unit*,
+\begin{align}
+      \textup{ReLU}(z) \max(0, z).\\
+\end{align}
+
+Die ReLU-Aktivierungsfunktion setzt also negative Werte auf 0 und lässt positive Werte unverändert. In NN ermöglicht sie eine sparsame anpassung und ist numerisch leicht handhabbar bei der Berechnung des Gradienten: Die Verwendung von Layers mit ReLU verringert das *Vanishing-Gradient-Problem*.^[Bei nicht-linearen Aktivierungsfunktionen kann der Gradient der Loss-Funktion extrem klein werden, was das Training von NN mit vielen Layers schwierig machen kann.]
+
+Das Output Layer des Netzes besteht aus einem einzigen Neuron, dass einen numerischen Wert (den geschätzten Hauspreis) zurückgibt.
+
+```{r}
+# NN mit Keras erstellen
+model <- keras_model_sequential() %>%
+  # Hidden Layer 1
+  layer_dense(
+    units = 64, 
+    activation = "relu", 
+    input_shape = ncol(train_x)
+  ) %>%
+  # Hidden Layer 2
+  layer_dense(
+    units = 64, 
+    activation = "relu"
+  ) %>%
+  # Output Layer
+  layer_dense(units = 1)
+
+# Modell kompilieren
+model %>% compile(
+  optimizer = "rmsprop",
+  loss = "mse",
+  metrics = "mae"
+)
+```
+
+Wir trainieren das NN über 100 Epochen mit einem Batch-Größe von 32 Datenpunkten.
+
+```{r}
+# Modell trainieren
+history <- model %>% 
+  fit(
+    x = as.matrix(train_x), 
+    y = train_y,
+    epochs = 100,
+    batch_size = 32,
+    validation_split = 0.2,
+    verbose = 0
+  )
+```
+
+Mit dem trainierten Nachdem das NN trainiert ist, verwenden wir `model`, um Vorhersagen auf den Testdaten `test_data` zu machen.
+
+```{r}
+# Vorhersagen mit trainiertem NN
+nn_pred <- model %>% 
+  predict(as.matrix(test_x))
+
+# Testdaten erweitern
+nn_predictions <- test_data %>%
+  mutate(
+    nn_pred = c(nn_pred)
+  )
+```
+
+Um die Leistung der Modelle zu vergleichen, berechnen wir den MSE für beide Modelle.
+
+```{r}
+# MSE berechnen
+ols_mse <- kq_predictions %>%
+  summarise(mse = mean((medv - kq_pred)^2)) %>%
+  pull(mse)
+
+nn_mse <- nn_predictions %>%
+  summarise(mse = mean((medv - nn_pred)^2)) %>%
+  pull(mse)
+
+c(
+  "MSE KQ" = ols_mse,
+  "MSE NN" = nn_mse
+)
+```
+
+Da das NN ist in der Lage ist, nicht-lineare Zusammenhänge zwischen den Prädiktoren und der Zielvariablen zu modellieren, liefert hat es eine höhere Vorhersagegenauigkeit auf dem Testdatensatz.
+
+Für eine Visualisierung der Vorhersagen tragen wir den wahren und die vorhergesagten Werte von `medv` für beide Modelle in einem Punkteplot ab.
+
+```{r}
+#| fig-cap: "Boston Housing: KQ vs. NN"
+#| label: fig-bhkq-nn
+# KQ- und NN-Vorhersagen sammeln
+preds <- kq_predictions %>%
+  select(medv, kq_pred) %>%
+  mutate(nn_pred = nn_predictions$nn_pred)
+
+# Visualisierung der Ergebnisse mit ggplot2
+preds %>%
+  ggplot(aes(x = medv)) +
+  geom_point(aes(y = kq_pred, color = "OLS"), alpha = 0.6) +
+  geom_point(aes(y = nn_pred, color = "Neuronales Netz"), alpha = 0.6) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
+  labs(
+    x = "Wahre Werte (medv)",
+    y = "Vorhersagen",
+    color = "Modell"
+  ) +
+  theme_minimal() +
+  scale_color_manual(
+    values = c(
+      "OLS" = "red", 
+      "Neuronales Netz" = "steelblue"
+    )
+  )
+```
+
+@fig-bhkq-nn zeigt, dass KQ und NN weitgehend vergleichbare Vorhersagen von `medv` auf dem Testdatensatz liefern. Das NN scheint jedoch besser in der Vorhersage hoher Verkaufspreise zu sein -- möglicherweise weil extreme Preise auf nicht-lineare Beziehungen zwischen bestimmten Regressoren und `medv` zurückzuführen sind, die in einer linearen KQ-Regression nicht erfasst werden können.
+
 ## Case Study: Vorhersage von Immobilienpreisen
 
 ```{r}
@@ -799,7 +1070,9 @@ housing_test_y <- housing_test$Sale_Price
 ```
 
 ```{r}
-blueprint <- recipe(Sale_Price ~ ., data = housing_train) %>%
+blueprint <- recipe(
+  Sale_Price ~ ., 
+  data = housing_train) %>%
   step_nzv(all_nominal()) %>%
   step_other(all_nominal(), threshold = .01, other = "other") %>%
   step_integer(matches("(Qual|Cond|QC|Qu)$")) %>%
