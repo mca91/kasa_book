@@ -1,3 +1,8 @@
+---
+format: live-html
+engine: knitr
+---
+
 # Regularisierte Regression {#sec-regreg}
 
 ```{r, echo=F, message=FALSE}
@@ -1660,4 +1665,4 @@ tibble(
 summary(Growth_DS)
 ```
 
-Das Ergebnis der Post-Double-Selection-Schätzung unterstützt die (bedingte) Konvergenzhypothese mit einer signifikanten negativen Schätzung $\widehat{\alpha}_0\approx`r round(Growth_DS$alpha, 3)\`\$.
+Das Ergebnis der Post-Double-Selection-Schätzung unterstützt die (bedingte) Konvergenzhypothese mit einer signifikanten negativen Schätzung $\widehat{\alpha}_0\approx`r round(Growth_DS$alpha, 3)`$.
