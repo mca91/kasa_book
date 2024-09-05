@@ -1,0 +1,375 @@
+---
+format: 
+  live-html:
+    webr: 
+      packages:
+        - 'baguette'
+        - 'cowplot'
+        - 'gbm'
+        - 'dplyr'
+        - 'ggplot2'
+        - 'MASS'
+        - 'purrr'
+        - 'randomForest'
+        - 'rattle'
+        - 'tidymodels'
+        - 'tidyr'
+        - 'vip'
+      cell-options:
+        fig-width: 8
+engine: knitr
+---
+
+{{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
+
+# Baum-basierte Methoden
+
+Baum-basierte Methoden bieten eine vielseitige und leistungsstarke Herangehensweise für Vorhersage und Klassifikation in komplexen Datensätzen mit nicht-linearen Zusammenhängen. Ein Vorteil baum-basierter Methoden ist ihre inhärente Fähigkeit, die Bedeutung einzelner Variablen für die Vorhersage zu quantifizieren – eine Eigenschaft, die viele Machine-Learning-Modelle nicht ohne weiteres bieten und insbesondere in hoch-dimensionalen Anwendungen (mit vielen potentiellen Regressoren) nicht trivial ist. Dies ermöglicht es, tiefere Einblicke in den Einfluss einzelner Merkmale auf die Vorhersagen des Modells zu erhalten, was besonders in empirischen Anwendungen für die Entscheidungsstützung mit Machine Learning hilfreich sein kann.
+
+*Entscheidungsbäume* stellen die Grundlage dieser Methoden dar. Sie ermöglichen die Aufteilung der Daten in immer kleinere, homogenere Gruppen, basierend auf *binären* Entscheidungsregeln, die aus den Prädiktoren abgleitet werden. Die trainierten Regeln eines solchen Modells lassen sich anhand eines Binärbaums visualisieren, was eine intuitive Interpretierbarkeit der Ergebnisse erlaubt. 
+
+*Random Forests* ist ein Ensemble-Ansatz, bei dem viele Entscheidungsbäume kombiniert werden. Jeder Baum wird auf einer zufälligen Teilmenge der Daten trainiert (*Bagging*), und bei jedem Knoten wird zusätzlich eine zufällige Teilmenge der Merkmale berücksichtigt. Die finale Vorhersage des Random Forests basiert auf der Aggregation der Vorhersagen aller Bäume (z.B. Mehrheitsvotum für Klassifikation, Durchschnitt für Regression). Dieses Verfahren reduziert das Risiko einer Überanpassung und erhöht oft die Vorhersagegenauigkeit im Vergleich zu einzelnen Entscheidungsbäumen.
+
+*Boosting* ist eine weitere Ensemble-Methode zur Anpassung von Modellen mit hoher Vorhersagegüte durch Kombination einfacher Modelle (*Base learner*), wobei Regressions- oder Klassifikationsbäume eingesetzt werden können. Alternativ zu Random Forests trainieren Boosting-Algorithmen sukzessiv einfache (Klassifikations- oder Regressions-)Bäume, wobei jeder nachfolgende Baum das Ziel hat, die Vorhersagefehler der vorherigen Bäume zu korrigieren. 
+
+In diesem Kapitel erläutern wir die Anwendung baum-basierter Methoden in R anhand von Beispieldatensätzen. Wir zeigen, wie Regressionsbäume, Random Forests und Boosting-Modelle im `tidymodels`-Framework trainiert werden und wie die Vorhersageleistung durch die Wahl geeigneter Hyperparameter mit Cross-Validation und Out-of-Sample-Evaluierungsmethoden optimiert werden kann.
+
+
+## Entscheidungsbäume
+
+Ein Entscheidungsbaum ist ein Modell, das auf der Basis von hierarchischen Bedingungen bzgl. der Regressoren Vorhersagen für die Outcome-Variable trifft. Jeder Baum beginnt mit einem Wurzelknoten (*root node*) und verzweigt sich binär. Jede Verzweigung stellt eine Bedingung dar, die auf einem bestimmten Regressor basiert. Der Baum trifft Entscheidungen, indem er diese Bedingungen sukzessive überprüft, bis er zu einem Blattknoten (*leaf node*) gelangt, der die finale Vorhersage liefert. Hierbei handelt es sich eine Mehrheitsentscheidung für Klassifikation und einen Mittelwert, jeweils gebildet anhand Beobachten des Trainingsdatensatzes im leaf node.
+
+@fig-exdectree zeigt ein einfaches Beispiel eines Entscheidungsbaums zur Klassifikation der Kreditwürdigkeit einer Person. Die Klassfikation erfolgt, in dem die Beobachtung basierend auf den Merkmalen Alter, Einkommen und Eigentum durch den Baum geleitet wird. Zunächst wird geprüft, die Person 30 Jahre oder jünger ist. Fall ja, entscheidet der Baum anhand des Einkommens: Bei einem Jahreseinkommen von 40.000 oder weniger wird die Person als wenig kreditwürdig klassifiziert, bei höherem Einkommen als mäßig kreditwürdig. Für Personen älter als 30 Jahre überprüft das Modell lediglich, ob die Person eine Immobilie besitzt, um zwischen mäßig kreditwürdig und guter Bonität zu unterscheiden.
+
+```{dot}
+//| fig-width: 8
+//| fig-height: 5
+//| fig-cap: "Entscheidungsbaum: Klassifikation sozioökonomischer Status"
+//| label: fig-exdectree
+digraph exdectree {
+    node [shape=box];
+    pad = .1
+
+    1 [label="Alter <= 30?"];
+    2 [label="Einkommen <= 40 Tsd.?"];
+    3 [label="Eigentum?"];
+    4 [label="Status: Niedrig"];
+    5 [label="Status: Mittel"];
+    6 [label="Status: Hoch"];
+
+    1 -> 2 [label="Ja"];
+    1 -> 3 [label="Nein"];
+    2 -> 4 [label="Ja"];
+    2 -> 5 [label="Nein"];
+    3 -> 6 [label="Ja"];
+    3 -> 5 [label="Nein"];
+}
+```
+
+
+```{webr}
+# Load necessary libraries
+library(tidymodels)
+library(cowplot)
+
+# Seed setzen
+set.seed(1234)
+
+# Prepare the data
+Boston <- as_tibble(MASS::Boston)
+
+Boston_split <- initial_split(
+  data = Boston, 
+  prop = 0.8, 
+  strata = medv
+  )
+
+Boston_train <- training(Boston_split)
+Boston_test <- testing(Boston_split)
+
+slice_head(Boston_train, n = 10)
+```
+
+```{webr}
+# 1. Fit a regression tree
+tree_spec <- decision_tree(
+  cost_complexity = 0.1
+  ) %>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+
+# Fit the model
+tree_fit <- tree_spec %>%
+  fit(
+    formula = medv ~ ., 
+    data = Boston_train, 
+    model = TRUE
+  )
+
+# Trainnierten Baum in Konsole ausgeben
+tree_fit$fit
+```
+
+```{webr}
+#| fig-width: 8
+#| fig-height: 8
+library(rattle)
+
+# Plot the decision tree
+fancyRpartPlot(
+  tree_fit$fit,
+  split.col = "black", 
+  nn.col = "black", 
+  caption = "",
+  palette = "Set1",
+  branch.col = "black"
+)
+```
+
+```{webr}
+# Fit a regression tree with cross-validation
+set.seed(1234)
+
+tree_spec_cv <- decision_tree(
+  cost_complexity = tune()
+  ) %>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+
+# Workflow for cross-validation
+tree_wf_cv <- workflow() %>%
+  add_model(tree_spec_cv) %>%
+  add_formula(medv ~ .)
+
+# Set up cross-validation
+cv_folds <- vfold_cv(Boston_train, v = 10, repeats = 2)
+
+# Perform cross-validation to tune cost_complexity
+set.seed(1234)
+
+tree_fit_cv <- tree_wf_cv %>%
+    tune_grid(
+        resamples = cv_folds, 
+        grid = tibble(cost_complexity = c(0.1, .075, 0.05, 0.01, 0.001, 0.0001)),
+        metrics = metric_set(rmse)
+    )
+```
+
+```{webr}
+autoplot(tree_fit_cv) +
+  theme_cowplot()
+
+# Check the best parameters (including cost_complexity)
+best_tree_fit <- select_best(tree_fit_cv, metric = "rmse")
+
+show_best(tree_fit_cv, metric = "rmse")
+
+# Display best
+best_tree_fit
+```
+
+```{webr}
+# Final tree model
+final_tree_spec <- decision_tree(
+  cost_complexity = best_tree_fit$cost_complexity
+  ) %>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+
+final_tree_fit <- final_tree_spec %>%
+  fit(medv ~ ., data = Boston_train)
+```
+
+```{webr}
+#| fig-width: 8
+#| fig-height: 8
+
+# Plot the decision tree
+fancyRpartPlot(
+  final_tree_fit$fit,
+  split.col = "black", 
+  nn.col = "black", 
+  caption = "",
+  palette = "Set1",
+  branch.col = "black"
+)
+```
+
+```{webr}
+# 3. Evaluate the models on the test set
+tree_pred <- predict(tree_fit, Boston_test) %>%
+  bind_cols(Boston_test) %>%
+  metrics(truth = medv, estimate = .pred)
+
+# Evaluate final model
+tree_pred_cv <- predict(final_tree_fit, Boston_test) %>%
+  bind_cols(Boston_test) %>%
+  metrics(truth = medv, estimate = .pred)
+
+tree_pred
+tree_pred_cv
+```
+
+## Random Forests
+
+```{webr}
+
+set.seed(1234)
+
+# Bagging
+bagging_spec <- bag_tree(
+  ) %>%
+  set_engine(
+    engine = "rpart", times = 50
+  ) %>%
+  set_mode("regression")
+
+bagging_fit <- bagging_spec %>%
+  fit(medv ~ ., data = Boston_train)
+
+# Evaluate bagging model
+bagging_pred <- predict(
+  object = bagging_fit, 
+  Boston_test
+  ) %>%
+  bind_cols(Boston_test) %>%
+  metrics(
+    truth = medv,
+    estimate = .pred
+  )
+```
+
+```{webr}
+
+set.seed(1234)
+
+# 5. Random forest with different mtry values
+rf_spec_mtry <- function(m) {
+  rand_forest(mtry = m, trees = 500) %>%
+    set_engine(
+      engine = "randomForest", 
+      importance = TRUE
+    ) %>%
+    set_mode("regression")
+}
+
+rf_mtry4_fit <- rf_spec_mtry(m = 4) %>%
+  fit(medv ~ ., data = Boston_train)
+
+rf_mtry6_fit <- rf_spec_mtry(m = 6) %>%
+  fit(medv ~ ., data = Boston_train)
+
+rf_mtry10_fit <- rf_spec_mtry(m = 10) %>%
+  fit(medv ~ ., data = Boston_train)
+```
+
+```{webr}
+# 6. Evaluate the random forest models
+rf_mtry4_pred <- predict(
+  object = rf_mtry4_fit, 
+  Boston_test
+  ) %>%
+  bind_cols(Boston_test) %>%
+  metrics(truth = medv, estimate = .pred)
+
+rf_mtry6_pred <- predict(
+  object = rf_mtry6_fit, 
+  Boston_test
+  ) %>%
+  bind_cols(Boston_test) %>%
+  metrics(
+    truth = medv, 
+    estimate = .pred
+  )
+
+rf_mtry10_pred <- predict(
+  object = rf_mtry10_fit, 
+  Boston_test
+  ) %>%
+  bind_cols(Boston_test) %>%
+  metrics(
+    truth = medv, 
+    estimate = .pred
+  )
+
+rf_mtry4_pred
+rf_mtry6_pred
+rf_mtry10_pred
+```
+
+```{webr}
+# Variable importance für mtry = 10
+vip::vip(rf_mtry10_fit$fit) +
+  theme_cowplot()
+```
+
+## Boosting
+
+```{webr}
+# Step 2: Fit the model using gbm
+set.seed(1234)
+
+gbm_model <- gbm(
+  formula = medv ~ ., 
+  data = Boston_train, 
+  distribution = "gaussian", 
+  n.trees = 50000,         # Number of trees
+  interaction.depth = 2,   # Interaction depth
+  shrinkage = 0.001,       # Learning rate
+  n.minobsinnode = 2       # Minimum observations in nodes
+)
+```
+
+```{webr}
+# Step 3: Make predictions on the test data
+gbm_predictions <- predict(
+  object = gbm_model, 
+  Boston_test, 
+  n.trees = gbm_model$n.trees
+)
+
+# Step 4: Evaluate the model performance using tidymodels' yardstick package
+results <- Boston_test %>%
+  mutate(predictions = gbm_predictions) %>%
+  metrics(
+    truth = medv, 
+    estimate = predictions
+  )
+
+results
+```
+
+```{webr}
+# Step 3: Get the variable importance from the gbm model
+var_importance <- summary(
+  object = gbm_model, 
+  plotit = FALSE # k. graphische Ausgabe
+)
+
+# Step 4: Create a ggplot2 variable importance plot
+# Reorder the variables by importance for better plotting
+var_importance <- var_importance %>%
+  as_tibble() %>%
+  arrange(
+    desc(rel.inf)
+  )
+
+# Plot using ggplot2
+ggplot(
+  data = var_importance,
+  mapping = aes(
+    x = reorder(var, rel.inf), 
+    y = rel.inf
+  )
+) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(
+    title = "Variable Importance für Gradient Boosting",
+    x = "Variable",
+    y = "Relativer Einfluss"
+  ) +
+  theme_cowplot()
+```
+
+

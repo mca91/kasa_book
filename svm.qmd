@@ -1,0 +1,55 @@
+---
+format: 
+  live-html:
+    webr: 
+      packages:
+        - 'censored'
+        - 'mboost'
+        - 'dplyr'
+        - 'tidymodels'
+        - 'MASS'
+      cell-options:
+        fig-width: 8
+engine: knitr
+---
+
+{{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
+
+# Support Vector Machines
+
+```{webr}
+# Load necessary libraries
+library(tidymodels)
+library(cowplot)
+
+# Seed setzen
+set.seed(1234)
+
+# Prepare the data
+Boston <- as_tibble(MASS::Boston)
+
+Boston_split <- initial_split(
+  data = Boston, 
+  prop = 0.8, 
+  strata = medv
+  )
+
+Boston_train <- training(Boston_split)
+Boston_test <- testing(Boston_split)
+
+slice_head(Boston_train, n = 10)
+```
+
+
+```{webr}
+library(mboost)
+
+spec <- boost_tree() %>% 
+  set_engine("mboost") %>% 
+  set_mode("censored regression")
+
+
+bagging_fit <- spec %>%
+  fit(medv ~ ., data = Boston_train)
+```
+
