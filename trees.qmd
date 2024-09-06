@@ -181,7 +181,11 @@ Mit `rsample::vfold_cv()` definieren wir den CV-Prozess: 10-fold CV mit 2 Wieder
 
 ```{webr}
 # CV-Prozess definieren
-cv_folds <- vfold_cv(Boston_train, v = 10, repeats = 2)
+cv_folds <- vfold_cv(
+  data = Boston_train, 
+  v = 10, 
+  repeats = 2
+)
 
 # CV durchführen:
 set.seed(1234)
@@ -228,7 +232,7 @@ best_tree_fit <- select_best(
   metric = "rmse"
 )
 
-best_tree_fit_cv
+best_tree_fit
 ```
 
 Anhand `tree_fit_cv` trainieren wir die finale Spezifikation.
@@ -274,7 +278,7 @@ Zur Beurteilung der Relevanz von Variablen für die Reduktion des Anpassungsfehl
 final_tree_fit$fit$variable.importance
 ```
 
-Die Werte zeigen, dass der mit CV ermittelte Baum alle Regressoren in `boston_train` für Splits nutzt, wobei `lstat` und `rm` die relevantesten Variablen sind.
+Die Werte von Variable Importance zeigen, dass der mit CV ermittelte Baum *alle* Regressoren in `boston_train` für Splits nutzt, wobei `lstat` und `rm` die relevantesten Variablen sind.
 
 Anhand von Vorhersagen für `medv` mit dem Test-Datensatz `boston_test` können wir das naive Baum-Modell `tree_fit` mit dem durch CV ermittelten Modell `tree_fit_cv` hinsichtlich des Vorhersagefehlers für ungesehene Beobachtungen vergleich. `yardstick::metric()` berechnet hierzu automatisch gängige Statistiken für Regressionsprobleme. 
 
@@ -344,10 +348,17 @@ bagging_pred
 
 Die Auswertung auf den Testdatensatz ergibt eine deutliche Verbesserung der Vorhersageleistung gegenüber einem einfachen Regressionsbaum.
 
-*Random Forests* erweitern Bagging, indem zusätzlich bei jedem Knoten innerhalb jedes Baumes eine *zufällige Teilmenge der Regressoren* als potentielle Variable für die Split-Regel ausgewählt wird. Dies führt zu einer weiteren Reduktion der Korrelation zwischen den Bäumen, was die Genauigkeit verbessert und das Risiko des Overfittings weiter verringert.
+Obwohl die Bäume beim Bagging auf unterschiedlichen Stichproben trainiert werden, kann innerhalb des Ensembles dennoch eine deutliche Korrelation vorliegen: Da jeder Baum auf alle Regressoren für Splits zugreift, können trotz Bootstrapping ähnliche (unverteilhafte) Muster aus dem Datensatz erlernt werden, was sich nachteilig auf die Generalisierungsfähigkeit auswirken kann. Diese Korrelation mindert die Effektivität von Bagging, da stark korrelierte Bäume dazu neigen, ähnliche Fehler zu machen.
+
+*Random Forests* erweitern Bagging, indem zusätzlich bei jedem Knoten innerhalb jedes Baumes eine *zufällige Teilmenge der Regressoren* als potentielle Variable für die Split-Regel ausgewählt wird. Dies führt zu einer Reduktion der Korrelation zwischen den Bäumen, was die Genauigkeit verbessert und das Risiko von Overfitting weiter verringert.
+
+In R erstellen wir die Spezifikation mit `parsnip::rand_forest()`. Der Parameter `mtry` legt fest, wie viele Regressoren zufällig für jeden Split zur Verfügung stehen. Wir nutzen den Algorithmus aus dem `randomForest`-Paket und legen in `set_engine()` fest, dass die von `randomForest::randomForest()` berechnete Variable-Importance-Metrik im Output-Objekt ausgegeben wird. Um die Spezifikation für verschiedene Werte von `mtry` anwenden zu können, implementieren wir die Spezifikation innerhalb einer Wrapper-Funktion `rf_spec_mtry()`. Mit `purrr::map()` iterieren wir `rf_spec_mtry()` über drei verschiedene Werte für den Tuning-Parameter `mtry`.
 
 ```{webr}
 set.seed(1234)
+
+# Werte für mtry
+mtry_values <- c(4, 6, 10)
 
 # Funktion: Random Forest für mtry = m
 rf_spec_mtry <- function(m) {
@@ -359,15 +370,20 @@ rf_spec_mtry <- function(m) {
     set_mode("regression")
 }
 
-rf_mtry4_fit <- rf_spec_mtry(m = 4) %>%
-  fit(medv ~ ., data = Boston_train)
+# Modelle für verschiedene mtry-Werte trainieren
+rf_fits <- map(
+  .x = mtry_values, 
+  .f = ~ rf_spec_mtry(.x) %>%
+    fit(
+      formula = medv ~ ., 
+      data = Boston_train
+    )
+)
 
-rf_mtry6_fit <- rf_spec_mtry(m = 6) %>%
-  fit(medv ~ ., data = Boston_train)
-
-rf_mtry10_fit <- rf_spec_mtry(m = 10) %>%
-  fit(medv ~ ., data = Boston_train)
+# Ausgabe der Liste von Modellen
+rf_fits
 ```
+
 
 ```{webr}
 # 6. Evaluate the random forest models
