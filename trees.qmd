@@ -35,20 +35,23 @@ Baum-basierte Methoden bieten eine vielseitige und leistungsstarke Herangehenswe
 In diesem Kapitel erläutern wir die Anwendung baum-basierter Methoden in R anhand von Beispieldatensätzen. Wir zeigen, wie Regressionsbäume, Random Forests und Boosting-Modelle im `tidymodels`-Framework trainiert werden und wie die Vorhersageleistung durch die Wahl geeigneter Hyperparameter mit Cross-Validation und Out-of-Sample-Evaluierungsmethoden optimiert werden kann.
 
 
-## Entscheidungsbäume
+## Entscheidungsbäume {#sec-simpletrees}
 
-Ein Entscheidungsbaum ist ein Modell, das auf der Basis von hierarchischen Bedingungen bzgl. der Regressoren Vorhersagen für die Outcome-Variable trifft. Jeder Baum beginnt mit einem Wurzelknoten (*root node*) und verzweigt sich binär. Jede Verzweigung stellt eine Bedingung dar, die auf einem bestimmten Regressor basiert. Der Baum trifft Entscheidungen, indem er diese Bedingungen sukzessive überprüft, bis er zu einem Blattknoten (*leaf node*) gelangt, der die finale Vorhersage liefert. Hierbei handelt es sich eine Mehrheitsentscheidung für Klassifikation und einen Mittelwert, jeweils gebildet anhand Beobachten des Trainingsdatensatzes im leaf node.
+Ein Entscheidungsbaum ist ein Modell, das auf der Basis von hierarchischen Bedingungen bzgl. der Regressoren Vorhersagen für die Outcome-Variable trifft. Jeder Baum beginnt mit einem Wurzelknoten (*root node*) und verzweigt sich binär. Jede Verzweigung (*split*) stellt eine Bedingung dar, die auf einem bestimmten Regressor basiert. Der Baum trifft Entscheidungen, indem er diese Bedingungen sukzessive überprüft, bis er zu einem Blattknoten (*leaf node* / *terminal node*) gelangt, der die finale Vorhersage liefert. Hierbei handelt es sich eine Mehrheitsentscheidung für Klassifikation und einen Mittelwert, jeweils gebildet anhand Beobachten des Trainingsdatensatzes im leaf node.
 
-@fig-exdectree zeigt ein einfaches Beispiel eines Entscheidungsbaums zur Klassifikation der Kreditwürdigkeit einer Person. Die Klassfikation erfolgt, in dem die Beobachtung basierend auf den Merkmalen Alter, Einkommen und Eigentum durch den Baum geleitet wird. Zunächst wird geprüft, die Person 30 Jahre oder jünger ist. Fall ja, entscheidet der Baum anhand des Einkommens: Bei einem Jahreseinkommen von 40.000 oder weniger wird die Person als wenig kreditwürdig klassifiziert, bei höherem Einkommen als mäßig kreditwürdig. Für Personen älter als 30 Jahre überprüft das Modell lediglich, ob die Person eine Immobilie besitzt, um zwischen mäßig kreditwürdig und guter Bonität zu unterscheiden.
+@fig-exdectree zeigt ein einfaches Beispiel eines Entscheidungsbaums zur Klassifikation der Kreditwürdigkeit einer Person. Die Klassfikation erfolgt, in dem die Beobachtung basierend auf den Merkmalen Alter, Einkommen und Eigentum durch den Baum geleitet wird. Zunächst wird geprüft, die Person 30 Jahre oder jünger ist. Fall ja, entscheidet der Baum anhand des Einkommens: Bei einem Jahreseinkommen von 40.000 oder weniger wird die Person als wenig kreditwürdig klassifiziert, bei höherem Einkommen als mäßig kreditwürdig. Für Personen älter als 30 Jahre überprüft das Modell lediglich, ob die Person eine Immobilie besitzt, um zwischen mäßiger Kreditwürdigkeit und guter Bonität zu unterscheiden.
 
 ```{dot}
 //| fig-width: 8
 //| fig-height: 5
-//| fig-cap: "Entscheidungsbaum: Klassifikation sozioökonomischer Status"
+//| fig-cap: "Entscheidungsbaum: Klassifikation von Kreditwürdigkeit"
 //| label: fig-exdectree
 digraph exdectree {
     node [shape=box];
-    pad = .1
+    splines=false;
+    ranksep = 1;  // Abstand zwischen den Ebenen
+    nodesep = 1.75;   // Abstand zwischen den Knoten
+    margin = 0.3;    // Rand um den gesamten Baum
 
     1 [label="Alter <= 30?"];
     2 [label="Einkommen <= 40 Tsd.?"];
@@ -66,18 +69,43 @@ digraph exdectree {
 }
 ```
 
+## Training von Bäumen
+
+Zur Konstruktion von Binär-Bäumen werden etablierte Algorithmen wie *Classification and Regression Trees* ([CART](https://de.wikipedia.org/wiki/CART_(Algorithmus)) von @Breimanetal1984 verwendet. Die wesentliche Vorgehensweise ist wie folgt:
+
+1. **Splitting**: Beginnend am root node sucht der Algorithmus nach der ``besten'' Regel, die Daten anhand eines Merkmals in zwei Gruppen zu teilen. Die Qualität des Splits wird in Abhängigkeit der Definition der Outcome-Variable beurteilt:
+
+    **Bei Klassifikation**: Die Reinheit (*purtity*) der Klassen in den unmittelbar nachfolgen nodes wird maximiert. Ein gängiges Kriterium hierfür ist der *Gini-Koeffizient*.
+    
+    **Bei Regression**: Die Fehlerquadratsumme bei Vorhersage des Outcomes durch Mittelwertbildung für Beobachtungen in den unmittelbar nachfolgenden nodes wird minimiert.
+
+2. **Rekursion**: Der Prozess wird rekursiv fortgesetzt, bis eine maximale Baumtiefe (*tree depth*) erreicht ist oder die Klassen in den leaf nodes ``rein'' sind: alle Beobachtungen in einem lead node gehören zur gleichen Klasse.
+
+3. **Pruning**: Um Überanpassung an die Trainingsdaten zu vermeiden, kann der Baum beschnitten werden (*pruning*). Der Grundgedanke ist, dass tief verzweigte Bäume die Trainingsdaten zwar gut modellieren können, aber schlecht auf neue, unbekannte Daten generalisieren. 
+
+    Bei *cost complexity (CP) pruning* werden, beginnend auf Ebene der leaf nodes sukuzessive Äste entfernt, und eine Balance zwischen Komplexität des Baums und dem Anpassungsfehler zu finden. Ähnlich wie bei regularisierter KQ-Schätzung (@sec-regreg), wird die Verlustfunktion $L$ um einen Strafterm für die Komplexität erweitert. Der Effekt der Strafe wird durch den CP-Parameter $\alpha\in[0,1]$ geregelt,
+    
+    \begin{align*}
+      L_{\alpha}(T) = L(T) + \alpha \lvert T\rvert,
+    \end{align*}
+  
+  für einen Baum $T$ mit Komplexitätsmaß $\lvert T\rvert$ (Anzahl der leaf nodes) [@Hastieetal2013].
+ 
+Zur Demonstation der Schätzung von Regressionsbäumen mit R betrachten wir nachfolgend den Datensatz `MASS::Bosten`. Ziel hierbei ist es, mittlere Hauswerte `medv` in Stadteilen von Boston, MA vorherzusagen. Wir verwenden hierzu Funktionen aus dem Paket `parsnip`. 
+
+Zunächst transformieren wir den Datensatz in ein `tibble`-Objekt und definieren Trainings- und Test-Daten.
 
 ```{webr}
-# Load necessary libraries
-library(tidymodels)
+library(parsnip)
 library(cowplot)
 
 # Seed setzen
 set.seed(1234)
 
-# Prepare the data
+# Datensatz als tibble
 Boston <- as_tibble(MASS::Boston)
 
+# Splitting in Training- und Test-Daten
 Boston_split <- initial_split(
   data = Boston, 
   prop = 0.8, 
@@ -90,15 +118,17 @@ Boston_test <- testing(Boston_split)
 slice_head(Boston_train, n = 10)
 ```
 
+`parsnip` bietet eine vereinheitlichetes Framework für das Training von Modellen mit R und bietet eine flexible und konsistente API für Machine Learning. Wir definieren zunächst mit `parsnip::decision_tree()` eine Spezifikation zum Training von Entschieundgsmodellen und übergeben beispielhaft einen CP-Parameter $\alpha=.1$. Mit `parsnip::set_engine` wählen wir das Paket `raprt`. Der hier implementierte Agorithmus ist CART. Zuletzt legen wir mit ` parsnip::set_mode()` fest, dass der Algorithmus für Regression durchgeführt werden soll.
+
 ```{webr}
-# 1. Fit a regression tree
+# Spezifikation festlegen
 tree_spec <- decision_tree(
   cost_complexity = 0.1
   ) %>%
   set_engine("rpart") %>%
   set_mode("regression")
 
-# Fit the model
+# Modell trainieren
 tree_fit <- tree_spec %>%
   fit(
     formula = medv ~ ., 
@@ -106,9 +136,13 @@ tree_fit <- tree_spec %>%
     model = TRUE
   )
 
-# Trainnierten Baum in Konsole ausgeben
+# Trainierten Baum in Konsole ausgeben
 tree_fit$fit
 ```
+
+Der Output in `tree_fit$fit` zeigt, dass CP-Pruning zu einem kleinen Baum mit 3 Hierarchie-Ebenen geführt hat. Die Struktur zeigt, dass `lstat` und `rm` für Splitting-Regeln (`split`) verwendet werden, wie viele Beobachtungen den  nodes zugeordnet sind (`n`), den Wert der Verlustfunktion (`deviance`) sowie den Durchschnitt von `medv` für jede node (`yval`). Für die drei leaf nodes (gekennzeichnet mit `*`) ist `yval` die Vorhersage der Outcome-Varibale für entsprechend gruppierte Beobachtungen.
+
+Eine besser interpretierbare Darstellung des angepassten Baums in `tree_fit$fit`  erhalten wir mit `rattle::fancyRpartPlot()`.
 
 ```{webr}
 #| fig-width: 8
@@ -126,50 +160,81 @@ fancyRpartPlot(
 )
 ```
 
-```{webr}
-# Fit a regression tree with cross-validation
-set.seed(1234)
+Für eine datengetriebene Wahl des CP-Parameters $\alpha$ kann Cross Validation (CV) verwendet werden. Hierzu erstellen wir zunächst eine `parsnip`-Spezifikation mit `cost_complexity = tune::tune()` in `decision_tree()` und erstellen einen *workflow* mit `parsnip::workflow()`
 
+```{webr}
+# Spezifikation für CV von cost_complexity
 tree_spec_cv <- decision_tree(
   cost_complexity = tune()
   ) %>%
   set_engine("rpart") %>%
   set_mode("regression")
 
-# Workflow for cross-validation
+# Workflow definieren
 tree_wf_cv <- workflow() %>%
   add_model(tree_spec_cv) %>%
   add_formula(medv ~ .)
 
-# Set up cross-validation
+```
+
+Mit `rsample::vfold_cv()` definieren wir den CV-Prozess: 10-fold CV mit 2 Wiederholungen. `tune::tune_grid()` führt CV anhand des in `tree_wf_cv` definierten workflows durch. Hierbei werden in `cp_grid` festgelegte Werte von `cost_complexity` berücksichtigt. Die mit `yardstick::metric_set(rmse)` festgelegte Verlustfunktion ist der mittlere quadratische Fehler (RMSE).^[Die hier verwedete Funktion ist `yardstick::rmse()`.]
+
+```{webr}
+# CV-Prozess definieren
 cv_folds <- vfold_cv(Boston_train, v = 10, repeats = 2)
 
-# Perform cross-validation to tune cost_complexity
+# CV durchführen:
 set.seed(1234)
 
+# Grid definieren
+cp_grid <- tibble(
+  cost_complexity = c(
+    0.1, .075, 0.05, 0.01, 0.001, 0.0001
+    )
+  )
+
+# Tuning mit CV
 tree_fit_cv <- tree_wf_cv %>%
     tune_grid(
         resamples = cv_folds, 
-        grid = tibble(cost_complexity = c(0.1, .075, 0.05, 0.01, 0.001, 0.0001)),
+        grid = cp_grid,
         metrics = metric_set(rmse)
     )
+
+# CV-Ergebnisse
+tree_fit_cv
 ```
 
+Mit `workflowsets::autoplot()` kann der CV-RMSE für als Funktion des CP-Parameter leicht grafisch betrachtet dargestellt werden.
+
 ```{webr}
+# CV-Ergebnisse visualisieren
 autoplot(tree_fit_cv) +
   theme_cowplot()
-
-# Check the best parameters (including cost_complexity)
-best_tree_fit <- select_best(tree_fit_cv, metric = "rmse")
-
-show_best(tree_fit_cv, metric = "rmse")
-
-# Display best
-best_tree_fit
 ```
 
+Für eine tabellierte Übersicht der besten Modelle kann `tune::show_best()` verwendet werden. `tune::select_best()` liest die beste Parameter-Kombination aus. 
+
 ```{webr}
-# Final tree model
+# Tabellarische Übersicht
+show_best(
+  x = tree_fit_cv, 
+  metric = "rmse"
+)
+
+# Getunter Paremater
+best_tree_fit <- select_best(
+  x = tree_fit_cv, 
+  metric = "rmse"
+)
+
+best_tree_fit_cv
+```
+
+Anhand `tree_fit_cv` trainieren wir die finale Spezifikation.
+
+```{webr}
+# Finales Modell schätzen
 final_tree_spec <- decision_tree(
   cost_complexity = best_tree_fit$cost_complexity
   ) %>%
@@ -177,14 +242,21 @@ final_tree_spec <- decision_tree(
   set_mode("regression")
 
 final_tree_fit <- final_tree_spec %>%
-  fit(medv ~ ., data = Boston_train)
+  fit(
+    formula = medv ~ ., 
+    data = Boston_train
+  )
+
+# final_tree_fit
 ```
+
+Der geringe CP-Parameter führt zu einem großen Entscheidungsbaum.^[Die Dimension der Grafik wurde hier zwecks Darstellung des gesamten Baums gewählt. `print(final_tree_fit$fit)` druckt die Entscheidungsregeln in die R-Konsole (hierzu die letzte Zeile ausführen).] 
 
 ```{webr}
 #| fig-width: 8
 #| fig-height: 8
 
-# Plot the decision tree
+# CV-Fit plotten
 fancyRpartPlot(
   final_tree_fit$fit,
   split.col = "black", 
@@ -195,14 +267,31 @@ fancyRpartPlot(
 )
 ```
 
+Zur Beurteilung der Relevanz von Variablen für die Reduktion des Anpassungsfehlers (*variable importance*) kann der Eintrag `variable.importance` des `rpart`-Objekts herangezogen werden. Variable importance misst hier die Gesamtreduktion der Fehlerquadratsumem über alle Knoten, an denen die jeweilige Variable für Splits verwendet wird. 
+
 ```{webr}
-# 3. Evaluate the models on the test set
-tree_pred <- predict(tree_fit, Boston_test) %>%
+# Variable-Importance auslesen
+final_tree_fit$fit$variable.importance
+```
+
+Die Werte zeigen, dass der mit CV ermittelte Baum alle Regressoren in `boston_train` für Splits nutzt, wobei `lstat` und `rm` die relevantesten Variablen sind.
+
+Anhand von Vorhersagen für `medv` mit dem Test-Datensatz `boston_test` können wir das naive Baum-Modell `tree_fit` mit dem durch CV ermittelten Modell `tree_fit_cv` hinsichtlich des Vorhersagefehlers für ungesehene Beobachtungen vergleich. `yardstick::metric()` berechnet hierzu automatisch gängige Statistiken für Regressionsprobleme. 
+
+```{webr}
+# Vorhersagegüte naives Modell
+tree_pred <- predict(
+  object = tree_fit, 
+  new_data = Boston_test
+) %>%
   bind_cols(Boston_test) %>%
   metrics(truth = medv, estimate = .pred)
 
-# Evaluate final model
-tree_pred_cv <- predict(final_tree_fit, Boston_test) %>%
+# Vorhersagegüte bei CV
+tree_pred_cv <- predict(
+  object = final_tree_fit, 
+  new_data = Boston_test
+) %>%
   bind_cols(Boston_test) %>%
   metrics(truth = medv, estimate = .pred)
 
@@ -210,40 +299,57 @@ tree_pred
 tree_pred_cv
 ```
 
-## Random Forests
+Der Vergleich zeigt eine bessere Vorsageleistung des großen Baums in `tree_fit_cv`. In diesem Fall scheint CP-Pruning wenig hilfreich zu sein. Tatsächlich liefert ein Baum mit $\alpha=0$ bessere Vorhersagen als `tree_fit_cv` (überprüfe dies!). 
+
+## Bagging und Random Forests {#sec-brf}
+
+*Bagging* ist eine Ensemble-Modelle, die durch aus einer Kombination von vielen Entscheidungsbäumen bestehen. Bagging steht für *Bootstrap Aggregating* und nutzt einen Algorithmus, bei dem Bäume auf *zufälligen* Stichproben aus dem Trainingsdatensatz angepasst werden: Jeder Baum wird auf einer *Bootstrap-Stichprobe* (siehe @sec-sim) trainiert, die durch zufällige Züge (mit Zurücklegen) erstellt wird. Nach dem Training aggregiert Bagging die Vorhersagen aller Bäume des Ensembles.
+
+Der Vorteil von Bagging gegenüber einem einzelnen Entscheidungsbaum ist, dass die Varianz der Vorhersage deutlich reduziert werden kann: Einzelne Entscheidungsbäume neigen dazu, Muster in den Trainingsdaten zu lernen, die sich zufällig aus der Zusammensetzung der Stichprobe ergeben und nicht repräsentativ für Zusammenhänge zwischen den Regressoren und der Outcome-Variable sind. Diese Überanpassung führt zu hoher Varianz auf von Vorhersagen für ungesehene Daten. Durch das Training vieler Bäume auf unterschiedlichen *zufälligen* Stichproben aus den Trainingsdaten und das anschließende Aggregieren kann der negative Effekt der Überanpassung auf die Unsicherheit der Vorhersage einzelner Bäume reduziert werden.
+
+Eine Bagging-Spezifikation kann mit `parsnip::bag_tree()` festgelegt werden. Mit `times = 500` wird definiert, dass der Bagging-Algorithmus ein Ensemble mit 500 Bäumen (mit CART) anpassen soll. Das Training und die Vorhersage auf den Testdaten erfolgt analog zur Vorgehensweise in @sec-simpletrees.
 
 ```{webr}
-
-set.seed(1234)
-
-# Bagging
-bagging_spec <- bag_tree(
-  ) %>%
+# Spezifikation für Bagging
+bagging_spec <- bag_tree() %>%
   set_engine(
-    engine = "rpart", times = 50
+    engine = "rpart",
+    times = 500
   ) %>%
   set_mode("regression")
 
-bagging_fit <- bagging_spec %>%
-  fit(medv ~ ., data = Boston_train)
 
-# Evaluate bagging model
+# Training durchführen
+set.seed(1234)
+
+bagging_fit <- bagging_spec %>%
+  fit(
+    formula = medv ~ ., 
+    data = Boston_train
+  )
+
+# Auswertung
 bagging_pred <- predict(
   object = bagging_fit, 
-  Boston_test
+  new_data = Boston_test
   ) %>%
   bind_cols(Boston_test) %>%
   metrics(
     truth = medv,
     estimate = .pred
   )
+
+bagging_pred
 ```
 
-```{webr}
+Die Auswertung auf den Testdatensatz ergibt eine deutliche Verbesserung der Vorhersageleistung gegenüber einem einfachen Regressionsbaum.
 
+*Random Forests* erweitern Bagging, indem zusätzlich bei jedem Knoten innerhalb jedes Baumes eine *zufällige Teilmenge der Regressoren* als potentielle Variable für die Split-Regel ausgewählt wird. Dies führt zu einer weiteren Reduktion der Korrelation zwischen den Bäumen, was die Genauigkeit verbessert und das Risiko des Overfittings weiter verringert.
+
+```{webr}
 set.seed(1234)
 
-# 5. Random forest with different mtry values
+# Funktion: Random Forest für mtry = m
 rf_spec_mtry <- function(m) {
   rand_forest(mtry = m, trees = 500) %>%
     set_engine(
