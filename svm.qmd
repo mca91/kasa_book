@@ -3,11 +3,10 @@ format:
   live-html:
     webr: 
       packages:
-        - 'censored'
-        - 'mboost'
-        - 'dplyr'
         - 'tidymodels'
-        - 'MASS'
+        - 'ISLR'
+        - 'kernlab'
+        - 'parsnip'
       cell-options:
         fig-width: 8
 engine: knitr
@@ -18,38 +17,183 @@ engine: knitr
 # Support Vector Machines
 
 ```{webr}
-# Load necessary libraries
+# Libraries
+library(ISLR)
 library(tidymodels)
-library(cowplot)
 
-# Seed setzen
+# Orange Juice dataset
+data(OJ, package = "ISLR")
+
+# (a) Datenaufteilung
 set.seed(1234)
-
-# Prepare the data
-Boston <- as_tibble(MASS::Boston)
-
-Boston_split <- initial_split(
-  data = Boston, 
-  prop = 0.8, 
-  strata = medv
-  )
-
-Boston_train <- training(Boston_split)
-Boston_test <- testing(Boston_split)
-
-slice_head(Boston_train, n = 10)
+oj_split <- initial_split(OJ, prop = 0.75, strata = Purchase)
+oj_train <- training(oj_split)
+oj_test <- testing(oj_split)
 ```
 
+```{webr}
+# (b) Lineares SVM mit C = 0.01
+linear_svm_spec <- svm_linear(cost = 0.01) %>%
+  set_engine("kernlab") %>%
+  set_mode("classification")
+
+linear_svm_fit <- linear_svm_spec %>%
+  fit(Purchase ~ ., data = oj_train)
+
+# Vorhersagen und Fehlerberechnung
+train_pred_svm_l <- predict(linear_svm_fit, oj_train) %>%
+  bind_cols(oj_train) %>%
+  metrics(truth = Purchase, estimate = .pred_class)
+
+test_pred_svm_l <- predict(linear_svm_fit, oj_test) %>%
+  bind_cols(oj_test) %>%
+  metrics(truth = Purchase, estimate = .pred_class)
+
+train_pred_svm_l
+test_pred_svm_l
+```
 
 ```{webr}
-library(mboost)
+# (d) Lineares SVM mit Kreuzvalidierung
+linear_svm_spec_cv <- svm_linear() %>%
+  set_engine(
+    engine = "kernlab",
+    cost = tune()
+  ) %>%
+  set_mode("classification")
 
-spec <- boost_tree() %>% 
-  set_engine("mboost") %>% 
-  set_mode("censored regression")
+linear_svm_wf <- workflow() %>%
+  add_model(linear_svm_spec_cv) %>%
+  add_formula(Purchase ~ .)
 
+set.seed(1)
+linear_svm_res <- tune_grid(
+  linear_svm_wf,
+  resamples = vfold_cv(oj_train, v = 10),
+  grid = grid_regular(cost(range = c(0.01, 0.2)), levels = 10),
+  control = control_grid(save_pred = TRUE)
+)
 
-bagging_fit <- spec %>%
-  fit(medv ~ ., data = Boston_train)
+best_linear_svm <- select_best(x = linear_svm_res, metric = "accuracy")
+final_linear_svm <- finalize_model(linear_svm_spec_cv, best_linear_svm) %>%
+  fit(Purchase ~ ., data = oj_train)
+```
+
+```{webr}
+# Vorhersagen
+train_pred_svm_cv <- predict(
+  object = final_linear_svm, 
+  new_data = oj_train
+) %>%
+  bind_cols(oj_train) %>%
+  metrics(
+    truth = Purchase, 
+    estimate = .pred_class
+  )
+
+test_pred_svm_cv <- predict(
+  object = final_linear_svm, 
+  new_data = oj_test
+  ) %>%
+  bind_cols(oj_test) %>%
+  metrics(
+    truth = Purchase, 
+    estimate = .pred_class
+  )
+
+train_pred_svm_cv
+test_pred_svm_cv
+
+```{webr}
+# (f) Radiales SVM
+radial_svm_spec <- svm_rbf(
+  mode = "classification", 
+  cost = 0.5, 
+  rbf_sigma = 0.05
+) %>%
+  set_engine("kernlab")
+
+radial_svm_fit <- radial_svm_spec %>%
+  fit(
+    formula = Purchase ~ ., 
+    data = oj_train
+  )
+
+train_pred_svm_rad <- predict(radial_svm_fit, oj_train) %>%
+  bind_cols(oj_train) %>%
+  metrics(truth = Purchase, estimate = .pred_class)
+
+test_pred_svm_rad <- predict(radial_svm_fit, oj_test) %>%
+  bind_cols(oj_test) %>%
+  metrics(truth = Purchase, estimate = .pred_class)
+
+train_pred_svm_rad
+test_pred_svm_rad
+```
+
+```{webr}
+# (f) Radiales SVM mit Kreuzvalidierung
+radial_svm_spec_cv <- svm_rbf() %>%
+  set_engine(
+    engine = "kernlab",
+    cost = tune(), 
+    rbf_sigma = tune()
+  ) %>%
+  set_mode(mode = "classification")
+
+radial_svm_wf <- workflow() %>%
+  add_model(spec = radial_svm_spec_cv) %>%
+  add_formula(
+    formula = Purchase ~ .
+  )
+
+set.seed(1234)
+
+radial_svm_res <- tune_grid(
+  radial_svm_wf,
+  resamples = vfold_cv(oj_train, v = 10),
+  grid = expand.grid(
+    cost = c(0.1, 1, 1.5, 10),
+    rbf_sigma = c(0.001, 0.01, 0.1, 0.5, 1)
+  ),
+  control = control_grid(save_pred = TRUE)
+)
+
+best_radial_svm <- select_best(radial_svm_res, metric = "accuracy")
+final_radial_svm <- finalize_model(radial_svm_spec_cv, best_radial_svm) %>%
+  fit(Purchase ~ ., data = oj_train)
+```
+
+```{webr}
+train_pred_svm_rad_cv <- predict(final_radial_svm, oj_train) %>%
+  bind_cols(oj_train) %>%
+  metrics(truth = Purchase, estimate = .pred_class)
+
+test_pred_svm_rad_cv <- predict(final_radial_svm, oj_test) %>%
+  bind_cols(oj_test) %>%
+  metrics(truth = Purchase, estimate = .pred_class)
+
+train_pred_svm_rad_cv
+test_pred_svm_rad_cv
+```
+
+```{webr}
+# (g) Polynomiales SVM
+poly_svm_spec <- svm_poly(mode = "classification", degree = 2, scale_factor = 0.01, cost = 0.25) %>%
+  set_engine("kernlab")
+
+poly_svm_fit <- poly_svm_spec %>%
+  fit(Purchase ~ ., data = oj_train)
+
+train_pred_svm_poly <- predict(poly_svm_fit, oj_train) %>%
+  bind_cols(oj_train) %>%
+  metrics(truth = Purchase, estimate = .pred_class)
+
+test_pred_svm_poly <- predict(poly_svm_fit, oj_test) %>%
+  bind_cols(oj_test) %>%
+  metrics(truth = Purchase, estimate = .pred_class)
+
+train_pred_svm_poly
+test_pred_svm_poly
 ```
 

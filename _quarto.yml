@@ -30,6 +30,7 @@ book:
     - part: "Machine Learning"
       chapters:
         - RegReg.qmd
+        - svm.qmd
         - trees.qmd
         - Machine Learning.qmd
     - part: Übungsaufgaben
