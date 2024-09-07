@@ -8,13 +8,13 @@ format:
         - 'gbm'
         - 'dplyr'
         - 'ggplot2'
+        - 'ggRandomForests'
         - 'MASS'
         - 'purrr'
         - 'randomForest'
         - 'rattle'
         - 'tidymodels'
         - 'tidyr'
-        - 'vip'
       cell-options:
         fig-width: 8
 engine: knitr
@@ -28,11 +28,11 @@ Baum-basierte Methoden bieten eine vielseitige und leistungsstarke Herangehenswe
 
 *Entscheidungsbäume* stellen die Grundlage dieser Methoden dar. Sie ermöglichen die Aufteilung der Daten in immer kleinere, homogenere Gruppen, basierend auf *binären* Entscheidungsregeln, die aus den Prädiktoren abgleitet werden. Die trainierten Regeln eines solchen Modells lassen sich anhand eines Binärbaums visualisieren, was eine intuitive Interpretierbarkeit der Ergebnisse erlaubt. 
 
-*Random Forests* ist ein Ensemble-Ansatz, bei dem viele Entscheidungsbäume kombiniert werden. Jeder Baum wird auf einer zufälligen Teilmenge der Daten trainiert (*Bagging*), und bei jedem Knoten wird zusätzlich eine zufällige Teilmenge der Merkmale berücksichtigt. Die finale Vorhersage des Random Forests basiert auf der Aggregation der Vorhersagen aller Bäume (z.B. Mehrheitsvotum für Klassifikation, Durchschnitt für Regression). Dieses Verfahren reduziert das Risiko einer Überanpassung und erhöht oft die Vorhersagegenauigkeit im Vergleich zu einzelnen Entscheidungsbäumen.
+*Random Forests* ist ein Ensemble-Ansatz, bei dem viele Entscheidungsbäume kombiniert werden. Jeder Baum wird auf einer zufälligen Teilmenge der Daten trainiert (*Bagging*), und bei jedem Knoten wird zusätzlich eine zufällige Teilmenge der Merkmale berücksichtigt. Die finale Vorhersage des Random Forests basiert auf der Aggregation der Vorhersagen aller Bäume (Mehrheitsvotum für Klassifikation, Durchschnitt für Regression). Dieses Verfahren reduziert das Risiko einer Überanpassung und erhöht oft die Vorhersagegenauigkeit im Vergleich zu einzelnen Entscheidungsbäumen.
 
 *Boosting* ist eine weitere Ensemble-Methode zur Anpassung von Modellen mit hoher Vorhersagegüte durch Kombination einfacher Modelle (*Base learner*), wobei Regressions- oder Klassifikationsbäume eingesetzt werden können. Alternativ zu Random Forests trainieren Boosting-Algorithmen sukzessiv einfache (Klassifikations- oder Regressions-)Bäume, wobei jeder nachfolgende Baum das Ziel hat, die Vorhersagefehler der vorherigen Bäume zu korrigieren. 
 
-In diesem Kapitel erläutern wir die Anwendung baum-basierter Methoden in R anhand von Beispieldatensätzen. Wir zeigen, wie Regressionsbäume, Random Forests und Boosting-Modelle im `tidymodels`-Framework trainiert werden und wie die Vorhersageleistung durch die Wahl geeigneter Hyperparameter mit Cross-Validation und Out-of-Sample-Evaluierungsmethoden optimiert werden kann.
+In diesem Kapitel erläutern wir die Anwendung baum-basierter Methoden in R anhand von Beispieldatensätzen. Wir zeigen, wie Regressionsbäume, Random Forests und Boosting-Modelle im `parsnip`-Framework trainiert werden und wie die Vorhersageleistung durch die Wahl geeigneter Hyperparameter mit Cross-Validation und Out-of-Sample-Evaluierungsmethoden optimiert werden kann.
 
 
 ## Entscheidungsbäume {#sec-simpletrees}
@@ -42,16 +42,16 @@ Ein Entscheidungsbaum ist ein Modell, das auf der Basis von hierarchischen Bedin
 @fig-exdectree zeigt ein einfaches Beispiel eines Entscheidungsbaums zur Klassifikation der Kreditwürdigkeit einer Person. Die Klassfikation erfolgt, in dem die Beobachtung basierend auf den Merkmalen Alter, Einkommen und Eigentum durch den Baum geleitet wird. Zunächst wird geprüft, die Person 30 Jahre oder jünger ist. Fall ja, entscheidet der Baum anhand des Einkommens: Bei einem Jahreseinkommen von 40.000 oder weniger wird die Person als wenig kreditwürdig klassifiziert, bei höherem Einkommen als mäßig kreditwürdig. Für Personen älter als 30 Jahre überprüft das Modell lediglich, ob die Person eine Immobilie besitzt, um zwischen mäßiger Kreditwürdigkeit und guter Bonität zu unterscheiden.
 
 ```{dot}
-//| fig-width: 8
+//| fig-width: 6
 //| fig-height: 5
 //| fig-cap: "Entscheidungsbaum: Klassifikation von Kreditwürdigkeit"
 //| label: fig-exdectree
 digraph exdectree {
     node [shape=box];
     splines=false;
-    ranksep = 1;  // Abstand zwischen den Ebenen
-    nodesep = 1.75;   // Abstand zwischen den Knoten
-    margin = 0.3;    // Rand um den gesamten Baum
+    ranksep = 1;
+    nodesep = 1.75;
+    margin = 0.15;
 
     1 [label="Alter <= 30?"];
     2 [label="Einkommen <= 40 Tsd.?"];
@@ -71,15 +71,19 @@ digraph exdectree {
 
 ## Training von Bäumen
 
-Zur Konstruktion von Binär-Bäumen werden etablierte Algorithmen wie *Classification and Regression Trees* ([CART](https://de.wikipedia.org/wiki/CART_(Algorithmus)) von @Breimanetal1984 verwendet. Die wesentliche Vorgehensweise ist wie folgt:
+Zur Konstruktion von Binär-Bäumen werden etablierte Algorithmen wie *Classification and Regression Trees* ([CART](https://de.wikipedia.org/wiki/CART_(Algorithmus)) von @Breimanetal1984 verwendet. Die wesentliche Vorgehensweise für das Training eines Baums $T$ ist wie folgt:
 
-1. **Splitting**: Beginnend am root node sucht der Algorithmus nach der ``besten'' Regel, die Daten anhand eines Merkmals in zwei Gruppen zu teilen. Die Qualität des Splits wird in Abhängigkeit der Definition der Outcome-Variable beurteilt:
+1. **Splitting**: Beginnend am root node sucht der Algorithmus nach der "besten" Regel, die Daten anhand eines Merkmals in zwei Gruppen zu teilen. Die Qualität des Splits wird in Abhängigkeit der Definition der Outcome-Variable beurteilt:
 
-    **Bei Klassifikation**: Die Reinheit (*purtity*) der Klassen in den unmittelbar nachfolgen nodes wird maximiert. Ein gängiges Kriterium hierfür ist der *Gini-Koeffizient*.
+    - **Bei Klassifikation**: Die Reinheit (*purtity*) der Klassen in den unmittelbar nachfolgen nodes wird maximiert. Ein gängiges Kriterium hierfür ist der [*Gini-Koeffizient*](https://de.wikipedia.org/wiki/Gini-Koeffizient).^[Der Gini-Koeffizient $0\leq G\leq1$ misst die Homogenität der Outcome-Variable für die Beobachtungen eines Knotens. $G=0$ ergibt sich bei vollständiger "Reinheit" (alle Beobachtungen im Knoten gehören zur gleichen Klasse). $G > 0$ zeigt Heterogenität der Klassen an, die mit $G$ zunimmt]
     
-    **Bei Regression**: Die Fehlerquadratsumme bei Vorhersage des Outcomes durch Mittelwertbildung für Beobachtungen in den unmittelbar nachfolgenden nodes wird minimiert.
+    - **Bei Regression**: Die Fehlerquadratsumme bei Vorhersage des Outcomes durch Mittelwertbildung für Beobachtungen in den unmittelbar nachfolgenden nodes wird minimiert.
 
-2. **Rekursion**: Der Prozess wird rekursiv fortgesetzt, bis eine maximale Baumtiefe (*tree depth*) erreicht ist oder die Klassen in den leaf nodes ``rein'' sind: alle Beobachtungen in einem lead node gehören zur gleichen Klasse.
+2. **Rekursion**: Der Prozess wird rekursiv fortgesetzt, bis Abbruchkriterien greifen eine weitere Verzewigung verhindern:
+
+    - Die maximale Baumtiefe (*tree depth*) ist erreicht 
+    - Die leaf nodes sind hinreichend "rein": Alle Beobachtungen in einem leaf node gehören zur gleichen Klasse oder die Verbesserung des Loss durch weitere Splits fällt unter einen festgelegten Schwellenwert
+    - Weitere Splits führen zu leaf nodes, die eine Mindestanzahl an Beobachtungen (*minimum split*) unterschreiten würden
 
 3. **Pruning**: Um Überanpassung an die Trainingsdaten zu vermeiden, kann der Baum beschnitten werden (*pruning*). Der Grundgedanke ist, dass tief verzweigte Bäume die Trainingsdaten zwar gut modellieren können, aber schlecht auf neue, unbekannte Daten generalisieren. 
 
@@ -118,7 +122,7 @@ Boston_test <- testing(Boston_split)
 slice_head(Boston_train, n = 10)
 ```
 
-`parsnip` bietet eine vereinheitlichetes Framework für das Training von Modellen mit R und bietet eine flexible und konsistente API für Machine Learning. Wir definieren zunächst mit `parsnip::decision_tree()` eine Spezifikation zum Training von Entschieundgsmodellen und übergeben beispielhaft einen CP-Parameter $\alpha=.1$. Mit `parsnip::set_engine` wählen wir das Paket `raprt`. Der hier implementierte Agorithmus ist CART. Zuletzt legen wir mit ` parsnip::set_mode()` fest, dass der Algorithmus für Regression durchgeführt werden soll.
+`parsnip` bietet eine vereinheitlichetes Framework für das Training von Modellen mit R und eine flexible API für Machine Learning. Wir definieren zunächst mit `parsnip::decision_tree()` eine Spezifikation zum Training von Entschieundgsmodellen und übergeben beispielhaft einen CP-Parameter $\alpha=.1$. Mit `parsnip::set_engine` wählen wir das Paket `raprt`. Der hier implementierte Agorithmus ist CART. Zuletzt legen wir mit ` parsnip::set_mode()` fest, dass der Algorithmus für Regression durchgeführt werden soll.
 
 ```{webr}
 # Spezifikation festlegen
@@ -154,7 +158,7 @@ fancyRpartPlot(
   tree_fit$fit,
   split.col = "black", 
   nn.col = "black", 
-  caption = "",
+  caption = "Trainierter Entscheidungsbaum für cp = 0.1",
   palette = "Set1",
   branch.col = "black"
 )
@@ -214,6 +218,9 @@ Mit `workflowsets::autoplot()` kann der CV-RMSE für als Funktion des CP-Paramet
 ```{webr}
 # CV-Ergebnisse visualisieren
 autoplot(tree_fit_cv) +
+  labs(
+    title = "CV für CP-Parameter: RMSE vs. Komplexität"
+  ) +
   theme_cowplot()
 ```
 
@@ -265,7 +272,7 @@ fancyRpartPlot(
   final_tree_fit$fit,
   split.col = "black", 
   nn.col = "black", 
-  caption = "",
+  caption = "Mit CV ermittelter Entscheidungsbaum",
   palette = "Set1",
   branch.col = "black"
 )
@@ -305,7 +312,7 @@ tree_pred_cv
 
 Der Vergleich zeigt eine bessere Vorsageleistung des großen Baums in `tree_fit_cv`. In diesem Fall scheint CP-Pruning wenig hilfreich zu sein. Tatsächlich liefert ein Baum mit $\alpha=0$ bessere Vorhersagen als `tree_fit_cv` (überprüfe dies!). 
 
-## Bagging und Random Forests {#sec-brf}
+## Bagging
 
 *Bagging* ist eine Ensemble-Modelle, die durch aus einer Kombination von vielen Entscheidungsbäumen bestehen. Bagging steht für *Bootstrap Aggregating* und nutzt einen Algorithmus, bei dem Bäume auf *zufälligen* Stichproben aus dem Trainingsdatensatz angepasst werden: Jeder Baum wird auf einer *Bootstrap-Stichprobe* (siehe @sec-sim) trainiert, die durch zufällige Züge (mit Zurücklegen) erstellt wird. Nach dem Training aggregiert Bagging die Vorhersagen aller Bäume des Ensembles.
 
@@ -350,9 +357,11 @@ Die Auswertung auf den Testdatensatz ergibt eine deutliche Verbesserung der Vorh
 
 Obwohl die Bäume beim Bagging auf unterschiedlichen Stichproben trainiert werden, kann innerhalb des Ensembles dennoch eine deutliche Korrelation vorliegen: Da jeder Baum auf alle Regressoren für Splits zugreift, können trotz Bootstrapping ähnliche (unverteilhafte) Muster aus dem Datensatz erlernt werden, was sich nachteilig auf die Generalisierungsfähigkeit auswirken kann. Diese Korrelation mindert die Effektivität von Bagging, da stark korrelierte Bäume dazu neigen, ähnliche Fehler zu machen.
 
+## Random Forests {#sec-brf}
+
 *Random Forests* erweitern Bagging, indem zusätzlich bei jedem Knoten innerhalb jedes Baumes eine *zufällige Teilmenge der Regressoren* als potentielle Variable für die Split-Regel ausgewählt wird. Dies führt zu einer Reduktion der Korrelation zwischen den Bäumen, was die Genauigkeit verbessert und das Risiko von Overfitting weiter verringert.
 
-In R erstellen wir die Spezifikation mit `parsnip::rand_forest()`. Der Parameter `mtry` legt fest, wie viele Regressoren zufällig für jeden Split zur Verfügung stehen. Wir nutzen den Algorithmus aus dem `randomForest`-Paket und legen in `set_engine()` fest, dass die von `randomForest::randomForest()` berechnete Variable-Importance-Metrik im Output-Objekt ausgegeben wird. Um die Spezifikation für verschiedene Werte von `mtry` anwenden zu können, implementieren wir die Spezifikation innerhalb einer Wrapper-Funktion `rf_spec_mtry()`. Mit `purrr::map()` iterieren wir `rf_spec_mtry()` über drei verschiedene Werte für den Tuning-Parameter `mtry`.
+In R erstellen wir die Spezifikation mit `parsnip::rand_forest()`. Der Parameter `mtry` legt fest, wie viele Regressoren $m$ zufällig für jeden Split zur Verfügung stehen. Wir nutzen den im `randomForest`-Paket implementierten Algorithmus und legen in `set_engine()` fest, dass die von `randomForest::randomForest()` berechnete Fehler-Metrik im Output-Objekt ausgegeben wird (`tree.err = TRUE`). Um die Spezifikation für verschiedene Werte von `mtry` anwenden zu können, implementieren wir die Spezifikation innerhalb einer Wrapper-Funktion `rf_spec_mtry()`. Mit `purrr::map()` iterieren wir `rf_spec_mtry()` über drei verschiedene Werte für den Tuning-Parameter `mtry` (4, 6 und 10 Variablen).^[Eine Faustregel für die Wahl von $m$ bei $k$ verfügbaren Regressoren ist $m\approx\sqrt{k}$.]
 
 ```{webr}
 set.seed(1234)
@@ -365,7 +374,7 @@ rf_spec_mtry <- function(m) {
   rand_forest(mtry = m, trees = 500) %>%
     set_engine(
       engine = "randomForest", 
-      importance = TRUE
+      tree.err = TRUE
     ) %>%
     set_mode("regression")
 }
@@ -380,77 +389,142 @@ rf_fits <- map(
     )
 )
 
-# Ausgabe der Liste von Modellen
+rf_fits <- set_names(
+  x = rf_fits,
+  nm =  paste0("rf_mtry", mtry_values, "_fit")
+)
+
+# Ausgabe der Ergebnisse
 rf_fits
 ```
 
+Für eine Beurteilung des Vorhersageleistung dieser drei Modelle können wir den *Out-of-Bag*-Fehler (OOB) verwenden: 
+
+Der OOB-Fehler ist eine Schätzung des Generalisierungsfehlers ohne einen separaten Testdatensatzes. Bei Random Forests (und Bagging) ist dies aufgrund der Berechnung des Ensembles für Bootstrap-Stichproben möglich: Grob ein Drittel der Beobachtungen des Datensatzes sind nicht Teil der Stichprobe, die für das Training jedes Baums im Ensemble genereiert werden.^[Beachte, dass beim Bootstrap $n$ aus $n$  Beobachtungen mit Zurücklegen gezogen werden. Die Wahrscheinlicht, dass eine Beobachtung *nicht* gezogen wird ("Out-of-Bag"), ist $(1-1/n)^n\approx37\%$.] Diese nicht gezogenen Datenpunkte sind OOB-Beobachtungen. Der OOB-Fehler des Ensembles ist der durchschnittliche Fehler für die aggregierten Vorhersagen der Bäume des Forests.
+
+Der OOB-Fehler kann auch verwendet werden, um die erforderliche Größe des Random Forests zu beurteilen: Eine größere Anzahl von Bäumen reduziert tendenziell die Varianz der Vorhersagen und verbessert die Generalisierungsfähigkeit. Allerdings nimmt dieser Effekt ab, und ab einer bestimmten Baumanzahl sind weitere Verbesserungen marginal. Obwohl das Risiko von Überanpassung durch viele Bäume aufgrund des Bagging minimal ist, kann es bei großen Datensätzen sinnvoll sein, kleinere Wälder zu trainieren, um den Rechenaufwand zu verringern. Wir plotten hierfür den OOB-Fehler für das Modell mit `mtry = 10` gegen die Anzahl der Bäume.
 
 ```{webr}
-# 6. Evaluate the random forest models
-rf_mtry4_pred <- predict(
-  object = rf_mtry4_fit, 
-  Boston_test
-  ) %>%
-  bind_cols(Boston_test) %>%
-  metrics(truth = medv, estimate = .pred)
+library(ggRandomForests)
 
-rf_mtry6_pred <- predict(
-  object = rf_mtry6_fit, 
-  Boston_test
-  ) %>%
-  bind_cols(Boston_test) %>%
-  metrics(
-    truth = medv, 
-    estimate = .pred
-  )
-
-rf_mtry10_pred <- predict(
-  object = rf_mtry10_fit, 
-  Boston_test
-  ) %>%
-  bind_cols(Boston_test) %>%
-  metrics(
-    truth = medv, 
-    estimate = .pred
-  )
-
-rf_mtry4_pred
-rf_mtry6_pred
-rf_mtry10_pred
-```
-
-```{webr}
-# Variable importance für mtry = 10
-vip::vip(rf_mtry10_fit$fit) +
+# OOB-Fehler als Funktion der Baumanzahl
+rf_fits$rf_mtry10_fit$fit %>% 
+  gg_error() %>% 
+  
+  plot() + 
+  labs(
+    title = "Random Forest: Ensemblegröße vs. OOB-Fehler (mtry = 10)"
+  ) + 
   theme_cowplot()
 ```
 
-## Boosting
+Die Grafik zeigt, dass die Verbesserung des OOB-Fehlers jenseits von 250 Beobachtungen deutlich nachlässt, sodass ein Training von 500 Bäumen ausreichend scheint.
+
+Zur Beurteiliung der Vorhersagegüte mit dem Testdatensatz gehen wir analog zum Training vor und iterieren mit `map()` über `rf_fits`, die Liste der angepassten Modelle.
 
 ```{webr}
-# Step 2: Fit the model using gbm
+# Vorhersage und Berechnung v. Metriken für jeden RF
+rf_predictions <- map(
+  .x = rf_fits, 
+  .f =  ~ predict(.x, Boston_test) %>%
+    bind_cols(Boston_test) %>%
+    metrics(
+      truth = medv, 
+      estimate = .pred
+    )
+)
+
+# Einträge benennen
+rf_predictions <- set_names(
+  x = rf_predictions,
+  nm =  paste0("rf_mtry", mtry_values, "_pred")
+)
+
+rf_predictions
+```
+
+Ähnlich wie für einen einzelnen Baum kann die Relevanz von Variablen anhand der Reduktion der Loss-Funktion durch das Ensemble beurteilt werden. Für einen einfachen Vergleich der Variable Importance für den Random Forests mit `mtry = 10` in `rf_fits$rf_mtry10_fit` nutzen wir `ggRandomForests::gg_vimp()`.
+
+```{webr}
+# Variable importance für mtry = 10
+rf_fits$rf_mtry10_fit$fit %>%
+  gg_vimp()  %>%
+  plot() +
+    labs(
+      title = "Variable Importance für Random Forest (mtry = 10)"
+    ) +
+    theme_cowplot()
+```
+
+Die Grafik bestärkt unsere Schlussfolgerung aus der Analyse des (mit CART trainierten) einzelnen Entscheidungsbaums in @sec-simpletrees, dass `rm` und `lstat` die wichtigsten Regressoren für die Vorhersage von `medv` sind.
+
+
+## Boosting {#sec-boosting}
+
+Boosting ist eine leistungsstarke Ensemble-Methode für Vorhersagen, die kleine Modelle (oft Entscheidungsbäume geringer Tiefe) sukzessiv trainiert und zu einem starken Modell kombiniert. Anders als bei Random Forests, bei denen viele Bäume unabhängig voneinander auf zufälligen Stichproben der Daten trainiert werden, geht ein Boosting-Algorithmuss sequentiell vor: Jeder nachfolgende Baum wird darauf optimiert, die Fehler des vorherigen Modells zu reduzieren. Die Idee hierbei ist es, iterativ "schwache" Modelle zu erzeugen, die eine gute Anpassung für Datenpunkte liefern, die in den vorherigen Durchläufen schlecht vorhergesagt wurden.
+
+Für einen Trainingsdatensatz $\{(x_i, y_i)\}_{i=1}^n$, wobei $x_i$ die Input-Features und $y_i$ Beobachtungen des Outcomes sind, kann Boosting wiefolgt durchgeführt werden.
+
+1. **Initialisierung**: Initialisiere das Boosting-Modell als $\widehat{F}_0(x)$. Setze die Residuen $r^0_i=y_i$ für alle $i$
+
+2. **Iteration**: Wiederhole die folgenden Schritte für $b = 1,2,\dots,B$ mit $B$ hinreichend groß:
+
+    2.1 **Base Learner**: Trainiere Baum $T_b$ mit $\{(\boldsymbol{x}_i, r^{b-1}_i)\}_{i=1}^n$ für die Vorhersage des *Fehlers* der vorherigen Iteration $r^{b-1}$.
+
+    2.2 **Aktualisierung**: Aktualisiere das Boosting-Modell,
+    
+      \begin{align*}
+      \widehat{F}_{b}(\boldsymbol{x}) = \widehat{F}_{b-1}(\boldsymbol{x}) + \eta \cdot T_{b}(\boldsymbol{x}),
+      \end{align*}
+        
+      wobei $\eta$ die (oft klein gewählte) *Lernrate* ist.
+
+    2.3 **Fehlerberechnung**: Berechne die Residuen $r^b_i$ als Differenzen zwischen dem tatsächlichen Werten $y_i$ und den Vorhersage des aktuellen Modells $\widehat{F}_m(\boldsymbol{x}_i)$,
+    
+      \begin{align*}
+      r^b_i = y_i - \widehat{F}_b(\boldsymbol{x}_i).
+      \end{align*}
+
+3. **Output**: Gib das finale Modell aus:
+  
+    \begin{align*}
+      \widehat{F}(\boldsymbol{x}) := \sum_{b=1}^B \eta\cdot \widehat{F}^b(\boldsymbol{x})
+    \end{align*}
+
+Der Parameter $0\leq\eta\leq0$ steuert, wie stark der Einfluss jedes neuen Baumes auf das Modell ist. Eine kleine Lernrate führt dazu, dass viele Bäume benötigt werden, was Vorhersagen (ähnlich wie bei Bagging) stabiler macht. Beachte die sequentielle Natur des Trainings: Die $r^b_i$ in Schritt 2.3 sind die zu vorhersagenden Outcome-Variable für den nächsten Baum. $T_{b+1}$ wird trainiert wird, um den *Fehler des bisherigen Modells* $\widehat{F}_b$ zu erklären.
+
+Für die Anwendung auf `MASS::Boston` in R nutzen wir den im Paket `gbm` implementierten *Gradient-Boosting*-Algorithmus. Bei Gradient Boosting wird jeder Baum so trainiert, dass er den negativen Gradienten einer Verlustfunktion approximiert, also die Richtung des größten Fehlers. Das Modell wird schrittweise verbessert, indem es entlang des Gradienten aktualisiert wird, um die Vorhersagegüe zu optimieren; siehe @Hastieetal2013 für eine detaillierte Erläuterung.
+
+Mit dem nachfolgenden Code-Chunk trainieren wir ein Boosting-Modell für Regression mit 5000 einfachen Bäumen (`n.trees = 5000`) mit einer maximalen Tiefe von 2 (`interaction.depth = 2`), d.h. es folgen maximal 2 Entscheidungs-Regeln nacheinander. Um das Risiko von Overfitting gering zu halten, erlauben wir nur Splits, die zu mindestens zwei Beobachtungen in resultierenden nodes führen (`n.minobsinnode = 2`). Die Lernrate (Beitrag der Base Learner zum Ensemble) wird typischerweise klein (und in Abhängigkeit von `n.trees`) gewählt (`shrinkage = 0.001`).^[Je kleiner die Lernrate, desto größer sollte `n.trees` gewählt werden.]
+
+```{webr}
 set.seed(1234)
 
+# Gradient Boosting durchführen
 gbm_model <- gbm(
   formula = medv ~ ., 
   data = Boston_train, 
-  distribution = "gaussian", 
-  n.trees = 50000,         # Number of trees
-  interaction.depth = 2,   # Interaction depth
-  shrinkage = 0.001,       # Learning rate
-  n.minobsinnode = 2       # Minimum observations in nodes
+  distribution = "gaussian", # für Regression
+  n.trees = 5000,           # Anz. Bäume
+  interaction.depth = 2,     # Maximale Tiefe der base learner
+  shrinkage = 0.01,         # Lernrate
+  n.minobsinnode = 2         # Min. Beobachtungen in nodes
 )
+
+gbm_model 
 ```
 
+Für die Vorhersagen auf dem Test-Datensatz legen wir mit `n.trees = gbm_model$n.trees` fest, dass das gesamte Ensemble genutzt werden soll.
+
 ```{webr}
-# Step 3: Make predictions on the test data
+# Vorhersagen Test-Datensatz
 gbm_predictions <- predict(
   object = gbm_model, 
-  Boston_test, 
-  n.trees = gbm_model$n.trees
+  newdata = Boston_test, 
+  n.trees = gbm_model$n.trees # gesamtes Ensemble nutzen
 )
 
-# Step 4: Evaluate the model performance using tidymodels' yardstick package
+# Auswertung Test-Datensatz
 results <- Boston_test %>%
   mutate(predictions = gbm_predictions) %>%
   metrics(
@@ -461,22 +535,52 @@ results <- Boston_test %>%
 results
 ```
 
+Die Ergebnisse zeigen, dass Gradient Boosting bereits für die naive Parameterwahl im Aufruf von `gbm::gbm()` zu einer Verbesserung der Vorhersageleistung gegenüber den Random-Forest-Modellen führt.
+
+Anstatt `n.trees = 5000` können wir `n.trees` in `predict()` einen Vektor mit verschiedenen Ensemble-Größen übergeben. Für `n.trees = 5000` erhalten wir Vorhersagen für jeden Status, den das Boosting-Modell im Training nach seiner Initialisierung bis zu der in `gbm::gbm()` festgelgten Größe durchläuft. Anhand dieser Vorhersagen können wir die Generalisierungsfähigkeit des Modells in Abhängigkeit der gewählten Lernrate und der Größe beurteilen, in dem wir den RMSE für den gesamten Trainingsprozess berechnen. Für eine leichtere Interpretation erzeugen wir eine Grafik ählich wie bei der OOB-Analyse des Random-Forest-Modells.
+
 ```{webr}
-# Step 3: Get the variable importance from the gbm model
+# Vorhersagen sukzessiv treffen
+predict(
+    object = gbm_model, 
+    newdata = Boston_test, 
+    n.trees = 1:5000
+) %>%
+    
+   # Testset-RMSE berechnen
+    as_tibble() %>%
+    map_dbl(
+      .f = ~ sqrt(mean((.x - Boston_test$medv)^2))
+    ) %>%
+    bind_cols(rmse = ., trees = 1:5000) %>%
+  
+  # Plotten
+  ggplot(mapping = aes(x = trees, y = rmse)) +
+    geom_line() +
+    labs(
+      title = "Boosting: Testset-RMSE als Funktion von n.trees"
+    ) +
+    theme_cowplot()
+```
+
+Die Grafik zeigt eine schnelle Verbesserung des Out-of-sample-Fehlers mit der Größe des Ensembles. Für die gewählte Lernrate scheinen 5000 Bäume adäquat zu sein.
+
+Analog zu Bagging und Random Forests können wir die Relevanz der Regressoren in `Boston` für die Vorhersage von `medv` anhand der mit `summary()` berechneten (relativen) Variable Importance für die Anpassung auf den Trainingsdatensatz einschätzen. 
+
+```{webr}
+# Variable Importance berechnen
 var_importance <- summary(
   object = gbm_model, 
   plotit = FALSE # k. graphische Ausgabe
 )
 
-# Step 4: Create a ggplot2 variable importance plot
-# Reorder the variables by importance for better plotting
+# ... und plotten
 var_importance <- var_importance %>%
   as_tibble() %>%
   arrange(
     desc(rel.inf)
   )
 
-# Plot using ggplot2
 ggplot(
   data = var_importance,
   mapping = aes(
@@ -489,9 +593,15 @@ ggplot(
   labs(
     title = "Variable Importance für Gradient Boosting",
     x = "Variable",
-    y = "Relativer Einfluss"
+    y = "Relativer Einfluss (%)"
   ) +
   theme_cowplot()
 ```
 
+
+Obwohl erneut `lstat` und `rm` als die wichtigsten Prädiktoren gelistet sind, identifiziert Gradient Boosting im Gegensatz zu Bagging und Random Forests `lstat` als die Variable mit der größten Vorhersagekraft für `medv`. 
+
+## Zusammenfassung
+
+In diesem Kapitel haben wir die Anwendung baum-basierter Methoden in R diskutiert. Darunter Entscheidungsbäume, Bagging, Random Forests und Boosting. Entscheidungsbäume sind Modelle, die die Daten anhand binärer Entscheidungsregeln sukzessiv in kleinere, homogene Gruppen aufgeteilt werden. Baum-Modelle bieten intuitive Interpretierbarkeit, neigen jedoch zur Überanpassung, was durch Beschneiden (Pruning) vermieden werden kann. Die Vorhersage einzelner Bäume ist tendentiell mit hoher Varianz verbunden. Random Forests kombinieren mit Bagging viele Entscheidungsbäume, die auf zufälligen Teilmengen der Daten und Merkmale trainiert werden. Durch die Aggregation der Vorhersagen vieler Bäume reduziert der Random Forest die Varianz und verbessert so die Vorhersagegenauigkeit. Boosting-Methoden mit Entscheidungsbäumen trainieren kleine Bäume sukzessive, wobei jeder weitere Baum zur Korrektur der gegenwärtigen Fehler des Ensembles trainiert wird. Gradient Boosting nutzt den Gradienten der Verlustfunktion, um die Vorhersagequalität des Ensembles optimieren. Für alle Methoden wurden Implementierungen im `parsnip`-Framework in R vorgestellt. Zudem wurde gezeigt, wie die Vorhersagegüte durch Testdatensätze beurteilt und die Bedeutung einzelner Variablen mit Variable-Importance-Metriken analysiert werden kann.
 
