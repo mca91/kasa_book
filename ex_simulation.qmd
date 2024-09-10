@@ -1,0 +1,220 @@
+---
+format: live-html
+engine: knitr
+webr: 
+  packages: [
+            'boot',
+            'gradethis',
+            'cowplot',
+            'dplyr',
+            'ggplot2',
+            'tidyr',
+            'readr'
+            ]
+---
+
+{{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
+{{< include ./_extensions/r-wasm/live/_gradethis.qmd >}}
+
+# Simulation mit R {.unnumbered}
+
+### Bootstrap mit Schleife
+
+(a) Zeige, dass der Bootstrap mit einer `for`-Schleife äquivalente Ergebnisse liefert, wie `boot::boot()`
+
+```{webr}
+#| envir: ex_reg
+#| caption: 'R'
+#| exercise: ex_1
+
+# Stichprobe erzeugen
+set.seed(123)
+daten <- rnorm(150)
+
+B <- 99
+
+boot_means <- numeric(_____)
+
+set.seed(1234)
+
+for(b in 1:_____) {
+  id <- sample(1:150, replace = _____)
+  boot_means[b] <- mean(
+    daten[_____]
+  )
+}
+
+```
+
+::: {.solution exercise="ex_1"}
+
+#### Solution
+
+Nutze die Formel `sex ~ bill_depth` und übergebe den Datensatz `penguins_cleaned`
+
+```{webr}
+#| envir: ex_reg
+#| exercise: ex_1
+#| solution: true
+# Stichprobe erzeugen
+set.seed(123)
+daten <- rnorm(150)
+
+B <- 99
+
+boot_means <- numeric(B)
+
+set.seed(1234)
+
+for(b in 1:B) {
+  id <- sample(1:150, replace = T)
+  boot_means[b] <- mean(
+    daten[id]
+  )
+}
+```
+
+:::
+
+::: { .hint exercise="ex_1"}
+::: { .callout-note collapse="false"}
+## Hinweis 1
+
+- `numeric(x)` initialisiert einen numerischen Vektor mit `x` Einträgen. `boot_means` muss nach Durchlauf der Schleife `B` Bootstrap-Mittelwerte enthalten.
+
+- Der Ansatz nutzt ziehen mit Zurücklegen aus der Indexmege der Stichprobe: `1:150`
+
+:::
+:::
+
+::: { .hint exercise="ex_1"}
+::: { .callout-note collapse="false"}
+## Hinweis 2
+
+- `id` ist eine Indexmenge. `X[id]` gibt die Beobachtungen aus dem Vektor `X` mit dem entsprechenden Index zurück.
+
+:::
+:::
+
+```{webr}
+#| envir: ex_reg
+#| exercise: ex_1
+#| check: true
+gradethis::grade_this_code()
+```
+
+
+
+
+(b)
+
+```{webr}
+#| envir: ex_reg
+#| exercise: ex_2
+#| setup: true
+set.seed(123)
+daten <- rnorm(150)
+B <- 99
+set.seed(1234)
+boot_means <- numeric(B)
+for(b in 1:B) {
+  id <- sample(1:150, replace = T)
+  boot_means[b] <- mean(
+    daten[id]
+  )
+}
+```
+
+```{webr}
+#| envir: ex_reg
+#| caption: 'R'
+#| exercise: ex_2
+
+mean(_____)
+sd(_____)
+
+```
+
+::: {.solution exercise="ex_2"}
+
+#### Solution
+
+Nutze die Formel `sex ~ bill_depth` und übergebe den Datensatz `penguins_cleaned`
+
+```{webr}
+#| envir: ex_reg
+#| exercise: ex_2
+#| solution: true
+
+mean(boot_means)
+sd(boot_means)
+```
+
+:::
+
+::: { .hint exercise="ex_2"}
+::: { .callout-note collapse="false"}
+## Hinweis 1
+
+- `numeric(x)` initialisiert einen numerischen Vektor mit `x` Einträgen. `boot_means` muss nach Durchlauf der Schleife `B` Bootstrap-Mittelwerte enthalten.
+
+- Der Ansatz nutzt ziehen mit Zurücklegen aus der Indexmege der Stichprobe: `1:150`
+
+:::
+:::
+
+::: { .hint exercise="ex_2"}
+::: { .callout-note collapse="false"}
+## Hinweis 2
+
+- `id` ist eine Indexmenge. `X[id]` gibt die Beobachtungen aus dem Vektor `X` mit dem entsprechenden Index zurück.
+
+:::
+:::
+
+```{webr}
+#| envir: ex_reg
+#| exercise: ex_2
+#| check: true
+gradethis::grade_this_code()
+```
+
+
+(c) boot
+
+```{webr}
+#| envir: ex_reg
+#| exercise: ex_3
+#| setup: true
+set.seed(123)
+daten <- rnorm(150)
+```
+
+```{webr}
+#| envir: ex_reg
+#| caption: 'R'
+#| exercise: ex_3
+
+set.seed(1234)
+
+boot_res <- boot::boot(
+  data = daten, 
+  statistic = \(d, id) {
+    mean(d[id])
+  }, 
+  R = B,
+)
+
+boot_res
+```
+
+(d)
+
+```{webr}
+#| envir: ex_reg
+#| caption: 'R'
+#| exercise: ex_4
+
+mean(boot_res$t)
+sd(boot_res$t)
+```
