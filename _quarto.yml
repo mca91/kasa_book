@@ -36,6 +36,7 @@ book:
     - part: Übungsaufgaben
       chapters:
         - ex.qmd
+        - ex_simulation.qmd
     - Literatur.qmd
   repo-branch: main
   repo-actions: [edit, issue]
