@@ -218,3 +218,24 @@ boot_res
 mean(boot_res$t)
 sd(boot_res$t)
 ```
+
+
+### bbbc
+
+```{webr}
+#| envir: ex_reg
+#| caption: 'R'
+#| exercise: ex_5
+library(purrr)
+
+set.seed(1234)
+map_dbl(
+  .x = 1:B, \(x) mean(daten[sample(1:150, replace = T)])
+) %>% 
+  bind_cols(bstat = .) %>%
+  summarise(
+    mean = mean(bstat),
+    sd = sd(bstat)
+  )
+```
+

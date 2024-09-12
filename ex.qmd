@@ -29,7 +29,7 @@ webr:
 }
 ```
 
-# Lineare Regression
+# Lineare Regression {.unnumbered}
 
 ### 1. Lineare Link-Funktion in `glm()` {.unnumbered}
 
