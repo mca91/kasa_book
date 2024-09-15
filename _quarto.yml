@@ -16,6 +16,7 @@ book:
     - part: "Grundlagen"
       chapters:
         - R_Einfuehrung.qmd
+        - RR.qmd
         - Reg.qmd
         - Simulation.qmd
     - part: "Kausale Inferenz"
@@ -55,7 +56,7 @@ format:
     grid: 
       body-width: 920px
       margin-width: 350px
-    fontsize: "18px"  
+    fontsize: "20px"  
     theme: cosmo
     cap-location: margin
     code-link: true

@@ -1,0 +1,178 @@
+---
+format: live-html
+filters:
+  - shinylive
+engine: knitr
+---
+
+# Reproduzierbarkeit
+
+```{r, echo = F}
+make_codeblock <- function(text) cat(paste0("```{r}\n", text, "\n```"))
+```
+
+In der modernen Forschung ist die **Reproduzierbarkeit** von Ergebnissen ein zentrales Anliegen. Es ist entscheidend, dass wissenschaftliche Ergebnisse nicht nur nachvollziehbar sind, sondern auch von anderen Forschern reproduziert werden können. Dieser Ansatz ist besonders wichtig in der angewandten Statistik und Datenwissenschaft, wo Daten und Code zu neuen Erkenntnissen führen. **R Markdown** bietet eine leistungsfähige Plattform, um reproduzierbare Forschung zu unterstützen, indem es die Integration von Datenanalyse, Visualisierungen, Code und schriftlicher Dokumentation in einem einzigen Format ermöglicht.
+
+## Was ist Reproduzierbare Forschung?
+
+Reproduzierbare Forschung bezieht sich auf den Prozess, bei dem Wissenschaftler ihre Analysen und Ergebnisse so dokumentieren, dass sie von anderen exakt nachvollzogen und erneut durchgeführt werden können. Dies beinhaltet:
+
+1. **Transparenz**: Der gesamte Analyseprozess sollte für Dritte transparent und einsehbar sein.
+2. **Automatisierung**: Analysen sollten automatisiert durchgeführt werden, um menschliche Fehler zu minimieren.
+3. **Teilbarkeit**: Daten, Code und Ergebnisse sollten leicht geteilt und überprüft werden können.
+
+Durch die Nutzung von **R Markdown** können Forscher sicherstellen, dass ihre Arbeit nicht nur reproduzierbar, sondern auch leicht zu teilen und nachzuvollziehen ist.
+
+## Was ist R Markdown?
+
+**R Markdown** ist ein Framework, das es ermöglicht, Code, Ergebnisse und Erläuterungen in einem einzigen Dokument zu kombinieren. Es ist eine erweiterte Form von Markdown und unterstützt sowohl **R-Code** als auch andere Programmiersprachen, sodass alle Schritte der Analyse dokumentiert und automatisiert wiederholbar sind.
+
+Ein R Markdown-Dokument besteht aus:
+
+- Einem YAML-Header, der Metadaten wie Titel, Autor, Datum und Ausgabeformat enthält.
+- Abschnitten mit R-Code, die als sogenannte *Chunks* bezeichnet werden und mit 
+  
+  ```{r}
+  #| echo: FALSE
+  make_codeblock(1234)
+  ```
+
+  markiert sind.
+- Text, der die Analyse erklärt und Kommentare zu den Ergebnissen liefert.
+- Mathematischen Formeln, die mit LaTeX-ähnlicher Syntax formatiert werden können.
+
+### Vorteile von R Markdown für Reproduzierbare Forschung
+
+- **Integrierte Analyse und Berichtserstellung**: Code und dessen Ausgaben (Tabellen, Diagramme, Statistiken) sind direkt im Dokument enthalten.
+- **Automatische Aktualisierungen**: Änderungen im Code führen automatisch zu aktualisierten Ergebnissen, was manuelles Kopieren und Einfügen überflüssig macht.
+- **Verschiedene Ausgabeformate**: R Markdown-Dokumente können als **HTML**, **PDF**, **Word**, oder sogar **Präsentationen** exportiert werden.
+
+## Aufbau eines R Markdown-Dokuments
+
+Ein typisches R Markdown-Dokument beginnt mit einem **YAML-Header**, der Informationen wie den Titel, Autor und das Ausgabeformat festlegt:
+
+```yaml
+---
+title: "Reproduzierbare Forschung mit R"
+author: "John Doe"
+date: "`r Sys.Date()`"
+output: html_document
+---
+```
+
+# Shiny
+
+`app.R`
+
+```{r}
+#| eval: false
+library(shiny)
+
+# Benutzer-Interface definieren
+ui <- fluidPage(
+      # Input-Elemente & Output-Elemente
+)
+
+# Shiny-Server konfigurieren
+server <- function(input, output, session) {
+  # Server-Code
+}
+
+# Shiny-App erzeugen und starten
+shinyApp(ui = ui, server = server)
+```
+
+```{r}
+#| eval: false
+library(shiny)
+library(ggplot2)
+
+# Benutzer-Interface definieren
+ui <- fluidPage(
+  titlePanel("Normalverteilung"),
+      sliderInput(
+        inputId = "sd",
+        label = "Standardabweichung:",
+        min = 0.1,
+        max = 3,
+        value = 1,
+        step = 0.1,
+        width = "100%"
+    ),
+    mainPanel(width = 12,
+      plotOutput(outputId = "distPlot", height = 400)
+    )
+)
+
+# Shiny-Server konfigurieren
+server <- function(input, output, session) {
+  output$distPlot <- renderPlot({
+    x <- seq(
+      from = - 4 * input$sd,
+      to = 4 * input$sd,
+      length.out = 1000
+    )
+    y <- dnorm(x, sd = input$sd)
+    data <- data.frame(x = x, y = y)
+    
+    ggplot(data, aes(x = x, y = y)) +
+      geom_line(color = "steelblue", lwd = 1) +
+      labs(x = "X", y = "Dichte") +
+      lims(x = c(-10, 10)) +
+      theme_minimal()
+  })
+}
+
+# Shiny-App erzeugen und starten
+shinyApp(ui = ui, server = server)
+```
+
+```{shinylive-r}
+#| standalone: true
+#| viewerHeight: 600
+library(shiny)
+library(ggplot2)
+
+# Define your Shiny UI here
+ui <- fluidPage(
+  titlePanel("Normalverteilung"),
+      sliderInput(
+        inputId = "sd",
+        label = "Standardabweichung:",
+        min = 0.1,
+        max = 3,
+        value = 1,
+        step = 0.1,
+        width = "100%"
+    ),
+    mainPanel(width = 12,
+      plotOutput(outputId = "distPlot", height = 400)
+    )
+)
+
+# Define your Shiny server logic here
+server <- function(input, output, session) {
+  output$distPlot <- renderPlot({
+    # Generate a sequence of x values
+    x <- seq(
+      from = - 4 * input$sd,
+      to = 4 * input$sd,
+      length.out = 1000
+    )
+    # Compute the normal distribution density
+    y <- dnorm(x, sd = input$sd)
+    # Create a data frame
+    data <- data.frame(x = x, y = y)
+    
+    # Plot using ggplot2
+    ggplot(data, aes(x = x, y = y)) +
+      geom_line(color = "steelblue", lwd = 1) +
+      labs(x = "X", y = "Dichte") +
+      lims(x = c(-10, 10)) +
+      theme_minimal()
+  })
+}
+
+# Create and launch the Shiny app
+shinyApp(ui = ui, server = server)
+```
