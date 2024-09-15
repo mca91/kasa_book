@@ -989,7 +989,7 @@ preds %>%
   )
 ```
 
-@fig-bhkq-nn zeigt, dass KQ und NN weitgehend vergleichbare Vorhersagen von `medv` auf dem Testdatensatz liefern. Das NN scheint jedoch besser in der Vorhersage hoher Verkaufspreise zu sein -- möglicherweise weil extreme Preise auf nicht-lineare Beziehungen zwischen bestimmten Regressoren und `medv` zurückzuführen sind, die in einer linearen KQ-Regression nicht erfasst werden können.
+@fig-bhkq-nn zeigt, dass KQ und NN weitgehend vergleichbare Vorhersagen von `medv` auf dem Testdatensatz liefern. Das NN scheint jedoch im Mittel besser in der Vorhersage hoher Verkaufspreise zu sein -- möglicherweise weil extreme Preise auf nicht-lineare Beziehungen zwischen bestimmten Regressoren und `medv` zurückzuführen sind, die in einer linearen KQ-Regression nicht erfasst werden können.
 
 ## Case Study: Vorhersage von Immobilienpreisen
 

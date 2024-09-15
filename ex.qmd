@@ -33,7 +33,7 @@ webr:
 
 ### 1. Lineare Link-Funktion in `glm()` {.unnumbered}
 
-In @sec-bov haben wir gelernt, wie generalisierte lineare Modell mit `stats::glm()` geschätzt werden können. In dieser Aufgabe prüfen wir anhand des Datensatzes `penguins_cleaned`, dass lineare Regression ein Spezialfall im generalisierten linearen Modell (GLM) für $Y$ mit linearem Prediktor $z$ und Link-Funktion $g(z)$ ist, wobei
+In Kapitel @sec-bov haben wir gelernt, wie generalisierte lineare Modell mit `stats::glm()` geschätzt werden können. In dieser Aufgabe prüfen wir anhand des Datensatzes `penguins_cleaned`, dass lineare Regression ein Spezialfall im generalisierten linearen Modell (GLM) für $Y$ mit linearem Prediktor $z$ und Link-Funktion $g(z)$ ist, wobei
 \begin{align*}
   Y\sim N(z, \sigma^2), \qquad z = \beta_0 + \beta_1 X, \qquad g(z) = z.
 \end{align*}
