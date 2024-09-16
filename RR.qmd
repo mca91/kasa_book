@@ -11,56 +11,172 @@ engine: knitr
 make_codeblock <- function(text) cat(paste0("```{r}\n", text, "\n```"))
 ```
 
-In der modernen Forschung ist die **Reproduzierbarkeit** von Ergebnissen ein zentrales Anliegen. Es ist entscheidend, dass wissenschaftliche Ergebnisse nicht nur nachvollziehbar sind, sondern auch von anderen Forschern reproduziert werden können. Dieser Ansatz ist besonders wichtig in der angewandten Statistik und Datenwissenschaft, wo Daten und Code zu neuen Erkenntnissen führen. **R Markdown** bietet eine leistungsfähige Plattform, um reproduzierbare Forschung zu unterstützen, indem es die Integration von Datenanalyse, Visualisierungen, Code und schriftlicher Dokumentation in einem einzigen Format ermöglicht.
+In viel empirischen Forschungsfeldern ist die *Reproduzierbarkeit* von Studienergebnissen von zentraler Bedeutung. Durch systematische Überprüfung und Bestätigung (oder Wiederlegung) wird die Aussagekraft und Verlässlichkeit wissenschaftlicher Erkenntnisse gewährleistet. Dieser Validierungsprozess ist entscheidend für weiterführende Forschung: Auf reproduzierbaren und verifizierten Ergebnissen können neue Hypothesen aufbauen, bestehende Theorien weiterentwickelt werden.
 
-## Was ist Reproduzierbare Forschung?
+Auch in mehrheitlich nicht-experimentellen Disziplinen wie der angewandten Statistik und den empirischen Wirtschaftswissenschaften ist die Reproduzierbarkeit von Forschung zunehmend relevant. In diesen Bereichen ist die datengetriebene Analyse mit statistischer Programmierung oft der zentrale Bestandteil wissenschaftlicher Studien. In vielen empirischen Forschungsarbeiten führt die Anwendung statistischer Methoden unmittelbar zu den Studienergebnissen, sodass eine transparente Dokumentation der Arbeitsweise und die Bereitstellung von reproduzierbaren Programm-Codes zunehmend an Bedeutung gewinnen.
 
-Reproduzierbare Forschung bezieht sich auf den Prozess, bei dem Wissenschaftler ihre Analysen und Ergebnisse so dokumentieren, dass sie von anderen exakt nachvollzogen und erneut durchgeführt werden können. Dies beinhaltet:
+Das R-Ökosystem bietet diverse Tools zur Gewährleistung von Reproduzierbarkeit und Kommunikation von Forschungsergebnissen. [*RMarkdown*](https://rmarkdown.rstudio.com) erlaubt es, Datenanalysen, Visualisierungen, Code und die dazugehörige Dokumentation nahtlos in einem einzigen Dokument zu kombinieren. Dies erleichtert nicht nur die Nachvollziehbarkeit von Analysen, sondern ermöglicht es auch, die Ergebnisse mühelos in verschiedene gängige Formate wie HTML, PDF oder Word zu konvertieren und verfügbar zu machen. Das R-Paket [*Shiny*](https://shiny.posit.co) ermöglicht es Forschenden ohne umfangreiche Erfahrung in Webentwicklung interaktive Webanwendungen und Dashboards mit R zu erstellen.
 
-1. **Transparenz**: Der gesamte Analyseprozess sollte für Dritte transparent und einsehbar sein.
-2. **Automatisierung**: Analysen sollten automatisiert durchgeführt werden, um menschliche Fehler zu minimieren.
-3. **Teilbarkeit**: Daten, Code und Ergebnisse sollten leicht geteilt und überprüft werden können.
+In diesem Kapitel erläutern wir Grundzüge der reproduzierbaren Forschung mit Rmarkdown und geben eine Einführung in die Entwicklung interaktiver Visualisierungen für Studienergebnisse mit Shiny. Weiterhin erfolgt ein Ausblick auf [*quarto*](https://quarto.org), eine neuere Entwicklung im Bereich wissenschaftlicher open-Source-Publikationssysteme.
 
-Durch die Nutzung von **R Markdown** können Forscher sicherstellen, dass ihre Arbeit nicht nur reproduzierbar, sondern auch leicht zu teilen und nachzuvollziehen ist.
+@XieetalRmd
 
-## Was ist R Markdown?
+## RMarkdown
 
-**R Markdown** ist ein Framework, das es ermöglicht, Code, Ergebnisse und Erläuterungen in einem einzigen Dokument zu kombinieren. Es ist eine erweiterte Form von Markdown und unterstützt sowohl **R-Code** als auch andere Programmiersprachen, sodass alle Schritte der Analyse dokumentiert und automatisiert wiederholbar sind.
+Reproduzierbare Forschung meint Prozesse, bei denen Forschende ihre Analysen und Ergebnisse so dokumentieren, dass sie von anderen exakt nachvollzogen und durch Wiederholung der dokumentierten Vorgehensweise reproduziert werden können. Die Anforderungen an solche Prozesse können im Wesentlichen anhand von drei Kriterien zusammengefasst werden:
 
-Ein R Markdown-Dokument besteht aus:
+1. **Transparenz**: Der gesamte Analyseprozess sollte für Dritte *einsehbar* und *transparent* sein. Die Nachvollziehbarkeit des Prozesses sollte durch adäquate Dokumentation sämtlicher Schritte gewährleistet sein.
 
-- Einem YAML-Header, der Metadaten wie Titel, Autor, Datum und Ausgabeformat enthält.
-- Abschnitten mit R-Code, die als sogenannte *Chunks* bezeichnet werden und mit 
-  
-  ```{r}
-  #| echo: FALSE
-  make_codeblock(1234)
+2. **Automatisierung**: Analysen sollten möglichst *automatisiert* durchgeführt werden, um das Risiko menschlicher Fehler (zum Beispiel bei der Datenverarbeitung oder bei Berechnungen) gering zu halten.
+
+3. **Teilbarkeit**: Die verwendeten Daten, der Code und die Ergebnisse sollten leicht geteilt und überprüft werden können, idealerweise anhand eines (Datei)Formats, dass geringe technische Anforderungen hinsichtlich der Reproduzierbarkeit der Inhalte voraussetzt.
+
+RMarkdown ist ein Dokumentationsformat im R-Ökosystem, das es Nutzern ermöglicht die oben genannten Anforderungen an reprozierbare Forschung zu erfüllen. Es kombiniert die Funktionalitäten von Markdown, einer schlanken [Markup-Sprache](https://en.wikipedia.org/wiki/Markup_language) für Textformatierung, mit der Möglichkeit, direkt in R geschriebenen Code auszuführen und die Ergebnisse, einschließlich Tabellen und Grafiken in ein Ziel-Dokument einzubinden.
+
+### Struktur
+
+Ein typisches Rmarkdown-Dokument (eine `.rmd`-Datei) besteht aus drei Hauptkomponenten:
+
+- **YAML-Header**: Dieser Bereich am Anfang des Dokuments wird durch `---` eingegrenzt und enthält Metadaten wie den Titel, Autor, Datum und das gewünschte Ausgabeformat (z. B. PDF, HTML, Word). Den Argumenten können, je nach Definition, Objekte des Typs `numeric`, `character` oder `function` übergeben werden. Der nachfolgende Chunk definiert ein Dokument mit dem Titel, Autor und Datumsangebe sowie eine Ausgabe als HTML-Dokument.
+
+  ```{yaml}
+  ---
+  title: "Reproduzierbare Forschung mit R"
+  author: "Martin Arnold"
+  date: "24. April 2023"
+  output: html_document
+  ---
   ```
 
-  markiert sind.
-- Text, der die Analyse erklärt und Kommentare zu den Ergebnissen liefert.
-- Mathematischen Formeln, die mit LaTeX-ähnlicher Syntax formatiert werden können.
+- **Code-Chunks und Inline-Code**: *Code-Chunks* enthalten *ausführbaren* R-Code (oder auch Code in anderen unterstützten Sprachen wie Python, SQL usw.), der *während der Erstellung* des Output-Dokument ausgeführt wird. Die Ergebnisse des Codes (z.B. Outputs von Schätzfunktionen wie `lm()`, Grafiken oder Tabellen) werden, gemeinsam mit dem Code, direkt im Dokument angezeigt. Ein einfacher Code-Chunk ist folgendermaßen aufgebaut:
 
-### Vorteile von R Markdown für Reproduzierbare Forschung
+  ```{r}
+  #| echo: false
+  make_codeblock("# Ein Kommentar\n1+1")
+  ```
 
-- **Integrierte Analyse und Berichtserstellung**: Code und dessen Ausgaben (Tabellen, Diagramme, Statistiken) sind direkt im Dokument enthalten.
-- **Automatische Aktualisierungen**: Änderungen im Code führen automatisch zu aktualisierten Ergebnissen, was manuelles Kopieren und Einfügen überflüssig macht.
-- **Verschiedene Ausgabeformate**: R Markdown-Dokumente können als **HTML**, **PDF**, **Word**, oder sogar **Präsentationen** exportiert werden.
+  **Inline-Code** kann im Fließtext verwendet werden, um die Ergebnisse einzeiligen Codes (oft kleine Rechnungen oder der Inhalt eines Objekts) direkt im Text (s.u.) auszugeben. Inline-Code-Ausdrücke können wie folgt ausgewertet werden:
+  
+  ```{r}
+  #| echo: false
+  cat('`r 1+1`')
+  ```
+  
+- *Markdown-formatierter Text*: Dies sind Abschnitte mit Fließtext, der in der [Markdown-Syntax](https://www.markdownguide.org/basic-syntax/) formatiert wird. Hierbei können Textformatierungen wie Überschriften, Listen, Links, Bilder aus externen Dateien und weitere Elemente durch kurze Befehle erstellt oder eingebunden werden. Zur Erläuterung statistischer Methoden können [$\LaTeX$-Formeln](https://de.wikipedia.org/wiki/LaTeX) in Text-Abschnitten gesetzt werden.
 
-## Aufbau eines R Markdown-Dokuments
+### Datei erstellen und kompilieren
 
-Ein typisches R Markdown-Dokument beginnt mit einem **YAML-Header**, der Informationen wie den Titel, Autor und das Ausgabeformat festlegt:
+Um eine `.Rmd`-Datei in das gewünschte Output-Format umzuwandeln (zu kompilieren), sind mehrere Software-Pakete und Schritte erforderlich:
 
-```yaml
+- ***RStudio*-Installation**: Obwohl RMarkdown auch über die Befehlszeile ([R-Konsole / R-GUI](https://cran.r-project.org)) ausgeführt werden kann, ist [*RStudio*](https://posit.co/download/rstudio-desktop/) die empfohlene Entwicklungsumgebung, da es eine benutzerfreundliche Schnittstelle bietet, mit der `.Rmd`-Dateien leicht erstellt, bearbeitet und kompiliert werden können. Beachte: *Für die Verwendung von RStudion muss die R-Konsole installiert sein*.
+
+- **`rmarkdown`-Paket**: Um `.Rmd`-Dateien verarbeiten zu können, muss das R-Paket `rmarkdown` installiert sein. Dies erfolgt über die R-Konsole oder in RStudio mit folgendem Befehl:
+
+  ```{r}
+  #| eval: false
+  # RMarkdown installieren
+  install.packages("rmarkdown")
+  ```
+
+- **Format-abhängige Pakete**: Um HTML-Output zu erzeugen, sind zusätzlichen Pakete erforderlich, da die erforderlichen Abhängigkeiten mit dem `rmarkdown`-Paket installiert werden. Für PDF-Output-Formate muss eine $\LaTeX$-Distribution verfügbar sein.^[LaTeX-*Formeln* in HTML-Outputs können ohne eine $\LaTeX$-Installation erzeugt werden. Hierbei werden Formeln im Web-Browser mit [MathJax](https://www.mathjax.org) dargestellt.]  $\LaTeX$ wird verwendet, um das Dokument in ein professionell formatiertes PDF zu konvertieren. Für Anfänger empfiehlt sich die Nutzung von [*TinyTeX*](https://yihui.org/tinytex/), eine kompakte Distribution, die direkt über die R-Konsole installiert werden kann:
+
+  ```{r}
+  #| eval: false
+  # tinytex-LaTeX-Distribution installieren
+  install.packages("tinytex")
+  tinytex::install_tinytex()
+  ```
+
+Sind diese Komponenten der vorhanden, ist Rmarkdown in der Lage den Kompilierungsprozess durchzuführen. Der grobe Ablauf ist in @fig-rmdwf dargestellt und erfolgt so:  
+
+1. Die von R-Code abhängigen Komponenten des `.Rmd`-Dokuments werden ausgeführt. Sämtliche Strukturelemente und ihre Ergebnisse werden durch das Tool [`knitr`](https://yihui.org/knitr/) in ein Markdown-Dokument (Dateiendung `.md`) übersetzt.^[Dieser Prozess wird auch als *knitting* (engl. stricken) bezeichnet: sämtliche Komponenten werden nach Ausführung des R-Codes zusammengestrickt und in ein `.md`-Format überführt.]
+
+2. Das in Schritt 1 erzeugte Markdown-Dokument wird dem Tool *pandoc* übergeben. Pandoc Pandoc ist ein Open-Source-Tool zur Dokumentenkonvertierung, das Texte in zahlreiche verschiedene Formate transformiert, darunter HTML, PDF, Word, und viele weitere. Die Formatierung und Bereitstellung des Outputs erfolgt gemäß der im `yaml`-Header festgelegten Format-Funktion (`output: ...`).
+
+![Workflow beim Kompilieren von Rmd-Dokumenten [Quelle: @Xieetal2020]](img/rmdworkflow.png){#fig-rmdwf width=80%}
+
+Um eine neue `.rmd-Datei` in RStudio zu erstellen und zu kompilieren, nutzen wir die Menü-Schaltflächen *Datei* $\rightarrow$ *Neue Datei* und wählen *R markdown* im Kontext-Menü aus. In dem sich anschließend öffnenden Dialog sind bereits Standard-Einstellungen für ein einfaches HTML-Dokument gesetzt.^[Die hier erfolgte Konfiguration setzt lediglich rudimentäre Optionen im `yaml`-Header, die später angepasst werden können.] Nach Bestätigung der Konfiguration mit *OK* wird ein `.Rmd`-Dokument mit Beispiel-Code geöffnet. @fig-rmdgif2 zeigt diesen Ablauf.
+
+![RStudio: `.Rmd`-Datei erstellen](img/ezgif-rmd-1.gif){#fig-rmdgif2 width=80%}
+
+Das neue `.Rmd`-Dokument kann nun bearbeitet und, nach erstmaligem abspeichern (hier unter dem namen `diamanten.rmd`) kompiliert werden. Hierzu klicken wir in der Aktionsleiste unterhalb des Dokumenten-Tabs auf "Knit", siehe @fig-rmdgifkomp. RMarkdown beginnt nun mit der Kompilierung des Dokuments. Wenn dieser Prozess fehlerfrei abschließt, öffnet sich die erzeugte HTML-Datei automatisch im Vorschau-Fenster in RStudio.
+
+![RStudio: `.Rmd`-Datei kompilieren](img/ezgif-rmd-knit.gif){#fig-rmdgifkomp width=80%}
+
+
+
+### Ein Minimalbeispiel
+
+Das folgene Minimalbeispiel zeigt den Aufbau einer `.Rmd`-Datei für die Analyse eines Datensatzes unter Verwendung der oben erläuterten Definitionen und Strukturelemente:
+
+- Wir erzeugen ein HTML-Dokument mit dem Titel "Diamanten" sowie einer Datumsangabe. 
+
+- Die Datei enthält zwei Code-Chunks, die den Datensatz `ggplot2::diamonds` einlesen, unter Verwendung von `dplyr`-Funktionen transformieren und eine kleine graphische Auswertung mit `ggplot2` erstellen. 
+
+- Die Schritte der Analyse werden im Fließtext zwischen den Code-Chunks erläutert. Hierbei kommt sowohl Markdown-Syntax zur Formatierung zum Einsatz als auch Inline-Code um Informationen mit R-Code zu berechnen und unmittelbar in die Erläuterungen einzubinden. Dank dieser Vorgehensweise passen sich die Erklärungen der Vorgehensweise für die Analyse automatisch an, wenn die verwendeten Variablen in den Code-Chunks geändert werden.
+
+- Der letzte Textblock verwendet $\LaTeX$-Code, um die zuvor mit R-Code durchgeführte Berechnung zu erläutern.
+
+
+
+***diamanten.Rmd:*** 
+```{r}
+#| echo: false
+cat('
 ---
-title: "Reproduzierbare Forschung mit R"
-author: "John Doe"
-date: "`r Sys.Date()`"
+title: "Diamanten"
+date: 2024-01-05
 output: html_document
 ---
+
+Wir lesen zunächst den Datensatz ein und filtern Diamanten mit einem Gewicht
+von weniger als 2.5 Karat.
+
+```{r}\nlibrary(tidyverse)\ndata("diamonds")
+kleiner <- diamonds %>%
+            filter(carat < 2.5)\n```
+
+Wir haben Beobachtungen für `r nrow(diamonds)` Diamanten. 
+
+Lediglich `r nrow(diamonds) - nrow(kleiner)` sind **schwerer** 
+als 2.5 *Karat*. 
+
+Der nachfolgende Code zeigt, wie die Häufigeitsverteilung von `carat` mit 
+R geplottet werden kann.
+
+```{r, echo = FALSE}\nkleiner %>% 
+  ggplot(aes(carat)) + 
+  geom_freqpoly(binwidth = 0.01)\n```
+
+Wie schwer ist der *schwerste* "kleine" Diamant?
+
+```{r}\nkleiner$carat %>% max()\n```
+
+Die Formel für diese Berechnung ist $$\\max(\\textup{carat}).$$\n
+')
 ```
 
-# Shiny
+---
+
+
+![RStudio: `.Rmd`-Datei erstellen](img/ezgif-rmd-2.gif){#fig-rmdex1 width=80% fig-align='center'}
+![RStudio: `.Rmd`-Datei erstellen](img/ezgif-rmd-3.gif){#fig-rmdex2 width=80% fig-align='center'}
+
+![RStudio: `.Rmd`-Datei erstellen](img/diamonds_res.png){#fig-rmdex3}
+
+## Shiny
+
+*Shiny* ist ein R-Paket, das die Erstellung interaktiver Webanwendungen (Apps) und Dashboards direkt aus R heraus ermöglicht. Mit Shiny können Nutzer dynamische, datengetriebene Visualisierungen und interaktive Elemente wie Slider, Dropdown-Menüs und Schaltflächen in ihren Anwendungen einbinden, ohne hierzu üblicherweise erforderliche Web-Standards wie HTML, CSS und JavaScript sowie die server-seitige Ausführung von R-Programmcode zu beherrschen.^[Kenntnisse in der Programmierung von Websiten sind jedoch hilfreich für das Fine-Tuning von Shiny-Applikationen.] Die Anwendungen laufen entweder lokal auf dem eigenen Rechner oder können über einen Webserver bereitgestellt werden (Hosting), sodass sie über das Internet zugänglich sind.^[Für Online-Hosting fallen in der Regel Gebühren an. Kleine Applikationen mit beschränkter Laufzeit können über RStudio auf [shinyapps.io](https://www.shinyapps.io/) kostenfrei gehostet werden.] 
+
+Shiny-Apps eignen sich besonders gut für die Bereitstellung von Data-Science-Tools: Nutzer einer Shiny-Anwendung können die Parameter der Analyse ändern und sehen unmittelbar, wie sich diese Änderungen auf die Ergebnisse auswirken, was die Nachvollziehbarkeit erhöht. Da die zugrunde liegenden R-Codes in die Anwendung eingebettet sind, bleibt der gesamte Analyseprozess offen zugänglich, und andere Forschende können die Anwendung nutzen, um die Ergebnisse auf ihre eigenen Daten anzuwenden oder die Schritte zu reproduzieren. Diese "interaktive Transparenz" fördert also die Reproduzierbarkeit datengetriebener Analysen, indem sie nicht nur den Code, sondern den gesamten Analyseablauf zugänglicher macht.
+
+Shiny ermöglicht zudem eine effektive Kommunikation von Forschungsergebnissen, indem komplexe Analysen in interaktive, leicht verständliche Webanwendungen überführt werden. Dies erleichtert die Vermittlung von Ergebnissen erheblich, insbesondere für Nicht-Experten, und trägt dazu bei, dass Forschungserkenntnisse nicht nur reproduzierbar, sondern auch zugänglicher und verständlicher gemacht werden.
+
+### Grundlagen 
+
+![RStudio: *Shiny*-App erstellen](img/shiny-gif1.gif){#fig-shinygif1 width=80% fig-align='center'}
+
+![RStudio: *Shiny*-App erstellen](img/shiny-gif2.gif){#fig-shinygif2 width=80% fig-align='center'}
 
 `app.R`
 
@@ -81,6 +197,31 @@ server <- function(input, output, session) {
 # Shiny-App erzeugen und starten
 shinyApp(ui = ui, server = server)
 ```
+
+### Beispiel: Normalverteilung
+
+```{r}
+#| fig-align: 'center'
+library(ggplot2)
+x <- seq(
+  from = - 4, 
+  to = 4,
+  length.out = 1000
+  )
+
+y <- dnorm(x, sd = 1)
+df <- tibble::tibble(x = x, y = y)
+    
+ggplot(
+  data = df, 
+  mapping =  aes(x = x, y = y)
+) +
+geom_line(color = "steelblue", lwd = 1) +
+labs(x = "X", y = "Dichte") +
+lims(x = c(-10, 10)) +
+theme_minimal()
+```
+
 
 ```{r}
 #| eval: false
@@ -130,6 +271,7 @@ shinyApp(ui = ui, server = server)
 ```{shinylive-r}
 #| standalone: true
 #| viewerHeight: 600
+#| cache: true
 library(shiny)
 library(ggplot2)
 
@@ -163,7 +305,7 @@ server <- function(input, output, session) {
     y <- dnorm(x, sd = input$sd)
     # Create a data frame
     data <- data.frame(x = x, y = y)
-    
+
     # Plot using ggplot2
     ggplot(data, aes(x = x, y = y)) +
       geom_line(color = "steelblue", lwd = 1) +

@@ -51,7 +51,27 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
@@ -205,9 +225,34 @@ const elements = document.querySelectorAll('[id^="qwebr-interactive-area"]');
    text-align: center;
 }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/quizdown@latest/public/build/quizdown.js"></script><script>quizdown.init();</script><link rel="stylesheet" href="custom_styles.css">
+<script src="https://cdn.jsdelivr.net/npm/quizdown@latest/public/build/quizdown.js"></script><script>quizdown.init();</script><script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script><link rel="stylesheet" href="custom_styles.css">
 </head>
-<body class="nav-sidebar floating">
+<body class="nav-sidebar floating slimcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
@@ -405,22 +450,28 @@ const elements = document.querySelectorAll('[id^="qwebr-interactive-area"]');
     <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title"><a href="./index.html">Übersicht</a></h2>
    
   <ul>
-<li><a href="#was-ist-reproduzierbare-forschung" id="toc-was-ist-reproduzierbare-forschung" class="nav-link active" data-scroll-target="#was-ist-reproduzierbare-forschung"><span class="header-section-number">3.1</span> Was ist Reproduzierbare Forschung?</a></li>
-  <li>
-<a href="#was-ist-r-markdown" id="toc-was-ist-r-markdown" class="nav-link" data-scroll-target="#was-ist-r-markdown"><span class="header-section-number">3.2</span> Was ist R Markdown?</a>
+<li>
+<a href="#rmarkdown" id="toc-rmarkdown" class="nav-link active" data-scroll-target="#rmarkdown"><span class="header-section-number">3.1</span> RMarkdown</a>
   <ul>
-<li><a href="#vorteile-von-r-markdown-f%C3%BCr-reproduzierbare-forschung" id="toc-vorteile-von-r-markdown-für-reproduzierbare-forschung" class="nav-link" data-scroll-target="#vorteile-von-r-markdown-f%C3%BCr-reproduzierbare-forschung"><span class="header-section-number">3.2.1</span> Vorteile von R Markdown für Reproduzierbare Forschung</a></li>
+<li><a href="#struktur" id="toc-struktur" class="nav-link" data-scroll-target="#struktur"><span class="header-section-number">3.1.1</span> Struktur</a></li>
+  <li><a href="#datei-erstellen-und-kompilieren" id="toc-datei-erstellen-und-kompilieren" class="nav-link" data-scroll-target="#datei-erstellen-und-kompilieren"><span class="header-section-number">3.1.2</span> Datei erstellen und kompilieren</a></li>
+  <li><a href="#ein-minimalbeispiel" id="toc-ein-minimalbeispiel" class="nav-link" data-scroll-target="#ein-minimalbeispiel"><span class="header-section-number">3.1.3</span> Ein Minimalbeispiel</a></li>
   </ul>
 </li>
-  <li><a href="#aufbau-eines-r-markdown-dokuments" id="toc-aufbau-eines-r-markdown-dokuments" class="nav-link" data-scroll-target="#aufbau-eines-r-markdown-dokuments"><span class="header-section-number">3.3</span> Aufbau eines R Markdown-Dokuments</a></li>
-  <li><a href="#shiny" id="toc-shiny" class="nav-link" data-scroll-target="#shiny"><span class="header-section-number">4</span> Shiny</a></li>
+  <li>
+<a href="#shiny" id="toc-shiny" class="nav-link" data-scroll-target="#shiny"><span class="header-section-number">3.2</span> Shiny</a>
+  <ul>
+<li><a href="#grundlagen" id="toc-grundlagen" class="nav-link" data-scroll-target="#grundlagen"><span class="header-section-number">3.2.1</span> Grundlagen</a></li>
+  <li><a href="#beispiel-normalverteilung" id="toc-beispiel-normalverteilung" class="nav-link" data-scroll-target="#beispiel-normalverteilung"><span class="header-section-number">3.2.2</span> Beispiel: Normalverteilung</a></li>
+  </ul>
+</li>
   </ul></nav>
 </nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./R_Einfuehrung.html">Grundlagen</a></li><li class="breadcrumb-item"><a href="./RR.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Reproduzierbarkeit</span></a></li></ol></nav><div class="quarto-title">
+<main class="content page-columns page-full" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./R_Einfuehrung.html">Grundlagen</a></li><li class="breadcrumb-item"><a href="./RR.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Reproduzierbarkeit</span></a></li></ol></nav><div class="quarto-title">
 <div class="quarto-title-block"><div><h1 class="title">
 <span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Reproduzierbarkeit</span>
 </h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
@@ -437,64 +488,195 @@ const elements = document.querySelectorAll('[id^="qwebr-interactive-area"]');
   
 
 
-</header><p>In der modernen Forschung ist die <strong>Reproduzierbarkeit</strong> von Ergebnissen ein zentrales Anliegen. Es ist entscheidend, dass wissenschaftliche Ergebnisse nicht nur nachvollziehbar sind, sondern auch von anderen Forschern reproduziert werden können. Dieser Ansatz ist besonders wichtig in der angewandten Statistik und Datenwissenschaft, wo Daten und Code zu neuen Erkenntnissen führen. <strong>R Markdown</strong> bietet eine leistungsfähige Plattform, um reproduzierbare Forschung zu unterstützen, indem es die Integration von Datenanalyse, Visualisierungen, Code und schriftlicher Dokumentation in einem einzigen Format ermöglicht.</p>
-<section id="was-ist-reproduzierbare-forschung" class="level2" data-number="3.1"><h2 data-number="3.1" class="anchored" data-anchor-id="was-ist-reproduzierbare-forschung">
-<span class="header-section-number">3.1</span> Was ist Reproduzierbare Forschung?</h2>
-<p>Reproduzierbare Forschung bezieht sich auf den Prozess, bei dem Wissenschaftler ihre Analysen und Ergebnisse so dokumentieren, dass sie von anderen exakt nachvollzogen und erneut durchgeführt werden können. Dies beinhaltet:</p>
+</header><p>In viel empirischen Forschungsfeldern ist die <em>Reproduzierbarkeit</em> von Studienergebnissen von zentraler Bedeutung. Durch systematische Überprüfung und Bestätigung (oder Wiederlegung) wird die Aussagekraft und Verlässlichkeit wissenschaftlicher Erkenntnisse gewährleistet. Dieser Validierungsprozess ist entscheidend für weiterführende Forschung: Auf reproduzierbaren und verifizierten Ergebnissen können neue Hypothesen aufbauen, bestehende Theorien weiterentwickelt werden.</p>
+<p>Auch in mehrheitlich nicht-experimentellen Disziplinen wie der angewandten Statistik und den empirischen Wirtschaftswissenschaften ist die Reproduzierbarkeit von Forschung zunehmend relevant. In diesen Bereichen ist die datengetriebene Analyse mit statistischer Programmierung oft der zentrale Bestandteil wissenschaftlicher Studien. In vielen empirischen Forschungsarbeiten führt die Anwendung statistischer Methoden unmittelbar zu den Studienergebnissen, sodass eine transparente Dokumentation der Arbeitsweise und die Bereitstellung von reproduzierbaren Programm-Codes zunehmend an Bedeutung gewinnen.</p>
+<p>Das R-Ökosystem bietet diverse Tools zur Gewährleistung von Reproduzierbarkeit und Kommunikation von Forschungsergebnissen. <a href="https://rmarkdown.rstudio.com"><em>RMarkdown</em></a> erlaubt es, Datenanalysen, Visualisierungen, Code und die dazugehörige Dokumentation nahtlos in einem einzigen Dokument zu kombinieren. Dies erleichtert nicht nur die Nachvollziehbarkeit von Analysen, sondern ermöglicht es auch, die Ergebnisse mühelos in verschiedene gängige Formate wie HTML, PDF oder Word zu konvertieren und verfügbar zu machen. Das R-Paket <a href="https://shiny.posit.co"><em>Shiny</em></a> ermöglicht es Forschenden ohne umfangreiche Erfahrung in Webentwicklung interaktive Webanwendungen und Dashboards mit R zu erstellen.</p>
+<p>In diesem Kapitel erläutern wir Grundzüge der reproduzierbaren Forschung mit Rmarkdown und geben eine Einführung in die Entwicklung interaktiver Visualisierungen für Studienergebnisse mit Shiny. Weiterhin erfolgt ein Ausblick auf <a href="https://quarto.org"><em>quarto</em></a>, eine neuere Entwicklung im Bereich wissenschaftlicher open-Source-Publikationssysteme.</p>
+<p><span class="citation" data-cites="XieetalRmd">Xie, Allaire, und Grolemund (<a href="Literatur.html#ref-XieetalRmd" role="doc-biblioref">2023</a>)</span></p>
+<section id="rmarkdown" class="level2 page-columns page-full" data-number="3.1"><h2 data-number="3.1" class="anchored" data-anchor-id="rmarkdown">
+<span class="header-section-number">3.1</span> RMarkdown</h2>
+<p>Reproduzierbare Forschung meint Prozesse, bei denen Forschende ihre Analysen und Ergebnisse so dokumentieren, dass sie von anderen exakt nachvollzogen und durch Wiederholung der dokumentierten Vorgehensweise reproduziert werden können. Die Anforderungen an solche Prozesse können im Wesentlichen anhand von drei Kriterien zusammengefasst werden:</p>
 <ol type="1">
-<li>
-<strong>Transparenz</strong>: Der gesamte Analyseprozess sollte für Dritte transparent und einsehbar sein.</li>
-<li>
-<strong>Automatisierung</strong>: Analysen sollten automatisiert durchgeführt werden, um menschliche Fehler zu minimieren.</li>
-<li>
-<strong>Teilbarkeit</strong>: Daten, Code und Ergebnisse sollten leicht geteilt und überprüft werden können.</li>
+<li><p><strong>Transparenz</strong>: Der gesamte Analyseprozess sollte für Dritte <em>einsehbar</em> und <em>transparent</em> sein. Die Nachvollziehbarkeit des Prozesses sollte durch adäquate Dokumentation sämtlicher Schritte gewährleistet sein.</p></li>
+<li><p><strong>Automatisierung</strong>: Analysen sollten möglichst <em>automatisiert</em> durchgeführt werden, um das Risiko menschlicher Fehler (zum Beispiel bei der Datenverarbeitung oder bei Berechnungen) gering zu halten.</p></li>
+<li><p><strong>Teilbarkeit</strong>: Die verwendeten Daten, der Code und die Ergebnisse sollten leicht geteilt und überprüft werden können, idealerweise anhand eines (Datei)Formats, dass geringe technische Anforderungen hinsichtlich der Reproduzierbarkeit der Inhalte voraussetzt.</p></li>
 </ol>
-<p>Durch die Nutzung von <strong>R Markdown</strong> können Forscher sicherstellen, dass ihre Arbeit nicht nur reproduzierbar, sondern auch leicht zu teilen und nachzuvollziehen ist.</p>
-</section><section id="was-ist-r-markdown" class="level2" data-number="3.2"><h2 data-number="3.2" class="anchored" data-anchor-id="was-ist-r-markdown">
-<span class="header-section-number">3.2</span> Was ist R Markdown?</h2>
-<p><strong>R Markdown</strong> ist ein Framework, das es ermöglicht, Code, Ergebnisse und Erläuterungen in einem einzigen Dokument zu kombinieren. Es ist eine erweiterte Form von Markdown und unterstützt sowohl <strong>R-Code</strong> als auch andere Programmiersprachen, sodass alle Schritte der Analyse dokumentiert und automatisiert wiederholbar sind.</p>
-<p>Ein R Markdown-Dokument besteht aus:</p>
+<p>RMarkdown ist ein Dokumentationsformat im R-Ökosystem, das es Nutzern ermöglicht die oben genannten Anforderungen an reprozierbare Forschung zu erfüllen. Es kombiniert die Funktionalitäten von Markdown, einer schlanken <a href="https://en.wikipedia.org/wiki/Markup_language">Markup-Sprache</a> für Textformatierung, mit der Möglichkeit, direkt in R geschriebenen Code auszuführen und die Ergebnisse, einschließlich Tabellen und Grafiken in ein Ziel-Dokument einzubinden.</p>
+<section id="struktur" class="level3" data-number="3.1.1"><h3 data-number="3.1.1" class="anchored" data-anchor-id="struktur">
+<span class="header-section-number">3.1.1</span> Struktur</h3>
+<p>Ein typisches Rmarkdown-Dokument (eine <code>.rmd</code>-Datei) besteht aus drei Hauptkomponenten:</p>
 <ul>
-<li><p>Einem YAML-Header, der Metadaten wie Titel, Autor, Datum und Ausgabeformat enthält.</p></li>
 <li>
-<p>Abschnitten mit R-Code, die als sogenannte <em>Chunks</em> bezeichnet werden und mit</p>
+<p><strong>YAML-Header</strong>: Dieser Bereich am Anfang des Dokuments wird durch <code>---</code> eingegrenzt und enthält Metadaten wie den Titel, Autor, Datum und das gewünschte Ausgabeformat (z. B. PDF, HTML, Word). Den Argumenten können, je nach Definition, Objekte des Typs <code>numeric</code>, <code>character</code> oder <code>function</code> übergeben werden. Der nachfolgende Chunk definiert ein Dokument mit dem Titel, Autor und Datumsangebe sowie eine Ausgabe als HTML-Dokument.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"Reproduzierbare Forschung mit R"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">author</span><span class="kw">:</span><span class="at"> </span><span class="st">"Martin Arnold"</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">date</span><span class="kw">:</span><span class="at"> </span><span class="st">"24. April 2023"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">output</span><span class="kw">:</span><span class="at"> html_document</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</li>
+<li>
+<p><strong>Code-Chunks und Inline-Code</strong>: <em>Code-Chunks</em> enthalten <em>ausführbaren</em> R-Code (oder auch Code in anderen unterstützten Sprachen wie Python, SQL usw.), der <em>während der Erstellung</em> des Output-Dokument ausgeführt wird. Die Ergebnisse des Codes (z.B. Outputs von Schätzfunktionen wie <code><a href="https://rdrr.io/r/stats/lm.html">lm()</a></code>, Grafiken oder Tabellen) werden, gemeinsam mit dem Code, direkt im Dokument angezeigt. Ein einfacher Code-Chunk ist folgendermaßen aufgebaut:</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>
 ```{r}
-1234
+# Ein Kommentar
+1+1
 ```
 </code></pre>
 </div>
 </div>
-<p>markiert sind.</p>
+<p><strong>Inline-Code</strong> kann im Fließtext verwendet werden, um die Ergebnisse einzeiligen Codes (oft kleine Rechnungen oder der Inhalt eines Objekts) direkt im Text (s.u.) auszugeben. Inline-Code-Ausdrücke können wie folgt ausgewertet werden:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>`r 1+1`</code></pre>
+</div>
+</div>
 </li>
-<li><p>Text, der die Analyse erklärt und Kommentare zu den Ergebnissen liefert.</p></li>
-<li><p>Mathematischen Formeln, die mit LaTeX-ähnlicher Syntax formatiert werden können.</p></li>
-</ul>
-<section id="vorteile-von-r-markdown-für-reproduzierbare-forschung" class="level3" data-number="3.2.1"><h3 data-number="3.2.1" class="anchored" data-anchor-id="vorteile-von-r-markdown-für-reproduzierbare-forschung">
-<span class="header-section-number">3.2.1</span> Vorteile von R Markdown für Reproduzierbare Forschung</h3>
+<li><p><em>Markdown-formatierter Text</em>: Dies sind Abschnitte mit Fließtext, der in der <a href="https://www.markdownguide.org/basic-syntax/">Markdown-Syntax</a> formatiert wird. Hierbei können Textformatierungen wie Überschriften, Listen, Links, Bilder aus externen Dateien und weitere Elemente durch kurze Befehle erstellt oder eingebunden werden. Zur Erläuterung statistischer Methoden können <a href="https://de.wikipedia.org/wiki/LaTeX"><span class="math inline">\(\LaTeX\)</span>-Formeln</a> in Text-Abschnitten gesetzt werden.</p></li>
+</ul></section><section id="datei-erstellen-und-kompilieren" class="level3 page-columns page-full" data-number="3.1.2"><h3 data-number="3.1.2" class="anchored" data-anchor-id="datei-erstellen-und-kompilieren">
+<span class="header-section-number">3.1.2</span> Datei erstellen und kompilieren</h3>
+<p>Um eine <code>.Rmd</code>-Datei in das gewünschte Output-Format umzuwandeln (zu kompilieren), sind mehrere Software-Pakete und Schritte erforderlich:</p>
 <ul>
+<li><p><strong><em>RStudio</em>-Installation</strong>: Obwohl RMarkdown auch über die Befehlszeile (<a href="https://cran.r-project.org">R-Konsole / R-GUI</a>) ausgeführt werden kann, ist <a href="https://posit.co/download/rstudio-desktop/"><em>RStudio</em></a> die empfohlene Entwicklungsumgebung, da es eine benutzerfreundliche Schnittstelle bietet, mit der <code>.Rmd</code>-Dateien leicht erstellt, bearbeitet und kompiliert werden können. Beachte: <em>Für die Verwendung von RStudion muss die R-Konsole installiert sein</em>.</p></li>
 <li>
-<strong>Integrierte Analyse und Berichtserstellung</strong>: Code und dessen Ausgaben (Tabellen, Diagramme, Statistiken) sind direkt im Dokument enthalten.</li>
+<p><strong><code>rmarkdown</code>-Paket</strong>: Um <code>.Rmd</code>-Dateien verarbeiten zu können, muss das R-Paket <code>rmarkdown</code> installiert sein. Dies erfolgt über die R-Konsole oder in RStudio mit folgendem Befehl:</p>
+<div class="cell">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># RMarkdown installieren</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"rmarkdown"</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</li>
 <li>
-<strong>Automatische Aktualisierungen</strong>: Änderungen im Code führen automatisch zu aktualisierten Ergebnissen, was manuelles Kopieren und Einfügen überflüssig macht.</li>
-<li>
-<strong>Verschiedene Ausgabeformate</strong>: R Markdown-Dokumente können als <strong>HTML</strong>, <strong>PDF</strong>, <strong>Word</strong>, oder sogar <strong>Präsentationen</strong> exportiert werden.</li>
-</ul></section></section><section id="aufbau-eines-r-markdown-dokuments" class="level2" data-number="3.3"><h2 data-number="3.3" class="anchored" data-anchor-id="aufbau-eines-r-markdown-dokuments">
-<span class="header-section-number">3.3</span> Aufbau eines R Markdown-Dokuments</h2>
-<p>Ein typisches R Markdown-Dokument beginnt mit einem <strong>YAML-Header</strong>, der Informationen wie den Titel, Autor und das Ausgabeformat festlegt:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"Reproduzierbare Forschung mit R"</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">author</span><span class="kw">:</span><span class="at"> </span><span class="st">"John Doe"</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">date</span><span class="kw">:</span><span class="at"> </span><span class="st">"2024-09-15"</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">output</span><span class="kw">:</span><span class="at"> html_document</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section><section id="shiny" class="level1" data-number="4"><h1 data-number="4">
-<span class="header-section-number">4</span> Shiny</h1>
+<p><strong>Format-abhängige Pakete</strong>: Um HTML-Output zu erzeugen, sind zusätzlichen Pakete erforderlich, da die erforderlichen Abhängigkeiten mit dem <code>rmarkdown</code>-Paket installiert werden. Für PDF-Output-Formate muss eine <span class="math inline">\(\LaTeX\)</span>-Distribution verfügbar sein.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> <span class="math inline">\(\LaTeX\)</span> wird verwendet, um das Dokument in ein professionell formatiertes PDF zu konvertieren. Für Anfänger empfiehlt sich die Nutzung von <a href="https://yihui.org/tinytex/"><em>TinyTeX</em></a>, eine kompakte Distribution, die direkt über die R-Konsole installiert werden kann:</p>
+<div class="cell">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># tinytex-LaTeX-Distribution installieren</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"tinytex"</span><span class="op">)</span></span>
+<span><span class="fu">tinytex</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tinytex/man/install_tinytex.html">install_tinytex</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</li>
+</ul>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;LaTeX-<em>Formeln</em> in HTML-Outputs können ohne eine <span class="math inline">\(\LaTeX\)</span>-Installation erzeugt werden. Hierbei werden Formeln im Web-Browser mit <a href="https://www.mathjax.org">MathJax</a> dargestellt.</p></div></div><p>Sind diese Komponenten der vorhanden, ist Rmarkdown in der Lage den Kompilierungsprozess durchzuführen. Der grobe Ablauf ist in <a href="#fig-rmdwf" class="quarto-xref">Abbildung&nbsp;<span>3.1</span></a> dargestellt und erfolgt so:</p>
+<ol type="1">
+<li><p>Die von R-Code abhängigen Komponenten des <code>.Rmd</code>-Dokuments werden ausgeführt. Sämtliche Strukturelemente und ihre Ergebnisse werden durch das Tool <a href="https://yihui.org/knitr/"><code>knitr</code></a> in ein Markdown-Dokument (Dateiendung <code>.md</code>) übersetzt.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p></li>
+<li><p>Das in Schritt 1 erzeugte Markdown-Dokument wird dem Tool <em>pandoc</em> übergeben. Pandoc Pandoc ist ein Open-Source-Tool zur Dokumentenkonvertierung, das Texte in zahlreiche verschiedene Formate transformiert, darunter HTML, PDF, Word, und viele weitere. Die Formatierung und Bereitstellung des Outputs erfolgt gemäß der im <code>yaml</code>-Header festgelegten Format-Funktion (<code>output: ...</code>).</p></li>
+</ol>
+<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;Dieser Prozess wird auch als <em>knitting</em> (engl. stricken) bezeichnet: sämtliche Komponenten werden nach Ausführung des R-Codes zusammengestrickt und in ein <code>.md</code>-Format überführt.</p></div></div><div id="fig-rmdwf" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
+<figure class="quarto-float quarto-float-fig figure page-columns page-full"><div aria-describedby="fig-rmdwf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/rmdworkflow.png" class="img-fluid figure-img" style="width:80.0%">
+</div>
+<figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-rmdwf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Abbildung&nbsp;3.1: Workflow beim Kompilieren von Rmd-Dokumenten <span class="citation" data-cites="Xieetal2020">(Quelle: <a href="Literatur.html#ref-Xieetal2020" role="doc-biblioref">Xie, Dervieux, und Riederer 2020</a>)</span>
+</figcaption></figure>
+</div>
+<p>Um eine neue <code>.rmd-Datei</code> in RStudio zu erstellen und zu kompilieren, nutzen wir die Menü-Schaltflächen <em>Datei</em> <span class="math inline">\(\rightarrow\)</span> <em>Neue Datei</em> und wählen <em>R markdown</em> im Kontext-Menü aus. In dem sich anschließend öffnenden Dialog sind bereits Standard-Einstellungen für ein einfaches HTML-Dokument gesetzt.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> Nach Bestätigung der Konfiguration mit <em>OK</em> wird ein <code>.Rmd</code>-Dokument mit Beispiel-Code geöffnet. <a href="#fig-rmdgif2" class="quarto-xref">Abbildung&nbsp;<span>3.2</span></a> zeigt diesen Ablauf.</p>
+<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;Die hier erfolgte Konfiguration setzt lediglich rudimentäre Optionen im <code>yaml</code>-Header, die später angepasst werden können.</p></div></div><div id="fig-rmdgif2" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
+<figure class="quarto-float quarto-float-fig figure page-columns page-full"><div aria-describedby="fig-rmdgif2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/ezgif-rmd-1.gif" class="img-fluid figure-img" style="width:80.0%">
+</div>
+<figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-rmdgif2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Abbildung&nbsp;3.2: RStudio: <code>.Rmd</code>-Datei erstellen
+</figcaption></figure>
+</div>
+<p>Das neue <code>.Rmd</code>-Dokument kann nun bearbeitet und, nach erstmaligem abspeichern (hier unter dem namen <code>diamanten.rmd</code>) kompiliert werden. Hierzu klicken wir in der Aktionsleiste unterhalb des Dokumenten-Tabs auf “Knit”, siehe <a href="#fig-rmdgifkomp" class="quarto-xref">Abbildung&nbsp;<span>3.3</span></a>. RMarkdown beginnt nun mit der Kompilierung des Dokuments. Wenn dieser Prozess fehlerfrei abschließt, öffnet sich die erzeugte HTML-Datei automatisch im Vorschau-Fenster in RStudio.</p>
+<div id="fig-rmdgifkomp" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
+<figure class="quarto-float quarto-float-fig figure page-columns page-full"><div aria-describedby="fig-rmdgifkomp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/ezgif-rmd-knit.gif" class="img-fluid figure-img" style="width:80.0%">
+</div>
+<figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-rmdgifkomp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Abbildung&nbsp;3.3: RStudio: <code>.Rmd</code>-Datei kompilieren
+</figcaption></figure>
+</div>
+</section><section id="ein-minimalbeispiel" class="level3 page-columns page-full" data-number="3.1.3"><h3 data-number="3.1.3" class="anchored" data-anchor-id="ein-minimalbeispiel">
+<span class="header-section-number">3.1.3</span> Ein Minimalbeispiel</h3>
+<p>Das folgene Minimalbeispiel zeigt den Aufbau einer <code>.Rmd</code>-Datei für die Analyse eines Datensatzes unter Verwendung der oben erläuterten Definitionen und Strukturelemente:</p>
+<ul>
+<li><p>Wir erzeugen ein HTML-Dokument mit dem Titel “Diamanten” sowie einer Datumsangabe.</p></li>
+<li><p>Die Datei enthält zwei Code-Chunks, die den Datensatz <code><a href="https://ggplot2.tidyverse.org/reference/diamonds.html">ggplot2::diamonds</a></code> einlesen, unter Verwendung von <code>dplyr</code>-Funktionen transformieren und eine kleine graphische Auswertung mit <code>ggplot2</code> erstellen.</p></li>
+<li><p>Die Schritte der Analyse werden im Fließtext zwischen den Code-Chunks erläutert. Hierbei kommt sowohl Markdown-Syntax zur Formatierung zum Einsatz als auch Inline-Code um Informationen mit R-Code zu berechnen und unmittelbar in die Erläuterungen einzubinden. Dank dieser Vorgehensweise passen sich die Erklärungen der Vorgehensweise für die Analyse automatisch an, wenn die verwendeten Variablen in den Code-Chunks geändert werden.</p></li>
+<li><p>Der letzte Textblock verwendet <span class="math inline">\(\LaTeX\)</span>-Code, um die zuvor mit R-Code durchgeführte Berechnung zu erläutern.</p></li>
+</ul>
+<p><strong><em>diamanten.Rmd:</em></strong></p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+---
+title: "Diamanten"
+date: 2024-01-05
+output: html_document
+---
+
+Wir lesen zunächst den Datensatz ein und filtern Diamanten mit einem Gewicht
+von weniger als 2.5 Karat.
+
+```{r}
+library(tidyverse)
+data("diamonds")
+kleiner &lt;- diamonds %&gt;%
+            filter(carat &lt; 2.5)
+```
+
+Wir haben Beobachtungen für `r nrow(diamonds)` Diamanten. 
+
+Lediglich `r nrow(diamonds) - nrow(kleiner)` sind **schwerer** 
+als 2.5 *Karat*. 
+
+Der nachfolgende Code zeigt, wie die Häufigeitsverteilung von `carat` mit 
+R geplottet werden kann.
+
+```{r, echo = FALSE}
+kleiner %&gt;% 
+  ggplot(aes(carat)) + 
+  geom_freqpoly(binwidth = 0.01)
+```
+
+Wie schwer ist der *schwerste* "kleine" Diamant?
+
+```{r}
+kleiner$carat %&gt;% max()
+```
+
+Die Formel für diese Berechnung ist $$\max(\textup{carat}).$$</code></pre>
+</div>
+</div>
+<hr>
+<p><img src="img/ezgif-rmd-2.gif" id="fig-rmdex1" class="img-fluid quarto-figure quarto-figure-center anchored" style="width:80.0%" alt="RStudio: .Rmd-Datei erstellen"><img src="img/ezgif-rmd-3.gif" id="fig-rmdex2" class="img-fluid quarto-figure quarto-figure-center anchored" style="width:80.0%" alt="RStudio: .Rmd-Datei erstellen"></p>
+<div id="fig-rmdex3" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
+<figure class="quarto-float quarto-float-fig figure page-columns page-full"><div aria-describedby="fig-rmdex3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/diamonds_res.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-rmdex3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Abbildung&nbsp;3.4: RStudio: <code>.Rmd</code>-Datei erstellen
+</figcaption></figure>
+</div>
+</section></section><section id="shiny" class="level2 page-columns page-full" data-number="3.2"><h2 data-number="3.2" class="anchored" data-anchor-id="shiny">
+<span class="header-section-number">3.2</span> Shiny</h2>
+<p><em>Shiny</em> ist ein R-Paket, das die Erstellung interaktiver Webanwendungen (Apps) und Dashboards direkt aus R heraus ermöglicht. Mit Shiny können Nutzer dynamische, datengetriebene Visualisierungen und interaktive Elemente wie Slider, Dropdown-Menüs und Schaltflächen in ihren Anwendungen einbinden, ohne hierzu üblicherweise erforderliche Web-Standards wie HTML, CSS und JavaScript sowie die server-seitige Ausführung von R-Programmcode zu beherrschen.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> Die Anwendungen laufen entweder lokal auf dem eigenen Rechner oder können über einen Webserver bereitgestellt werden (Hosting), sodass sie über das Internet zugänglich sind.<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a></p>
+<div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;Kenntnisse in der Programmierung von Websiten sind jedoch hilfreich für das Fine-Tuning von Shiny-Applikationen.</p></div><div id="fn5"><p><sup>5</sup>&nbsp;Für Online-Hosting fallen in der Regel Gebühren an. Kleine Applikationen mit beschränkter Laufzeit können über RStudio auf <a href="https://www.shinyapps.io/">shinyapps.io</a> kostenfrei gehostet werden.</p></div></div><p>Shiny-Apps eignen sich besonders gut für die Bereitstellung von Data-Science-Tools: Nutzer einer Shiny-Anwendung können die Parameter der Analyse ändern und sehen unmittelbar, wie sich diese Änderungen auf die Ergebnisse auswirken, was die Nachvollziehbarkeit erhöht. Da die zugrunde liegenden R-Codes in die Anwendung eingebettet sind, bleibt der gesamte Analyseprozess offen zugänglich, und andere Forschende können die Anwendung nutzen, um die Ergebnisse auf ihre eigenen Daten anzuwenden oder die Schritte zu reproduzieren. Diese “interaktive Transparenz” fördert also die Reproduzierbarkeit datengetriebener Analysen, indem sie nicht nur den Code, sondern den gesamten Analyseablauf zugänglicher macht.</p>
+<p>Shiny ermöglicht zudem eine effektive Kommunikation von Forschungsergebnissen, indem komplexe Analysen in interaktive, leicht verständliche Webanwendungen überführt werden. Dies erleichtert die Vermittlung von Ergebnissen erheblich, insbesondere für Nicht-Experten, und trägt dazu bei, dass Forschungserkenntnisse nicht nur reproduzierbar, sondern auch zugänglicher und verständlicher gemacht werden.</p>
+<section id="grundlagen" class="level3 page-columns page-full" data-number="3.2.1"><h3 data-number="3.2.1" class="anchored" data-anchor-id="grundlagen">
+<span class="header-section-number">3.2.1</span> Grundlagen</h3>
+<div id="fig-shinygif1" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure page-columns page-full"><div aria-describedby="fig-shinygif1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/shiny-gif1.gif" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%">
+</div>
+<figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-shinygif1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Abbildung&nbsp;3.5: RStudio: <em>Shiny</em>-App erstellen
+</figcaption></figure>
+</div>
+<div id="fig-shinygif2" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure page-columns page-full"><div aria-describedby="fig-shinygif2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="img/shiny-gif2.gif" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%">
+</div>
+<figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-shinygif2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Abbildung&nbsp;3.6: RStudio: <em>Shiny</em>-App erstellen
+</figcaption></figure>
+</div>
 <p><code>app.R</code></p>
 <div class="cell">
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.posit.co/">shiny</a></span><span class="op">)</span></span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.posit.co/">shiny</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Benutzer-Interface definieren</span></span>
 <span><span class="va">ui</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/fluidPage.html">fluidPage</a></span><span class="op">(</span></span>
@@ -509,8 +691,36 @@ const elements = document.querySelectorAll('[id^="qwebr-interactive-area"]');
 <span><span class="co"># Shiny-App erzeugen und starten</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html">shinyApp</a></span><span class="op">(</span>ui <span class="op">=</span> <span class="va">ui</span>, server <span class="op">=</span> <span class="va">server</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section><section id="beispiel-normalverteilung" class="level3" data-number="3.2.2"><h3 data-number="3.2.2" class="anchored" data-anchor-id="beispiel-normalverteilung">
+<span class="header-section-number">3.2.2</span> Beispiel: Normalverteilung</h3>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span></span>
+<span>  from <span class="op">=</span> <span class="op">-</span> <span class="fl">4</span>, </span>
+<span>  to <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>  length.out <span class="op">=</span> <span class="fl">1000</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">x</span>, sd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span>
+<span>    </span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">df</span>, </span>
+<span>  mapping <span class="op">=</span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"steelblue"</span>, lwd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"X"</span>, y <span class="op">=</span> <span class="st">"Dichte"</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html">lims</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><img src="RR_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 <div class="cell">
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.posit.co/">shiny</a></span><span class="op">)</span></span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.posit.co/">shiny</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Benutzer-Interface definieren</span></span>
@@ -554,6 +764,7 @@ const elements = document.querySelectorAll('[id^="qwebr-interactive-area"]');
 </div>
 <pre class="shinylive-r" data-engine="r"><code><a href="https://shiny.posit.co/">#| standalone: true
 #| viewerHeight: 600
+#| cache: true
 library(shiny)
 library(ggplot2)
 
@@ -587,7 +798,7 @@ server &lt;- function(input, output, session) {
     y &lt;- dnorm(x, sd = input$sd)
     # Create a data frame
     data &lt;- data.frame(x = x, y = y)
-    
+
     # Plot using ggplot2
     ggplot(data, aes(x = x, y = y)) +
       geom_line(color = "steelblue", lwd = 1) +
@@ -615,7 +826,15 @@ eyJjb250ZW50cyI6W119
 </div>
 <script type="vfs-file">
 W10=
-</script></section></main><!-- /main --><script type="ojs-module-contents">
+</script><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-XieetalRmd" class="csl-entry" role="listitem">
+Xie, Yihui, J. J. Allaire, und Garrett Grolemund. 2023. <em>R Markdown: The Definitive Guide: The Definitive Guide</em>. Chapman; Hall/CRC. <a href="https://doi.org/10.1201/9781138359444">https://doi.org/10.1201/9781138359444</a>.
+</div>
+<div id="ref-Xieetal2020" class="csl-entry" role="listitem">
+Xie, Yihui, Christophe Dervieux, und Emily Riederer. 2020. <em>R Markdown Cookbook</em>. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://bookdown.org/yihui/rmarkdown-cookbook">https://bookdown.org/yihui/rmarkdown-cookbook</a>.
+</div>
+</div>
+</section></section></main><!-- /main --><script type="ojs-module-contents">
 eyJjb250ZW50cyI6W119
 </script><script type="module">
 if (window.location.protocol === "file:") { alert("The OJS runtime does not work with file:// URLs. Please use a web server to view this document."); }
@@ -1105,184 +1324,326 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Quellcode</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb6" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> live-html</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="an">filters:</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">  - shinylive</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="an">engine:</span><span class="co"> knitr</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu"># Reproduzierbarkeit</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="in">```{r, echo = F}</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="in">make_codeblock &lt;- function(text) cat(paste0("```{r}\n", text, "\n```"))</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>In der modernen Forschung ist die **Reproduzierbarkeit** von Ergebnissen ein zentrales Anliegen. Es ist entscheidend, dass wissenschaftliche Ergebnisse nicht nur nachvollziehbar sind, sondern auch von anderen Forschern reproduziert werden können. Dieser Ansatz ist besonders wichtig in der angewandten Statistik und Datenwissenschaft, wo Daten und Code zu neuen Erkenntnissen führen. **R Markdown** bietet eine leistungsfähige Plattform, um reproduzierbare Forschung zu unterstützen, indem es die Integration von Datenanalyse, Visualisierungen, Code und schriftlicher Dokumentation in einem einzigen Format ermöglicht.</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="fu">## Was ist Reproduzierbare Forschung?</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>Reproduzierbare Forschung bezieht sich auf den Prozess, bei dem Wissenschaftler ihre Analysen und Ergebnisse so dokumentieren, dass sie von anderen exakt nachvollzogen und erneut durchgeführt werden können. Dies beinhaltet:</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Transparenz**: Der gesamte Analyseprozess sollte für Dritte transparent und einsehbar sein.</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Automatisierung**: Analysen sollten automatisiert durchgeführt werden, um menschliche Fehler zu minimieren.</span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Teilbarkeit**: Daten, Code und Ergebnisse sollten leicht geteilt und überprüft werden können.</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>Durch die Nutzung von **R Markdown** können Forscher sicherstellen, dass ihre Arbeit nicht nur reproduzierbar, sondern auch leicht zu teilen und nachzuvollziehen ist.</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="fu">## Was ist R Markdown?</span></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>**R Markdown** ist ein Framework, das es ermöglicht, Code, Ergebnisse und Erläuterungen in einem einzigen Dokument zu kombinieren. Es ist eine erweiterte Form von Markdown und unterstützt sowohl **R-Code** als auch andere Programmiersprachen, sodass alle Schritte der Analyse dokumentiert und automatisiert wiederholbar sind.</span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>Ein R Markdown-Dokument besteht aus:</span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Einem YAML-Header, der Metadaten wie Titel, Autor, Datum und Ausgabeformat enthält.</span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Abschnitten mit R-Code, die als sogenannte *Chunks* bezeichnet werden und mit </span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>  <span class="in">```{r}</span></span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="in">  #| echo: FALSE</span></span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="in">  make_codeblock(1234)</span></span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="in">  ```</span></span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>  markiert sind.</span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Text, der die Analyse erklärt und Kommentare zu den Ergebnissen liefert.</span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Mathematischen Formeln, die mit LaTeX-ähnlicher Syntax formatiert werden können.</span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="fu">### Vorteile von R Markdown für Reproduzierbare Forschung</span></span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Integrierte Analyse und Berichtserstellung**: Code und dessen Ausgaben (Tabellen, Diagramme, Statistiken) sind direkt im Dokument enthalten.</span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Automatische Aktualisierungen**: Änderungen im Code führen automatisch zu aktualisierten Ergebnissen, was manuelles Kopieren und Einfügen überflüssig macht.</span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Verschiedene Ausgabeformate**: R Markdown-Dokumente können als **HTML**, **PDF**, **Word**, oder sogar **Präsentationen** exportiert werden.</span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a><span class="fu">## Aufbau eines R Markdown-Dokuments</span></span>
-<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>Ein typisches R Markdown-Dokument beginnt mit einem **YAML-Header**, der Informationen wie den Titel, Autor und das Ausgabeformat festlegt:</span>
-<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a><span class="in">```yaml</span></span>
-<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
-<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"Reproduzierbare Forschung mit R"</span></span>
-<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a><span class="fu">author</span><span class="kw">:</span><span class="at"> </span><span class="st">"John Doe"</span></span>
-<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a><span class="fu">date</span><span class="kw">:</span><span class="at"> </span><span class="st">"`r Sys.Date()`"</span></span>
-<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a><span class="fu">output</span><span class="kw">:</span><span class="at"> html_document</span></span>
-<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
-<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a><span class="fu"># Shiny</span></span>
-<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a><span class="in">`app.R`</span></span>
-<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(shiny)</span>
-<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a><span class="co"># Benutzer-Interface definieren</span></span>
-<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>(</span>
-<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Input-Elemente &amp; Output-Elemente</span></span>
-<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a><span class="co"># Shiny-Server konfigurieren</span></span>
-<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output, session) {</span>
-<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Server-Code</span></span>
-<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a><span class="co"># Shiny-App erzeugen und starten</span></span>
-<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a><span class="fu">shinyApp</span>(<span class="at">ui =</span> ui, <span class="at">server =</span> server)</span>
-<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(shiny)</span>
-<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a><span class="co"># Benutzer-Interface definieren</span></span>
-<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>(</span>
-<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a>  <span class="fu">titlePanel</span>(<span class="st">"Normalverteilung"</span>),</span>
-<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sliderInput</span>(</span>
-<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a>        <span class="at">inputId =</span> <span class="st">"sd"</span>,</span>
-<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a>        <span class="at">label =</span> <span class="st">"Standardabweichung:"</span>,</span>
-<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a>        <span class="at">min =</span> <span class="fl">0.1</span>,</span>
-<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a>        <span class="at">max =</span> <span class="dv">3</span>,</span>
-<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a>        <span class="at">value =</span> <span class="dv">1</span>,</span>
-<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a>        <span class="at">step =</span> <span class="fl">0.1</span>,</span>
-<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>        <span class="at">width =</span> <span class="st">"100%"</span></span>
-<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mainPanel</span>(<span class="at">width =</span> <span class="dv">12</span>,</span>
-<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a>      <span class="fu">plotOutput</span>(<span class="at">outputId =</span> <span class="st">"distPlot"</span>, <span class="at">height =</span> <span class="dv">400</span>)</span>
-<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a><span class="co"># Shiny-Server konfigurieren</span></span>
-<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output, session) {</span>
-<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a>  output<span class="sc">$</span>distPlot <span class="ot">&lt;-</span> <span class="fu">renderPlot</span>({</span>
-<span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">seq</span>(</span>
-<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a>      <span class="at">from =</span> <span class="sc">-</span> <span class="dv">4</span> <span class="sc">*</span> input<span class="sc">$</span>sd,</span>
-<span id="cb6-116"><a href="#cb6-116" aria-hidden="true" tabindex="-1"></a>      <span class="at">to =</span> <span class="dv">4</span> <span class="sc">*</span> input<span class="sc">$</span>sd,</span>
-<span id="cb6-117"><a href="#cb6-117" aria-hidden="true" tabindex="-1"></a>      <span class="at">length.out =</span> <span class="dv">1000</span></span>
-<span id="cb6-118"><a href="#cb6-118" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb6-119"><a href="#cb6-119" aria-hidden="true" tabindex="-1"></a>    y <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(x, <span class="at">sd =</span> input<span class="sc">$</span>sd)</span>
-<span id="cb6-120"><a href="#cb6-120" aria-hidden="true" tabindex="-1"></a>    data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)</span>
-<span id="cb6-121"><a href="#cb6-121" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-122"><a href="#cb6-122" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
-<span id="cb6-123"><a href="#cb6-123" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"steelblue"</span>, <span class="at">lwd =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb6-124"><a href="#cb6-124" aria-hidden="true" tabindex="-1"></a>      <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"X"</span>, <span class="at">y =</span> <span class="st">"Dichte"</span>) <span class="sc">+</span></span>
-<span id="cb6-125"><a href="#cb6-125" aria-hidden="true" tabindex="-1"></a>      <span class="fu">lims</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="dv">10</span>)) <span class="sc">+</span></span>
-<span id="cb6-126"><a href="#cb6-126" aria-hidden="true" tabindex="-1"></a>      <span class="fu">theme_minimal</span>()</span>
-<span id="cb6-127"><a href="#cb6-127" aria-hidden="true" tabindex="-1"></a>  })</span>
-<span id="cb6-128"><a href="#cb6-128" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb6-129"><a href="#cb6-129" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-130"><a href="#cb6-130" aria-hidden="true" tabindex="-1"></a><span class="co"># Shiny-App erzeugen und starten</span></span>
-<span id="cb6-131"><a href="#cb6-131" aria-hidden="true" tabindex="-1"></a><span class="fu">shinyApp</span>(<span class="at">ui =</span> ui, <span class="at">server =</span> server)</span>
-<span id="cb6-132"><a href="#cb6-132" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-133"><a href="#cb6-133" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-134"><a href="#cb6-134" aria-hidden="true" tabindex="-1"></a><span class="in">```{shinylive-r}</span></span>
-<span id="cb6-135"><a href="#cb6-135" aria-hidden="true" tabindex="-1"></a><span class="in">#| standalone: true</span></span>
-<span id="cb6-136"><a href="#cb6-136" aria-hidden="true" tabindex="-1"></a><span class="in">#| viewerHeight: 600</span></span>
-<span id="cb6-137"><a href="#cb6-137" aria-hidden="true" tabindex="-1"></a><span class="in">library(shiny)</span></span>
-<span id="cb6-138"><a href="#cb6-138" aria-hidden="true" tabindex="-1"></a><span class="in">library(ggplot2)</span></span>
-<span id="cb6-139"><a href="#cb6-139" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-140"><a href="#cb6-140" aria-hidden="true" tabindex="-1"></a><span class="in"># Define your Shiny UI here</span></span>
-<span id="cb6-141"><a href="#cb6-141" aria-hidden="true" tabindex="-1"></a><span class="in">ui &lt;- fluidPage(</span></span>
-<span id="cb6-142"><a href="#cb6-142" aria-hidden="true" tabindex="-1"></a><span class="in">  titlePanel("Normalverteilung"),</span></span>
-<span id="cb6-143"><a href="#cb6-143" aria-hidden="true" tabindex="-1"></a><span class="in">      sliderInput(</span></span>
-<span id="cb6-144"><a href="#cb6-144" aria-hidden="true" tabindex="-1"></a><span class="in">        inputId = "sd",</span></span>
-<span id="cb6-145"><a href="#cb6-145" aria-hidden="true" tabindex="-1"></a><span class="in">        label = "Standardabweichung:",</span></span>
-<span id="cb6-146"><a href="#cb6-146" aria-hidden="true" tabindex="-1"></a><span class="in">        min = 0.1,</span></span>
-<span id="cb6-147"><a href="#cb6-147" aria-hidden="true" tabindex="-1"></a><span class="in">        max = 3,</span></span>
-<span id="cb6-148"><a href="#cb6-148" aria-hidden="true" tabindex="-1"></a><span class="in">        value = 1,</span></span>
-<span id="cb6-149"><a href="#cb6-149" aria-hidden="true" tabindex="-1"></a><span class="in">        step = 0.1,</span></span>
-<span id="cb6-150"><a href="#cb6-150" aria-hidden="true" tabindex="-1"></a><span class="in">        width = "100%"</span></span>
-<span id="cb6-151"><a href="#cb6-151" aria-hidden="true" tabindex="-1"></a><span class="in">    ),</span></span>
-<span id="cb6-152"><a href="#cb6-152" aria-hidden="true" tabindex="-1"></a><span class="in">    mainPanel(width = 12,</span></span>
-<span id="cb6-153"><a href="#cb6-153" aria-hidden="true" tabindex="-1"></a><span class="in">      plotOutput(outputId = "distPlot", height = 400)</span></span>
-<span id="cb6-154"><a href="#cb6-154" aria-hidden="true" tabindex="-1"></a><span class="in">    )</span></span>
-<span id="cb6-155"><a href="#cb6-155" aria-hidden="true" tabindex="-1"></a><span class="in">)</span></span>
-<span id="cb6-156"><a href="#cb6-156" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-157"><a href="#cb6-157" aria-hidden="true" tabindex="-1"></a><span class="in"># Define your Shiny server logic here</span></span>
-<span id="cb6-158"><a href="#cb6-158" aria-hidden="true" tabindex="-1"></a><span class="in">server &lt;- function(input, output, session) {</span></span>
-<span id="cb6-159"><a href="#cb6-159" aria-hidden="true" tabindex="-1"></a><span class="in">  output$distPlot &lt;- renderPlot({</span></span>
-<span id="cb6-160"><a href="#cb6-160" aria-hidden="true" tabindex="-1"></a><span class="in">    # Generate a sequence of x values</span></span>
-<span id="cb6-161"><a href="#cb6-161" aria-hidden="true" tabindex="-1"></a><span class="in">    x &lt;- seq(</span></span>
-<span id="cb6-162"><a href="#cb6-162" aria-hidden="true" tabindex="-1"></a><span class="in">      from = - 4 * input$sd,</span></span>
-<span id="cb6-163"><a href="#cb6-163" aria-hidden="true" tabindex="-1"></a><span class="in">      to = 4 * input$sd,</span></span>
-<span id="cb6-164"><a href="#cb6-164" aria-hidden="true" tabindex="-1"></a><span class="in">      length.out = 1000</span></span>
-<span id="cb6-165"><a href="#cb6-165" aria-hidden="true" tabindex="-1"></a><span class="in">    )</span></span>
-<span id="cb6-166"><a href="#cb6-166" aria-hidden="true" tabindex="-1"></a><span class="in">    # Compute the normal distribution density</span></span>
-<span id="cb6-167"><a href="#cb6-167" aria-hidden="true" tabindex="-1"></a><span class="in">    y &lt;- dnorm(x, sd = input$sd)</span></span>
-<span id="cb6-168"><a href="#cb6-168" aria-hidden="true" tabindex="-1"></a><span class="in">    # Create a data frame</span></span>
-<span id="cb6-169"><a href="#cb6-169" aria-hidden="true" tabindex="-1"></a><span class="in">    data &lt;- data.frame(x = x, y = y)</span></span>
-<span id="cb6-170"><a href="#cb6-170" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
-<span id="cb6-171"><a href="#cb6-171" aria-hidden="true" tabindex="-1"></a><span class="in">    # Plot using ggplot2</span></span>
-<span id="cb6-172"><a href="#cb6-172" aria-hidden="true" tabindex="-1"></a><span class="in">    ggplot(data, aes(x = x, y = y)) +</span></span>
-<span id="cb6-173"><a href="#cb6-173" aria-hidden="true" tabindex="-1"></a><span class="in">      geom_line(color = "steelblue", lwd = 1) +</span></span>
-<span id="cb6-174"><a href="#cb6-174" aria-hidden="true" tabindex="-1"></a><span class="in">      labs(x = "X", y = "Dichte") +</span></span>
-<span id="cb6-175"><a href="#cb6-175" aria-hidden="true" tabindex="-1"></a><span class="in">      lims(x = c(-10, 10)) +</span></span>
-<span id="cb6-176"><a href="#cb6-176" aria-hidden="true" tabindex="-1"></a><span class="in">      theme_minimal()</span></span>
-<span id="cb6-177"><a href="#cb6-177" aria-hidden="true" tabindex="-1"></a><span class="in">  })</span></span>
-<span id="cb6-178"><a href="#cb6-178" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
-<span id="cb6-179"><a href="#cb6-179" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-180"><a href="#cb6-180" aria-hidden="true" tabindex="-1"></a><span class="in"># Create and launch the Shiny app</span></span>
-<span id="cb6-181"><a href="#cb6-181" aria-hidden="true" tabindex="-1"></a><span class="in">shinyApp(ui = ui, server = server)</span></span>
-<span id="cb6-182"><a href="#cb6-182" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<div class="sourceCode" id="cb11" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> live-html</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="an">filters:</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">  - shinylive</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="an">engine:</span><span class="co"> knitr</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="fu"># Reproduzierbarkeit</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="in">```{r, echo = F}</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="in">make_codeblock &lt;- function(text) cat(paste0("```{r}\n", text, "\n```"))</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>In viel empirischen Forschungsfeldern ist die *Reproduzierbarkeit* von Studienergebnissen von zentraler Bedeutung. Durch systematische Überprüfung und Bestätigung (oder Wiederlegung) wird die Aussagekraft und Verlässlichkeit wissenschaftlicher Erkenntnisse gewährleistet. Dieser Validierungsprozess ist entscheidend für weiterführende Forschung: Auf reproduzierbaren und verifizierten Ergebnissen können neue Hypothesen aufbauen, bestehende Theorien weiterentwickelt werden.</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>Auch in mehrheitlich nicht-experimentellen Disziplinen wie der angewandten Statistik und den empirischen Wirtschaftswissenschaften ist die Reproduzierbarkeit von Forschung zunehmend relevant. In diesen Bereichen ist die datengetriebene Analyse mit statistischer Programmierung oft der zentrale Bestandteil wissenschaftlicher Studien. In vielen empirischen Forschungsarbeiten führt die Anwendung statistischer Methoden unmittelbar zu den Studienergebnissen, sodass eine transparente Dokumentation der Arbeitsweise und die Bereitstellung von reproduzierbaren Programm-Codes zunehmend an Bedeutung gewinnen.</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>Das R-Ökosystem bietet diverse Tools zur Gewährleistung von Reproduzierbarkeit und Kommunikation von Forschungsergebnissen. <span class="co">[</span><span class="ot">*RMarkdown*</span><span class="co">](https://rmarkdown.rstudio.com)</span> erlaubt es, Datenanalysen, Visualisierungen, Code und die dazugehörige Dokumentation nahtlos in einem einzigen Dokument zu kombinieren. Dies erleichtert nicht nur die Nachvollziehbarkeit von Analysen, sondern ermöglicht es auch, die Ergebnisse mühelos in verschiedene gängige Formate wie HTML, PDF oder Word zu konvertieren und verfügbar zu machen. Das R-Paket <span class="co">[</span><span class="ot">*Shiny*</span><span class="co">](https://shiny.posit.co)</span> ermöglicht es Forschenden ohne umfangreiche Erfahrung in Webentwicklung interaktive Webanwendungen und Dashboards mit R zu erstellen.</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>In diesem Kapitel erläutern wir Grundzüge der reproduzierbaren Forschung mit Rmarkdown und geben eine Einführung in die Entwicklung interaktiver Visualisierungen für Studienergebnisse mit Shiny. Weiterhin erfolgt ein Ausblick auf <span class="co">[</span><span class="ot">*quarto*</span><span class="co">](https://quarto.org)</span>, eine neuere Entwicklung im Bereich wissenschaftlicher open-Source-Publikationssysteme.</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>@XieetalRmd</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="fu">## RMarkdown</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>Reproduzierbare Forschung meint Prozesse, bei denen Forschende ihre Analysen und Ergebnisse so dokumentieren, dass sie von anderen exakt nachvollzogen und durch Wiederholung der dokumentierten Vorgehensweise reproduziert werden können. Die Anforderungen an solche Prozesse können im Wesentlichen anhand von drei Kriterien zusammengefasst werden:</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Transparenz**: Der gesamte Analyseprozess sollte für Dritte *einsehbar* und *transparent* sein. Die Nachvollziehbarkeit des Prozesses sollte durch adäquate Dokumentation sämtlicher Schritte gewährleistet sein.</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Automatisierung**: Analysen sollten möglichst *automatisiert* durchgeführt werden, um das Risiko menschlicher Fehler (zum Beispiel bei der Datenverarbeitung oder bei Berechnungen) gering zu halten.</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Teilbarkeit**: Die verwendeten Daten, der Code und die Ergebnisse sollten leicht geteilt und überprüft werden können, idealerweise anhand eines (Datei)Formats, dass geringe technische Anforderungen hinsichtlich der Reproduzierbarkeit der Inhalte voraussetzt.</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>RMarkdown ist ein Dokumentationsformat im R-Ökosystem, das es Nutzern ermöglicht die oben genannten Anforderungen an reprozierbare Forschung zu erfüllen. Es kombiniert die Funktionalitäten von Markdown, einer schlanken <span class="co">[</span><span class="ot">Markup-Sprache</span><span class="co">](https://en.wikipedia.org/wiki/Markup_language)</span> für Textformatierung, mit der Möglichkeit, direkt in R geschriebenen Code auszuführen und die Ergebnisse, einschließlich Tabellen und Grafiken in ein Ziel-Dokument einzubinden.</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="fu">### Struktur</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>Ein typisches Rmarkdown-Dokument (eine <span class="in">`.rmd`</span>-Datei) besteht aus drei Hauptkomponenten:</span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**YAML-Header**: Dieser Bereich am Anfang des Dokuments wird durch <span class="in">`---`</span> eingegrenzt und enthält Metadaten wie den Titel, Autor, Datum und das gewünschte Ausgabeformat (z. B. PDF, HTML, Word). Den Argumenten können, je nach Definition, Objekte des Typs <span class="in">`numeric`</span>, <span class="in">`character`</span> oder <span class="in">`function`</span> übergeben werden. Der nachfolgende Chunk definiert ein Dokument mit dem Titel, Autor und Datumsangebe sowie eine Ausgabe als HTML-Dokument.</span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>  <span class="in">```{yaml}</span></span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a><span class="in">  ---</span></span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a><span class="in">  title: "Reproduzierbare Forschung mit R"</span></span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a><span class="in">  author: "Martin Arnold"</span></span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a><span class="in">  date: "24. April 2023"</span></span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a><span class="in">  output: html_document</span></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a><span class="in">  ---</span></span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a><span class="in">  ```</span></span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Code-Chunks und Inline-Code**: *Code-Chunks* enthalten *ausführbaren* R-Code (oder auch Code in anderen unterstützten Sprachen wie Python, SQL usw.), der *während der Erstellung* des Output-Dokument ausgeführt wird. Die Ergebnisse des Codes (z.B. Outputs von Schätzfunktionen wie <span class="in">`lm()`</span>, Grafiken oder Tabellen) werden, gemeinsam mit dem Code, direkt im Dokument angezeigt. Ein einfacher Code-Chunk ist folgendermaßen aufgebaut:</span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>  <span class="in">```{r}</span></span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a><span class="in">  #| echo: false</span></span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a><span class="in">  make_codeblock("# Ein Kommentar\n1+1")</span></span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a><span class="in">  ```</span></span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a>  **Inline-Code** kann im Fließtext verwendet werden, um die Ergebnisse einzeiligen Codes (oft kleine Rechnungen oder der Inhalt eines Objekts) direkt im Text (s.u.) auszugeben. Inline-Code-Ausdrücke können wie folgt ausgewertet werden:</span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a>  <span class="in">```{r}</span></span>
+<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a><span class="in">  #| echo: false</span></span>
+<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a><span class="in">  cat('`r 1+1`')</span></span>
+<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a><span class="in">  ```</span></span>
+<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>*Markdown-formatierter Text*: Dies sind Abschnitte mit Fließtext, der in der <span class="co">[</span><span class="ot">Markdown-Syntax</span><span class="co">](https://www.markdownguide.org/basic-syntax/)</span> formatiert wird. Hierbei können Textformatierungen wie Überschriften, Listen, Links, Bilder aus externen Dateien und weitere Elemente durch kurze Befehle erstellt oder eingebunden werden. Zur Erläuterung statistischer Methoden können <span class="co">[</span><span class="ot">$\LaTeX$-Formeln</span><span class="co">](https://de.wikipedia.org/wiki/LaTeX)</span> in Text-Abschnitten gesetzt werden.</span>
+<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a><span class="fu">### Datei erstellen und kompilieren</span></span>
+<span id="cb11-68"><a href="#cb11-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-69"><a href="#cb11-69" aria-hidden="true" tabindex="-1"></a>Um eine <span class="in">`.Rmd`</span>-Datei in das gewünschte Output-Format umzuwandeln (zu kompilieren), sind mehrere Software-Pakete und Schritte erforderlich:</span>
+<span id="cb11-70"><a href="#cb11-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-71"><a href="#cb11-71" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>***RStudio*-Installation**: Obwohl RMarkdown auch über die Befehlszeile (<span class="co">[</span><span class="ot">R-Konsole / R-GUI</span><span class="co">](https://cran.r-project.org)</span>) ausgeführt werden kann, ist <span class="co">[</span><span class="ot">*RStudio*</span><span class="co">](https://posit.co/download/rstudio-desktop/)</span> die empfohlene Entwicklungsumgebung, da es eine benutzerfreundliche Schnittstelle bietet, mit der <span class="in">`.Rmd`</span>-Dateien leicht erstellt, bearbeitet und kompiliert werden können. Beachte: *Für die Verwendung von RStudion muss die R-Konsole installiert sein*.</span>
+<span id="cb11-72"><a href="#cb11-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-73"><a href="#cb11-73" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**`rmarkdown`-Paket**: Um <span class="in">`.Rmd`</span>-Dateien verarbeiten zu können, muss das R-Paket <span class="in">`rmarkdown`</span> installiert sein. Dies erfolgt über die R-Konsole oder in RStudio mit folgendem Befehl:</span>
+<span id="cb11-74"><a href="#cb11-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-75"><a href="#cb11-75" aria-hidden="true" tabindex="-1"></a>  <span class="in">```{r}</span></span>
+<span id="cb11-76"><a href="#cb11-76" aria-hidden="true" tabindex="-1"></a><span class="in">  #| eval: false</span></span>
+<span id="cb11-77"><a href="#cb11-77" aria-hidden="true" tabindex="-1"></a><span class="in">  # RMarkdown installieren</span></span>
+<span id="cb11-78"><a href="#cb11-78" aria-hidden="true" tabindex="-1"></a><span class="in">  install.packages("rmarkdown")</span></span>
+<span id="cb11-79"><a href="#cb11-79" aria-hidden="true" tabindex="-1"></a><span class="in">  ```</span></span>
+<span id="cb11-80"><a href="#cb11-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-81"><a href="#cb11-81" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Format-abhängige Pakete**: Um HTML-Output zu erzeugen, sind zusätzlichen Pakete erforderlich, da die erforderlichen Abhängigkeiten mit dem <span class="in">`rmarkdown`</span>-Paket installiert werden. Für PDF-Output-Formate muss eine $\LaTeX$-Distribution verfügbar sein.^<span class="co">[</span><span class="ot">LaTeX-*Formeln* in HTML-Outputs können ohne eine $\LaTeX$-Installation erzeugt werden. Hierbei werden Formeln im Web-Browser mit [MathJax](https://www.mathjax.org) dargestellt.</span><span class="co">]</span>  $\LaTeX$ wird verwendet, um das Dokument in ein professionell formatiertes PDF zu konvertieren. Für Anfänger empfiehlt sich die Nutzung von <span class="co">[</span><span class="ot">*TinyTeX*</span><span class="co">](https://yihui.org/tinytex/)</span>, eine kompakte Distribution, die direkt über die R-Konsole installiert werden kann:</span>
+<span id="cb11-82"><a href="#cb11-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-83"><a href="#cb11-83" aria-hidden="true" tabindex="-1"></a>  <span class="in">```{r}</span></span>
+<span id="cb11-84"><a href="#cb11-84" aria-hidden="true" tabindex="-1"></a><span class="in">  #| eval: false</span></span>
+<span id="cb11-85"><a href="#cb11-85" aria-hidden="true" tabindex="-1"></a><span class="in">  # tinytex-LaTeX-Distribution installieren</span></span>
+<span id="cb11-86"><a href="#cb11-86" aria-hidden="true" tabindex="-1"></a><span class="in">  install.packages("tinytex")</span></span>
+<span id="cb11-87"><a href="#cb11-87" aria-hidden="true" tabindex="-1"></a><span class="in">  tinytex::install_tinytex()</span></span>
+<span id="cb11-88"><a href="#cb11-88" aria-hidden="true" tabindex="-1"></a><span class="in">  ```</span></span>
+<span id="cb11-89"><a href="#cb11-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-90"><a href="#cb11-90" aria-hidden="true" tabindex="-1"></a>Sind diese Komponenten der vorhanden, ist Rmarkdown in der Lage den Kompilierungsprozess durchzuführen. Der grobe Ablauf ist in @fig-rmdwf dargestellt und erfolgt so:  </span>
+<span id="cb11-91"><a href="#cb11-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-92"><a href="#cb11-92" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Die von R-Code abhängigen Komponenten des <span class="in">`.Rmd`</span>-Dokuments werden ausgeführt. Sämtliche Strukturelemente und ihre Ergebnisse werden durch das Tool <span class="co">[</span><span class="ot">`knitr`</span><span class="co">](https://yihui.org/knitr/)</span> in ein Markdown-Dokument (Dateiendung <span class="in">`.md`</span>) übersetzt.^<span class="co">[</span><span class="ot">Dieser Prozess wird auch als *knitting* (engl. stricken) bezeichnet: sämtliche Komponenten werden nach Ausführung des R-Codes zusammengestrickt und in ein `.md`-Format überführt.</span><span class="co">]</span></span>
+<span id="cb11-93"><a href="#cb11-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-94"><a href="#cb11-94" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Das in Schritt 1 erzeugte Markdown-Dokument wird dem Tool *pandoc* übergeben. Pandoc Pandoc ist ein Open-Source-Tool zur Dokumentenkonvertierung, das Texte in zahlreiche verschiedene Formate transformiert, darunter HTML, PDF, Word, und viele weitere. Die Formatierung und Bereitstellung des Outputs erfolgt gemäß der im <span class="in">`yaml`</span>-Header festgelegten Format-Funktion (<span class="in">`output: ...`</span>).</span>
+<span id="cb11-95"><a href="#cb11-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-96"><a href="#cb11-96" aria-hidden="true" tabindex="-1"></a>!<span class="co">[</span><span class="ot">Workflow beim Kompilieren von Rmd-Dokumenten [Quelle: @Xieetal2020]</span><span class="co">](img/rmdworkflow.png)</span>{#fig-rmdwf width=80%}</span>
+<span id="cb11-97"><a href="#cb11-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-98"><a href="#cb11-98" aria-hidden="true" tabindex="-1"></a>Um eine neue <span class="in">`.rmd-Datei`</span> in RStudio zu erstellen und zu kompilieren, nutzen wir die Menü-Schaltflächen *Datei* $\rightarrow$ *Neue Datei* und wählen *R markdown* im Kontext-Menü aus. In dem sich anschließend öffnenden Dialog sind bereits Standard-Einstellungen für ein einfaches HTML-Dokument gesetzt.^[Die hier erfolgte Konfiguration setzt lediglich rudimentäre Optionen im `yaml`-Header, die später angepasst werden können.] Nach Bestätigung der Konfiguration mit *OK* wird ein <span class="in">`.Rmd`</span>-Dokument mit Beispiel-Code geöffnet. @fig-rmdgif2 zeigt diesen Ablauf.</span>
+<span id="cb11-99"><a href="#cb11-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-100"><a href="#cb11-100" aria-hidden="true" tabindex="-1"></a><span class="al">![RStudio: `.Rmd`-Datei erstellen](img/ezgif-rmd-1.gif)</span>{#fig-rmdgif2 width=80%}</span>
+<span id="cb11-101"><a href="#cb11-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-102"><a href="#cb11-102" aria-hidden="true" tabindex="-1"></a>Das neue <span class="in">`.Rmd`</span>-Dokument kann nun bearbeitet und, nach erstmaligem abspeichern (hier unter dem namen <span class="in">`diamanten.rmd`</span>) kompiliert werden. Hierzu klicken wir in der Aktionsleiste unterhalb des Dokumenten-Tabs auf "Knit", siehe @fig-rmdgifkomp. RMarkdown beginnt nun mit der Kompilierung des Dokuments. Wenn dieser Prozess fehlerfrei abschließt, öffnet sich die erzeugte HTML-Datei automatisch im Vorschau-Fenster in RStudio.</span>
+<span id="cb11-103"><a href="#cb11-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-104"><a href="#cb11-104" aria-hidden="true" tabindex="-1"></a><span class="al">![RStudio: `.Rmd`-Datei kompilieren](img/ezgif-rmd-knit.gif)</span>{#fig-rmdgifkomp width=80%}</span>
+<span id="cb11-105"><a href="#cb11-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-106"><a href="#cb11-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-107"><a href="#cb11-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-108"><a href="#cb11-108" aria-hidden="true" tabindex="-1"></a><span class="fu">### Ein Minimalbeispiel</span></span>
+<span id="cb11-109"><a href="#cb11-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-110"><a href="#cb11-110" aria-hidden="true" tabindex="-1"></a>Das folgene Minimalbeispiel zeigt den Aufbau einer <span class="in">`.Rmd`</span>-Datei für die Analyse eines Datensatzes unter Verwendung der oben erläuterten Definitionen und Strukturelemente:</span>
+<span id="cb11-111"><a href="#cb11-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-112"><a href="#cb11-112" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Wir erzeugen ein HTML-Dokument mit dem Titel "Diamanten" sowie einer Datumsangabe. </span>
+<span id="cb11-113"><a href="#cb11-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-114"><a href="#cb11-114" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Die Datei enthält zwei Code-Chunks, die den Datensatz <span class="in">`ggplot2::diamonds`</span> einlesen, unter Verwendung von <span class="in">`dplyr`</span>-Funktionen transformieren und eine kleine graphische Auswertung mit <span class="in">`ggplot2`</span> erstellen. </span>
+<span id="cb11-115"><a href="#cb11-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-116"><a href="#cb11-116" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Die Schritte der Analyse werden im Fließtext zwischen den Code-Chunks erläutert. Hierbei kommt sowohl Markdown-Syntax zur Formatierung zum Einsatz als auch Inline-Code um Informationen mit R-Code zu berechnen und unmittelbar in die Erläuterungen einzubinden. Dank dieser Vorgehensweise passen sich die Erklärungen der Vorgehensweise für die Analyse automatisch an, wenn die verwendeten Variablen in den Code-Chunks geändert werden.</span>
+<span id="cb11-117"><a href="#cb11-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-118"><a href="#cb11-118" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Der letzte Textblock verwendet $\LaTeX$-Code, um die zuvor mit R-Code durchgeführte Berechnung zu erläutern.</span>
+<span id="cb11-119"><a href="#cb11-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-120"><a href="#cb11-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-121"><a href="#cb11-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-122"><a href="#cb11-122" aria-hidden="true" tabindex="-1"></a>***diamanten.Rmd:*** </span>
+<span id="cb11-125"><a href="#cb11-125" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb11-126"><a href="#cb11-126" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb11-127"><a href="#cb11-127" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">'</span></span>
+<span id="cb11-128"><a href="#cb11-128" aria-hidden="true" tabindex="-1"></a><span class="st">---</span></span>
+<span id="cb11-129"><a href="#cb11-129" aria-hidden="true" tabindex="-1"></a><span class="st">title: "Diamanten"</span></span>
+<span id="cb11-130"><a href="#cb11-130" aria-hidden="true" tabindex="-1"></a><span class="st">date: 2024-01-05</span></span>
+<span id="cb11-131"><a href="#cb11-131" aria-hidden="true" tabindex="-1"></a><span class="st">output: html_document</span></span>
+<span id="cb11-132"><a href="#cb11-132" aria-hidden="true" tabindex="-1"></a><span class="st">---</span></span>
+<span id="cb11-133"><a href="#cb11-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-134"><a href="#cb11-134" aria-hidden="true" tabindex="-1"></a><span class="st">Wir lesen zunächst den Datensatz ein und filtern Diamanten mit einem Gewicht</span></span>
+<span id="cb11-135"><a href="#cb11-135" aria-hidden="true" tabindex="-1"></a><span class="st">von weniger als 2.5 Karat.</span></span>
+<span id="cb11-136"><a href="#cb11-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-137"><a href="#cb11-137" aria-hidden="true" tabindex="-1"></a><span class="st">```{r}</span><span class="sc">\n</span><span class="st">library(tidyverse)</span><span class="sc">\n</span><span class="st">data("diamonds")</span></span>
+<span id="cb11-138"><a href="#cb11-138" aria-hidden="true" tabindex="-1"></a><span class="st">kleiner &lt;- diamonds %&gt;%</span></span>
+<span id="cb11-139"><a href="#cb11-139" aria-hidden="true" tabindex="-1"></a><span class="st">            filter(carat &lt; 2.5)</span><span class="sc">\n</span><span class="st">```</span></span>
+<span id="cb11-140"><a href="#cb11-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-141"><a href="#cb11-141" aria-hidden="true" tabindex="-1"></a><span class="st">Wir haben Beobachtungen für `r nrow(diamonds)` Diamanten. </span></span>
+<span id="cb11-142"><a href="#cb11-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-143"><a href="#cb11-143" aria-hidden="true" tabindex="-1"></a><span class="st">Lediglich `r nrow(diamonds) - nrow(kleiner)` sind **schwerer** </span></span>
+<span id="cb11-144"><a href="#cb11-144" aria-hidden="true" tabindex="-1"></a><span class="st">als 2.5 *Karat*. </span></span>
+<span id="cb11-145"><a href="#cb11-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-146"><a href="#cb11-146" aria-hidden="true" tabindex="-1"></a><span class="st">Der nachfolgende Code zeigt, wie die Häufigeitsverteilung von `carat` mit </span></span>
+<span id="cb11-147"><a href="#cb11-147" aria-hidden="true" tabindex="-1"></a><span class="st">R geplottet werden kann.</span></span>
+<span id="cb11-148"><a href="#cb11-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-149"><a href="#cb11-149" aria-hidden="true" tabindex="-1"></a><span class="st">```{r, echo = FALSE}</span><span class="sc">\n</span><span class="st">kleiner %&gt;% </span></span>
+<span id="cb11-150"><a href="#cb11-150" aria-hidden="true" tabindex="-1"></a><span class="st">  ggplot(aes(carat)) + </span></span>
+<span id="cb11-151"><a href="#cb11-151" aria-hidden="true" tabindex="-1"></a><span class="st">  geom_freqpoly(binwidth = 0.01)</span><span class="sc">\n</span><span class="st">```</span></span>
+<span id="cb11-152"><a href="#cb11-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-153"><a href="#cb11-153" aria-hidden="true" tabindex="-1"></a><span class="st">Wie schwer ist der *schwerste* "kleine" Diamant?</span></span>
+<span id="cb11-154"><a href="#cb11-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-155"><a href="#cb11-155" aria-hidden="true" tabindex="-1"></a><span class="st">```{r}</span><span class="sc">\n</span><span class="st">kleiner$carat %&gt;% max()</span><span class="sc">\n</span><span class="st">```</span></span>
+<span id="cb11-156"><a href="#cb11-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-157"><a href="#cb11-157" aria-hidden="true" tabindex="-1"></a><span class="st">Die Formel für diese Berechnung ist $$</span><span class="sc">\\</span><span class="st">max(</span><span class="sc">\\</span><span class="st">textup{carat}).$$</span><span class="sc">\n</span></span>
+<span id="cb11-158"><a href="#cb11-158" aria-hidden="true" tabindex="-1"></a><span class="st">'</span>)</span>
+<span id="cb11-159"><a href="#cb11-159" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-160"><a href="#cb11-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-161"><a href="#cb11-161" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb11-162"><a href="#cb11-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-163"><a href="#cb11-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-164"><a href="#cb11-164" aria-hidden="true" tabindex="-1"></a><span class="al">![RStudio: `.Rmd`-Datei erstellen](img/ezgif-rmd-2.gif)</span>{#fig-rmdex1 width=80% fig-align='center'}</span>
+<span id="cb11-165"><a href="#cb11-165" aria-hidden="true" tabindex="-1"></a><span class="al">![RStudio: `.Rmd`-Datei erstellen](img/ezgif-rmd-3.gif)</span>{#fig-rmdex2 width=80% fig-align='center'}</span>
+<span id="cb11-166"><a href="#cb11-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-167"><a href="#cb11-167" aria-hidden="true" tabindex="-1"></a><span class="al">![RStudio: `.Rmd`-Datei erstellen](img/diamonds_res.png)</span>{#fig-rmdex3}</span>
+<span id="cb11-168"><a href="#cb11-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-169"><a href="#cb11-169" aria-hidden="true" tabindex="-1"></a><span class="fu">## Shiny</span></span>
+<span id="cb11-170"><a href="#cb11-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-171"><a href="#cb11-171" aria-hidden="true" tabindex="-1"></a>*Shiny* ist ein R-Paket, das die Erstellung interaktiver Webanwendungen (Apps) und Dashboards direkt aus R heraus ermöglicht. Mit Shiny können Nutzer dynamische, datengetriebene Visualisierungen und interaktive Elemente wie Slider, Dropdown-Menüs und Schaltflächen in ihren Anwendungen einbinden, ohne hierzu üblicherweise erforderliche Web-Standards wie HTML, CSS und JavaScript sowie die server-seitige Ausführung von R-Programmcode zu beherrschen.^<span class="co">[</span><span class="ot">Kenntnisse in der Programmierung von Websiten sind jedoch hilfreich für das Fine-Tuning von Shiny-Applikationen.</span><span class="co">]</span> Die Anwendungen laufen entweder lokal auf dem eigenen Rechner oder können über einen Webserver bereitgestellt werden (Hosting), sodass sie über das Internet zugänglich sind.^<span class="co">[</span><span class="ot">Für Online-Hosting fallen in der Regel Gebühren an. Kleine Applikationen mit beschränkter Laufzeit können über RStudio auf [shinyapps.io](https://www.shinyapps.io/) kostenfrei gehostet werden.</span><span class="co">]</span> </span>
+<span id="cb11-172"><a href="#cb11-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-173"><a href="#cb11-173" aria-hidden="true" tabindex="-1"></a>Shiny-Apps eignen sich besonders gut für die Bereitstellung von Data-Science-Tools: Nutzer einer Shiny-Anwendung können die Parameter der Analyse ändern und sehen unmittelbar, wie sich diese Änderungen auf die Ergebnisse auswirken, was die Nachvollziehbarkeit erhöht. Da die zugrunde liegenden R-Codes in die Anwendung eingebettet sind, bleibt der gesamte Analyseprozess offen zugänglich, und andere Forschende können die Anwendung nutzen, um die Ergebnisse auf ihre eigenen Daten anzuwenden oder die Schritte zu reproduzieren. Diese "interaktive Transparenz" fördert also die Reproduzierbarkeit datengetriebener Analysen, indem sie nicht nur den Code, sondern den gesamten Analyseablauf zugänglicher macht.</span>
+<span id="cb11-174"><a href="#cb11-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-175"><a href="#cb11-175" aria-hidden="true" tabindex="-1"></a>Shiny ermöglicht zudem eine effektive Kommunikation von Forschungsergebnissen, indem komplexe Analysen in interaktive, leicht verständliche Webanwendungen überführt werden. Dies erleichtert die Vermittlung von Ergebnissen erheblich, insbesondere für Nicht-Experten, und trägt dazu bei, dass Forschungserkenntnisse nicht nur reproduzierbar, sondern auch zugänglicher und verständlicher gemacht werden.</span>
+<span id="cb11-176"><a href="#cb11-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-177"><a href="#cb11-177" aria-hidden="true" tabindex="-1"></a><span class="fu">### Grundlagen </span></span>
+<span id="cb11-178"><a href="#cb11-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-179"><a href="#cb11-179" aria-hidden="true" tabindex="-1"></a><span class="al">![RStudio: *Shiny*-App erstellen](img/shiny-gif1.gif)</span>{#fig-shinygif1 width=80% fig-align='center'}</span>
+<span id="cb11-180"><a href="#cb11-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-181"><a href="#cb11-181" aria-hidden="true" tabindex="-1"></a><span class="al">![RStudio: *Shiny*-App erstellen](img/shiny-gif2.gif)</span>{#fig-shinygif2 width=80% fig-align='center'}</span>
+<span id="cb11-182"><a href="#cb11-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-183"><a href="#cb11-183" aria-hidden="true" tabindex="-1"></a><span class="in">`app.R`</span></span>
+<span id="cb11-184"><a href="#cb11-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-187"><a href="#cb11-187" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb11-188"><a href="#cb11-188" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb11-189"><a href="#cb11-189" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(shiny)</span>
+<span id="cb11-190"><a href="#cb11-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-191"><a href="#cb11-191" aria-hidden="true" tabindex="-1"></a><span class="co"># Benutzer-Interface definieren</span></span>
+<span id="cb11-192"><a href="#cb11-192" aria-hidden="true" tabindex="-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>(</span>
+<span id="cb11-193"><a href="#cb11-193" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Input-Elemente &amp; Output-Elemente</span></span>
+<span id="cb11-194"><a href="#cb11-194" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-195"><a href="#cb11-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-196"><a href="#cb11-196" aria-hidden="true" tabindex="-1"></a><span class="co"># Shiny-Server konfigurieren</span></span>
+<span id="cb11-197"><a href="#cb11-197" aria-hidden="true" tabindex="-1"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output, session) {</span>
+<span id="cb11-198"><a href="#cb11-198" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Server-Code</span></span>
+<span id="cb11-199"><a href="#cb11-199" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-200"><a href="#cb11-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-201"><a href="#cb11-201" aria-hidden="true" tabindex="-1"></a><span class="co"># Shiny-App erzeugen und starten</span></span>
+<span id="cb11-202"><a href="#cb11-202" aria-hidden="true" tabindex="-1"></a><span class="fu">shinyApp</span>(<span class="at">ui =</span> ui, <span class="at">server =</span> server)</span>
+<span id="cb11-203"><a href="#cb11-203" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-204"><a href="#cb11-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-205"><a href="#cb11-205" aria-hidden="true" tabindex="-1"></a><span class="fu">### Beispiel: Normalverteilung</span></span>
+<span id="cb11-206"><a href="#cb11-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-209"><a href="#cb11-209" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb11-210"><a href="#cb11-210" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-align: 'center'</span></span>
+<span id="cb11-211"><a href="#cb11-211" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb11-212"><a href="#cb11-212" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(</span>
+<span id="cb11-213"><a href="#cb11-213" aria-hidden="true" tabindex="-1"></a>  <span class="at">from =</span> <span class="sc">-</span> <span class="dv">4</span>, </span>
+<span id="cb11-214"><a href="#cb11-214" aria-hidden="true" tabindex="-1"></a>  <span class="at">to =</span> <span class="dv">4</span>,</span>
+<span id="cb11-215"><a href="#cb11-215" aria-hidden="true" tabindex="-1"></a>  <span class="at">length.out =</span> <span class="dv">1000</span></span>
+<span id="cb11-216"><a href="#cb11-216" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-217"><a href="#cb11-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-218"><a href="#cb11-218" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(x, <span class="at">sd =</span> <span class="dv">1</span>)</span>
+<span id="cb11-219"><a href="#cb11-219" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)</span>
+<span id="cb11-220"><a href="#cb11-220" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-221"><a href="#cb11-221" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(</span>
+<span id="cb11-222"><a href="#cb11-222" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df, </span>
+<span id="cb11-223"><a href="#cb11-223" aria-hidden="true" tabindex="-1"></a>  <span class="at">mapping =</span>  <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)</span>
+<span id="cb11-224"><a href="#cb11-224" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb11-225"><a href="#cb11-225" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"steelblue"</span>, <span class="at">lwd =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb11-226"><a href="#cb11-226" aria-hidden="true" tabindex="-1"></a><span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"X"</span>, <span class="at">y =</span> <span class="st">"Dichte"</span>) <span class="sc">+</span></span>
+<span id="cb11-227"><a href="#cb11-227" aria-hidden="true" tabindex="-1"></a><span class="fu">lims</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="dv">10</span>)) <span class="sc">+</span></span>
+<span id="cb11-228"><a href="#cb11-228" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_minimal</span>()</span>
+<span id="cb11-229"><a href="#cb11-229" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-230"><a href="#cb11-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-231"><a href="#cb11-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-234"><a href="#cb11-234" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb11-235"><a href="#cb11-235" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb11-236"><a href="#cb11-236" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(shiny)</span>
+<span id="cb11-237"><a href="#cb11-237" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb11-238"><a href="#cb11-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-239"><a href="#cb11-239" aria-hidden="true" tabindex="-1"></a><span class="co"># Benutzer-Interface definieren</span></span>
+<span id="cb11-240"><a href="#cb11-240" aria-hidden="true" tabindex="-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>(</span>
+<span id="cb11-241"><a href="#cb11-241" aria-hidden="true" tabindex="-1"></a>  <span class="fu">titlePanel</span>(<span class="st">"Normalverteilung"</span>),</span>
+<span id="cb11-242"><a href="#cb11-242" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sliderInput</span>(</span>
+<span id="cb11-243"><a href="#cb11-243" aria-hidden="true" tabindex="-1"></a>        <span class="at">inputId =</span> <span class="st">"sd"</span>,</span>
+<span id="cb11-244"><a href="#cb11-244" aria-hidden="true" tabindex="-1"></a>        <span class="at">label =</span> <span class="st">"Standardabweichung:"</span>,</span>
+<span id="cb11-245"><a href="#cb11-245" aria-hidden="true" tabindex="-1"></a>        <span class="at">min =</span> <span class="fl">0.1</span>,</span>
+<span id="cb11-246"><a href="#cb11-246" aria-hidden="true" tabindex="-1"></a>        <span class="at">max =</span> <span class="dv">3</span>,</span>
+<span id="cb11-247"><a href="#cb11-247" aria-hidden="true" tabindex="-1"></a>        <span class="at">value =</span> <span class="dv">1</span>,</span>
+<span id="cb11-248"><a href="#cb11-248" aria-hidden="true" tabindex="-1"></a>        <span class="at">step =</span> <span class="fl">0.1</span>,</span>
+<span id="cb11-249"><a href="#cb11-249" aria-hidden="true" tabindex="-1"></a>        <span class="at">width =</span> <span class="st">"100%"</span></span>
+<span id="cb11-250"><a href="#cb11-250" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb11-251"><a href="#cb11-251" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mainPanel</span>(<span class="at">width =</span> <span class="dv">12</span>,</span>
+<span id="cb11-252"><a href="#cb11-252" aria-hidden="true" tabindex="-1"></a>      <span class="fu">plotOutput</span>(<span class="at">outputId =</span> <span class="st">"distPlot"</span>, <span class="at">height =</span> <span class="dv">400</span>)</span>
+<span id="cb11-253"><a href="#cb11-253" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb11-254"><a href="#cb11-254" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-255"><a href="#cb11-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-256"><a href="#cb11-256" aria-hidden="true" tabindex="-1"></a><span class="co"># Shiny-Server konfigurieren</span></span>
+<span id="cb11-257"><a href="#cb11-257" aria-hidden="true" tabindex="-1"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output, session) {</span>
+<span id="cb11-258"><a href="#cb11-258" aria-hidden="true" tabindex="-1"></a>  output<span class="sc">$</span>distPlot <span class="ot">&lt;-</span> <span class="fu">renderPlot</span>({</span>
+<span id="cb11-259"><a href="#cb11-259" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">seq</span>(</span>
+<span id="cb11-260"><a href="#cb11-260" aria-hidden="true" tabindex="-1"></a>      <span class="at">from =</span> <span class="sc">-</span> <span class="dv">4</span> <span class="sc">*</span> input<span class="sc">$</span>sd,</span>
+<span id="cb11-261"><a href="#cb11-261" aria-hidden="true" tabindex="-1"></a>      <span class="at">to =</span> <span class="dv">4</span> <span class="sc">*</span> input<span class="sc">$</span>sd,</span>
+<span id="cb11-262"><a href="#cb11-262" aria-hidden="true" tabindex="-1"></a>      <span class="at">length.out =</span> <span class="dv">1000</span></span>
+<span id="cb11-263"><a href="#cb11-263" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb11-264"><a href="#cb11-264" aria-hidden="true" tabindex="-1"></a>    y <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(x, <span class="at">sd =</span> input<span class="sc">$</span>sd)</span>
+<span id="cb11-265"><a href="#cb11-265" aria-hidden="true" tabindex="-1"></a>    data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)</span>
+<span id="cb11-266"><a href="#cb11-266" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-267"><a href="#cb11-267" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb11-268"><a href="#cb11-268" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"steelblue"</span>, <span class="at">lwd =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb11-269"><a href="#cb11-269" aria-hidden="true" tabindex="-1"></a>      <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"X"</span>, <span class="at">y =</span> <span class="st">"Dichte"</span>) <span class="sc">+</span></span>
+<span id="cb11-270"><a href="#cb11-270" aria-hidden="true" tabindex="-1"></a>      <span class="fu">lims</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="dv">10</span>)) <span class="sc">+</span></span>
+<span id="cb11-271"><a href="#cb11-271" aria-hidden="true" tabindex="-1"></a>      <span class="fu">theme_minimal</span>()</span>
+<span id="cb11-272"><a href="#cb11-272" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb11-273"><a href="#cb11-273" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-274"><a href="#cb11-274" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-275"><a href="#cb11-275" aria-hidden="true" tabindex="-1"></a><span class="co"># Shiny-App erzeugen und starten</span></span>
+<span id="cb11-276"><a href="#cb11-276" aria-hidden="true" tabindex="-1"></a><span class="fu">shinyApp</span>(<span class="at">ui =</span> ui, <span class="at">server =</span> server)</span>
+<span id="cb11-277"><a href="#cb11-277" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-278"><a href="#cb11-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-279"><a href="#cb11-279" aria-hidden="true" tabindex="-1"></a><span class="in">```{shinylive-r}</span></span>
+<span id="cb11-280"><a href="#cb11-280" aria-hidden="true" tabindex="-1"></a><span class="in">#| standalone: true</span></span>
+<span id="cb11-281"><a href="#cb11-281" aria-hidden="true" tabindex="-1"></a><span class="in">#| viewerHeight: 600</span></span>
+<span id="cb11-282"><a href="#cb11-282" aria-hidden="true" tabindex="-1"></a><span class="in">#| cache: true</span></span>
+<span id="cb11-283"><a href="#cb11-283" aria-hidden="true" tabindex="-1"></a><span class="in">library(shiny)</span></span>
+<span id="cb11-284"><a href="#cb11-284" aria-hidden="true" tabindex="-1"></a><span class="in">library(ggplot2)</span></span>
+<span id="cb11-285"><a href="#cb11-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-286"><a href="#cb11-286" aria-hidden="true" tabindex="-1"></a><span class="in"># Define your Shiny UI here</span></span>
+<span id="cb11-287"><a href="#cb11-287" aria-hidden="true" tabindex="-1"></a><span class="in">ui &lt;- fluidPage(</span></span>
+<span id="cb11-288"><a href="#cb11-288" aria-hidden="true" tabindex="-1"></a><span class="in">  titlePanel("Normalverteilung"),</span></span>
+<span id="cb11-289"><a href="#cb11-289" aria-hidden="true" tabindex="-1"></a><span class="in">      sliderInput(</span></span>
+<span id="cb11-290"><a href="#cb11-290" aria-hidden="true" tabindex="-1"></a><span class="in">        inputId = "sd",</span></span>
+<span id="cb11-291"><a href="#cb11-291" aria-hidden="true" tabindex="-1"></a><span class="in">        label = "Standardabweichung:",</span></span>
+<span id="cb11-292"><a href="#cb11-292" aria-hidden="true" tabindex="-1"></a><span class="in">        min = 0.1,</span></span>
+<span id="cb11-293"><a href="#cb11-293" aria-hidden="true" tabindex="-1"></a><span class="in">        max = 3,</span></span>
+<span id="cb11-294"><a href="#cb11-294" aria-hidden="true" tabindex="-1"></a><span class="in">        value = 1,</span></span>
+<span id="cb11-295"><a href="#cb11-295" aria-hidden="true" tabindex="-1"></a><span class="in">        step = 0.1,</span></span>
+<span id="cb11-296"><a href="#cb11-296" aria-hidden="true" tabindex="-1"></a><span class="in">        width = "100%"</span></span>
+<span id="cb11-297"><a href="#cb11-297" aria-hidden="true" tabindex="-1"></a><span class="in">    ),</span></span>
+<span id="cb11-298"><a href="#cb11-298" aria-hidden="true" tabindex="-1"></a><span class="in">    mainPanel(width = 12,</span></span>
+<span id="cb11-299"><a href="#cb11-299" aria-hidden="true" tabindex="-1"></a><span class="in">      plotOutput(outputId = "distPlot", height = 400)</span></span>
+<span id="cb11-300"><a href="#cb11-300" aria-hidden="true" tabindex="-1"></a><span class="in">    )</span></span>
+<span id="cb11-301"><a href="#cb11-301" aria-hidden="true" tabindex="-1"></a><span class="in">)</span></span>
+<span id="cb11-302"><a href="#cb11-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-303"><a href="#cb11-303" aria-hidden="true" tabindex="-1"></a><span class="in"># Define your Shiny server logic here</span></span>
+<span id="cb11-304"><a href="#cb11-304" aria-hidden="true" tabindex="-1"></a><span class="in">server &lt;- function(input, output, session) {</span></span>
+<span id="cb11-305"><a href="#cb11-305" aria-hidden="true" tabindex="-1"></a><span class="in">  output$distPlot &lt;- renderPlot({</span></span>
+<span id="cb11-306"><a href="#cb11-306" aria-hidden="true" tabindex="-1"></a><span class="in">    # Generate a sequence of x values</span></span>
+<span id="cb11-307"><a href="#cb11-307" aria-hidden="true" tabindex="-1"></a><span class="in">    x &lt;- seq(</span></span>
+<span id="cb11-308"><a href="#cb11-308" aria-hidden="true" tabindex="-1"></a><span class="in">      from = - 4 * input$sd,</span></span>
+<span id="cb11-309"><a href="#cb11-309" aria-hidden="true" tabindex="-1"></a><span class="in">      to = 4 * input$sd,</span></span>
+<span id="cb11-310"><a href="#cb11-310" aria-hidden="true" tabindex="-1"></a><span class="in">      length.out = 1000</span></span>
+<span id="cb11-311"><a href="#cb11-311" aria-hidden="true" tabindex="-1"></a><span class="in">    )</span></span>
+<span id="cb11-312"><a href="#cb11-312" aria-hidden="true" tabindex="-1"></a><span class="in">    # Compute the normal distribution density</span></span>
+<span id="cb11-313"><a href="#cb11-313" aria-hidden="true" tabindex="-1"></a><span class="in">    y &lt;- dnorm(x, sd = input$sd)</span></span>
+<span id="cb11-314"><a href="#cb11-314" aria-hidden="true" tabindex="-1"></a><span class="in">    # Create a data frame</span></span>
+<span id="cb11-315"><a href="#cb11-315" aria-hidden="true" tabindex="-1"></a><span class="in">    data &lt;- data.frame(x = x, y = y)</span></span>
+<span id="cb11-316"><a href="#cb11-316" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-317"><a href="#cb11-317" aria-hidden="true" tabindex="-1"></a><span class="in">    # Plot using ggplot2</span></span>
+<span id="cb11-318"><a href="#cb11-318" aria-hidden="true" tabindex="-1"></a><span class="in">    ggplot(data, aes(x = x, y = y)) +</span></span>
+<span id="cb11-319"><a href="#cb11-319" aria-hidden="true" tabindex="-1"></a><span class="in">      geom_line(color = "steelblue", lwd = 1) +</span></span>
+<span id="cb11-320"><a href="#cb11-320" aria-hidden="true" tabindex="-1"></a><span class="in">      labs(x = "X", y = "Dichte") +</span></span>
+<span id="cb11-321"><a href="#cb11-321" aria-hidden="true" tabindex="-1"></a><span class="in">      lims(x = c(-10, 10)) +</span></span>
+<span id="cb11-322"><a href="#cb11-322" aria-hidden="true" tabindex="-1"></a><span class="in">      theme_minimal()</span></span>
+<span id="cb11-323"><a href="#cb11-323" aria-hidden="true" tabindex="-1"></a><span class="in">  })</span></span>
+<span id="cb11-324"><a href="#cb11-324" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb11-325"><a href="#cb11-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-326"><a href="#cb11-326" aria-hidden="true" tabindex="-1"></a><span class="in"># Create and launch the Shiny app</span></span>
+<span id="cb11-327"><a href="#cb11-327" aria-hidden="true" tabindex="-1"></a><span class="in">shinyApp(ui = ui, server = server)</span></span>
+<span id="cb11-328"><a href="#cb11-328" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code><button title="In die Zwischenablage kopieren" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
