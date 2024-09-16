@@ -264,14 +264,13 @@ server <- function(input, output, session) {
   })
 }
 
-# Shiny-App erzeugen und starten
+# Shiny-App erzeugen, Server starten
 shinyApp(ui = ui, server = server)
 ```
 
 ```{shinylive-r}
 #| standalone: true
 #| viewerHeight: 600
-#| cache: true
 library(shiny)
 library(ggplot2)
 
