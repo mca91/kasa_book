@@ -9,7 +9,7 @@ project:
 book:
   title: "Kausalanalyse mit R"
   reader-mode: true
-  author: "Martin C. Arnold, Christoph Hanck"
+  author: "Martin C. Arnold und Christoph Hanck"
   date: "November 2023"
   chapters:
     - index.qmd
@@ -37,6 +37,7 @@ book:
     - part: Übungsaufgaben
       chapters:
         - ex.qmd
+        - ex_RR.qmd
         - ex_simulation.qmd
     - Literatur.qmd
   repo-branch: main
