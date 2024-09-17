@@ -7,8 +7,21 @@ engine: knitr
 
 # Reproduzierbarkeit
 
-```{r, echo = F}
-make_codeblock <- function(text) cat(paste0("```{r}\n", text, "\n```"))
+```{r, echo=F, message=FALSE}
+library(gt)
+library(tidyverse)
+# Formatierung von gt-Tabellen
+tabopts <- function(x) {
+    fmt_number(x, decimals = 3, drop_trailing_zeros = T) %>%
+  tab_options(table_body.hlines.color = "white", 
+              column_labels.border.bottom.color = "black", 
+             column_labels.border.top.color = "black",
+             table_body.border.bottom.color = "black", 
+             table.border.bottom.color = "black",
+             column_labels.font.weight = "bold", 
+             table.font.color = "black", 
+             table.font.size = 16)
+}
 ```
 
 In viel empirischen Forschungsfeldern ist die *Reproduzierbarkeit* von Studienergebnissen von zentraler Bedeutung. Durch systematische Überprüfung und Bestätigung (oder Wiederlegung) wird die Aussagekraft und Verlässlichkeit wissenschaftlicher Erkenntnisse gewährleistet. Dieser Validierungsprozess ist entscheidend für weiterführende Forschung: Auf reproduzierbaren und verifizierten Ergebnissen können neue Hypothesen aufbauen, bestehende Theorien weiterentwickelt werden.
@@ -31,7 +44,7 @@ Reproduzierbare Forschung meint Prozesse, bei denen Forschende ihre Analysen und
 
 3. **Teilbarkeit**: Die verwendeten Daten, der Code und die Ergebnisse sollten leicht geteilt und überprüft werden können, idealerweise anhand eines (Datei)Formats, dass geringe technische Anforderungen hinsichtlich der Reproduzierbarkeit der Inhalte voraussetzt.
 
-RMarkdown ist ein Dokumentationsformat im R-Ökosystem, das es Nutzern ermöglicht die oben genannten Anforderungen an reprozierbare Forschung zu erfüllen. Es kombiniert die Funktionalitäten von Markdown, einer schlanken [Markup-Sprache](https://en.wikipedia.org/wiki/Markup_language) für Textformatierung, mit der Möglichkeit, direkt in R geschriebenen Code auszuführen und die Ergebnisse, einschließlich Tabellen und Grafiken in ein Ziel-Dokument einzubinden.
+RMarkdown ist ein Dokumentationsformat im R-Ökosystem, das es Nutzern ermöglicht die oben genannten Anforderungen an reprozierbare Forschung zu erfüllen. Es kombiniert die Funktionalitäten von [Markdown](https://markdown.de/), einer schlanken [Markup-Sprache](https://en.wikipedia.org/wiki/Markup_language) für Textformatierung, mit der Möglichkeit, direkt in R geschriebenen Code auszuführen und die Ergebnisse, einschließlich Tabellen und Grafiken in ein Ziel-Dokument einzubinden.
 
 ### Struktur
 
@@ -50,10 +63,19 @@ Ein typisches Rmarkdown-Dokument (eine `.rmd`-Datei) besteht aus drei Hauptkompo
 
 - **Code-Chunks und Inline-Code**: *Code-Chunks* enthalten *ausführbaren* R-Code (oder auch Code in anderen unterstützten Sprachen wie Python, SQL usw.), der *während der Erstellung* des Output-Dokument ausgeführt wird. Die Ergebnisse des Codes (z.B. Outputs von Schätzfunktionen wie `lm()`, Grafiken oder Tabellen) werden, gemeinsam mit dem Code, direkt im Dokument angezeigt. Ein einfacher Code-Chunk ist folgendermaßen aufgebaut:
 
-  ```{r}
-  #| echo: false
-  make_codeblock("# Ein Kommentar\n1+1")
+  ```{{r}}
+  # Ein einfacher Code-Chunk
+  1 + 1
   ```
+
+  Code-Chunks können mit Optionen versehen werden, die das Verhalten von *Knitr* beim Auswerten des Codes festlegen. Das Schema hierfür ist ` ```{r, option = wert} `, wobei mehrere Optionen komma-getrennt gesetzt werden können. Einige nützliche Optionen^[Ausführliche Erläuterungen und weitere Optionen können [hier](https://yihui.org/knitr/options/#code-evaluation) eingesehen werden.] (und ihre Standardwerte) sind:
+  
+  - `eval (TRUE)`: Gibt an, ob der Code-Chunk ausgeführt werden soll
+  - `echo (TRUE)`: Gibt an, ob (oder welche Zeilen des) Quellcodes eines Chunks ausgegeben werden sollen
+  - `cache (FALSE)`: Gibt an, ob die Ergebnisse des Code-Chunks zwischengespeichert werden sollen
+  - `warning (TRUE)`: Gibt an, ob Warnungen ausgegeben werden sollen
+  - `message (TRUE)`: Gibt an, ob Hinweise ausgegeben bleiben sollen
+  - `include (TRUE)`: Gibt an, ob der Code-Chunk im Ausgabedokument enthalten sein soll
 
   **Inline-Code** kann im Fließtext verwendet werden, um die Ergebnisse einzeiligen Codes (oft kleine Rechnungen oder der Inhalt eines Objekts) direkt im Text (s.u.) auszugeben. Inline-Code-Ausdrücke können wie folgt ausgewertet werden:
   
@@ -64,7 +86,8 @@ Ein typisches Rmarkdown-Dokument (eine `.rmd`-Datei) besteht aus drei Hauptkompo
   
 - *Markdown-formatierter Text*: Dies sind Abschnitte mit Fließtext, der in der [Markdown-Syntax](https://www.markdownguide.org/basic-syntax/) formatiert wird. Hierbei können Textformatierungen wie Überschriften, Listen, Links, Bilder aus externen Dateien und weitere Elemente durch kurze Befehle erstellt oder eingebunden werden. Zur Erläuterung statistischer Methoden können [$\LaTeX$-Formeln](https://de.wikipedia.org/wiki/LaTeX) in Text-Abschnitten gesetzt werden.
 
-### Datei erstellen und kompilieren
+
+### Datei erstellen und kompilieren {#sec-genrmd}
 
 Um eine `.Rmd`-Datei in das gewünschte Output-Format umzuwandeln (zu kompilieren), sind mehrere Software-Pakete und Schritte erforderlich:
 
@@ -91,35 +114,45 @@ Sind diese Komponenten der vorhanden, ist Rmarkdown in der Lage den Kompilierung
 
 1. Die von R-Code abhängigen Komponenten des `.Rmd`-Dokuments werden ausgeführt. Sämtliche Strukturelemente und ihre Ergebnisse werden durch das Tool [`knitr`](https://yihui.org/knitr/) in ein Markdown-Dokument (Dateiendung `.md`) übersetzt.^[Dieser Prozess wird auch als *knitting* (engl. stricken) bezeichnet: sämtliche Komponenten werden nach Ausführung des R-Codes zusammengestrickt und in ein `.md`-Format überführt.]
 
-2. Das in Schritt 1 erzeugte Markdown-Dokument wird dem Tool *pandoc* übergeben. Pandoc Pandoc ist ein Open-Source-Tool zur Dokumentenkonvertierung, das Texte in zahlreiche verschiedene Formate transformiert, darunter HTML, PDF, Word, und viele weitere. Die Formatierung und Bereitstellung des Outputs erfolgt gemäß der im `yaml`-Header festgelegten Format-Funktion (`output: ...`).
+2. Das in Schritt 1 erzeugte Markdown-Dokument wird dem Tool [*pandoc*](https://pandoc.org) übergeben. Pandoc ist ein Open-Source-Tool zur Dokumentenkonvertierung, das Texte in zahlreiche verschiedene Formate transformiert, darunter HTML, PDF, Word, und viele weitere. Die Formatierung und Bereitstellung des Outputs erfolgt gemäß der im `yaml`-Header festgelegten Format-Funktion (`output: ...`).
 
 ![Workflow beim Kompilieren von Rmd-Dokumenten [Quelle: @Xieetal2020]](img/rmdworkflow.png){#fig-rmdwf width=80%}
 
-Um eine neue `.rmd-Datei` in RStudio zu erstellen und zu kompilieren, nutzen wir die Menü-Schaltflächen *Datei* $\rightarrow$ *Neue Datei* und wählen *R markdown* im Kontext-Menü aus. In dem sich anschließend öffnenden Dialog sind bereits Standard-Einstellungen für ein einfaches HTML-Dokument gesetzt.^[Die hier erfolgte Konfiguration setzt lediglich rudimentäre Optionen im `yaml`-Header, die später angepasst werden können.] Nach Bestätigung der Konfiguration mit *OK* wird ein `.Rmd`-Dokument mit Beispiel-Code geöffnet. @fig-rmdgif2 zeigt diesen Ablauf.
+Um eine neue `.rmd-Datei` in RStudio zu erstellen und zu kompilieren, nutzen wir die Menü-Schaltflächen *Datei* $\rightarrow$ *Neue Datei* und wählen *R markdown* im Kontext-Menü aus. In dem sich anschließend öffnenden Dialog sind bereits Standard-Einstellungen für ein einfaches HTML-Dokument gesetzt.^[Die hier erfolgte Konfiguration setzt lediglich rudimentäre Optionen im `yaml`-Header, die später angepasst werden können.] Nach Bestätigung der Konfiguration mit "*OK*" wird ein `.Rmd`-Dokument mit Beispiel-Code geöffnet. @fig-rmdgif2 zeigt diesen Ablauf.
 
 ![RStudio: `.Rmd`-Datei erstellen](img/ezgif-rmd-1.gif){#fig-rmdgif2 width=80%}
 
-Das neue `.Rmd`-Dokument kann nun bearbeitet und, nach erstmaligem abspeichern (hier unter dem namen `diamanten.rmd`) kompiliert werden. Hierzu klicken wir in der Aktionsleiste unterhalb des Dokumenten-Tabs auf "Knit", siehe @fig-rmdgifkomp. RMarkdown beginnt nun mit der Kompilierung des Dokuments. Wenn dieser Prozess fehlerfrei abschließt, öffnet sich die erzeugte HTML-Datei automatisch im Vorschau-Fenster in RStudio.
+Das neue `.Rmd`-Dokument kann nun bearbeitet werden. Beachte, dass Code-Chunks (grau hinterlegt) direkt im Dokument ausgeführt werden können und das Ergebnis im Editor angezeigt wird. Dies erfolgt durch Klick auf den "Play"-Button im jeweiligen Chunk.^[Eine Keyboard-Shurtcut zum Ausführungen von Chunks ist `CMD + Enter` in MacOS und `STRG + Enter` bei Windows.] @fig-rmdchunkex zeigt diesen Vorgang für zwei Chunks in standardmäßig bereitgestellten Minimalbeispiel. Die so ggf. erzeugten R-Objekte werden in der Arbeitsumgebung von RStudio zugeordnet.
 
-![RStudio: `.Rmd`-Datei kompilieren](img/ezgif-rmd-knit.gif){#fig-rmdgifkomp width=80%}
+![RStudio: Code-Chunks in `.Rmd`-Datei ausführen](img/ezgif-chunkec.gif){#fig-rmdchunkex width=80%}
 
+`.Rmd`-Dateien sind also eine Alternative zur Programmierung von R-Code in einem R-Skript (einer `.R`-Datei), die dem Nutzer mehr Komfort und die Möglichkeit zu [*Literate Programming*](https://de.wikipedia.org/wiki/Literate_Programming) bietet. Literate Programming meint die Praxis, Quellcode und erklärenden Text so zu kombinieren, dass der Code von Menschen besser verstanden werden kann. Der Fokus liegt dabei darauf, den Programmablauf verständlich zu dokumentieren, indem Code und dessen Beschreibung in einem einzigen Dokument integriert werden. So werden nicht nur die technischen Aspekte der Analyse dargestellt, sondern auch der *gedankliche Prozess* hinter der Analyse klar und nachvollziehbar.
 
+Nach erstmaligem abspeichern der `.Rmd`-Datei (hier unter dem namen `diamanten.rmd`) kann das Dokument kompiliert werden. Hierzu klicken wir in der Aktionsleiste unterhalb des Dokumenten-Tabs auf den Button "*Knit*", siehe @fig-rmdgifkomp.^[Eine Keyboard-Shurtcut zum Kompilieren der `.Rmd`-Datei ist `CMD + Shift + k` in MacOS und `STRG + Shift + k` bei Windows.] 
 
-### Ein Minimalbeispiel
+![RStudio: `.Rmd`-Datei kompilieren](img/ezgif-rmd-knit.gif){#fig-rmdgifkomp width=50% fig-align='center'}
 
-Das folgene Minimalbeispiel zeigt den Aufbau einer `.Rmd`-Datei für die Analyse eines Datensatzes unter Verwendung der oben erläuterten Definitionen und Strukturelemente:
+RMarkdown beginnt nun mit der Kompilierung des Dokuments, wobei der Ablauf in @fig-rmdwf für das entsprechende Output-Format ausgeführt wird. Der Fortschritt der Kompilierung wird im Tab "Render" angezeigt und informiert zunächst über die Ausführung der Code-Chunks und zeigt anschließend den Log für die Umwandlung in das Output-Format mit *pandoc*, siehe @fig-rmdgifkomp.
 
-- Wir erzeugen ein HTML-Dokument mit dem Titel "Diamanten" sowie einer Datumsangabe. 
+![RStudio: Fortschritt der Kompilierung im Tab 'Render'](img/ezgif-rmd-3.gif){#fig-rmdex2 width=80% fig-align='center'}
+
+Wenn dieser Prozess fehlerfrei abschließt, wird im Verzeichnis von `diamanten.rmd` eine gleichnamige Datei mit der Endung `.html` erstellt. Die erzeugte HTML-Datei wird automatisch im Vorschaufenster von *RStudio* angezeigt, kann jedoch auch in jedem Webbrowser dargestellt und damit zur Reproduktion der Analyse an andere weitergegeben werden.
+
+### Ein Beispiel
+
+Das folgene Minimalbeispiel zeigt den Aufbau einer `.Rmd`-Datei für eine kurze Analyse des Datensatzes `ggplot2::diamonds` unter Verwendung der oben erläuterten Definitionen und Strukturelemente:
+
+- Im `yaml`-Header definieren wir den Output als HTML-Dokument mit dem Titel "Diamanten" sowie einer Datumsangabe. 
 
 - Die Datei enthält zwei Code-Chunks, die den Datensatz `ggplot2::diamonds` einlesen, unter Verwendung von `dplyr`-Funktionen transformieren und eine kleine graphische Auswertung mit `ggplot2` erstellen. 
 
-- Die Schritte der Analyse werden im Fließtext zwischen den Code-Chunks erläutert. Hierbei kommt sowohl Markdown-Syntax zur Formatierung zum Einsatz als auch Inline-Code um Informationen mit R-Code zu berechnen und unmittelbar in die Erläuterungen einzubinden. Dank dieser Vorgehensweise passen sich die Erklärungen der Vorgehensweise für die Analyse automatisch an, wenn die verwendeten Variablen in den Code-Chunks geändert werden.
+- Die Schritte der Analyse werden im Fließtext zwischen den Code-Chunks erläutert. Hierbei kommt sowohl Markdown-Syntax zur Formatierung zum Einsatz als auch Inline-Code um Informationen mit R-Code zu berechnen und unmittelbar in die Erläuterungen einzubinden. Dank dieser Vorgehensweise passen sich die Erklärungen der Analyse automatisch an, wenn die verwendeten Variablen in den Code-Chunks geändert werden.
 
 - Der letzte Textblock verwendet $\LaTeX$-Code, um die zuvor mit R-Code durchgeführte Berechnung zu erläutern.
 
 
-
 ***diamanten.Rmd:*** 
+
 ```{r}
 #| echo: false
 cat('
@@ -156,17 +189,210 @@ Die Formel für diese Berechnung ist $$\\max(\\textup{carat}).$$\n
 ')
 ```
 
----
+Eine `.rmd`-Datei mit dem obigen Code kann [hier](https://github.com/mca91/kasa_book/blob/main/misc/diamonds.rmd) herunterlagen werden. Alternativ kann in RStudio ein neues Dokument erstellt werden (siehe @sec-genrmd) und der Inhalt kopiert und eingefügt werden. 
+
+![RStudio: `diamonds.Rmd` kompilieren](img/ezgif-rmd-2.gif){#fig-diamondsknit width=80% fig-align='center'}
+
+![](img/ezgif-rmd-3.gif){width=80% fig-align='center'}
+
+Nach der Kompilierung des Dokuments mit *knitr* (siehe @fig-diamondsknit) erhalten wir das in @fig-diamondshtml gezeigte HTML-Dokument. Das Resultat ist eine Webseite, die [hier](/diamanten.html){target="_blank"} eingesehen werden kann.
+
+![diamonds.html](img/diamonds_res.png){#fig-diamondshtml width=80% fig-align='center'}
+
+Sofern eine $\LaTeX$-Distribution installiert ist, kann der Output ohne weiteren Aufwand als PDF-Datei generiert werden. Hierzu setzen wir über das Kontext-Menü neben dem "*Knit*"-Button im Dokumenten-Tab die Option *Knit to PDF*, siehe @fig-knitpdf. RMarkdown beginnt dann unmittelbar mit der Kompilierung des Dokuments und erzeugt anschließend mit *pandoc* und dem $\LaTeX$-Compiler die PDF-Datei `diamonds.pdf` im entsprechenden Arbeitsverzeichnis.
+
+![diamanten.pdf](img/ezgif-knitpdf.gif){#fig-knitpdf width=60% fig-align='center'}
+
+@fig-diamondspdfres zeigt das finale PDF-Dokument `diamanten.pdf`.
+
+![diamanten.pdf](misc/diamanten.pdf){#fig-diamondspdfres width=80% height=900 fig-align='center'}
 
 
-![RStudio: `.Rmd`-Datei erstellen](img/ezgif-rmd-2.gif){#fig-rmdex1 width=80% fig-align='center'}
-![RStudio: `.Rmd`-Datei erstellen](img/ezgif-rmd-3.gif){#fig-rmdex2 width=80% fig-align='center'}
+### Tabellen
 
-![RStudio: `.Rmd`-Datei erstellen](img/diamonds_res.png){#fig-rmdex3}
+In RMarkdown können einfache Tabellen durch Markup-Syntax erstellt werden. Hierbei werden die Zeichen "-", "|" und ":" kombiniert um die Dimensionen und die Formatierung der Tabelle zu definieren: Jede Spalte wird durch senkrechte Striche getrennt. Die Kopfzeile der Tabelle wird mit Bindestrichen unterhalb definiert. Um die Ausrichtung der Inhalte in den Spalten festzulegen, verwendet man unterhalb der Kopfzeile Doppelpunkte in den Spaltendefinitionen.
+
+Der nachfolgende Markdown-Code-Chunk definiert eine Tabelle mit vier Zeilen und vier Spalten, deren Inhalte unterschiedliche Ausrichtungen haben. @tbl-simplemd ist das Ergebnis.
+
+
+```{md}
+| rechts | links | standard | zentriert |
+|-------:|:------|----------|:---------:|
+|   12   |   12  |   12     |   12      | 
+|  123   |  123  |  123     |  123      | 
+|    1   |    1  |    1     |    1      |
+```
+
+::: {tbl} 
+
+| rechts | links | standard | zentriert |
+|-------:|:------|----------|:---------:|
+|   12   |   12  |   12     |   12      | 
+|  123   |  123  |  123     |  123      | 
+|    1   |    1  |    1     |    1      |
+
+Table: Eine einfache mit markdown erzeugte Tabelle {#tbl-simplemd}
+:::
+
+Oft ist es wünschenswert, die Ergebnisse statistischer Analysen in einer Tabelle darzustellen. Das R-Paket `knitr` bietet mit `knitr::kable()` eine rudimentäre Funktion, um den Inhalt eines "rechteckigen" R-Objekts^[Hierzu zählen typische Formate wie Vektoren, Matrizen, data.frames und tibbles.] für diverse Output-Formate zu formatieren. 
+
+Im nächsten Code-Chunk definieren wir eine Matrix `m` mit den numerischen Werten aus @tbl-simplemd und nutzen `kable()` für eine Transformation in ein HTML-kompatibles tabellarisches Format.^[Bei Kompilierung zu PDF (@sec-genrmd) erzeugt `kable()` automatisch eine entsprechende $\LaTeX$-Tabelle.] @tbl-mkable zeigt das Ergebnis.
+
+```{{r}}
+library(tidyverse)
+
+# matrix erzeugen
+m  <- matrix( 
+  c(12, 123, 1), 
+  nrow = 3, 
+  ncol = 4, 
+  byrow = TRUE
+)
+
+# Spaltennamen festlegen 
+colnames(m) <- c("rechts", "links", 
+                 "standard", "zentriert")
+
+# Tabelle Erzeugen
+knitr::kable(
+  m, 
+  align = c("r", "l", "l", "c"), 
+  format = "html"
+)
+```
+
+```{r}
+#| echo: false
+#| tbl-cap: "Mit `knitr::kable()` erzeugte tabellarische Darstellung der Matrix `m`"
+#| label: tbl-mkable
+# matrix erzeugen
+m <- matrix( 
+  c(12, 123, 1), 
+  nrow = 3, 
+  ncol = 4, 
+  byrow = TRUE
+)
+
+# Spaltennamen festlegen 
+colnames(m) <- c("rechts", "links", 
+                 "standard", "zentriert")
+
+# Tabelle Erzeugen
+knitr::kable(
+  m, 
+  align = c("r", "l", "l", "c"), 
+  format = "html"
+)
+```
+
+Statistische Analysen profitieren erheblich von einer klaren und strukturierten Aufbereitung der Ergebnisse in Tabellen. Es gibt zahlreiche R-Pakete, die aus Modell-Objekten, wie sie beispielsweise von der Funktion `lm` ausgegeben werden, informative tabellarische Darstellungen der Regressionsergebnissen zu erzeugen.
+
+Ein modernes und vielseitiges Paket für diesen Zweck ist `modelsummary`. Mit `modelsummary` können wir die Ergebnisse direkt in gut formatierte Tabellen exportieren, die in verschiedenen Formaten wie HTML, $\LaTeX$ oder Word ausgegeben werden können. Darüber hinaus bietet das Paket viele [Optionen zur Anpassung des Outputs](https://modelsummary.com/vignettes/modelsummary.html), etwa das Hinzufügen von Konfidenzintervallen, statistischen Tests oder zusätzlichen Statistiken.
+
+Zur illustration von `modelsummary()` schätzen wir nachfolgend das einfache Regressionsmodell
+
+\begin{align*}
+  \textup{price} = \beta_0 + \beta_1 \textup{carat} + u
+\end{align*}
+
+anhand des Datenusatzes `ggplot2::diamonds`, um den Einfluss des Gewichts von Diamanten auf ihren Verkaufspreis zu untersuchen.
+
+```{r}
+# `diamonds` zuweisen
+df <- ggplot2::diamonds
+
+# Regression durchfühen
+(
+  s <- summary(
+    lm(formula = price ~ carat, data = df)
+  )
+)
+```
+
+Für eine professionelle tabellarische Darstellung der Regressionsergebnisse übergeben wir das Objekt `s` in einer bennanten Liste an `modelsummary()`. Mit `star = T` erhalten wir Signifikanzzeichen an den geschätzten Koeffizienten. `output = "gt"` legt fest, dass das Paket `gt` für die Formatierung der Tabelle verwendet werden soll.^[Mit dieser Konfiguration werden die meisten Tabellen in diesem Buch erzeugt.] @tbl-msgtex zeigt die tabellierten Regressionsergebnisse.
+
+```{r}
+#| tbl-cap: "Mit `modelsummary` und `gt` erstellte tabellarische Zusammenfassung einer Regression"
+#| label: tbl-msgtex
+library(modelsummary)
+library(gt)
+
+# Regressionsoutput mit modelsummary darstellen
+modelsummary(
+  models = list("Abh. Variable: price" = s), 
+  stars = T, 
+  output = "gt"
+)
+```
+
+### Mathematische Formeln
+
+In RMarkdown können mathematische Formeln sowohl inline (innerhalb einer Textzeile) als auch als Blockgleichungen gesetzt werden. Inline-Gleichungen werden direkt im Fließtext platziert. Wir verwenden einzelne Dollarzeichen \$...\$, um den mathematischen Ausdruck zu markieren.
+
+::: {.callout-note appearance="simple"}
+
+**Beispiel: Inline-Gleichung**
+
+*Die Gleichung \$y = \\beta_0 + \\beta_1x\$ beschreibt eine lineare Funktion.*
+
+In mit RMardkown kompilierten Dokumenten wird dieser Satz dargestellt als:
+
+Die Gleichung $y = \beta_0 + \beta_1x$ beschreibt eine lineare Funktion.
+
+:::
+
+Blockgleichungen stehen separat vom Text, zentriert und hervorgehoben. Sie werden mit doppelten Dollarzeichen eingefasst:
+
+```latex
+$$ ... $$
+```
+
+::: {.callout-note appearance="simple"}
+
+**Beispiel: Block-Gleichung**
+
+Der Ausdruck 
+
+```latex
+$$y = \beta_0 + \beta_1 x$$
+```
+
+erscheint im kompilierten Dokument als
+
+$$y = \beta_0 + \beta_1x.$$
+
+:::
+
+Mit Gleichungs-Umgebungen wie \\begin{align*}...\\end{align*} können mehrzeilige Gleichungen dargestellt werden. Hierbei wird dient `&` als Anker-Punkt für die Ausrichtung der Gleichungen. Mit `\\` wird eine neue Zeile begonnen.
+
+::: {.callout-note appearance="simple"}
+
+**Beispiel: Normale Dichtefunktion**
+
+Der Ausdruck
+
+```latex
+\begin{align*}
+  f(x) &= \frac{1}{\sigma \sqrt{2\pi}} 
+  \exp\left( -\frac{(x - \mu)^2}{2\sigma^2} \right) \\
+       &= \frac{1}{\sigma \sqrt{2\pi}} 
+  \exp\left( -\frac{x^2 - 2x\mu + \mu^2}{2\sigma^2} \right)
+\end{align*}
+```
+
+erscheint im kompilierten Dokument als
+
+\begin{align*}
+  f(x) &= \frac{1}{\sigma \sqrt{2\pi}} 
+  \exp\left( -\frac{(x - \mu)^2}{2\sigma^2} \right) \\
+       &= \frac{1}{\sigma \sqrt{2\pi}} 
+  \exp\left( -\frac{x^2 - 2x\mu + \mu^2}{2\sigma^2} \right).
+\end{align*}
+:::
 
 ## Shiny
 
-*Shiny* ist ein R-Paket, das die Erstellung interaktiver Webanwendungen (Apps) und Dashboards direkt aus R heraus ermöglicht. Mit Shiny können Nutzer dynamische, datengetriebene Visualisierungen und interaktive Elemente wie Slider, Dropdown-Menüs und Schaltflächen in ihren Anwendungen einbinden, ohne hierzu üblicherweise erforderliche Web-Standards wie HTML, CSS und JavaScript sowie die server-seitige Ausführung von R-Programmcode zu beherrschen.^[Kenntnisse in der Programmierung von Websiten sind jedoch hilfreich für das Fine-Tuning von Shiny-Applikationen.] Die Anwendungen laufen entweder lokal auf dem eigenen Rechner oder können über einen Webserver bereitgestellt werden (Hosting), sodass sie über das Internet zugänglich sind.^[Für Online-Hosting fallen in der Regel Gebühren an. Kleine Applikationen mit beschränkter Laufzeit können über RStudio auf [shinyapps.io](https://www.shinyapps.io/) kostenfrei gehostet werden.] 
+[*Shiny*](https://shiny.posit.co) ist ein R-Paket, das die Erstellung interaktiver Webanwendungen (Apps) und Dashboards direkt aus R heraus ermöglicht. Mit Shiny können Nutzer dynamische, datengetriebene Visualisierungen und interaktive Elemente wie Slider, Dropdown-Menüs und Schaltflächen in ihren Anwendungen einbinden, ohne hierzu üblicherweise erforderliche Web-Standards wie HTML, CSS und JavaScript sowie die server-seitige Ausführung von R-Programmcode zu beherrschen.^[Kenntnisse in der Programmierung von Websiten sind jedoch hilfreich für das Fine-Tuning von Shiny-Applikationen.] Die Anwendungen laufen entweder lokal auf dem eigenen Rechner oder können über einen Webserver bereitgestellt werden (Hosting), sodass sie über das Internet zugänglich sind.^[Für Online-Hosting fallen in der Regel Gebühren an. Kleine Applikationen mit beschränkter Laufzeit können über RStudio auf [shinyapps.io](https://www.shinyapps.io/) kostenfrei gehostet werden.] 
 
 Shiny-Apps eignen sich besonders gut für die Bereitstellung von Data-Science-Tools: Nutzer einer Shiny-Anwendung können die Parameter der Analyse ändern und sehen unmittelbar, wie sich diese Änderungen auf die Ergebnisse auswirken, was die Nachvollziehbarkeit erhöht. Da die zugrunde liegenden R-Codes in die Anwendung eingebettet sind, bleibt der gesamte Analyseprozess offen zugänglich, und andere Forschende können die Anwendung nutzen, um die Ergebnisse auf ihre eigenen Daten anzuwenden oder die Schritte zu reproduzieren. Diese "interaktive Transparenz" fördert also die Reproduzierbarkeit datengetriebener Analysen, indem sie nicht nur den Code, sondern den gesamten Analyseablauf zugänglicher macht.
 
@@ -174,11 +400,19 @@ Shiny ermöglicht zudem eine effektive Kommunikation von Forschungsergebnissen, 
 
 ### Grundlagen 
 
+Ein *Shiny*-Projekt kann ähnlich wie ein *RMarkdown*-Projekt direkt in *RStudio* entwickelt werden. Dazu wählen wir im Menü für eine neue Datei: *File* $\rightarrow$ *New File* $\rightarrow$ *Shiny Web App…*. Im folgenden Dialogfeld müssen lediglich der Name der Applikation sowie optional das Arbeitsverzeichnis festgelegt werden. Standardmäßig kann der gesamte Code der Applikation in einer einzigen Datei namens `app.R` organisiert werden. Diese Datei wird nach einem Klick auf "*Create*" erstellt, siehe @fig-shinygif1.
+
 ![RStudio: *Shiny*-App erstellen](img/shiny-gif1.gif){#fig-shinygif1 width=80% fig-align='center'}
 
-![RStudio: *Shiny*-App erstellen](img/shiny-gif2.gif){#fig-shinygif2 width=80% fig-align='center'}
+Der nächste Code-Chunk zeigt den grundsätzlichen Aufbau einer *Shiny*-App. Dieser besteht aus drei Komponenten:
 
-`app.R`
+- **Benutzer-Interface**: In `ui <- fluidPage()` definieren wir das Layout und die Darstellung der App. Der Funktion `fluidPage()` können Funktions-Objekte übergeben werden, die verschiedene Benutzeroberflächenelemente wie Schaltflächen, Schieberegler, Eingabefelder und auch Ausgabeelemente (z.B. eine Grafik) definiert und ihre Anordnung strukturiert.
+
+- **Server-Logik**: In `server <- function(input, output, session) {...}` wird die Funktionsweise der App mit R-Code programmiert. Hier legen wir fest, wie Reaktionenen auf Benutzereingaben verarbeitet, Berechnungen durchgeführt und die Ergebnisse als Ausgaben zurück an die Benutzeroberfläche übergeben werden.
+
+- **App-Objekt**: `shinyApp(ui = ui, server = server)` startet den Server und verknüpft das Benutzer-Interface `ui` mit der Server-Logik `server`. Die App wird anschließend über eine (lokale) IP-Adresse zur Ausführung bereitstellt und kann in einem Web-Browser aufgerufen werden.^[Diese Komponente der App muss in der Regel nicht weiter modifiziert werden.]
+
+Der nächste Code-Chunk zeigt diesen grundsätzlichen Aufbau.
 
 ```{r}
 #| eval: false
@@ -186,10 +420,10 @@ library(shiny)
 
 # Benutzer-Interface definieren
 ui <- fluidPage(
-      # Input-Elemente & Output-Elemente
+  # Input-Elemente & Output-Elemente
 )
 
-# Shiny-Server konfigurieren
+# Logik für Shiny-Server festlegen
 server <- function(input, output, session) {
   # Server-Code
 }
@@ -198,11 +432,136 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+### Die Standard-App
+
+Die Standard-*Shiny*-App in der Datei app.R erzeugt eine interaktive Grafik, die die Verteilung der Wartezeiten bis zum nächsten Ausbruch des Geysirs [*Old Faithful*](https://de.wikipedia.org/wiki/Old_Faithful) im Yellowstone-Nationalpark in den USA visualisiert.^[Der Datensatz ist in der Basis-Installation von R unter `datasets::faithful` verfügbar.] In der *Shiny*-App kann der Benutzer über einen Slider die Anzahl der Klassen des Histogramms variieren. Die App ist so programmiert, dass sich die Grafik automatisch für die gewählte Anzahl an Intervallen aktualisiert.
+
+```{r}
+#| eval: false
+# This is a Shiny web application. You can run the application by clicking
+# the 'Run App' button above.
+#
+# Find out more about building applications with Shiny here:
+#
+#    https://shiny.posit.co/
+#
+
+library(shiny)
+
+# Define UI for application that draws a histogram
+ui <- fluidPage(
+
+    # Application title
+    titlePanel("Old Faithful Geyser Data"),
+
+    # Sidebar with a slider input for number of bins 
+    sidebarLayout(
+        sidebarPanel(
+            sliderInput("bins",
+                        "Number of bins:",
+                        min = 1,
+                        max = 50,
+                        value = 30)
+        ),
+
+        # Show a plot of the generated distribution
+        mainPanel(
+           plotOutput("distPlot")
+        )
+    )
+)
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+
+    output$distPlot <- renderPlot({
+        # generate bins based on input$bins from ui.R
+        x    <- faithful[, 2]
+        bins <- seq(min(x), max(x), length.out = input$bins + 1)
+
+        # draw the histogram with the specified number of bins
+        hist(x, breaks = bins, col = 'darkgray', border = 'white',
+             xlab = 'Waiting time to next eruption (in mins)',
+             main = 'Histogram of waiting times')
+    })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server)
+```
+
+Um die App auszuführen, genügt ein Klick auf "*Run App*" oben im Dokumenten-Tab, siehe @fig-shinygif2. 
+
+![RStudio: *Shiny*-App erstellen](img/shiny-gif2.gif){#fig-shinygif2 width=80% fig-align='center'}
+
+`app.R` wird nun ausgeführt, indem ein lokaler *Shiny*-Server gestartet wird. Die App wird anschließend entweder im integrierten Vorschaufenster von *RStudio* oder in einem externen Browser automatisch geöffnet. Zuerst wird die in `ui` definierte Benutzeroberfläche geladen und angezeigt, sodass interaktive Elemente wie Schieberegler oder Schaltflächen verfügbar werden. Gleichzeitig wird die in der `server`-Funktion definierte Logik aktiv, in der festgelegt ist, wie Benutzereingaben über das interaktive Elemente verarbeitet und die Ausgaben in Echtzeit aktualisiert werden.^[Je nach Komplexität der Berechnung kann es hierbei zu Verzögerungen bei der erstmaligen Anzeige oder Aktualisierungen kommen.] Das nachfolgende Widget zeigt das Resultat für die Standard-App.
+
+```{shinylive-r}
+#| standalone: true
+#| viewerHeight: 650
+#
+# This is a Shiny web application. You can run the application by clicking
+# the 'Run App' button above.
+#
+# Find out more about building applications with Shiny here:
+#
+#    https://shiny.posit.co/
+#
+
+library(shiny)
+
+# Define UI for application that draws a histogram
+ui <- fluidPage(
+
+    # Application title
+    titlePanel("Old Faithful Geyser Data"),
+
+    # Sidebar with a slider input for number of bins
+    sidebarLayout(
+        sidebarPanel(
+            sliderInput("bins",
+                        "Number of bins:",
+                        min = 1,
+                        max = 50,
+                        value = 30)
+        ),
+
+        # Show a plot of the generated distribution
+        mainPanel(
+           plotOutput("distPlot")
+        )
+    )
+)
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+
+    output$distPlot <- renderPlot({
+        # generate bins based on input$bins from ui.R
+        x    <- faithful[, 2]
+        bins <- seq(min(x), max(x), length.out = input$bins + 1)
+
+        # draw the histogram with the specified number of bins
+        hist(x, breaks = bins, col = 'darkgray', border = 'white',
+             xlab = 'Waiting time to next eruption (in mins)',
+             main = 'Histogram of waiting times')
+    })
+}
+
+# Run the application
+shinyApp(ui = ui, server = server)
+```
+
 ### Beispiel: Normalverteilung
+
+In diesem Beispiel zeigen wir, wie eine statische R-Grafik in mit *Shiny* in eine interaktive Grafik umgewandelt werden kann. Als Fallbeispiel betrachten wir die Veranschaulichung des Effekts des Verteilungsparameters Standardabweichung auf die Form der Dichtefunktion einer standardnormalverteilten Zufallsvariable. Ähnlich wie in der Standard-Shiny-App liegt der Fokus hierbei darauf das Ergebnis einer statistischen Berechnung (Dichtefunktion) und der Variation von Parametern der Berechnnug (Variation der Standardabweichung) durch grafische interaktive Darstellung in leicht-verständlicher Art zu kommunizieren. 
+
+Ein guter Ansatz für die Konzeption einer Shiny-App ist es, zunächst eine repräsentative Statische Version des Codes zu definieren. Wir nutzen `ggplot2` um die für eine Sequenz `x` von 1000 Werten im Bereich -4 bis 4 berechneten Werte der Dichtefunktion einer Standardnormalverteilung als Glockenkurve zu visualisieren.
 
 ```{r}
 #| fig-align: 'center'
 library(ggplot2)
+
 x <- seq(
   from = - 4, 
   to = 4,
@@ -222,6 +581,17 @@ lims(x = c(-10, 10)) +
 theme_minimal()
 ```
 
+Zunächst definieren wir das Benutzer-Interface für die *Shiny*-App. Wir verwenden `shiny::fluidPage()`, um das Layout der App zu gestalten und fügen wir mit `shiny::sliderInput()` einen Slider hinzu, der erlaubt die Standardabweichung der Normalverteilung zwischen 0.1 und 3 anzupassen. Der Slider wird mit einer Schrittweite von 0.1 konfiguriert. Zusätzlich legen wir mit `shiny::plotOutput()` fest, dass die resultierende Grafik im Output-Panel der Benutzeroberfläche angezeigt wird.
+
+Anschließend richten wir die Server-Logik ein. Mit `shiny::renderPlot()` erreichen wir, dass die Grafik jedes Mal neu gezeichnet wird, wenn der Benutzer den Wert der Standardabweichung über den Slider variiert. Der aktuelle Wert des Schiebereglers wird durch die Variable `input$sd` an zwei Stellen des Codes für die statische Grafik integriert:
+
+1. In der Definition der Sequenz `x`. Wir modifizieren die Argumente `from` und `to` so, dass Start- und Endwerte in `x` entsprechend der gewählten Standardabweichung den relevanten Bereich der X-Achse abdecken.
+
+2. Bei der Berechnung der Dichte mit `dnorm()`. So stellen wir sicher, dass die Grafik die neu berechnete Normalverteilung mit der jeweils gewählten Standardabweichung in anzeigt. 
+
+Beachte, dass die X-Achse auf einen festen Bereich von -10 bis 10 begrenzt ist, damit die Änderungen in der "Breite" der Dichtefunktion erkennbar sind. Andernfalls skaliert `ggplot2` die Achse automatisch, um für den gewählten Wert der Standardabweichung die bestmögliche Darstellung zu gewährleisten.^["Bestmöglich" meint hier eine "hinreichend große" Skalierung der Achse. Dies ist hinderlich, wenn wir den Effekt der Skalierung der Verteilung beobachten wollen.]
+
+Sobald wir die App starten und der Schieberegler verwenden, wird die Grafik dynamisch aktualisiert: Kleine Werte für die Standardabweichung führen zu einer stärkeren Zentrierung der typischen Glockenform der Verteilung um den Erwartungswert 0.
 
 ```{r}
 #| eval: false
@@ -249,8 +619,8 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   output$distPlot <- renderPlot({
     x <- seq(
-      from = - 4 * input$sd,
-      to = 4 * input$sd,
+      from = - 3.33 * input$sd,
+      to = 3.33 * input$sd,
       length.out = 1000
     )
     y <- dnorm(x, sd = input$sd)
@@ -317,3 +687,9 @@ server <- function(input, output, session) {
 # Create and launch the Shiny app
 shinyApp(ui = ui, server = server)
 ```
+
+## Zusammenfassung
+
+In diesem Kapitel haben wir die Bedeutung der Reproduzierbarkeit datengetriebener Analysen diskutiert und gezeigt, wie diverse Pakete im R-Ökosystem verwendet werden können, um reproduzierbare Analysen zu erstellen. Zu den wichtigsten Werkzeugen gehört *RMarkdown*, das die Erstellung von Berichten ermöglicht, in denen mathematische Erläuterungen, Programm-Code, code-basierte Outputs und Text nahtlos integriert sind. *RMarkdown* ermöglicht es, sämtliche Schritte einer Analyse transparent zu dokumentieren und die Ergebnisse in verschiedene Formaten zu exportieren und zu teilen.
+
+Ein weiteres leistungsstarkes Werkzeug zur Förderung der Reproduzierbarkeit ist das *Shiny*-Paket, das es Forschenden ermöglicht, interaktive Webanwendungen und Dashboards zu erstellen. Diese Anwendungen können dynamische Visualisierungen und benutzerfreundliche Oberflächen bieten, wodurch komplexe Analysen verständlicher und zugänglicher gemacht werden.

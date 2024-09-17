@@ -1119,7 +1119,7 @@ OJ <- OJ %>%
   )
 ```
 
-@fig-sales zeigt die Gesamtenwicklung der Verkäufe über das Jahr.
+Der nächste Code-Chunk produziert eine Grafik für die Gesamtenwicklung der Verkäufe über das Jahr.
 
 ```{webr}
 #| fig-cap: "Saft-Verkäufe im Zeitverlauf"

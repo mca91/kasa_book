@@ -1,0 +1,39 @@
+---
+title: "Diamanten"
+date: "2024-01-05"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+Wir lesen zunächst den Datensatz ein und filtern Diamanten mit einem Gewicht
+von weniger als 2.5 Karat.
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+data("diamonds")
+kleiner <- diamonds %>%
+            filter(carat < 2.5)
+```
+
+Wir haben Beobachtungen für `r nrow(diamonds)` Diamanten. 
+
+Lediglich `r nrow(diamonds) - nrow(kleiner)` sind **schwerer** 
+als 2.5 *Karat*. 
+
+Der nachfolgende Code zeigt, wie die Häufigeitsverteilung von `carat` mit 
+R geplottet werden kann.
+
+```{r, echo = FALSE}
+kleiner %>% 
+  ggplot(aes(carat)) + 
+  geom_freqpoly(binwidth = 0.01)
+```
+
+Wie schwer ist der *schwerste* "kleine" Diamant?
+
+```{r}
+kleiner$carat %>% max()
+```
+
+Die Formel für diese Berechnung ist $$\max(\textup{carat}).$$
