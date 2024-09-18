@@ -19,29 +19,12 @@ webr:
 ---
 
 {{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
-{{< include ./_extensions/r-wasm/live/_gradethis.qmd >}}
 
 # Regression {#sec-regression}
 
-```{webr}
-#| echo: false
-#| completion: true
-tabopts <- function(x) {
-    fmt_number(x, decimals = 3, drop_trailing_zeros = T) %>%
-    tab_options(table_body.hlines.color = "white",
-              column_labels.border.bottom.color = "black", 
-             column_labels.border.top.color = "black",
-             table_body.border.bottom.color = "black", 
-             table.border.bottom.color = "black",
-             column_labels.font.weight = "bold", 
-             table.font.color = "black", 
-             table.font.size = 16)
-}
-```
-
 Viele der in diesem Companion behandelten Methoden basiert auf dem Konzept der Schätzung kausaler Effekte mit *Regression*. Als Regressionsansatz bezeichnet man eine Methode, welche die Beziehungen zwischen Variablen durch einen funktionalen Zusammenhang beschreibt und die Parameter der gewählten funktionalen Form anhand von beobachteten Daten schätzt. *Lineare Regression* nimmt eine lineare funktionale Form der Beziehung zwischen einer abhängigen Variable (Outcome-Varibale) und erklärenden Variablen (Regressoren) an. *Nicht-lineare Regressionsmethoden* modellieren die Beziehung etwa durch Polynome höherer Ordnung, exponentielle Funktionen oder andere komplexere Formen. Die Wahl der funktionalen Form hängt von der Natur des datenerzeugenden Prozesses (DGP) und somit stets von der spezifischen Beziehung ab, die untersucht wird. 
 
-Regressionsansätze gehören zu den am häufigsten verwendeten Methoden für Kausalanalysen, da so in vielen Forschungsdesigns kausale Effekte identifiziert werden können, indem Backdoors geschlossen werden: Regression kann die durch die Behandlungsvariable verursachte Variation in der Outcome-Variable isolieren, indem für gemeinsame Einflussfaktoren von Behandlungs- *und* Outcome-Variable kontrolliert wird. In diesem Kapitel erläutern wir Grundlagen der Spezifikation und Schätzung von Regressionsansätzen, die für spätere Kapitel relevant sind. Neben einer Motivation der Schätzung kausaler Effekte mit multipler Regression betrachten wir Modelle für verschiedene Kategorien von Outcome-Variablen und diskutieren deren Implementierung mit R.
+Regressionsansätze gehören zu den am häufigsten verwendeten Methoden für Kausalanalysen, da so in vielen Forschungsdesigns kausale Effekte identifiziert werden können, indem Backdoors geschlossen werden: Regression kann die durch die Behandlungsvariable verursachte Variation in der Outcome-Variable isolieren, indem für gemeinsame Einflussfaktoren von Behandlungs- *und* Outcome-Variable kontrolliert wird. In diesem Kapitel erläutern wir erweiterungen der Spezifikation und Schätzung von Regressionsansätzen, die für spätere Kapitel relevant sind. Neben einer Motivation der Schätzung kausaler Effekte mit multipler Regression betrachten wir Modelle für verschiedene Kategorien von Outcome-Variablen und diskutieren deren Implementierung mit R.
 
 ```{r}
 library(tidyverse)
@@ -130,6 +113,10 @@ peng_mod_fwl1a <- lm(
 
 body_mass_res <- residuals(peng_mod_fwl1a)
 
+head(body_mass_res, n = 10)
+```
+
+```{webr}
 # FWL-Schritt 1 (b)
 peng_mod_fwl1b <- lm(
   formula = bill_length ~ flipper_length, 
@@ -137,7 +124,11 @@ peng_mod_fwl1b <- lm(
 )
 
 bill_length_res <- residuals(peng_mod_fwl1b)
+
+head(bill_length_res, n = 10)
 ```
+
+Für den zweiten Schritt regressieren wir `body_mass_res` auf `bill_length_res`.
 
 ```{webr}
 # FWL-Schritt 2
@@ -155,7 +146,7 @@ Wir können den Effekt der Kontrolle für `flipper_length` visualisieren. Wir pl
 
 ```{webr}
 # Residuen in tibble sammeln
-tibble(
+p <- tibble(
   body_mass_res, 
   bill_length_res
 ) %>%
@@ -177,8 +168,29 @@ tibble(
     se = F,
     col = "purple"
   ) +
-  # Ursprüngliche Datenpunkte plotten
-  geom_point(
+  scale_color_manual(
+    name = "",
+    values = c(
+      "Um flipper_length bereinigte Daten" = "purple",
+      "Ursprüngliche Datenpunkte" = "black"
+    )
+  ) +
+  labs(
+    title = "Penguins: Anwendung von FWL",
+    x = "bill_length",
+    y = "body_mass"
+  ) +
+  theme_cowplot() +
+  theme(legend.position = "top")
+
+p
+```
+
+Wir erweitern `p` um die ursprünglichen Datenpunkte und die zugehörige Regressionslinie.
+
+```{webr}
+# Ursprüngliche Datenpunkte hinzufügen
+p + geom_point(
     data = penguins_cleaned, 
     mapping = aes(
       x = bill_length - mean(bill_length), 
@@ -198,21 +210,7 @@ tibble(
     formula = "y ~ x - 1",
     se = F,
     col = alpha("black", .5)
-  ) +
-  scale_color_manual(
-    name = "",
-    values = c(
-      "Um flipper_length bereinigte Daten" = "purple",
-      "Ursprüngliche Datenpunkte" = "black"
-    )
-  ) +
-  labs(
-    title = "Penguins: Anwendung von FWL",
-    x = "bill_length",
-    y = "body_mass"
-  ) +
-  theme_cowplot() +
-  theme(legend.position = "top")
+  )
 ```
 
 Der grafische Vergleich beider Vorgehensweisen zeigt den Effekt der Kontrolle für `flipper_length`: Die geschätzte (schwarze) Regressionslinie für die bereinigten Daten hat eine deutlich geringere Steigung als die anhand der ursprünglichen Daten geschätzte (lilane) Linie. Der Effekt von `bill_length` auf `body_mass` wird mit der einfachen Regression `lm(body_mass ~ bill_length)` vermutlich *überschätzt*, weil es andere Faktoren (wie `flipper_length` gibt, die mit `bill_length` und `body_mass` korrelieren. Kontrollieren für `flipper_length` in der multiplen Regression `lm(body_mass ~ bill_length + flipper_length)` schließt die Backdoor durch `flipper_length`. Die Konsequenz ist eine deutlich geringere Steigung der lilanen Regressionslinie.
@@ -496,7 +494,7 @@ ggplot() +
 
 Die nachstehende interaktive Grafik zeigt, wie die Wahscheinlichkeitsfunktion der latenten Variable $z=\beta_0 + \beta_1 X$ von den Parametern $\beta_0$ und $\beta_1$ jeweils für Logit- und Probit-Regression beeinflusst wird.
 
-<iframe class="obs-soft-box-shadow" width="100%" height="700" frameborder="0"
+<iframe class="obs-soft-box-shadow" width="100%" height="680" frameborder="0"
   src="https://observablehq.com/embed/@mca91/latent-variable-cdf?cells=plot%2Cviewof+beta0%2Cviewof+beta%2CMathJax"></iframe>
 
 
@@ -708,9 +706,8 @@ modelsummary(
   vcov = "HC1", 
   stars = TRUE, 
 ) %>%
-  tabopts() %>%
   tab_header(
-    title = "Modelle für Geschlecht v. Pinguinen",
+    title = "Modelle für Geschlecht v. Pinguinen"
   )
 ```
 
@@ -1066,3 +1063,8 @@ ggplot() +
   theme_cowplot() +
   theme(legend.position = "top")
 ```
+
+## Zusammenfassung
+
+In diesem Kapitel haben wir erweiterte Konzepte der Regressionsanalyse diskutiert. Anhand des Frisch-Waugh-Lovell-Theorems wurde die Wirkungsweise der Kontrolle von Kovariablen mit multipler Regression auf den interessierenden Koeffizienten (Effekt) einer Variable veranschaulicht. Weiterhin haben wir gängige Typen generalisierter linearer Modelle für binäre und Poisson-verteilte Outcome-Variablen eingeführt. Anhand relevanter Beispiele wurde gezeigt, wie diese generalisierten Regressionsmodelle in R spezifiziert, geschätzt und der resultierende Output mit Paketen wie `broom`, `ggplot2` und `modelsummary` interpretiert werden kann.
+

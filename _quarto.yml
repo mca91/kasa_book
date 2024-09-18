@@ -7,7 +7,7 @@ project:
   output-dir: "docs"
 
 book:
-  title: "Kausalanalyse mit R"
+  title: "Kausalanalyse und maschinelles Lernen mit R"
   reader-mode: true
   author: "Martin C. Arnold und Christoph Hanck"
   date: "November 2023"

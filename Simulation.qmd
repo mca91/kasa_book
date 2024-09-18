@@ -15,154 +15,29 @@ webr:
 
 {{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
 
-
-```{=html}
-<style>
-
-div.sidebar-item-container .active {
-  color: darkgreen;
-  font-weight: 550;
-}
-
-div.sidebar-item-container:hover {
-  color: darkgreen;
-}
-
-.sidebar nav[role=doc-toc] ul>li>a.active,
-.sidebar nav[role=doc-toc] ul>li>ul>li>a.active,
-.sidebar nav[role=doc-toc] ul>li>ul>li>ul>li>a.active {
-  border-left: 1px solid darkgreen !important;
-  color: darkgreen !important;
-  font-weight: 550;
-}
-
-.sidebar nav[role=doc-toc] ul>li>a:hover,
-.sidebar nav[role=doc-toc] ul>li>ul>li>a:hover,
-.sidebar nav[role=doc-toc] ul>li>ul>li>ul>li>a:hover {
-  color: darkgreen !important;
-}
-
-.qwebr-icon-run-code {
-  color: white;
-  padding-right: 2px;
-}
-
-.qwebr-button-run, .qwebr-button-reset, .qwebr-button-copy {
-  background-color:  rgba(0, 0, 0, 0) !important;
-  border-style: none;
-  font-weight: 400;
-  color: white !important; 
-  transition: none;
-}
-
-.qwebr-button-run:hover, .qwebr-button-reset:hover, .qwebr-button-copy:hover {
-    border-radius: 6px 6px 6px 6px;
-    border-color: darkgreen !important;
-    border: 1px 1px 1px 1px;
-}
-
-.qwebr-button-run {
-  font-weight: 600;
-}
-
-.qwebr-editor-toolbar {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  box-sizing: border-box;
-  border-radius: 6px 6px 0 0;
-  background-color: darkgreen !important;
-  border: 1px solid darkgreen !important;
-  padding: 0 0; 
-  transition: color .1s ease-in-out, background-color .1s ease-in-out,border-color .1s ease-in-out,box-shadow .1s ease-in-out !important;
-}
-
-.qwebr-editor-toolbar:hover {
-  background-color: white !important;
-  border-color: darkgreen;
-  border: 1px 1px 0px 1px;
-}
-
-.qwebr-editor-toolbar:hover * {
-  color: darkgreen !important;
-}
-
-/*
-.qwebr-editor {
-  border-radius: 0 0 6px 6px !important;
-  border: 1px solid darkgreen !important;
-}
-*/
-
-.qwebr-output-code-area {
-  border-radius: 0 0 6px 6px !important;
-  padding-left: 3.7em;
-  padding-top: .5em;
-  margin-bottom: 1em;
-  /*background-color:rgba(250,250,250,.9) !important;*/
-}
-
-.qwebr-output-code-area div {
-  padding-bottom: 12px;
-}
-
-.qwebr-output-graph-area {
-  margin-bottom: 1.5em;
-}
-
-.monaco-editor .lines-content {
-  background: none;
-}
-
-.monaco-editor {
-  outline-width: 0;
-  background: none !important;
-}
-
-.monaco-editor .margin {
-  background: none !important;
-}
-
-.monaco-editor .line-numbers {
-  color:black !important;
-}
-
-.box-shadow {
-    box-shadow: 0px 1px 2px rgba(0,0,0,.1),
-                0px 3px 7px rgba(0,0,0,.1),
-                0px 12px 30px rgba(0,0,0,.08);
-    border-radius: 0 0 6px 6px;
-}
-
-
-</style>
-```
-
 # Simulation {#sec-sim}
 
 Bei der Analyse quantitativer Methoden treten häufig Fragestellungen auf, die sich rein mathematisch nur schwer oder gar nicht lösen lassen. So ist es sogar in einfachsten ökonometrischen Modellen oft unmöglich, die exakte Verteilung von Koeffizientenschätzern unter “realistischen” Bedingungen (etwa eine endliche Stichprobengröße und schwache Annahmen über die Verteilung der Fehlerterme) formal zu bestimmen. Asymptotische Theorie kann dann helfen, indem eine Approximation der Stichproben-Eigenschaften eines Schätzers aus Eigenschaften der asymptotischen Verteilung abgeleitet werden. Häufig sind solche Approximationen jedoch nur bei großen Stichproben verlässlich. Wichtige Eigenschaften von Schätzern kausaler Effekte in empirischen Anwendungen, wie die Varianz der Schätzung oder das zu erwartende Außmaß der Verzerrung bei Verletzungen von Modellannahmen hingegen können mit asymptotischer Theorie oftmals gar nicht approximiert werden.
 
-Um diese Schwierigkeiten zu überwinden, können wir Simulationstechniken (Monte-Carlo-Methoden) verwenden. In Monte-Carlo-Simulationen wird die Möglichkeit der Erzeugung von Pseudozufallszahlen mit Computern und ihre Rechenleistung genutzt, um eine Vielzahl von Datensätzen gemäß eines interessierenden datenerzeugenden Prozess (DGP) zu generieren. Anhand dieser simulierten Datensätze können wir die Stichprobenverteilung von Schätzern approximieren und so die statistischen Eigenschaften für verschiedene Parameterwerte des DGP analysieren. Insbesondere erlauben *Monte-Carlo-Studien* den Vergleich verschiedener Schätzfunktionen hinsichtlich ihrer Robustheit gegenüber Verletzungen zugrundeliegender Annahmen über den DGP. Der *Bootstrap* [@Efron1979] ist eine simulations-basierte Methode, um gültige statistische Inferenz in empirischen Anwendungen zu gewährleisten, wenn Modellannahmen derart verletzt sind, dass asymptotische kritische Werte (sogar für große Stichproben) ungültig sind.
+Um diese Schwierigkeiten zu überwinden, können wir Simulationstechniken (Monte-Carlo-Methoden) verwenden. In Monte-Carlo-Simulationen wird die Möglichkeit der Erzeugung von Pseudozufallszahlen mit Computern und ihre Rechenleistung genutzt, um eine Vielzahl von Datensätzen gemäß eines interessierenden datenerzeugenden Prozess (DGP) zu generieren. Anhand dieser simulierten Datensätze können wir die Stichprobenverteilung von Schätzern approximieren und so die statistischen Eigenschaften für verschiedene Parameterwerte des DGP analysieren. Insbesondere erlauben *Monte-Carlo-Studien* den Vergleich verschiedener Schätzfunktionen hinsichtlich ihrer Robustheit gegenüber Verletzungen zugrundeliegender Annahmen über den DGP. 
 
-In diesem Kapitel erläutern wir Grundlagen in der Anwendung von Simulations-Methoden mit R und diskutieren Beispiele für die Schätzung kausaler Effekte mit Regressionsmodellen.
+In diesem Kapitel erläutern wir Grundlagen in der Anwendung von Simulations-Methoden mit R und diskutieren Beispiele für die Schätzung kausaler Effekte mit Regressionsmodellen. Wir erläutern weiterhin das Konzept und die Anwendung des *Bootstraps* [@Efron1979], eine simulations-basierte Methode, die gültige Inferenz in empirischen Anwendungen erlaubt, wenn Modellannahmen derart verletzt sind, dass asymptotische kritische Werte (sogar für große Stichproben) ungültig sind.
 
 ## Simulation der Stichprobenverteilung eines Schätzers {#sec-simspv}
 
-Zur Illustration der Simulation von Stichprobenverteilungen eines Schätzers betrachten wir zunächst das kanonische Beispiel der Schätzung des Erwartungswerts $\mu_X$ einer normalverteilen Zufallsvariable $X$ anhand einer $n$-elementigen Stichprobe,
-\begin{align}
+Zur Illustration der Simulation von Stichprobenverteilungen eines Schätzers betrachten wir zunächst das kanonische Beispiel der Schätzung des Erwartungswerts $\mu_X$ einer normalverteilen Zufallsvariable $X$ anhand einer $n$-elementigen Stichprobe, \begin{align}
   X_i \sim\,u.i.v. N(\mu_X,\ \sigma_X^2), \quad i=1,\dots,n.\label{eq:distx}
-\end{align}
-Die Vorschrift \eqref{eq:distx} ist der *datenerzeugende Prozess* (DGP)^[Englische Abkürzung für *data generating process*.]. Das arithmetische Mittel der $X_i$,
-\begin{align*}
+\end{align} Die Vorschrift \eqref{eq:distx} ist der *datenerzeugende Prozess* (DGP)[^simulation-1]. Das arithmetische Mittel der $X_i$, \begin{align*}
   \overline{X} := \sum_{i=1}^n X_i,
-\end{align*}
-ist ein *konsistenter Schätzer* für $\mu_X$ und hat (aufgrund der Normalverteilung der $X_i$) die formal herleitbare Eigenschaft, dass die Stichprobenverteilung normal ist^[D.h. hier ist $\overline{X}\sim N(50, 2.88)$.],
-\begin{align*}
+\end{align*} ist ein *konsistenter Schätzer* für $\mu_X$ und hat (aufgrund der Normalverteilung der $X_i$) die formal herleitbare Eigenschaft, dass die Stichprobenverteilung normal ist[^simulation-2], \begin{align*}
   \overline{X} \sim N(\mu_X, \sigma_X^2 / n), \qquad \overline{X}\xrightarrow{p}\mu_X.
 \end{align*}
 
-Wir können die Eigenschaften von $\overline{X}$ mit wenig Aufwand in R prüfen indem wir die Stichprobenentnahme durch wiederholtes Ziehen einer (großen) Anzahl von $N$ Stichproben aus der *Populationsverteilung* von $X$ gemäß der Vorschrift \eqref{eq:distx} simulieren und jeweils $\overline{X}$ für diese simulierten Stichproben berechnen. Wir simulieren so Züge aus der Stichprobenverteilung von $\overline{X}$, deren Eigenschaften -- in Abhängigkeit von $\mu_X$, $\sigma_X^2$ und $n$ -- wir anhand der Realisierungen von $\overline{X}$ ableiten können. In den nachfolgenden Code-Beispielen wählen wir
-\begin{align*}
+[^simulation-1]: Englische Abkürzung für *data generating process*.
+
+[^simulation-2]: D.h. hier ist $\overline{X}\sim N(50, 2.88)$.
+
+Wir können die Eigenschaften von $\overline{X}$ mit wenig Aufwand in R prüfen indem wir die Stichprobenentnahme durch wiederholtes Ziehen einer (großen) Anzahl von $N$ Stichproben aus der *Populationsverteilung* von $X$ gemäß der Vorschrift \eqref{eq:distx} simulieren und jeweils $\overline{X}$ für diese simulierten Stichproben berechnen. Wir simulieren so Züge aus der Stichprobenverteilung von $\overline{X}$, deren Eigenschaften -- in Abhängigkeit von $\mu_X$, $\sigma_X^2$ und $n$ -- wir anhand der Realisierungen von $\overline{X}$ ableiten können. In den nachfolgenden Code-Beispielen wählen wir \begin{align*}
   \mu_X = 50,\quad \sigma_X^2=12^2,\quad n = 50.
 \end{align*}
 
@@ -190,12 +65,13 @@ mean(
 )
 ```
 
-Dieses einfache Simulationsexperiment mit $N=1$ ergibt zwar eine Schätzung des Erwartungswerts von $X$ nahe des wahren Werts $\mu_X = 50$, ist jedoch wenig informativ über die Qualität des Schätzers, d.h. die Eigenschaften der Stichprobenverteilung von $\overline{X}$. Diese *Realisation* könnte zufällig nahe bei $\mu_X = 50$ liegen, obwohl die Stichprobenverteilung  $\overline{X}$ einen von $50$ verschiedenen Erwartungswert hat und/oder eine große Varianz aufweist.
+Dieses einfache Simulationsexperiment mit $N=1$ ergibt zwar eine Schätzung des Erwartungswerts von $X$ nahe des wahren Werts $\mu_X = 50$, ist jedoch wenig informativ über die Qualität des Schätzers, d.h. die Eigenschaften der Stichprobenverteilung von $\overline{X}$. Diese *Realisation* könnte zufällig nahe bei $\mu_X = 50$ liegen, obwohl die Stichprobenverteilung $\overline{X}$ einen von $50$ verschiedenen Erwartungswert hat und/oder eine große Varianz aufweist.
 
-Um die Stichprobenverteilung zu simulieren, wiederholen wir das Simulationsexperiment $N=1000$ mal: Wir erzeugen $N=1000$ Realisierungen aus der Stichprobenverteilung von $\overline{X}$ für die gewählten Parameter. Hierfür verwenden wir *Iteration* in R: Eine `for()`-Schleife wiederholt das Simulationsexperiment über `1:N` Iterationen und speichert das Ergebnis des `j`-ten Experiments in einem zuvor definierten numerischen Vektor `sim_est`.^[Iteration mit Funktionen aus dem Paket `purrr` (siehe tab) ist eine Alternative zum "klassischen" Ansatz mit einer `for()`-Schleife.]
+Um die Stichprobenverteilung zu simulieren, wiederholen wir das Simulationsexperiment $N=1000$ mal: Wir erzeugen $N=1000$ Realisierungen aus der Stichprobenverteilung von $\overline{X}$ für die gewählten Parameter. Hierfür verwenden wir *Iteration* in R: Eine `for()`-Schleife wiederholt das Simulationsexperiment über `1:N` Iterationen und speichert das Ergebnis des `j`-ten Experiments in einem zuvor definierten numerischen Vektor `sim_est`.[^simulation-3]
 
-::: {.panel-tabset}
+[^simulation-3]: Iteration mit Funktionen aus dem Paket `purrr` (siehe tab) ist eine Alternative zum "klassischen" Ansatz mit einer `for()`-Schleife.
 
+::: panel-tabset
 ## Iteration mit `for()-Schleife`
 
 ```{webr-r}
@@ -255,7 +131,6 @@ tibble(sim_est) %>%
         sd_Xbar = sd(sim_est)
     )
 ```
-
 :::
 
 Die zusammenfassenden Statistiken sind *Schätzungen* der Verteilungseigenschaften von $\overline{X}$. Da wir die Anzahl der Replikation $N$ selber wählen, können wir die wahren Parameter theoretisch "beliebig" genau approximieren: Lediglich die Rechenleistung des Computers limitiert die Güte dieser Approximation. In vielen Anwendungen liefert eine vierstellige Zahl an Simulationsdurchläufen gute Approximationen. Tatsächlich liegen die simulierten Parameter der Stichprobenverteilung von $\overline{X}$ nahe bei den wahren Werten.
@@ -306,7 +181,9 @@ Die Abbildung zeigt, dass die simulierte Stichprobenverteilung (graues Dichte-Hi
 
 ### Simulation mit nicht-normalen Daten
 
-Simulationen sind insbesondere dann hilfreich, wenn die Stichproben-Eigenschaften eines Schätzers *unbekannt* sind. Im nachfolgenden Beispiel wiederholen wir die Simulation für eine Log-normal-verteilte Zufallsvariable^[Ist $X$ log-normal-verteilt mit Erwartungswert $\mu_X$ und Varianz $\sigma_X^2$, dann ist $\log X$ normal-verteilt mit $\mu_{\log X} = \log \mu_X - \sigma_X^2/2$ und $\sigma^2_{\log X} = \mu_X^2 [\exp(\sigma_X^2)-1]$.] $X$ mit Erwartungswert $\mu_X = 50$ und plotten die geschätzten Dichtefunktionen der Stichprobenverteilungen von $\overline{X}$ für einen Vergleich.
+Simulationen sind insbesondere dann hilfreich, wenn die Stichproben-Eigenschaften eines Schätzers *unbekannt* sind. Im nachfolgenden Beispiel wiederholen wir die Simulation für eine Log-normal-verteilte Zufallsvariable[^simulation-4] $X$ mit Erwartungswert $\mu_X = 50$ und plotten die geschätzten Dichtefunktionen der Stichprobenverteilungen von $\overline{X}$ für einen Vergleich.
+
+[^simulation-4]: Ist $X$ log-normal-verteilt mit Erwartungswert $\mu_X$ und Varianz $\sigma_X^2$, dann ist $\log X$ normal-verteilt mit $\mu_{\log X} = \log \mu_X - \sigma_X^2/2$ und $\sigma^2_{\log X} = \mu_X^2 [\exp(\sigma_X^2)-1]$.
 
 ```{webr-r}
 #| autorun: true
@@ -382,17 +259,21 @@ digraph CONFSIM {
 
 Für die Simulation von Stichproben gemäß @fig-simconf nutzen wir den linearen Prozess
 
+```{=tex}
 \begin{align*}
   X =& \, a + \alpha_1 U,\\
   Y =& \, \beta_1 X + \beta_2 U + e,
 \end{align*}
+```
+mit $a \sim \mathcal{U}[0,1]$, $U\sim N(0, 2^2)$ und $e\sim N(0, 10)$ und wählen die Parameter $\alpha_1 = 1$, $\beta_1 = 2$ und $\beta_2 = -1$.[^simulation-5] Der nächste Code-Block implementiert den DGP und zeigt die KQ-Schätzung des fehlspezifizierten Modells
 
-mit $a \sim \mathcal{U}[0,1]$, $U\sim N(0, 2^2)$ und $e\sim N(0, 10)$ und wählen die Parameter $\alpha_1 = 1$, $\beta_1 = 2$ und $\beta_2 = -1$.^[$\mathcal{U}[a,b]$ meint die stetige [Gleichverteilung](https://de.wikipedia.org/wiki/Gleichverteilung) auf dem Intervall $[a,b]$] Der nächste Code-Block implementiert den DGP und zeigt die KQ-Schätzung des fehlspezifizierten Modells
+[^simulation-5]: $\mathcal{U}[a,b]$ meint die stetige [Gleichverteilung](https://de.wikipedia.org/wiki/Gleichverteilung) auf dem Intervall $[a,b]$
 
+```{=tex}
 \begin{align*}
   Y = \beta_1 X + \epsilon
 \end{align*}
-
+```
 anhand einer simulierten Stichprobe mit einem Umfang von 100 Beobachtungen.
 
 ```{webr-r}
@@ -501,9 +382,11 @@ ggplot(
   theme_cowplot()
 ```
 
-Der grafische Vergleich der simulierten Stichprobenverteilung von $\widehat{\beta}_1$ mit dem wahren Koeffizienten $\beta_1 = 2$ (gestrichelte rote Linie) zeigt, dass $\widehat{\beta}_1$ aufgrund des ausgelassenen Confounders $U$ für die hier gewählte Spezifikation des DGP tatsächlich ein *verzerrter* Schätzer für den kausalen Effekt $\beta_1$ ist: Die geschätzte Dichtefunktion ist ein Indikator dafür, dass die Verteilungsfunktion von $\widehat{\beta}_1$ einen Großteil der Wahrscheinlichkeitsmasse im Wertebereich oberhalb von $\beta_1 = 2$ hat, sodass wir den kausalen Effekt im Mittel *überschätzen*. 
+Der grafische Vergleich der simulierten Stichprobenverteilung von $\widehat{\beta}_1$ mit dem wahren Koeffizienten $\beta_1 = 2$ (gestrichelte rote Linie) zeigt, dass $\widehat{\beta}_1$ aufgrund des ausgelassenen Confounders $U$ für die hier gewählte Spezifikation des DGP tatsächlich ein *verzerrter* Schätzer für den kausalen Effekt $\beta_1$ ist: Die geschätzte Dichtefunktion ist ein Indikator dafür, dass die Verteilungsfunktion von $\widehat{\beta}_1$ einen Großteil der Wahrscheinlichkeitsmasse im Wertebereich oberhalb von $\beta_1 = 2$ hat, sodass wir den kausalen Effekt im Mittel *überschätzen*.
 
-Wir können die Simulationsergebnisse in `sim_est` nutzen, um die Verzerrung^[Die Verzerrung (engl. *bias*) eines Schätzers $\widehat{\beta}_1$ für $\beta_1$ ist $\textup{bias}(\widehat{\beta}_1) = \textup{E}(\widehat{\beta}_1 - \beta_1)$.] von $\widehat\beta_1$ zu schätzen.
+Wir können die Simulationsergebnisse in `sim_est` nutzen, um die Verzerrung[^simulation-6] von $\widehat\beta_1$ zu schätzen.
+
+[^simulation-6]: Die Verzerrung (engl. *bias*) eines Schätzers $\widehat{\beta}_1$ für $\beta_1$ ist $\textup{bias}(\widehat{\beta}_1) = \textup{E}(\widehat{\beta}_1 - \beta_1)$.
 
 ```{webr-r}
 #| autorun: true
@@ -515,10 +398,11 @@ Diese Berechnung anhand von Zügen aus der Stichprobenverteilung von $\widehat{\
 
 Anhand von `sim_function_conf()` können wir die Identifizierbarkeit des kausalen Effekts $\beta_1$ bei Kontrolle für $U$ im Modell
 
+```{=tex}
 \begin{align*}
   Y = \beta_0 + \beta_1 X + \beta_2 U + \varepsilon
 \end{align*}
-
+```
 überprüfen, in dem wir die Simulation unter Angabe dieses Modells über das Argument `formula` durchführen.
 
 ```{webr-r}
@@ -561,7 +445,7 @@ ggplot(
   theme_cowplot()
 ```
 
-Die geschätzte Stichprobenverteilung von $\widehat{\beta}_1$ bei Kontrolle für den Confounder $U$ zeigt keine Anzeichen für eine Verzerrung des Schätzers für den kausalen Effekt von $X$ auf $Y$. Die Monte-Carlo-Schätzung der Verzerrung von $\widehat{\beta}_1$ unterstützt das Ergebnis der grafischen Analyse. 
+Die geschätzte Stichprobenverteilung von $\widehat{\beta}_1$ bei Kontrolle für den Confounder $U$ zeigt keine Anzeichen für eine Verzerrung des Schätzers für den kausalen Effekt von $X$ auf $Y$. Die Monte-Carlo-Schätzung der Verzerrung von $\widehat{\beta}_1$ unterstützt das Ergebnis der grafischen Analyse.
 
 ```{webr-r}
 #| autorun: true
@@ -602,8 +486,7 @@ digraph COLSIM {
   X \sim& \, N(0,1),\\
   Y =& \, \beta_1 X + e,\\
   C =& \, N(0,1) + .25X + .25Y,
-\end{align*}
-wobei $e \sim N(0,3^2)$ erneut ein unsystematischer Fehlterterm für $Y$ ist. Wie im DGP aus @sec-simbiasconf wählen wir $\beta_1 = 2$ für den wahren kausalen Effekt von $X$ auf $Y$.
+\end{align*} wobei $e \sim N(0,3^2)$ erneut ein unsystematischer Fehlterterm für $Y$ ist. Wie im DGP aus @sec-simbiasconf wählen wir $\beta_1 = 2$ für den wahren kausalen Effekt von $X$ auf $Y$.
 
 ```{webr-r}
 #| autorun: true
@@ -704,7 +587,6 @@ sim_est_col %>%
   )
 ```
 
-
 ## Regression: Durchschnittlicher Behandlungseffekt
 
 Wir können Simulation einsetzen, um die Güte der Schätzung von Behandlungseffekten in linearen Regressionsmodellen zu untersuchen. Hierzu implementieren wir einen DGP gemäß @fig-simheteff.
@@ -731,8 +613,8 @@ digraph HETEFFSIM {
     e -> Y [style=dashed, color=gray];
 }
 ```
-Für die Komponenten wählen wir:
-\begin{align}
+
+Für die Komponenten wählen wir: \begin{align}
   \begin{split}
     \text{B} &\sim \text{Bernoulli}(0.5) \\
     X &\sim N(0, 2) \\
@@ -745,19 +627,22 @@ Für die Komponenten wählen wir:
 
 In diesem linearen DGP bestimmt $B$ über die Zuteilung der Behandlung. $X$ ist eine Determinante der Outcome-Variable $Y$ ohne Backdoor-Pfad. Der Behandlungseffekt $\beta_1$ ist *heterogen*, da $\beta_1$ aus einer kontinuierlichen Gleichverteilung auf dem Intervall $[0, 3]$ gezogen wird. Der durchschnittliche Behandlungseffekt (ATE) entspricht hier dem *Erwartungswert* von $\beta_1$, was zu einem ATE von 1.5 führt, da
 
+```{=tex}
 \begin{align*}
   \textup{ATE} =&\, \textup{E}(\beta_1)\\
   =&\, \frac{1}{2}(a + b)\\ 
   =&\, \frac{1}{2}(0 + 3) = 1.5.
 \end{align*}
-
+```
 Wir verfizieren nachfolgend mit Monte-Carlo-Simulation für Stichproben von DGP \eqref{eq:dgpatesim} mit $n=150$, dass
 
-- der KQ-Schätzer für $\beta_1$ im Modell $Y=\beta_0 + \beta_1 B + \epsilon$ ein erwartungstreuer Schätzer für den ATE ist und
+-   der KQ-Schätzer für $\beta_1$ im Modell $Y=\beta_0 + \beta_1 B + \epsilon$ ein erwartungstreuer Schätzer für den ATE ist und
 
-- kontrollieren für $X$ hier die Präzision der Schätzung des ATE verbessert.
+-   kontrollieren für $X$ hier die Präzision der Schätzung des ATE verbessert.
 
-Im nachfolgenden Code-Block erzeugen wir die Simulationsergebnisse in jeder Iteration durch Berechnung der interessierenen Schätzer auf derselben simulierten Stichprobe und geben die Ergebnisse als `tibble()` mit einer Reihe und zwei benannten Einträgen zurück. Die Funktion `map_dfr()` fasst die Ergebnisse nach der Iteration über `1:N` als `tibble()` zusammen. Wir nutzen hier einen Ansatz, bei dem die Schritte für die Simulation dem Argument `.f` über den Syntax `~ { ... }` innerhalb einer *anonymen Funktion* ohne Argumente.^[Anonyme Funktionen in R (auch *Lambda-Funktionen* genannt) sind Funktionen, die ohne Namen definiert werden und in der Regel sofort angwendet werden. `~` ist eine Kurznotation für anonyme Funktionen innerhalb von `purrr`-Funktionen.]
+Im nachfolgenden Code-Block erzeugen wir die Simulationsergebnisse in jeder Iteration durch Berechnung der interessierenen Schätzer auf derselben simulierten Stichprobe und geben die Ergebnisse als `tibble()` mit einer Reihe und zwei benannten Einträgen zurück. Die Funktion `map_dfr()` fasst die Ergebnisse nach der Iteration über `1:N` als `tibble()` zusammen. Wir nutzen hier einen Ansatz, bei dem die Schritte für die Simulation dem Argument `.f` über den Syntax `~ { ... }` innerhalb einer *anonymen Funktion* ohne Argumente.[^simulation-7]
+
+[^simulation-7]: Anonyme Funktionen in R (auch *Lambda-Funktionen* genannt) sind Funktionen, die ohne Namen definiert werden und in der Regel sofort angwendet werden. `~` ist eine Kurznotation für anonyme Funktionen innerhalb von `purrr`-Funktionen.
 
 ```{webr-r}
 #| autorun: true
@@ -843,7 +728,7 @@ sim_res_ATE %>%
 
 Die grafische Analyse der Stichprobenverteilungen bestätigt, dass der KQ-Schätzer für $\beta_1$ sowohl im Modell mit Kontrolle für $X$ als auch im Modell ohne $X$ erwartungstreu für den ATE von 1.5 ist. Da $X$ gemäß DGP \eqref{eq:dgpatesim} einen größeren Teil der Variation in $Y$ verursacht, verbesserte Kontrolle für $X$ hier die Präzision der Schätzung des ATE mit KQ.
 
-Die Variabilität der Ansätze können wir durch Zusammenfassung der Spalten in `sim_res_ATE ` mit `summarize()` und `across()` quantifizieren, wobei wir `sd` als zusammenfassende Statistik nutzen und `.names = "sd_{.col}"` ein entsprechendes Präfix für die Variablennamen einführt.
+Die Variabilität der Ansätze können wir durch Zusammenfassung der Spalten in `sim_res_ATE` mit `summarize()` und `across()` quantifizieren, wobei wir `sd` als zusammenfassende Statistik nutzen und `.names = "sd_{.col}"` ein entsprechendes Präfix für die Variablennamen einführt.
 
 ```{webr-r}
 #| autorun: true
@@ -858,15 +743,19 @@ sim_res_ATE %>%
   )
 ```
 
-
 ## Verletzung von Modellannahmen: Heteroskedastizität
 
-Unter der Annahme von *Homoskedastizität* (konstante Varianz) der Fehlerterme des Modells ist die KQ-Schätzung von Behandlungseffekten anhand linearer Regression effizient, d.h. der KQ-Schätzer hat die geringste Varianz unter allen unverzerrten Schätzern des interessierenden Koeffizienten.^[Die ist die Kern-Aussage des [Gauss-Markov-Theorems](https://de.wikipedia.org/wiki/Satz_von_Gau%C3%9F-Markow).] Hängt die Varianz der Fehlerterme von den Regressoren ab, liegt *Heteroskedastizität* vor: Die Fehlerterm-Varianz unterscheided sich zwischen den Beobachtungen, in Abhängigkeit der Ausprägungen der Regressoren. Unter Heteroskedastie ist der KQ-Schätzer nicht länger der effizienteste Schätzer: In Verfahren wie der gewichteten KQ-Methode (WKQ)^[Engl. *weighted least squares*.] haben Beobachtungen mit geringer Fehlerterm-Varianz einen größeren Einfluss als Beobachtungen mit großer Varianz, sodass der WKQ-Schätzer präziser als der KQ-Schätzer sein kann.
+Unter der Annahme von *Homoskedastizität* (konstante Varianz) der Fehlerterme des Modells ist die KQ-Schätzung von Behandlungseffekten anhand linearer Regression effizient, d.h. der KQ-Schätzer hat die geringste Varianz unter allen unverzerrten Schätzern des interessierenden Koeffizienten.[^simulation-8] Hängt die Varianz der Fehlerterme von den Regressoren ab, liegt *Heteroskedastizität* vor: Die Fehlerterm-Varianz unterscheided sich zwischen den Beobachtungen, in Abhängigkeit der Ausprägungen der Regressoren. Unter Heteroskedastie ist der KQ-Schätzer nicht länger der effizienteste Schätzer: In Verfahren wie der gewichteten KQ-Methode (WKQ)[^simulation-9] haben Beobachtungen mit geringer Fehlerterm-Varianz einen größeren Einfluss als Beobachtungen mit großer Varianz, sodass der WKQ-Schätzer präziser als der KQ-Schätzer sein kann.
+
+[^simulation-8]: Die ist die Kern-Aussage des [Gauss-Markov-Theorems](https://de.wikipedia.org/wiki/Satz_von_Gau%C3%9F-Markow).
+
+[^simulation-9]: Engl. *weighted least squares*.
 
 Weiterhin sind bei heteroskedastischen Fehlertermen die (aus historischen Gründen) standardmäßig von `summary()` berechneten Standardfehler *ungültig*, und können die Unsicherheit von KQ unterschätzen. Dies ist problematisch, da unter Verwendung von ungültigen Standardfehlern berechnete Inferenzsstatistiken ebenfalls ungültig sind. Als Konsequenz erhöht sich die Gefahr falscher Schlussfolgerungen hinsichtlich des zu schätzenden Behandlungseffekts anhand von Test-Statistiken und Konfidenzintervallen.
 
-Wir zeigen nachfolgend, wie die Konsequenzen von Heteroskedastizität für den KQ-Schätzer mit Simulation untersucht werden können. Hierfür betrachten wir den DGP 
+Wir zeigen nachfolgend, wie die Konsequenzen von Heteroskedastizität für den KQ-Schätzer mit Simulation untersucht werden können. Hierfür betrachten wir den DGP
 
+```{=tex}
 \begin{align}
   \begin{split}
     X \sim&\, \chi^2_{50}\\
@@ -874,14 +763,12 @@ Wir zeigen nachfolgend, wie die Konsequenzen von Heteroskedastizität für den K
     Y =&\, \beta_1 X + e,
   \end{split}\label{eq:simhetdgp}
 \end{align}
-
-wobei die Fehlerterm-Varianz $\sigma_e^2(X)$ eine Funktion von $X$ ist,
-\begin{align*}
+```
+wobei die Fehlerterm-Varianz $\sigma_e^2(X)$ eine Funktion von $X$ ist, \begin{align*}
   \sigma_e^2(X) = \textup{Var}(e\vert X) = \lvert X-50 \rvert^{p}.
-\end{align*}
-Der Parameter $p$ bestimmt die funktionale Form dieser bedingten Varianz.
+\end{align*} Der Parameter $p$ bestimmt die funktionale Form dieser bedingten Varianz.
 
-Der nächste Code-Chunk plottet die Funktion $f(x) = \lvert X-50 \rvert^{p}$ für verschiedene $p$ über den Wertebereich von $X$. Hierfür berechnen wir $f(x)$ für ein mit `expand_grid()` erstelltes Raster von Werten für $X$ und $p$. 
+Der nächste Code-Chunk plottet die Funktion $f(x) = \lvert X-50 \rvert^{p}$ für verschiedene $p$ über den Wertebereich von $X$. Hierfür berechnen wir $f(x)$ für ein mit `expand_grid()` erstelltes Raster von Werten für $X$ und $p$.
 
 ```{webr-r}
 #| autorun: true
@@ -933,7 +820,9 @@ ggplot(
   theme_cowplot()
 ```
 
-In den Simulationsdurchläufen schätzen wir jeweils $\beta_1$ im Modell $Y=\beta_1X+\epsilon$ mit KQ, berechnen den nur bei Homoskedastie gültigen Standardfehler und eine bei Heteroskedastie robuste Schätzung. Für lezteres verwenden wir `sandwich::vcovHC()` und mit `type = "HC1"`.^[Der Typ `HC1`, auch bekannt als Huber-White-Schätzer, ist ein häufig genutzter Standardfehler und wird in späteren Kapiteln dieses Companions häufig angewendet.] Wir fassen diese Schritte in der Funktion `sim_function_het()` zusammen.
+In den Simulationsdurchläufen schätzen wir jeweils $\beta_1$ im Modell $Y=\beta_1X+\epsilon$ mit KQ, berechnen den nur bei Homoskedastie gültigen Standardfehler und eine bei Heteroskedastie robuste Schätzung. Für lezteres verwenden wir `sandwich::vcovHC()` und mit `type = "HC1"`.[^simulation-10] Wir fassen diese Schritte in der Funktion `sim_function_het()` zusammen.
+
+[^simulation-10]: Der Typ `HC1`, auch bekannt als Huber-White-Schätzer, ist ein häufig genutzter Standardfehler und wird in späteren Kapiteln dieses Companions häufig angewendet.
 
 ```{webr-r}
 #| autorun: true
@@ -1030,10 +919,9 @@ ggplot(data = sim_res_het) +
   theme(legend.position = "top")
 ```
 
-Als Konsequenz falscher Standardfehler kann die nominale $\alpha$-Fehlerrate von Signifikanztests verletzt sein: Der Hypothesentest lehnt dann eine korrekte Nullhypothese mit einer geringeren oder höheren Fehlerwahrscheinlichkeit (das nominale Signifikanzniveau $\alpha$) als gewünscht ab. 
+Als Konsequenz falscher Standardfehler kann die nominale $\alpha$-Fehlerrate von Signifikanztests verletzt sein: Der Hypothesentest lehnt dann eine korrekte Nullhypothese mit einer geringeren oder höheren Fehlerwahrscheinlichkeit (das nominale Signifikanzniveau $\alpha$) als gewünscht ab.
 
-Inwiefern die in der Simulation gewählte Form von Heteroskedastizität die $\alpha$-Fehlerrate eines t-Tests beeinflusst, können wir anhand der Simulationsergebnisse schätzen: Wir berechnen die Ablehnrate für t-Tests der (wahren) Null-Hypothese $H_0:\beta_1=0$ zum 5\%-Niveau jeweils für robuste und nicht-robuste Standardfehler und vergleichen. Wir vergleichen die so berechneten Test-Statistiken mit dem entsprechenden kritischen Wert der t-Verteilung mit $n-1$ Freiheitsgraden.
-
+Inwiefern die in der Simulation gewählte Form von Heteroskedastizität die $\alpha$-Fehlerrate eines t-Tests beeinflusst, können wir anhand der Simulationsergebnisse schätzen: Wir berechnen die Ablehnrate für t-Tests der (wahren) Null-Hypothese $H_0:\beta_1=0$ zum 5%-Niveau jeweils für robuste und nicht-robuste Standardfehler und vergleichen. Wir vergleichen die so berechneten Test-Statistiken mit dem entsprechenden kritischen Wert der t-Verteilung mit $n-1$ Freiheitsgraden.
 
 ```{webr-r}
 #| autorun: true
@@ -1049,11 +937,13 @@ sim_res_het %>%
   )
 ```
 
-Die Simulationsergebnisse deuten darauf hin, dass ein Fehler erster Art für den Signifikanztest ohne korrigierte Standardfehler oberhalb des 5\%-Niveaus liegt. Für die robuste Teststatistik hingegen liegt die Schätzung des $\alpha$-Fehlers nahe 5\%.
+Die Simulationsergebnisse deuten darauf hin, dass ein Fehler erster Art für den Signifikanztest ohne korrigierte Standardfehler oberhalb des 5%-Niveaus liegt. Für die robuste Teststatistik hingegen liegt die Schätzung des $\alpha$-Fehlers nahe 5%.
 
 ## Der Bootstrap
 
-In den zuvor diskutierten Simulationsstudien haben wir iterativ Stichproben basierend auf einem bekannten DGP generiert, um die Eigenschaften der Stichprobenverteilung eines Schätzers (für bestimmte Parameterwerte) zu untersuchen. Der Bootstrap [@Efron1979] ist eine Methode zur Approximation der unbekannten Stichprobenverteilung eines Schätzers, bei der zufällige Stichproben mit Zurücklegen aus einer beobachteten Stichprobe gezogen werden.^[Diese Vorgehensweise wird auch als *resampling* bezeichnet.] Bootstrapping approximiert die Verteilung eines Schätzers aus beobachteten Datenpunkten und *ohne Kenntnis des wahren DGP*. Der Bootstrap ist daher eine Simulationsmethode, die in empirischen Anwendungen für die Bestimmung der Unsicherheit (Standardfehler) eines Schätzers genutzt werden kann. Bootstrapping ist hilfreich für Hypothesentests, wenn die beobachtete Stichprobe klein oder untypisch ist, was dazu führen kann, dass Standard-Inferenz für Behandlungseffekte nicht zuverlässig anwendbar oder ungültig ist. Insbesondere wenn Modellannahmen verletzt sind wird bootstrapping häufig in empirischen Studien eingesetzt, um Konfidenzintervalle, Standardfehler oder p-Werte zu berechnen. 
+In den zuvor diskutierten Simulationsstudien haben wir iterativ Stichproben basierend auf einem bekannten DGP generiert, um die Eigenschaften der Stichprobenverteilung eines Schätzers (für bestimmte Parameterwerte) zu untersuchen. Der Bootstrap [@Efron1979] ist eine Methode zur Approximation der unbekannten Stichprobenverteilung eines Schätzers, bei der zufällige Stichproben mit Zurücklegen aus einer beobachteten Stichprobe gezogen werden.[^simulation-11] Bootstrapping approximiert die Verteilung eines Schätzers aus beobachteten Datenpunkten und *ohne Kenntnis des wahren DGP*. Der Bootstrap ist daher eine Simulationsmethode, die in empirischen Anwendungen für die Bestimmung der Unsicherheit (Standardfehler) eines Schätzers genutzt werden kann. Bootstrapping ist hilfreich für Hypothesentests, wenn die beobachtete Stichprobe klein oder untypisch ist, was dazu führen kann, dass Standard-Inferenz für Behandlungseffekte nicht zuverlässig anwendbar oder ungültig ist. Insbesondere wenn Modellannahmen verletzt sind wird bootstrapping häufig in empirischen Studien eingesetzt, um Konfidenzintervalle, Standardfehler oder p-Werte zu berechnen.
+
+[^simulation-11]: Diese Vorgehensweise wird auch als *resampling* bezeichnet.
 
 Die nachfolgenden Key Facts fassen die wesentlichen Eigenschaften des Bootstraps und die grundsätzliche Vorgehensweise zusammen.
 
@@ -1064,42 +954,50 @@ Der Bootstrap ist eine statistische Methode, die durch wiederholtes Ziehen von S
 
 **Vorgehensweise**
 
-1. **Stichproben mit Zurücklegen ziehen**: Ziehe wiederholt ($B$ mal) Stichproben der Größe $N$ (Größe der ursprünglichen Stichprobe) mit Zurücklegen aus der originalen Stichprobe.
+1.  **Stichproben mit Zurücklegen ziehen**: Ziehe wiederholt ($B$ mal) Stichproben der Größe $N$ (Größe der ursprünglichen Stichprobe) mit Zurücklegen aus der originalen Stichprobe.
 
-2. **Parameterschätzung für jede Bootstrap-Stichprobe**: Wende die Schätzfunktion $\widehat{\beta}$ auf jede der $B$ Bootstrap-Stichproben an und erhalte $B$ Bootstrap-Schätzwerte $\widehat{\beta}^1,\dots,\widehat{\beta}^B$ des interessierenden Koeffizienten $\beta$.^[Häufig wird für $B$ eine ungerade Anzahl (z.B. 199) gewählt. Dies ermöglicht ein genaue Bestimmung des Medians der Bootstrap-Verteilung, was die Berechnung von Konfidenzintervallen erleichtert.]
+2.  **Parameterschätzung für jede Bootstrap-Stichprobe**: Wende die Schätzfunktion $\widehat{\beta}$ auf jede der $B$ Bootstrap-Stichproben an und erhalte $B$ Bootstrap-Schätzwerte $\widehat{\beta}^1,\dots,\widehat{\beta}^B$ des interessierenden Koeffizienten $\beta$.[^simulation-12]
 
-3. **Verteilungsparameter Schätzen**: Anhand der $B$ Bootstrap-Schätzungen aus Schritt 2 können die Eigenschaften der Verteilung des Schätzers $\widehat{\beta}$ (oder für Funktionen von $\widehat{\beta}$) geschätzt werden:
+3.  **Verteilungsparameter Schätzen**: Anhand der $B$ Bootstrap-Schätzungen aus Schritt 2 können die Eigenschaften der Verteilung des Schätzers $\widehat{\beta}$ (oder für Funktionen von $\widehat{\beta}$) geschätzt werden:
 
-    - Das arithmetische Mittel der $B$ Bootstrap-Schätzungen ist ein konsistenter Schätzer des Erwartungswerts von $\widehat{\beta}$ 
-    - Der Standardfehler des Schätzers $\widehat{\beta}$ kann durch die Standardabweichung der $B$ Bootstrap-Schätzungen approximiert werden
-    - Ein $1-\alpha\%$-Bootstrap-Konfidenzintervall für $\beta_1$ kann anhand des $\alpha/2\%$- und des $1-\alpha/2\%$-Perzentils der Bootstrap-Verteilung approximiert werden
+    -   Das arithmetische Mittel der $B$ Bootstrap-Schätzungen ist ein konsistenter Schätzer des Erwartungswerts von $\widehat{\beta}$
+    -   Der Standardfehler des Schätzers $\widehat{\beta}$ kann durch die Standardabweichung der $B$ Bootstrap-Schätzungen approximiert werden
+    -   Ein $1-\alpha\%$-Bootstrap-Konfidenzintervall für $\beta_1$ kann anhand des $\alpha/2\%$- und des $1-\alpha/2\%$-Perzentils der Bootstrap-Verteilung approximiert werden
 
-- Bootstrapping wird häufig genutzt, um die Unsicherheit eines Schätzers zu ermitteln. Dies ist insbesondere dann hilfreich, wenn keine analytische Darstellung für die Verteilung eines Schätzers existiert oder "starke" Verteilungsannahmen (z.B. Normalverteilung) unplausibel sind.
+-   Bootstrapping wird häufig genutzt, um die Unsicherheit eines Schätzers zu ermitteln. Dies ist insbesondere dann hilfreich, wenn keine analytische Darstellung für die Verteilung eines Schätzers existiert oder "starke" Verteilungsannahmen (z.B. Normalverteilung) unplausibel sind.
 
-- Ein Bootstrap-Schätzer für einen unbekannten Parameter^[Das arithmetische Mittel von $B$ Bootstrap-Schätzwerten ist ein einfacher Bootstrap-Schätzer.] ist im Allgemeinen *nicht erwartungstreu* für den interessierenden Effekt, selbst wenn ein erwartungstreuer Schätzer verwendet wird. Bootstrap-Schätzer sind jedoch in vielen Fällen unter schwachen Annahmen *konsistent* für den wahren Parameter.
-
+-   Ein Bootstrap-Schätzer für einen unbekannten Parameter[^simulation-13] ist im Allgemeinen *nicht erwartungstreu* für den interessierenden Effekt, selbst wenn ein erwartungstreuer Schätzer verwendet wird. Bootstrap-Schätzer sind jedoch in vielen Fällen unter schwachen Annahmen *konsistent* für den wahren Parameter.
 :::
+
+[^simulation-12]: Häufig wird für $B$ eine ungerade Anzahl (z.B. 199) gewählt. Dies ermöglicht ein genaue Bestimmung des Medians der Bootstrap-Verteilung, was die Berechnung von Konfidenzintervallen erleichtert.
+
+[^simulation-13]: Das arithmetische Mittel von $B$ Bootstrap-Schätzwerten ist ein einfacher Bootstrap-Schätzer.
 
 Der nächste Abschnitt diskutiert Bootstrapping der Stichprobenverteilung von $\overline{X}$ anhand des Beispiels aus @sec-simspv.
 
 ### Interaktive Visualisierung des Bootstraps
 
-Die nachfolgende interaktive Visualisierung illustriert die Vorgehensweise des oben beschriebenen Bootstrap-Algorithmus für die Schätzung eines $95\%$-Konfidenzintervalls für den Erwartungswert einer normalen <span style="color: purple;">Verteilung</span> basierend auf einer <span style="color: red;">Stichprobe</span>, wenn das arithmetische Mittel als Schätzer verwendet wird. Diese <span style="color: purple;">Pupulationsverteilung</span> ist $N(\mu = 50, \sigma^2 = 12^2)$. In jeder Iteration des Bootstraps wird eine <span style="color: orange;">Bootstrap-Stichprobe</span> mit Zurücklegen aus der originalen <span style="color: red;">Stichprobe</span> gezogen. Für jede <span style="color: orange;">Bootstrap-Stichprobe</span> berechnen wir das <span style="color: darkgreen;">Arithmetische Mittel (grüne Punkte)</span>. Für hinreichend viele <span style="color: darkgreen;">Bootstrap-Schätzungen</span> erhalten wir eine repräsentative <span style="color: darkgreen;">Bootstrap-Verteilung</span> unseres Schätzers.^[Die Grüne Linie zeigt eine Kerndichte-Schätzung der Bootstrap-Verteilung. Die Bandweite dieser Schätzung kann in der Applikation variiert werden.] Basierend auf dieser Verteilung berechnen wir eine <span style="color: black;">Bootstrap-Schätzung des Erwartungswerts</span> $\mu$ (schwarzer Punkt) und ein <span style="color: black;">$95\%$-Konfidenzintervall</span> (schwarze Linie).
+Die nachfolgende interaktive Visualisierung illustriert die Vorgehensweise des oben beschriebenen Bootstrap-Algorithmus für die Schätzung eines $95\%$-Konfidenzintervalls für den Erwartungswert einer normalen [Verteilung]{style="color: purple;"} basierend auf einer [Stichprobe]{style="color: red;"}, wenn das arithmetische Mittel als Schätzer verwendet wird. Diese [Pupulationsverteilung]{style="color: purple;"} ist $N(\mu = 50, \sigma^2 = 12^2)$. In jeder Iteration des Bootstraps wird eine [Bootstrap-Stichprobe]{style="color: orange;"} mit Zurücklegen aus der originalen [Stichprobe]{style="color: red;"} gezogen. Für jede [Bootstrap-Stichprobe]{style="color: orange;"} berechnen wir das [Arithmetische Mittel (grüne Punkte)]{style="color: darkgreen;"}. Für hinreichend viele [Bootstrap-Schätzungen]{style="color: darkgreen;"} erhalten wir eine repräsentative [Bootstrap-Verteilung]{style="color: darkgreen;"} unseres Schätzers.[^simulation-14] Basierend auf dieser Verteilung berechnen wir eine [Bootstrap-Schätzung des Erwartungswerts]{style="color: black;"} $\mu$ (schwarzer Punkt) und ein [$95\%$-Konfidenzintervall]{style="color: black;"} (schwarze Linie).
+
+[^simulation-14]: Die Grüne Linie zeigt eine Kerndichte-Schätzung der Bootstrap-Verteilung. Die Bandweite dieser Schätzung kann in der Applikation variiert werden.
 
 In der interaktiven Grafik können wir insbesondere folgende Eigenschaften des Bootstrap-Verfahrens überprüfen:
 
-- Die <span style="color: purple;">Populationsverteilung</span> ist normal. Daher ist auch die Stichproben-Verteilung des arithmetischen Mittels $\overline{X}$ für *jede* Stichprobengröße normal. Die Illustration zeigt, dass die <span style="color: darkgreen;">Bootstrap-Verteilung</span> diese Normalverteilung des Schätzers (die typische Glockenform) tatsächlich gut approximieren kann, wenn $B$ hinreichend groß gewählt wird.
+-   Die [Populationsverteilung]{style="color: purple;"} ist normal. Daher ist auch die Stichproben-Verteilung des arithmetischen Mittels $\overline{X}$ für *jede* Stichprobengröße normal. Die Illustration zeigt, dass die [Bootstrap-Verteilung]{style="color: darkgreen;"} diese Normalverteilung des Schätzers (die typische Glockenform) tatsächlich gut approximieren kann, wenn $B$ hinreichend groß gewählt wird.
 
-- Der Bootstrap-Schätzer von $\mu$ ist nicht erwartungstreu für $\mu$, da wir mit Zurückziehen aus einer <span style="color: red;">Stichprobe</span> ziehen und so die zentrale Tendenz in den beobachteten Daten reproduzieren. Diese Verzerrung verringert sich mit der Größe der <span style="color: red;">originalen Stichprobe</span>. 
+-   Der Bootstrap-Schätzer von $\mu$ ist nicht erwartungstreu für $\mu$, da wir mit Zurückziehen aus einer [Stichprobe]{style="color: red;"} ziehen und so die zentrale Tendenz in den beobachteten Daten reproduzieren. Diese Verzerrung verringert sich mit der Größe der [originalen Stichprobe]{style="color: red;"}.
 
-- Größere <span style="color: red;">Stichproben</span> verringern die Unsicherheit des interessierenden Schätzers $\overline{X}$: Die Varianz der Stichprobenverteilung von $\overline{X}$ nimmt mit der Stichprobengröße ab. Da der Bootstrap die Verteilung von $\overline{X}$ approximiert, spiegelt sich diese Eigenschaft auch in der <span style="color: darkgreen;">Bootstrap-Verteilung</span>.
+-   Größere [Stichproben]{style="color: red;"} verringern die Unsicherheit des interessierenden Schätzers $\overline{X}$: Die Varianz der Stichprobenverteilung von $\overline{X}$ nimmt mit der Stichprobengröße ab. Da der Bootstrap die Verteilung von $\overline{X}$ approximiert, spiegelt sich diese Eigenschaft auch in der [Bootstrap-Verteilung]{style="color: darkgreen;"}.
 
 <iframe class="obs-soft-box-shadow" width="100%" height="668" frameborder="0" src="https://observablehq.com/embed/62d24833f3dbd27a?cells=svg%2Cviewof+B%2Cviewof+BW%2Cviewof+speed%2Cviewof+n">
+
 </iframe>
 
 ### Bootstrap mit R durchführen
 
-Mit dem R-Paket `boot` kann Bootstrapping komfortabel für eine selbst definierte Schätzfunktion durchgeführt werden. Diese Funktion (`boot_fun` im nachfolgenden Code-Beispiel) muss den Schätzer unter Angabe einer Indexmenge für die beobachteten Daten berechnen und zurückgeben.^[`boot::boot()` zieht in jeder Bootstrap-Iteration mit Zurücklegen aus der Indexmenge der originalen Stichprobe, um die Bootstrap-Stichprobe festzulegen.] 
+Mit dem R-Paket `boot` kann Bootstrapping komfortabel für eine selbst definierte Schätzfunktion durchgeführt werden. Diese Funktion (`boot_fun` im nachfolgenden Code-Beispiel) muss den Schätzer unter Angabe einer Indexmenge für die beobachteten Daten berechnen und zurückgeben.[^simulation-15]
+
+[^simulation-15]: `boot::boot()` zieht in jeder Bootstrap-Iteration mit Zurücklegen aus der Indexmenge der originalen Stichprobe, um die Bootstrap-Stichprobe festzulegen.
 
 Der nächste Code-Chunk zeigt, wie `boot::boot()` angewendet werden kann, um den Bootstrap von @Efron1979 für $\overline{X}$ anhand einer Stichprobe mit $n=250$ aus der in @sec-simspv betrachteten $N(\mu = 50, \sigma^2 = 12^2)$-Populationsverteilung für $B=999$ Iterationen zu berechnen.
 
@@ -1175,8 +1073,7 @@ tibble(mu_boot = boot_est$t) %>%
   theme_cowplot()
 ```
 
-Mit `boot::boot.ci()` erhalten wir ein symmetrisches 95\%-Bootstrap-Konfidenzintervall für $\mu$,
-\begin{align}
+Mit `boot::boot.ci()` erhalten wir ein symmetrisches 95%-Bootstrap-Konfidenzintervall für $\mu$, \begin{align}
   95\%\textup{-KI}_\textup{boot} = \big[2\cdot \overline{X}_o - q_{.975,\,\textup{boot}}, \ 2\cdot \overline{X}_o - q_{.025,\,\textup{boot}}\big].\label{eq:95bootci}
 \end{align}
 
@@ -1199,7 +1096,7 @@ Für die Berechnung per Hand mit der Formel \eqref{eq:95bootci} bestimmen wir di
 )
 ```
 
-Anhand dieses Konfidenzintervalls können wir Hypothesen zum 5\%-Niveau testen.
+Anhand dieses Konfidenzintervalls können wir Hypothesen zum 5%-Niveau testen.
 
 ```{webr-r}
 #| autorun: true
@@ -1207,13 +1104,12 @@ Anhand dieses Konfidenzintervalls können wir Hypothesen zum 5\%-Niveau testen.
 between(50, KI_boot[1], KI_boot[2])
 ```
 
-Wir können die (wahre) Nullhypothese $H_0: \mu = 50$ also zum 5\%-Niveau nicht ablehnen.
+Wir können die (wahre) Nullhypothese $H_0: \mu = 50$ also zum 5%-Niveau nicht ablehnen.
 
-# Zusammenfassung
+## Zusammenfassung
 
-In diesem Kapitel haben wir Simulation zur Analyse der Eigenschaften von Koeffizientenschätzern in ökonometrischen Modellen betrachtet. In Simulationen können die Eigenschaften eines datenerzeugenden Prozesses vollständig kontrolliert und variiert werden, um deren Auswirkungen auf das Verhalten des Schätzers systematisch zu untersuchen. Simulation kann genutzt werden, um die Verteilung eines Schätzers näherungsweise durch iterative Berechnung von Schätzungen auf simulierten Datensätzen zu bestimmen. Solche Approximationen sind hilfreich, da analytische Lösungen für die Verteilungseigenschaften von Schätzfunktionen oft nicht verfügbar sind. Simulationen sind außerdem hilfreich, um verschiedene Schätzer hinsichtlich ihrer Güte bei Verletzungen von Modellannahmen zu bewerten und so Empfehlungen bezüglicher ihrer Verlässlichkeit in empirischen Anwendungen treffen zu können.
+In diesem Kapitel haben wir Simulation zur Analyse der Eigenschaften von Koeffizientenschätzern in ökonometrischen Modellen betrachtet. In Simulationen können die Parameter eines datenerzeugenden Prozesses vollständig kontrolliert und variiert werden, um deren Auswirkungen auf das Verhalten eines Schätzers systematisch zu untersuchen: Simulation kann genutzt werden, um die Verteilung eines Schätzers näherungsweise durch iterative Anwendung auf simulierten Datensätzen zu bestimmen. Solche Approximationen sind hilfreich, da analytische Lösungen für die Verteilungseigenschaften von Schätzfunktionen oft nicht verfügbar sind. Simulationen sind außerdem hilfreich, um verschiedene Schätzer hinsichtlich ihrer Güte bei Verletzungen von Modellannahmen zu bewerten und so Empfehlungen bezüglicher ihrer Verlässlichkeit in empirischen Anwendungen treffen zu können.
 
-Der Bootstrap ist eine Simulationsmethode, die es ermöglicht, die Unsicherheit eines Schätzers im empirischen Anwenungen ohne starke Verteilungsannahmen abzuschätzen. Bootstrapping ist besonders nützlich in Situationen, in denen herkömmliche Inferenz versagt, weil die Approximationen mit einer asymptotischen Verteilung aufgrund zu kleiner Stichprobengröße schlecht ist, oder die asymptotische Verteilung unbekannt ist. Der Bootstrap wird in empirischen Studien häufig zur Berechnung verlässlicher Konfidenzintervalle für kausale Effekte angewendet. 
+Der *Bootstrap* ist eine Simulationsmethode, die es ermöglicht, die Unsicherheit eines Schätzers im empirischen Anwenungen ohne starke Verteilungsannahmen abzuschätzen. *Bootstrapping* ist besonders nützlich in Situationen, in denen herkömmliche Inferenz versagt, weil die Approximationen mit einer asymptotischen Verteilung aufgrund zu kleiner Stichprobengröße schlecht ist, oder die asymptotische Verteilung unbekannt ist. Der *Bootstrap* wird in empirischen Studien häufig zur Berechnung verlässlicher Konfidenzintervalle für kausale Effekte angewendet.
 
-Die gezeigten Code-Beispiele illustrieren die Anwendung dieser Techniken mit R.
-
+Die gezeigten Code-Beispiele illustrieren die Anwendung dieser Techniken in R mit Paketen für Iteration (`purrr`) und Resampling (`boot`).
