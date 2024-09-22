@@ -338,7 +338,7 @@ map(
 
 ### Lösung
 
-Beide Informationskriterien sprechend für das Logit-Modell: 
+Beide Informationskriterien sprechen für das Logit-Modell: 
 
 ```{webr}
 #| envir: ex_reg
