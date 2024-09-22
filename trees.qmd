@@ -73,11 +73,15 @@ digraph exdectree {
 
 Zur Konstruktion von Binär-Bäumen werden etablierte Algorithmen wie *Classification and Regression Trees* ([CART](https://de.wikipedia.org/wiki/CART_(Algorithmus)) von @Breimanetal1984 verwendet. Die wesentliche Vorgehensweise für das Training eines Baums $T$ ist wie folgt:
 
+::: {.callout-tip}
+
+## CART-Algorithmus
+
 1. **Splitting**: Beginnend am root node sucht der Algorithmus nach der "besten" Regel, die Daten anhand eines Merkmals in zwei Gruppen zu teilen. Die Qualität des Splits wird in Abhängigkeit der Definition der Outcome-Variable beurteilt:
 
     - **Bei Klassifikation**: Die Reinheit (*purtity*) der Klassen in den unmittelbar nachfolgen nodes wird maximiert. Ein gängiges Kriterium hierfür ist der [*Gini-Koeffizient*](https://de.wikipedia.org/wiki/Gini-Koeffizient).^[Der Gini-Koeffizient $0\leq G\leq1$ misst die Homogenität der Outcome-Variable für die Beobachtungen eines Knotens. $G=0$ ergibt sich bei vollständiger "Reinheit" (alle Beobachtungen im Knoten gehören zur gleichen Klasse). $G > 0$ zeigt Heterogenität der Klassen an, die mit $G$ zunimmt]
     
-    - **Bei Regression**: Die Fehlerquadratsumme bei Vorhersage des Outcomes durch Mittelwertbildung für Beobachtungen in den unmittelbar nachfolgenden nodes wird minimiert.
+    - **Bei Regression**: Der MSE bei Vorhersage des Outcomes durch Mittelwertbildung für Beobachtungen in den unmittelbar nachfolgenden nodes wird minimiert.
 
 2. **Rekursion**: Der Prozess wird rekursiv fortgesetzt, bis Abbruchkriterien greifen eine weitere Verzewigung verhindern:
 
@@ -94,6 +98,8 @@ Zur Konstruktion von Binär-Bäumen werden etablierte Algorithmen wie *Classific
     \end{align*}
   
   für einen Baum $T$ mit Komplexitätsmaß $\lvert T\rvert$ (Anzahl der leaf nodes) [@Hastieetal2013].
+
+:::
  
 Zur Demonstation der Schätzung von Regressionsbäumen mit R betrachten wir nachfolgend den Datensatz `MASS::Bosten`. Ziel hierbei ist es, mittlere Hauswerte `medv` in Stadteilen von Boston, MA vorherzusagen. Wir verwenden hierzu Funktionen aus dem Paket `parsnip`. 
 
@@ -146,7 +152,7 @@ tree_fit$fit
 
 Der Output in `tree_fit$fit` zeigt, dass CP-Pruning zu einem kleinen Baum mit 3 Hierarchie-Ebenen geführt hat. Die Struktur zeigt, dass `lstat` und `rm` für Splitting-Regeln (`split`) verwendet werden, wie viele Beobachtungen den  nodes zugeordnet sind (`n`), den Wert der Verlustfunktion (`deviance`) sowie den Durchschnitt von `medv` für jede node (`yval`). Für die drei leaf nodes (gekennzeichnet mit `*`) ist `yval` die Vorhersage der Outcome-Varibale für entsprechend gruppierte Beobachtungen.
 
-Eine besser interpretierbare Darstellung des angepassten Baums in `tree_fit$fit`  erhalten wir mit `rattle::fancyRpartPlot()`.
+Eine leichter interpretierbare Darstellung der Entscheidungsregeln des angepassten Baums in `tree_fit$fit`  erhalten wir mit `rattle::fancyRpartPlot()`.
 
 ```{webr}
 #| fig-width: 8
@@ -160,9 +166,62 @@ fancyRpartPlot(
   nn.col = "black", 
   caption = "Trainierter Entscheidungsbaum für cp = 0.1",
   palette = "Set1",
-  branch.col = "black"
+  branch.col = "black",
+  digits = 3
 )
 ```
+
+@fig-rpartregspace zeigt Beobachtungen von `rm` und `lstat`, die hinsichtlich ihrer in drei Klassen eingeteilten Ausprägung von `medv` eingefärbt sind. Die durch den CART-Algorithmus gelernten Entscheidungsregeln sind als farbige Paritionen des Regressorraums dargestellt. 
+
+```{r}
+#| echo: false
+#| fig-cap: "Partitionierung des Regressorraums für `lstat` und `rm` durch Regressionsbaum"
+#| label: fig-rpartregspace
+#| fig-height: 6
+library(ggplot2)
+library(cowplot)
+
+# Seed setzen
+set.seed(1234)
+
+# Datensatz als tibble
+Boston <- tibble::as_tibble(MASS::Boston)
+
+# Splitting in Training- und Test-Daten
+Boston_split <- rsample::initial_split(
+  data = Boston, 
+  prop = 0.8, 
+  strata = medv
+  )
+
+Boston_train <- rsample::training(Boston_split)
+library(rpart)
+tree <- rpart(formula = medv ~ rm + lstat, data = Boston_train, control = rpart.control(cp = .1))
+
+# Create a grid of values for rm and lstat (the two features of interest)
+grid_rm <- seq(min(Boston_train$rm), max(Boston_train$rm), length.out = 100)
+grid_lstat <- seq(min(Boston_train$lstat), max(Boston_train$lstat), length.out = 100)
+
+# Generate all combinations of grid points
+grid <- expand.grid(rm = grid_rm, lstat = grid_lstat)
+
+# Predict the median value (medv) for each point in the grid
+grid$pred <- predict(tree, newdata = grid)
+
+# Create a scatter plot of the original data points colored by the actual medv values
+ggplot(Boston_train, aes(x = rm, y = lstat)) +
+    labs(x = "Anz. Räume (rm)", y = "Anteil Bev. niedriger Status  (lstat)") +
+    
+    # Add the predicted decision boundary
+    geom_tile(data = grid, aes(x = rm, y = lstat, fill = as.factor(round(pred,2))), alpha = 0.3) +
+    scale_fill_viridis_d("Vorhersage in Partition") +  # Fill scale for predicted medv
+    geom_point(aes(color = cut(medv, 3))) +  # Original data points
+    scale_color_viridis_d("medv") +  # Color scale for the median value of homes
+    theme_cowplot() +  # Use a clean theme'
+    coord_cartesian(expand = 0) +
+    theme(legend.position = "top", legend.direction = "vertical")
+```
+
 
 Für eine datengetriebene Wahl des CP-Parameters $\alpha$ kann Cross Validation (CV) verwendet werden. Hierzu erstellen wir zunächst eine `parsnip`-Spezifikation mit `cost_complexity = tune::tune()` in `decision_tree()` und erstellen einen *workflow* mit `parsnip::workflow()`
 
@@ -465,6 +524,10 @@ Boosting ist eine leistungsstarke Ensemble-Methode für Vorhersagen, die kleine 
 
 Für einen Trainingsdatensatz $\{(x_i, y_i)\}_{i=1}^n$, wobei $x_i$ die Input-Features und $y_i$ Beobachtungen des Outcomes sind, kann Boosting wiefolgt durchgeführt werden.
 
+::: {.callout-tip}
+
+## Boosting für Regression
+
 1. **Initialisierung**: Initialisiere das Boosting-Modell als $\widehat{F}_0(x)$. Setze die Residuen $r^0_i=y_i$ für alle $i$
 
 2. **Iteration**: Wiederhole die folgenden Schritte für $b = 1,2,\dots,B$ mit $B$ hinreichend groß:
@@ -490,6 +553,8 @@ Für einen Trainingsdatensatz $\{(x_i, y_i)\}_{i=1}^n$, wobei $x_i$ die Input-Fe
     \begin{align*}
       \widehat{F}(\boldsymbol{x}) := \sum_{b=1}^B \eta\cdot \widehat{F}^b(\boldsymbol{x})
     \end{align*}
+
+:::
 
 Der Parameter $0\leq\eta\leq0$ steuert, wie stark der Einfluss jedes neuen Baumes auf das Modell ist. Eine kleine Lernrate führt dazu, dass viele Bäume benötigt werden, was Vorhersagen (ähnlich wie bei Bagging) stabiler macht. Beachte die sequentielle Natur des Trainings: Die $r^b_i$ in Schritt 2.3 sind die zu vorhersagenden Outcome-Variable für den nächsten Baum. $T_{b+1}$ wird trainiert wird, um den *Fehler des bisherigen Modells* $\widehat{F}_b$ zu erklären.
 
@@ -600,6 +665,311 @@ ggplot(
 
 
 Obwohl erneut `lstat` und `rm` als die wichtigsten Prädiktoren gelistet sind, identifiziert Gradient Boosting im Gegensatz zu Bagging und Random Forests `lstat` als die Variable mit der größten Vorhersagekraft für `medv`. 
+
+## Causal Trees und Causal Forests^[Aus technischen Gründen verzichten wir in diesem Kapitel zur Zeit auf die Einbindung der WebR-Konsole.]
+
+Baum-Algorithmen sind vielversprechende Ansätze zur Schätzung kausaler Effekte, insbesondere in Situationen, in denen die Bestimmung heterogener Effekte gewünscht ist: Der Vorteil von Baum-Methoden liegt darin, dass sie nicht-parametrisch sind: Der Regressorraum wird adaptiv in Partitionen unterteilt, um auf Basis dieser Aufteilung differenzierte Vorhersagen für die Zielvariable zu treffen. Diese Eigenschaft kann für Kausalanalysen hilfreich sein, da wir in vielen empirischen Anwendungen die Effekte einer Behandlung nicht nur im Durchschnitt für die betrachtete Population, sondern *differenzierter* schätzen möchten: Ein durchschnittlicher Behandlungseffekt (engl. *average treatment effect*, ATE) kann nicht ausreichend informativ für unsere Forschungsfrage sein, bspw. wenn wir erwarten, dass eine politische Intervention unterschiedliche Auswirkungen auf verschiedene Bevölkerungsgruppen hat. Idealerweise möchten wir $\tau_i$ bestimmen, den individuellen Behandlungseffekt einer Beobachtung $i$. Das fundamentale Problem der Kausalinferenz ist, dass $\tau_i$ nicht ermittelt werden kann (s. u.), sodass wir unser Ziel abschwächen müssen. Statt $\tau_i$ suchen wir einen Behandlungseffekt in Abhängigkeit von beobachtbaren Charakteristiken $\boldsymbol{X}$ für Untergruppen der Population, einen *conditional average treatment effect* (CATE). Im Potential-Outcomes-Framework ist der CATE definiert als
+
+\begin{align*}
+  \tau(\boldsymbol{x}) = \textup{E}\big(Y^{(1)} - Y^{(0)}\big\vert \boldsymbol{X} = \boldsymbol{x}\big),
+\end{align*}
+
+wobei $Y^{(1)}$ und $Y^{(0)}$ die potenziellen Outcomes darstellen, wenn eine Behandlung erfolgt bzw. nicht erfolgt. In der Praxis beobachten wir jedoch nur $Y_i = Y_i^{(B_i)}$, wobei $B_i$ der Behandlungsindikator für die Beobachtung $i$ ist, sodass $\tau(\boldsymbol{x}_i)$ nicht direkt beobachtet werden kann. Unter der Annahme, dass nach Kontrolle für (beobachtbare) $\boldsymbol{X}$ die Zuordnung zur Behandlung quasi-zufällig ist (*unconfoundedness*), formal
+
+\begin{align*}
+Y_i^{(0)},\,Y_i^{(1)} \perp B_i \vert \boldsymbol{X}_i,
+\end{align*}
+
+kann $\tau(\boldsymbol{x})$ geschätzt werden: Wir können Outcome-Differenzen zwischen behandelten und nicht behandelten Beobachtungen als kausal interpretieren, da unbeobachtete Faktoren die Ergebnisse nicht verzerren.
+
+CART und andere traditionelle Entscheidungsbaum-Algorithmen sind für die Schätzung heterogener Behandlungseffekte jedoch ungeeignet. Dafür gibt es zwei wesentliche Ursachen:
+
+- **Das Splitting-Kriterium**
+
+    Das Splitting-Kriterium des CART-Algorithmus optimiert die Aufteilungen der Beobachtungen in jedem Knoten, um die Genauigkeit von Vorhersagen für die Outcome-Variable $Y$ durch Minimierung der Heterogienität (Klassifikation) oder des MSE (Regression) zu optimieren. Diese Kriterien zielen also darauf ab, die *Homogenität innerhalb der Blätter hinsichtlich* $Y$ zu maximieren.
+
+    Für die Schätzung heterogener kausaler Effekte ist ein solches Splitting jedoch nicht zielführend. Statt Knoten zu formen, in denen $Y$ möglichst homogen ist, benötigen wir für die Schätzung von Behandlungseffekten grundsätzlich Aufteilungen, bei denen sich $Y$ zwischen den behandelten und unbehandelten Individuen innerhalb der Knoten unterscheidet.^[Wenn die Kontroll- und Behandlungsbeobachtungen in einem Blatt sehr ähnliche Outcomes $Y$ haben, können wir den Effekt nicht schätzen.] Das Splitting sollte zu Blättern führen, die hinsichtlich des *geschätzten Behandlungseffekts* möglichst heterogen sind.
+    
+    Die Wahl des Splitting-Kriterium für die Schätzung kausaler Effekte mit Bäumen ist nicht trivial: Ein natürliches Kriterium ist der mittlere quadratische Fehler bei der Vorhersage von $\tau$,
+    
+    \begin{align*}
+      \textup{MSE}_\tau = \frac{1}{n} \sum_{i=1}^n (\tau_i - \widehat{\tau}_i(\boldsymbol{X}_i))^2.
+    \end{align*}
+    
+    $\textup{MSE}_\tau$ ist jedoch nicht direkt berechenbar: Aufgrund der nicht-beobachtbaren individuellen Behandlungseffekte $\tau_i$ müsste $\textup{MSE}_\tau$ selbst geschätzt werden!^[Bei "herkömmlichen" Regressionsbäumen besteht dieses Problem nicht, weil das Splitting-Kriterium Abweichungen von den wahren, *beobachteten* Werten von $Y$ misst.]
+
+- **Data leakage**
+
+    Data leakage tritt auf, wenn Informationen aus dem Trainingsprozess in den Modellvalidierungs- oder Schätzprozess einfließen. Bei der Anpassung des Baums berücksichtigt der Algorithmus idealerweise Informationen über $Y$ *und* $B$ im Splitting-Prozess, um die besten Aufteilungen zu finden. Die hiezu verwendeten Datenpunkte definieren damit *den zu schätzten CATE* anhand der durch Partionierung gebildeten Blätter. Wenn dieselben Datenpunkte auch für die tatsächliche Schätzung des CATE mit dem trainierten Baum verwendet werden, besteht die Gefahr von Überanpassung und somit verzerrten Schätzungen.
+    
+### Causal Trees
+
+Der Causal Tree Algorithmus von @AtheyImbens2016 modifiziert den CART-Algorithmus für die Schätzung heterogener Behandlungseffekte. In diesem Kontext wird die Vorgehensweise als „ehrlich“ (*honest*) bezeichnet, wenn nicht dieselben Informationen sowohl zur Auswahl des Modells (die Partitionierung des Regressorraums durch Splits) als auch zur Schätzung anhand dieses Modells verwendet werden. @AtheyImbens2016 adressieren das Data-Leakage-Problem durch zufällige Aufteilung des Datensatzes in eine Teilmenge $\mathcal{S}^{tr}$ für das *Training des Baums* und eine Teilmenge $\mathcal{S}^{est}$ für die *Schätzung der Behandlungseffekte*. 
+
+Für die Erläuterung von *honest splitting* führen wir folgende Notation aus @AtheyImbens2016 ein:
+
+- $\mathcal{S}^{te}$ ist ein hypothetischer *Testdatensatz*
+
+- $\Pi$ ist eine *Partition*, d.h. eine Aufteilung des Regressorraums von $\boldsymbol{X}$^[$\Pi$ sammelt also die Entschidungsregeln eines Baums und ist äquivalent zu $T$ in den füheren Kapiteln.]
+
+- Wir definieren die Schätzung des CATE anhand der Beobachtungen $\mathcal{S}^{est}$: Der CATE  $\widehat{\tau}(\boldsymbol{X}_i,\mathcal{S}^{est},\Pi)$ ist die Differenz der Mittelwerte von $Y_i$ für Behandlungs- und Kontrollbeobachtungen in dem aus $\Pi$ resultierenden Blatt für $\boldsymbol{X}_i$.
+
+Für die Wahl der Splits (die Partitionierung $\Pi$) für den Causal Tree schlagen @AtheyImbens2016 statt der Minimierung des MSE der Vorhersagen $\widehat{Y}$ (wie bei Regressionsbäumen) die Minimierung des MSE für den CATE vor. Das Vorgehen hierbei ist *honest* in dem Sinn, dass der erwartete Schätzfehler für ungesehene Beobachtungen $\mathcal{S}^{te}$ anhand einer Paritionierung $\Pi$ und entsprechenden Schätzungen der Behandlungseffekte $\widehat\tau$ mit unabhängigen Datensätzen $\mathcal{S}^{tr}$ bzw. $\mathcal{S}^{est}$ minimiert wird. Das hierzu verwendete Splitting-Kriterium ist eine Schätzung des *Erwartungswerts* von 
+\begin{align*}
+  \textup{MSE}(\mathcal{S}^{est},\mathcal{S}^{te},\Pi) = \frac{1}{n^{te}} \sum_{i=1}^{n^{te}} \big(\tau_i - \widehat{\tau}(\boldsymbol{X}_i,\mathcal{S}^{est},\Pi)\big)^2,
+\end{align*}
+der *erwartete*^[Die Notation $\textup{E}_{\mathcal{S}^{est},\,\mathcal{S}^{te}}$ meint, dass die Erwartung über $\mathcal{S}^{est}$, und $\mathcal{S}^{te}$ gebildet wird.] mittlere quadratische Fehler der heterogenen Behandlungseffekte,
+
+\begin{align*}
+  \textup{EMSE}(\Pi) = \textup{E}_{\mathcal{S}^{est},\,\mathcal{S}^{te}}\big[\textup{MSE}(\mathcal{S}^{est},\mathcal{S}^{te},\,\Pi)\big].
+\end{align*}
+
+Eine hilfreiche Umformung für $\textup{EMSE}$ ist
+
+\begin{align*}
+  \textup{EMSE}(\Pi) = \textup{Var}_{\mathcal{S}^{est},\boldsymbol{X}_i} \big[\widehat\tau(\boldsymbol{X}_i,\mathcal{S}^{est},\Pi)\big] - \textup{E}_{\boldsymbol{X}_i}\big[\tau^2(\boldsymbol{X}_i,\Pi)\big] + \textup{E}[\tau_i^2],
+\end{align*}
+
+denn @AtheyImbens2016 zeigen, wie die ersten beiden Summanden empirisch geschätzt werden können. Der Term $\textup{E}[\tau_i^2]$ ist nicht schätzbar (unbeobachteter individueller Behandlungseffekt $\tau_i$), kann aber vernachlässigt werden, da er nicht von $\Pi$ oder den Daten abhängt und somit eine *Konstante* ist, die sich beim Vergleich des geschätzen EMSE für verschiedene $\Pi$ rauskürzt.
+
+Dies sorgt für konsistente Schätzungen. @AtheyImbens2016 zeigen, dass die Minimierung des EMSE sowohl eine ausgewogene Verteilung der behandelten und unbehandelten Individuen als auch eine genaue Schätzung des Behandlungseffekts innerhalb jedes Knotens gewährleistet.
+
+::: {.callout-tip}
+
+## Algorithmus: Causal Tree
+
+1. Passe den Baum an: teile den Regressorraum mit binären Entscheidungsregeln rekursiv in Partitionen $\Pi$:
+    a. An jedem Knoten wird die Aufteilung so gewählt, dass die Schätzung des *erwarteten mittleren quadratischen Fehlers* \textup{EMSE}(\Pi) über alle möglichen binären Aufteilungen $\Pi$ minimiert wird.
+    b. Stelle sicher, dass eine Mindestanzahl von behandelten und Kontroll-Einheiten in jedem Blatt des so angepassten Baums nicht unterschritten wird.
+2. Bestimmte mit Cross-Validation die Tiefe $d^*$ der Partition, die eine Schätzung des MSE der Behandlungseffekte minimiert.
+3. Ehalte die Partition $\Pi^*$ durch das Beschneiden von $\Pi$ auf die Tiefe $d^*$: Entferne Blätter, die die geringste Verbesserung der Anpassung bieten. Dieser Schritt liefert den finalen Baum.
+4. Schätze die Behandlungseffekte in jedem Blatt von $\Pi^*$ mit den Beobachtungen in $\mathcal{S}^{est}$.
+
+:::
+
+```{r}
+nl_effects <- readRDS(file = "datasets/nl_effects.Rds")
+```
+
+```{r}
+library(dplyr)
+library(grf)
+# Fit a causal tree (one single tree)
+causal_tree <- causal_forest(
+  X = nl_effects %>% select(X1:X3) %>% as.matrix(),
+  Y = nl_effects$Y,
+  W = nl_effects$B, 
+  num.trees = 1, 
+  honesty = FALSE, 
+  min.node.size = 150
+)
+
+causal_tree
+```
+
+@fig-ct
+
+```{r}
+#| eval: false
+the_tree <- get_tree(causal_tree, index = 1)
+
+plot(the_tree)
+```
+
+![Mit `grf::causal_forest` geschätzter Causal Tree](img/causal_tree.svg){#fig-ct width=70%}
+
+
+
+
+### Causal Forests
+
+*Causal Forests* sind eine Erweiterung von Random Forests, die speziell entwickelt wurden, um individuelle Behandlungseffekte*(engl. Individual Treatment Effects, ITE) zu schätzen. Der Hauptunterschied zu Random Forests besteht darin, dass Causal Forests nicht nur Vorhersagen treffen, sondern auch den **kausalen Effekt** einer Behandlung $B$ auf das Outcome $Y$ schätzen. Der kausale Effekt wird oft als Differenz der Ergebnisse unter verschiedenen Bedingungen (z. B. mit und ohne Behandlung) modelliert.
+
+
+| Aspekt                 | Random Forests                              | Causal Forests                                 |
+|------------------------|---------------------------------------------|------------------------------------------------|
+| **Ziel**                | Vorhersage von Zielvariablen                | Schätzung individueller Behandlungseffekte     |
+| **Ergebnisse**          | Globale Vorhersagen                         | Heterogene, individuelle Effekte               |
+| **Trainingsdaten**      | Outcome und Prädiktoren               | Behandlung, Outcome und Prädiktoren           |
+| **Beispiel**            | Einkommensvorhersage auf Basis von Merkmalen| Effekt einer Werbekampagne auf verschiedene Kunden |
+| **Schätzung**           | Bedingte Erwartung $\textup{E}[Y|X]$               | Bedingter Behandlungseffekt $\textup{E}[Y(1) - Y(0)|X]$ |
+| **Verwendung**          | Klassifikation und Regression               | Kausalanalyse und individuelle Wirkungsschätzung|
+
+Table: Vergleich von Random Forests und Causal Forests {#tbl-rfcfcomp}
+
+In diesem Beispiel verwenden wir das Paket `grf` (Generalized Random Forests) in R, um einen Causal Forest zu trainieren und die individuellen Behandlungseffekte zu schätzen.
+
+Naive Methode mit Random Forest
+
+
+```{r}
+#| fig-cap: "Zusammenhang zwischen X1, X2, X3 und dem wahren Behandlungseffekt tau"
+#| label: fig-xvstau
+library(tidyverse)
+# Daten ins Long-Format umwandeln für einfachere Facettierung
+nl_long <- nl_effects %>% 
+  select(X1, X2, X3, tau) %>% 
+  pivot_longer(cols = starts_with("X"), names_to = "Variable", values_to = "Value")
+
+# Erstelle den facettierten Plot
+ggplot(
+  data = nl_long,
+  mapping = aes(x = Value, y = tau)) + 
+  geom_point(alpha = 0.3, size = .5) + 
+  facet_wrap(~Variable, scales = "free") + 
+  theme_minimal() + 
+  labs(
+    x = "Wert der Prädiktoren",
+    y = "Wahrer Behandlungseffekt (tau)"
+  )
+```
+
+```{r}
+#| fig-cap: "Korrelation zwischen Behandlungsindikator (B) und relevanten Kovariablen"
+#| label: fig-bvsvars
+# In langes Format überführen
+df_long <- nl_effects %>% 
+    select(X1, X2, X3, B) %>% 
+    pivot_longer(
+      cols = starts_with("X"),
+      names_to = "Variable",
+      values_to = "Value"
+    )
+
+# Facetting nach Variable
+ggplot(df_long, aes(x = Value, fill = factor(B))) + 
+    geom_density(alpha = 0.5) + 
+    facet_wrap(~Variable, scales = "free") + 
+    labs(
+      x = "Prädiktoren-Werte",
+      fill = "Behandlung (B)"
+    ) +
+    theme_minimal() + 
+    theme(legend.position = "top")
+```
+
+
+```{r}
+library(grf)
+library(randomForest)
+library(tidymodels)
+
+the_split <- initial_split(data = nl_effects, prop = .8)
+nl_effects_train <- training(the_split)
+nl_effects_test <- testing(the_split)
+
+# Variablen in Matrizen / Vektoren überführen
+X <- nl_effects_train %>% 
+  select(starts_with("X")) %>% 
+  as.matrix()
+B <- nl_effects_train %>% pull(B)
+Y <- nl_effects_train %>% pull(Y)
+tau <- nl_effects_train %>% pull(tau)
+```
+
+
+```{r, cache=T}
+# Propensity Score Schätzen
+B_hat_mod <- regression_forest(
+  X = X,
+  Y = B,
+  tune.parameters = "all"
+)
+
+B_hat <- B_hat_mod$predictions
+
+# Outcome Schätzen
+Y_hat_mod <- regression_forest(
+  X = X,
+  Y = Y,
+  tune.parameters = "all"
+)
+
+Y_hat <- Y_hat_mod$predictions
+
+# Causal Forest trainieren
+cf <- causal_forest(
+  X = X, 
+  Y = Y, 
+  W = B, 
+  Y.hat = Y_hat,
+  W.hat = B_hat
+)
+```
+
+```{r}
+# Schritt 4: Vorhersage des durchschnittlichen Behandlungseffekts
+# Causal Forest
+tau.cf <- average_treatment_effect(cf)
+cat("Durchschnittlicher Behandlungseffekt mit Causal Forest:", tau.cf[1], "\n")
+
+# Random Forest: Berechne die Vorhersagen für behandelte und unbehandelte Gruppen
+rf.predictions <- predict(rf)
+tau.rf <- mean(rf.predictions[B == 1]) - mean(rf.predictions[B == 0])
+cat("Geschätzter Behandlungseffekt mit Random Forest:", tau.rf, "\n")
+```
+
+```{r}
+# Schritt 5: Individuelle Schätzungen der Behandlungseffekte
+# Causal Forest - Individuelle Behandlungseffekte (CATE)
+tau.hat.cf <- predict(cf)$predictions
+
+# Wahrer Behandlungseffekt tau
+head(tau.hat.cf)
+```
+
+```{r}
+tibble(
+    x = nl_effects_train$tau,
+    y = predict(cf)$predictions
+) %>%
+    ggplot(aes(x  =x, y = y)) +
+    geom_point(alpha= .3, size = 1) +
+    geom_abline(intercept = 0, slope = 1, col = "red") +
+    theme_minimal()
+```
+
+
+```{r}
+# ATE CF
+mean(tau.hat.cf)
+```
+
+```{r}
+# Schritt 6: Evaluierung - Vergleich der Genauigkeit der beiden Modelle
+# MSE für Causal Forest
+mse.cf <- sqrt(mean((tau.hat.cf - tau)^2))
+cat("MSE des Causal Forest:", mse.cf, "\n")
+
+# MSE für Random Forest bei verwendung von ATE
+mse.rf <- sqrt(mean((tau.rf - tau)^2))
+cat("MSE des Random Forest:", mse.rf, "\n")
+```
+
+Test set
+
+```{r}
+sqrt(mean((predict(object = cf, newdata = nl_effects_test %>% select(-Y, -tau, -B))$predictions - nl_effects_test$tau)^2))
+```
+
+```{r}
+sqrt(mean((predict(object = rf, newdata = nl_effects_test %>% select(-Y, -tau)) - nl_effects_test$tau)^2))
+```
+
+```{r}
+# ATE CF pred
+mean(predict(object = cf, newdata = nl_effects_test %>% select(-Y, -tau, -B))$predictions)
+```
+
+```{r}
+# ATE RF pred
+predict(object = rf, newdata = nl_effects_test %>% select(-Y, -tau)) %>% mean()
+```
+
+
+
+
+
 
 ## Zusammenfassung
 

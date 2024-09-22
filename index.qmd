@@ -1,8 +1,21 @@
 ---
 format: live-html
+engine: knitr
+webr:
+  packages:
+    - tibble
 ---
 
+{{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
+
 # Einführung
+
+```{css}
+#| echo: false
+#einführung #webr-1 #webr-2 {
+  margin-left: 40px;
+}
+```
 
 ```{r}
 #| echo: false
@@ -20,48 +33,68 @@ tabopts <- function(x) {
 }
 ```
 
-```{webr-r}
-library(palmerpenguins)
-data(penguins)
+Das Interesse an modernen Methoden der Kausalanalyse und des maschinellen Lernens hat in den letzten Jahren stark zugenommen. Diese Verfahren haben sich nicht nur in der empirischen Forschung, sondern auch in der Wirtschaft als unverzichtbare Werkzeuge etabliert. Mit der zunehmenden Verfügbarkeit großer Datenmengen (*Big Data*) und immer komplexeren Fragestellungen in den Wirtschaftswissenschaften sind fortgeschrittene statistische Methoden notwendig geworden, die über traditionelle Regressionsansätze hinausgehen. Kausalanalyse und maschinelles Lernen ermöglichen es, fundierte Aussagen über Ursache-Wirkungs-Zusammenhänge zu treffen und leistungsfähige Vorhersagemodelle zu erstellen.
 
-penguins_cleaned <- penguins %>% 
-  rename(
-    bill_length = bill_length_mm,
-    bill_depth  = bill_depth_mm,
-    flipper_length = flipper_length_mm,
-    body_mass = body_mass_g
-  ) %>% 
-  drop_na() %>% 
-  filter(
-    body_mass < quantile(body_mass, .95)
+Dieses Kompendium, *Kausalanalyse und Maschinelles Lernen mit R* (KMR), bietet Studierenden und Lehrenden eine umfassende, interaktive Lernplattform, die darauf ausgerichtet ist, die in Vorlesungen und Übungen vermittelten Inhalte im Selbststudium zu vertiefen und praktisch anzuwenden. Entwickelt mit dem Publikationssystem „Quarto“, enthält das Kompendium eine Vielzahl dynamischer Elemente, darunter interaktive Grafiken und Anwendungen, die mit „Observable“ erstellt wurden, sowie ein Web-basiertes Framework („WebR“), das eine voll funktionsfähige R-Konsole direkt im Browser integriert. Dies ermöglicht den Studierenden, R-Code in Fallstudien auszuführen, Analysen eigenständig durchzuführen und Ergebnisse sofort nachzuvollziehen.
+
+Ein entscheidender Vorteil von R liegt in der Möglichkeit, die Analyseschritte vollständig zu dokumentieren und reproduzierbar zu gestalten. Dies erleichtert es nicht nur, Code wiederzuverwenden und auf neue Datensätze anzuwenden, sondern auch, Ergebnisse transparent und nachvollziehbar zu präsentieren – ein wesentlicher Bestandteil moderner wissenschaftlicher Praxis. Darüber hinaus können die Studierenden den vorgegebenen Code modifizieren, Parameter von Schätzfunktionen anpassen und durch eigenständiges Experimentieren ein tieferes Verständnis der statistischen Verfahren und deren Anwendungen erlangen.
+
+**Relevanz der behandelten Methoden für empirische Wirtschaftswissenschaften**
+
+Die in diesem Kompendium behandelten Methoden – von klassischen Verfahren wie der Regressionsanalyse bis hin zu modernen Ansätzen des maschinellen Lernens – sind für Studierende in den Wirtschaftswissenschaften mit empirischem Bezug von zentraler Bedeutung. Methoden wie Matching, Panel-Daten-Analysen und Difference-in-Differences bieten robuste Werkzeuge, um kausale Zusammenhänge in Beobachtungsdaten zu identifizieren. Diese Techniken sind unverzichtbar, um die Auswirkungen wirtschaftspolitischer Maßnahmen oder unternehmerischer Entscheidungen empirisch zu untersuchen und verlässliche Aussagen über Ursache-Wirkungs-Beziehungen zu treffen.
+
+Neben diesen klassischen Verfahren rücken zunehmend moderne Methoden des maschinellen Lernens in den Vordergrund. Techniken wie Entscheidungsbäume, Random Forests, Support Vector Machines und neuronale Netzwerke ermöglichen die Analyse großer und komplexer Datensätze und bieten leistungsfähige Vorhersagemodelle, die in der empirischen Wirtschaftsforschung immer häufiger zum Einsatz kommen. Diese Methoden erweitern das methodische Spektrum über traditionelle Ansätze hinaus und bieten flexible Lösungen für eine Vielzahl von praktischen Anwendungen.
+
+Dieses Kompendium bietet nicht nur Studierenden eine wertvolle Ressource, um die behandelten Methoden in eigenen empirischen Projekten anzuwenden, sondern richtet sich auch an Lehrende. Als offene Bildungsressource ermöglicht es, bestehende Lehrveranstaltungen um aktuelle und relevante Themen zu erweitern oder als Grundlage für die Konzeption neuer Kurse zu dienen. Die Integration von interaktiven Lernkomponenten und einer in den Browser integrierten R-Konsole fördert das Verständnis theoretischer Inhalte und erleichtert die praktische Anwendung der Methoden. Lehrende können die bereitgestellten Materialien flexibel in ihre Kurse integrieren und ihren Studierenden eine innovative und praxisnahe Lernerfahrung bieten.
+
+**Ziel des Kompendiums**
+
+Das Kompendium „Kausalanalyse und Maschinelles Lernen mit R“ verfolgt das Ziel, Studierenden eine praxisorientierte und interaktive Lernumgebung zu bieten, die sie in die Lage versetzt, empirische Studien eigenständig durchzuführen und die erlernten Techniken flexibel in verschiedenen Kontexten einzusetzen. Durch die Kombination von theoretischen Erläuterungen, praktischen Fallstudien und interaktiven Übungen wird das Verständnis der behandelten Methoden vertieft und deren Anwendung in der Forschung gefördert.
+
+Studierende erhalten die Möglichkeit, ihre Programmierkenntnisse in R zu erweitern, statistische Verfahren direkt im Browser anzuwenden und durch Modifikation des Codes eigene Analysen durchzuführen. Lehrende profitieren von der offenen Struktur des Kompendiums, das sich leicht in bestehende Lehrveranstaltungen integrieren oder als Grundlage für neue Kurse nutzen lässt. Ziel ist es, nicht nur das Verständnis moderner statistischer Methoden zu fördern, sondern auch die Fähigkeit, diese in der Praxis anzuwenden und zu erweitern.
+
+In diesem Kompendium verwendeten wir folgende Konventionen hinsichtlich der Formatierung und Einbindung von (ausführbarem) R-Code:
+
+- Mit `so formatiertem Text` referenzieren wir einzeilige Bestandteile komplexerer Code-Statements, häufig R-Objekte oder Funktionsargumente. Solcher *Inline-Code* wird häufig im Fließtext verwendet, um nicht ausführbare und ausführbare Code-Anweisungen besser unterscheidbar zu machen und insbesondere letztere zu erläutern.
+
+- Grundsätzlich wird R-Code in Form von Blöcken dargestellt, die als *Code-Chunks* bezeichnet werden. In diesen Blöcken wird gezeigt, wie die im Fließtext beschriebenen Analyse-Schritte mit R umgesetzt werden können. Für bessere Nachvollziehbarkeit einzelner Komponenten des Codes, werden durch `#` gekennzeichnete `# Kommentare` genutzt.
+
+  ```{r}
+  # Beispiel-Datensatz erzeugen
+  library(tibble)
+  dat <- tibble(
+    Alter = c(28, 34, 23, 45)
   )
+  
+  # Durchschnittsalter berechnen
+  mean(dat$Alter)
+  ```
 
-# Überblick
-slice_head(penguins_cleaned, n = 10)
+- Interaktive Code-Chunks. 
+
+```{webr}
+# Beispiel-Datensatz erzeugen
+library(tibble)
+dat <- tibble(
+  Alter = c(28, 34, 23, 45)
+)
+
+# Durchschnittsalter berechnen
+mean(dat$Alter)
 ```
 
-```{webr-r}
-# Zusatz: Globale Regression
-penguins_cleaned %>%
-  ggplot(
-    mapping = aes(
-      x = body_mass, 
-      y = bill_depth, 
-      color = species
-    )
-  ) +
-  geom_point() +
-  geom_smooth(method = "lm", se = F) +
-  # Regression für alle Datenpunkte
-  geom_smooth(
-    mapping = aes(
-      x = body_mass, 
-      y = bill_depth
-    ),
-    method = "lm", 
-    se = F, 
-    inherit.aes = F
-  )
+```{webr}
+#| autorun: false
+# Die Laufzeit dieses Codes beträgt 3 Sekunden
+# 3 Sekunden nichts tun
+Sys.sleep(time = 3)
+
+# Leser begrüßen
+cat("Willkommen bei KMR!")
 ```
 
-just some test.
+- Interaktive Visualisierungen:
+
+    <iframe width="100%" height="682" frameborder="0" class="box-shadow" src="https://observablehq.com/embed/@mca91/latent-variable-cdf?cells=plot%2Cviewof+beta0%2Cviewof+beta"></iframe>
+
+
