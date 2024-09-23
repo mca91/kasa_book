@@ -902,11 +902,6 @@ cf <- causal_forest(
 # Causal Forest
 tau.cf <- average_treatment_effect(cf)
 cat("Durchschnittlicher Behandlungseffekt mit Causal Forest:", tau.cf[1], "\n")
-
-# Random Forest: Berechne die Vorhersagen für behandelte und unbehandelte Gruppen
-rf.predictions <- predict(rf)
-tau.rf <- mean(rf.predictions[B == 1]) - mean(rf.predictions[B == 0])
-cat("Geschätzter Behandlungseffekt mit Random Forest:", tau.rf, "\n")
 ```
 
 ```{r}
@@ -940,10 +935,6 @@ mean(tau.hat.cf)
 # MSE für Causal Forest
 mse.cf <- sqrt(mean((tau.hat.cf - tau)^2))
 cat("MSE des Causal Forest:", mse.cf, "\n")
-
-# MSE für Random Forest bei verwendung von ATE
-mse.rf <- sqrt(mean((tau.rf - tau)^2))
-cat("MSE des Random Forest:", mse.rf, "\n")
 ```
 
 Test set
@@ -953,25 +944,15 @@ sqrt(mean((predict(object = cf, newdata = nl_effects_test %>% select(-Y, -tau, -
 ```
 
 ```{r}
-sqrt(mean((predict(object = rf, newdata = nl_effects_test %>% select(-Y, -tau)) - nl_effects_test$tau)^2))
-```
-
-```{r}
 # ATE CF pred
 mean(predict(object = cf, newdata = nl_effects_test %>% select(-Y, -tau, -B))$predictions)
 ```
 
-```{r}
-# ATE RF pred
-predict(object = rf, newdata = nl_effects_test %>% select(-Y, -tau)) %>% mean()
-```
-
-
-
-
-
-
 ## Zusammenfassung
 
-In diesem Kapitel haben wir die Anwendung baum-basierter Methoden in R diskutiert. Darunter Entscheidungsbäume, Bagging, Random Forests und Boosting. Entscheidungsbäume sind Modelle, die die Daten anhand binärer Entscheidungsregeln sukzessiv in kleinere, homogene Gruppen aufgeteilt werden. Baum-Modelle bieten intuitive Interpretierbarkeit, neigen jedoch zur Überanpassung, was durch Beschneiden (Pruning) vermieden werden kann. Die Vorhersage einzelner Bäume ist tendentiell mit hoher Varianz verbunden. Random Forests kombinieren mit Bagging viele Entscheidungsbäume, die auf zufälligen Teilmengen der Daten und Merkmale trainiert werden. Durch die Aggregation der Vorhersagen vieler Bäume reduziert der Random Forest die Varianz und verbessert so die Vorhersagegenauigkeit. Boosting-Methoden mit Entscheidungsbäumen trainieren kleine Bäume sukzessive, wobei jeder weitere Baum zur Korrektur der gegenwärtigen Fehler des Ensembles trainiert wird. Gradient Boosting nutzt den Gradienten der Verlustfunktion, um die Vorhersagequalität des Ensembles optimieren. Für alle Methoden wurden Implementierungen im `parsnip`-Framework in R vorgestellt. Zudem wurde gezeigt, wie die Vorhersagegüte durch Testdatensätze beurteilt und die Bedeutung einzelner Variablen mit Variable-Importance-Metriken analysiert werden kann.
+In diesem Kapitel haben wir die Anwendung baum-basierter Methoden in R diskutiert. Darunter Entscheidungsbäume, Bagging, Random Forests und Boosting. Entscheidungsbäume sind Modelle, die die Daten anhand binärer Entscheidungsregeln sukzessiv in kleinere, homogene Gruppen aufgeteilt werden. Baum-Modelle bieten intuitive Interpretierbarkeit, neigen jedoch zur Überanpassung, was durch Beschneiden (Pruning) vermieden werden kann. Die Vorhersage einzelner Bäume ist tendentiell mit hoher Varianz verbunden. Random Forests kombinieren mit Bagging viele Entscheidungsbäume, die auf zufälligen Teilmengen der Daten und Merkmale trainiert werden. Durch die Aggregation der Vorhersagen vieler Bäume reduziert der Random Forest die Varianz und verbessert so die Vorhersagegenauigkeit. Boosting-Methoden mit Entscheidungsbäumen trainieren kleine Bäume sukzessive, wobei jeder weitere Baum zur Korrektur der gegenwärtigen Fehler des Ensembles trainiert wird. Gradient Boosting nutzt den Gradienten der Verlustfunktion, um die Vorhersagequalität des Ensembles optimieren. 
+
+
+
+Für alle Methoden wurden Implementierungen im `parsnip`-Framework in R vorgestellt. Zudem wurde gezeigt, wie die Vorhersagegüte durch Testdatensätze beurteilt und die Bedeutung einzelner Variablen mit Variable-Importance-Metriken analysiert werden kann.
 
