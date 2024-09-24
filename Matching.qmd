@@ -1,17 +1,19 @@
 ---
+format: live-html
+engine: knitr
 webr: 
-  show-startup-message: true
-  packages: [
-            'boot', 
-            'cobalt', 
-            'dplyr',
-            'ggplot2',
-            'marginaleffects', 
-            'MatchIt', 
-            'sandwich',
-            'tidyr',
-            ]
+  packages: 
+    - 'boot' 
+    - 'cobalt'
+    - 'dplyr'
+    - 'ggplot2'
+    - 'marginaleffects'
+    - 'MatchIt'
+    - 'sandwich'
+    - 'tidyr'
 ---
+
+{{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
 
 # Matching
 
@@ -32,8 +34,9 @@ tabopts <- function(x) {
 }
 ```
 
-```{webr-r}
-#| context: setup
+```{webr}
+#| echo: false
+#| edit: false
 # create dataset directory
 dir.create("datasets")
 # Download the dataset
@@ -41,10 +44,6 @@ download.file(
     "https://raw.githubusercontent.com/mca91/kausal_data/main/darkmode.csv",
     'datasets/darkmode.csv',
 )
-```
-
-```{webr-r}
-#| context: setup
 library(dplyr)
 # make darkmode available using read.csv for now
 # because there's some issue with readr::read_csv
@@ -57,7 +56,7 @@ darkmode <- read.csv(
 options(pillar.bold = TRUE, pillar.subtle = FALSE)
 ```
 
-In randomisierten kontrollierten Studien stellt eine randomisierte Behandlung sicher, dass die Individuen beider Gruppen im Mittel vergleichbar sind, dass heißt es gibt keine systematischen Unterschiede der Studiensubjekte hinsichtlich der Verteilung von Charakteristika zwischen den Gruppen. Dann ist es plausibel eine beobachtete mittlere Differenz in der Outcome-Variable alleine auf die Behandlung zurückzuführen.
+In randomisierten kontrollierten Studien stellt eine zufällige Zuweisung der Behandlung sicher, dass die Individuen beider Gruppen im Mittel vergleichbar sind, dass heißt es gibt keine systematischen Unterschiede der Studiensubjekte hinsichtlich der Verteilung von Charakteristika zwischen den Gruppen. Dann ist es plausibel, eine beobachtete mittlere Differenz in der Outcome-Variable zwischen den Gruppen alleine auf die Behandlung zurückzuführen.
 
 In der Praxis, insbesondere in ökonomischen Studien, sind randomisierte kontrollierte Studien aus ethischen und/oder finanziellen Gründen nicht durchführbar. Stattdessen werden nicht-experimentelle Daten genutzt, die jedoch nur sehr selten eine Vergleichbarkeit von Behandlungs- und Kontrollgruppe gewährleisten.
 
@@ -113,6 +112,24 @@ tibble(
 ```
 
 Für die Analyse lesen wir zunächst den Datensatz *darkmode.csv* mit `readr::read_csv()` ein und verschaffen uns einen Überblick über die verfügbaren Variablen.
+
+```{webr}
+#| message: false
+#| warning: false
+# Paket `tidyverse` laden
+library(tidyverse)
+
+# Datensatz 'darkmode' einlesen
+darkmode <- read_csv(
+  file = "datasets/darkmode.csv"
+)
+
+# kurzer Überblick
+slice_head(
+  .data = darkmode, 
+  n = 10 
+)
+```
 
 ```{r, message=FALSE}
 # Paket `tidyverse` laden

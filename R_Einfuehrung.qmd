@@ -27,9 +27,9 @@ library(modelsummary)
 library(gt)
 ```
 
-Dieses Kapitel ist *nicht* als umfassende Einführung in R gedacht, sondern behandelt Kernfunktionen aus der Paketsammlung `tidyverse`. Wenngleich die Inhalte deutlich über ein Hallo-Welt-Beispiel^[https://de.wikipedia.org/wiki/Hallo-Welt-Programm] hinausgehen, betrachten wir hier grundlegene Funktionen für Datenmanipulation und Visualisierung. Diese sind Vorraussetzung für das Verständnis fortgeschrittener Code-Bausteine in späteren Kapiteln. Falls Sie bereits über Grundkenntnisse im Umgang mit `tidyverse` verfügen, können Sie dieses Kapitel überspringen. Sollten Sie nicht oder nur teilweise mit den hier gezeigten Befehlen vertraut sein oder keinerlei Erfahrung mit R haben, empfiehlt sich vorab eine Erarbeitung bzw. Wiederholung der Inhalte. Nachstehede Ressourcen finden wir hilfreich:
+Dieses Kapitel ist *nicht* als umfassende Einführung in R konzipiert, sondern behandelt Kernfunktionen aus der Paketsammlung [*tidyverse*](https://www.tidyverse.org). Wenngleich die Inhalte deutlich über ein Hallo-Welt-Beispiel^[https://de.wikipedia.org/wiki/Hallo-Welt-Programm] hinausgehen, betrachten wir hier grundlegene Funktionen für Datenmanipulation und Visualisierung unter dem Paradigma [*Funktionale Programmierung*](http://adv-r.had.co.nz/Functional-programming.html), mit einem starken Fokus auf Pipelines und Transformationen von Datenstrukturen. Diese Grundlagen sind Voraussetzung für das Verständnis fortgeschrittener Code-Bausteine in späteren Kapiteln. Falls Sie bereits über Grundkenntnisse im Umgang mit dem *tidyverse* verfügen, können Sie dieses Kapitel überspringen. Sollten Sie nicht oder nur teilweise mit den hier gezeigten Befehlen vertraut sein oder keinerlei Erfahrung mit R haben, empfiehlt sich vorab eine Erarbeitung bzw. Wiederholung dieser Inhalte. Nachstehede Ressourcen finden wir über dieses Kapitel hinaus hilfreich:
 
-- Feedbackgestütze interaktive Übungsaufgaben bei DataCamp^[Ein Teil des hier angebotenen Katalogs (exlusive *Einführung in R*) ist kostenpflichtig.], bspw. 
+- Feedbackgestütze interaktive Übungsaufgaben bei DataCamp^[Der überwiegende Teil des angebotenen Katalogs (exlusive *Einführung in R*!) ist kostenpflichtig.], bspw. 
 
     - [Einführung in R](https://campus.datacamp.com/courses/einfuhrung-in-r/)
     - [Introduction to Data Visualization with ggplot2](https://www.datacamp.com/courses/introduction-to-data-visualization-with-ggplot2)
@@ -41,8 +41,13 @@ Dieses Kapitel ist *nicht* als umfassende Einführung in R gedacht, sondern beha
     - [R for Data Science](https://r4ds.hadley.nz/)
     - [Hands-On Programming with R](https://rstudio-education.github.io/hopr/)
 
+- [Advanced R](http://adv-r.had.co.nz) vertieft wichtige Programmierkonzepte und bietet einen umfassenden Einblick in die Funktionsweise von R. Das Buch richtet sich an erfahrenere R-Nutzer, kann jedoch auch für (Quer)Einsteiger*innen ein hilfreiches Nachschlagewerk sein.
 
-Wir laden zunächst die Paketsammlung `tidyverse`. Für die Reproduktion mit dem [R GUI](https://www.r-project.org/) oder mit [RStudio](https://posit.co/download/rstudio-desktop/) muss das Paket vorab mit `install.packages()` installiert werden. In den interaktiven R-Konsolen in diesem Kapitel (und im Rest des Buchs) sind die benötigten R-Pakete bereits installiert *und* geladen, sofern nicht anders beschrieben. 
+## tidyverse
+
+*tidyverse* ist eine Sammlung von R-Paketen, die für Datenmanipulation, -analyse und -visualisierung entwickelt wurden, und einen konsistenten, benutzerfreundlichen und funktionalen Programmierstil fördern. Im Fokus der bereitgestellten Funktionen sind saubere, strukturierte und reproduzierbare Data-Science-Workflows.
+
+Wir laden zunächst die Paketsammlung `tidyverse` in R. Für die Reproduktion mit dem [R GUI](https://www.r-project.org/) oder mit [RStudio](https://posit.co/download/rstudio-desktop/) muss das Paket vorab mit `install.packages()` installiert werden. In den interaktiven R-Konsolen in diesem Kapitel (und im Rest des Buchs) sind die benötigten R-Pakete bereits installiert *und* geladen, sofern nicht anders beschrieben. 
 
 ```{r}
 # Paket tidyverse installieren
@@ -66,7 +71,7 @@ x
 )
 ```
 
-## Lange, weite und "tidy" Datenformate
+### Lange, weite und "tidy" Datenformate
 
 Wir betrachten den in @tbl-Klausurergebnisse dargestellten Datensatz *Klausurergebnisse*.
 
@@ -174,7 +179,7 @@ long %>%
   drop_na()
 ```
 
-## Pinguine und Pipes {#sec-pp}
+### Pinguine und Pipes {#sec-pp}
 
 In diesem Abschnitt zeigen wir die Verwendung häufig verwendeter `dplyr`-Funktionen (s.g. *Verben*) für die Transformation von Datensätzen: `mutate()`, `select()`, `filter()`,` summarise()` und `arrange()`.
 
@@ -198,7 +203,7 @@ data(penguins)
 glimpse(penguins)
 ```
 
-### `dplyr::mutate()`
+#### `dplyr::mutate()`
 
 Mit `mutate()` können bestehende Variablen überschrieben oder neue Variablen als Funktion bestehender Variablen definiert werden. `mutate()` operiert in der Spaltendimension des Datensatz. 
 
@@ -239,7 +244,7 @@ penguins %>%
   )
 ```
 
-### `dplyr::select()`
+#### `dplyr::select()`
 
 Mit `select()` werden Variablen aus dem Datensatz ausgewählt. Dies geschieht entweder über den Variablennamen...
 
@@ -279,7 +284,7 @@ penguins %>%
   )
 ```
 
-### `dplyr::filter()`
+#### `dplyr::filter()`
 
 Das Verb `filter()` filtert den Datensatz in der Zeilendimension. So können Beobachtungen ausgewält werden, deren Merkmalsausprägungen bestimmte Kriterien erfüllen. Hierzu muss `filter()` ein logischer (`logical`) Ausdruck übergeben werden. Häufig erfolgt dies über Vergleichsoperatoren.
 
@@ -388,7 +393,7 @@ penguins_cleaned %>%
   glimpse()
 ```
 
-### `dplyr::summarise()`
+#### `dplyr::summarise()`
 
 Das Verb `summarise()` fasst Variablen über Beobachtungen hinweg zusammen. Der nachstehende Code-Chunk erzeugt eine Tabelle mit Stichprobenmittelwert und -standardabweichung von `flipper_length_mm`.^[`dplyr::summarise()` darf nicht mit `base::summary()` verwechselt werden!] Um zu vermeiden, dass die Auswertung aufgrund fehlender Werte (`NA`) in `flipper_length_mm` scheitert, lassen wir `NA`s mit `na.rm = TRUE` bei der Berechnung unberücksichtigt (wir verwenden weiterhin den unbereinigten Datensatz `penguins`).
 
@@ -419,7 +424,7 @@ penguins %>%
 ```
 
 
-### `dplyr::arrange()`
+#### `dplyr::arrange()`
 
 Mit `arrange()` können Datensätze in Abhängigkeit der beobachteten Ausprägungen von Variablen sortiert werden.
 
@@ -451,7 +456,7 @@ penguins %>%
 ```
 
 
-### Operationen mit gruppierten Datensätzen
+#### Operationen mit gruppierten Datensätzen
 
 Für manche Transformationen ist eine Gruppierung der Daten hilfreich. Wir illustrieren nachfolgend die unterschiedlichen Verhaltensweisen ausgewählter Verben durch Vergleiche von gruppierten und nicht-gruppierten Anwendungen.
   
@@ -522,7 +527,7 @@ penguins_sample %>%
 
 Bei gruppierten Daten berechnet `mutate()` das Stichprobenmittel *pro Gruppe* und weist die Mittelwerte entsprechend zu.
 
-## Eine explorative Analyse mit ggplot2
+### Eine explorative Analyse mit ggplot2
 
 Der bereinigte Datensatz `penguins_cleaned` eignet sich gut für eine graphische Auswertung mit dem R-Paket `ggplot2`, welches Bestandteil des `tidyverse` ist. Nachfolgend untersuchen wir Zusammenhänge zwischen den Körpermaßen der Pinguine.
 
