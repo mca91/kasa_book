@@ -751,6 +751,8 @@ Dies sorgt für konsistente Schätzungen. @AtheyImbens2016 zeigen, dass die Mini
 nl_effects <- readRDS(file = "datasets/nl_effects.Rds")
 ```
 
+@grfPackage
+
 ```{r}
 library(dplyr)
 library(grf)

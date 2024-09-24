@@ -44,9 +44,12 @@ book:
     - Literatur.qmd
   repo-branch: main
   repo-actions: [edit, issue]
+  search:
+    location: navbar
+    type: overlay
   cookie-consent: false
   sidebar:
-    title: "<a href='/index.html'>Kausalanalyse mit R</a>"
+    title: "<a href='/index.html'>Kausalanalyse und machinelles Lernen mit R</a>"
 
 bibliography: references.bib
 
@@ -59,7 +62,7 @@ format:
     grid: 
       body-width: 920px
       margin-width: 350px
-    fontsize: "20px"  
+    fontsize: "20px"
     theme: cosmo
     cap-location: margin
     code-link: true
