@@ -721,16 +721,16 @@ Die nachstehende interaktive Grafik zeigt Beobachtungen zweier Matching-Variable
 library(rsvg)
 library(qrcode)
 code <- qr_code("https://observablehq.com/d/1338355035acc056")
-path <- "img/EDM_qr.svg"
+path <- "img/MDM_qr.svg"
 qrcode::generate_svg(
   qrcode = code, 
-  filename =  "img/EDM_qr.svg"
+  filename =  "img/MDM_qr.svg"
   )
 rsvg::rsvg_png(
-  "img/EDM_qr.svg", "img/EDM_qr.png",
+  "img/MDM_qr.svg", "img/MDM_qr.png",
   width = 200, height = 200
 )
-knitr::include_graphics(path = "img/EDM_qr.png", dpi = 490)
+knitr::include_graphics(path = "img/MDM_qr.png", dpi = 490)
 ```
 <iframe width="100%" height="648" frameborder="0" class="box-shadow"
   src="https://observablehq.com/embed/1338355035acc056?cells=theplot%2Cviewof+caliper%2Cstyles"></iframe>

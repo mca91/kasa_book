@@ -56,7 +56,7 @@ webr:
 </style>
 ```
 
-# Difference-in-Differences
+# Difference-in-Differences {#sec-did}
 
 ```{r, echo=F,message=F,warning=F}
 # Formatierung von gt-Tabellen
