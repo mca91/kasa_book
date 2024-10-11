@@ -7,6 +7,12 @@ project:
   output-dir: "docs"
 
 book:
+  announcement: 
+    icon: info-circle
+    dismissable: true
+    content: "**Alert** - this is some information that you should pay attention to"
+    type: primary
+    position: below-navbar
   title: "Kausalanalyse und maschinelles Lernen mit R"
   reader-mode: true
   author: 
@@ -49,7 +55,7 @@ book:
     type: overlay
   cookie-consent: false
   sidebar:
-    title: "<a href='/index.html'>Kausalanalyse und machinelles Lernen mit R</a>"
+    title: "<a href='/index.html'>Kausalanalyse und maschinelles Lernen mit R</a>"
 
 bibliography: references.bib
 
@@ -73,7 +79,7 @@ format:
     toc-title: "<a href='/index.html'>Übersicht</a>"
     reference-location: margin
     include-in-header:
-      file: 'mathjax.html'
+      file: 'mathjax.html' 
     code-tools: true
     css: custom_styles.css
 
