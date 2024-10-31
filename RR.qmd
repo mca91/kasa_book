@@ -24,7 +24,7 @@ tabopts <- function(x) {
 }
 ```
 
-In viel empirischen Forschungsfeldern ist die *Reproduzierbarkeit* von Studienergebnissen von zentraler Bedeutung. Durch systematische Überprüfung und Bestätigung (oder Wiederlegung) wird die Aussagekraft und Verlässlichkeit wissenschaftlicher Erkenntnisse gewährleistet. Dieser Validierungsprozess ist entscheidend für weiterführende Forschung: Auf verifizierbaren Ergebnissen können neue Hypothesen aufbauen und bestehende Theorien weiterentwickelt werden.
+In viel empirischen Forschungsfeldern ist die *Reproduzierbarkeit* von Studienergebnissen von zentraler Bedeutung. Durch systematische Überprüfung und Bestätigung (oder Widerlegung) wird die Aussagekraft und Verlässlichkeit wissenschaftlicher Erkenntnisse gewährleistet. Dieser Validierungsprozess ist entscheidend für weiterführende Forschung: Auf verifizierbaren Ergebnissen können neue Hypothesen aufbauen und bestehende Theorien weiterentwickelt werden.
 
 Auch in mehrheitlich nicht-experimentellen Disziplinen wie den empirischen Wirtschaftswissenschaften ist die Reproduzierbarkeit von Forschung zunehmend relevant. In diesen Bereichen ist die datengetriebene Analyse mit statistischer Programmierung oft der zentrale Bestandteil wissenschaftlicher Studien. In vielen empirischen Forschungsarbeiten führt die Anwendung statistischer Methoden unmittelbar zu den Studienergebnissen, sodass eine transparente Dokumentation der Arbeitsweise und die Bereitstellung von reproduzierbaren Programm-Codes von großer Bedeutung ist.
 
@@ -42,13 +42,13 @@ Reproduzierbare Forschung meint Prozesse, bei denen Forschende ihre Analysen und
 
 3. **Teilbarkeit**: Die verwendeten Daten, der Code und die Ergebnisse sollten leicht geteilt und überprüft werden können, idealerweise anhand eines (Datei)Formats, dass geringe technische Anforderungen hinsichtlich der Reproduzierbarkeit der Inhalte voraussetzt.
 
-RMarkdown ist ein Dokumentationsformat im R-Ökosystem, das es Nutzern ermöglicht die oben genannten Anforderungen an reprozierbare Forschung zu erfüllen. Es kombiniert die Funktionalitäten von [Markdown](https://markdown.de/), einer schlanken [Markup-Sprache](https://en.wikipedia.org/wiki/Markup_language) für Textformatierung, mit der Möglichkeit, direkt in R geschriebenen Code auszuführen und die Ergebnisse, einschließlich Tabellen und Grafiken in ein Ziel-Dokument einzubinden.
+RMarkdown ist ein Dokumentationsformat im R-Ökosystem, das es Nutzern ermöglicht die oben genannten Anforderungen an reproduzierbare Forschung zu erfüllen. Es kombiniert die Funktionalitäten von [Markdown](https://markdown.de/), einer schlanken [Markup-Sprache](https://en.wikipedia.org/wiki/Markup_language) für Textformatierung, mit der Möglichkeit, direkt in R geschriebenen Code auszuführen und die Ergebnisse, einschließlich Tabellen und Grafiken in ein Ziel-Dokument einzubinden.
 
 ### Struktur
 
 Ein typisches Rmarkdown-Dokument (eine `.rmd`-Datei) besteht aus drei Hauptkomponenten:
 
-- **YAML-Header**: Dieser Bereich am Anfang des Dokuments wird durch `---` eingegrenzt und enthält Metadaten wie den Titel, Autor, Datum und das gewünschte Ausgabeformat (z. B. PDF, HTML, Word). Den Argumenten können, je nach Definition, Objekte des Typs `numeric`, `character` oder `function` übergeben werden. Der nachfolgende Chunk definiert ein Dokument mit dem Titel, Autor und Datumsangebe sowie eine Ausgabe als HTML-Dokument.
+- **YAML-Header**: Dieser Bereich am Anfang des Dokuments wird durch `---` eingegrenzt und enthält Metadaten wie den Titel, Autor, Datum und das gewünschte Ausgabeformat (z. B. PDF, HTML, Word). Den Argumenten können, je nach Definition, Objekte des Typs `numeric`, `character` oder `function` übergeben werden. Der nachfolgende Chunk definiert ein Dokument mit dem Titel, Autor und Datumsangabe sowie eine Ausgabe als HTML-Dokument.
 
   ```{yaml}
   ---
@@ -120,13 +120,13 @@ Um eine neue `.rmd-Datei` in RStudio zu erstellen und zu kompilieren, nutzen wir
 
 ![RStudio: `.Rmd`-Datei erstellen](img/ezgif-rmd-1.gif){#fig-rmdgif2 width=80%}
 
-Das neue `.Rmd`-Dokument kann nun bearbeitet werden. Beachte, dass Code-Chunks (grau hinterlegt) direkt im Dokument ausgeführt werden können und das Ergebnis im Editor angezeigt wird. Dies erfolgt durch Klick auf den "Play"-Button im jeweiligen Chunk.^[Eine Keyboard-Shurtcut zum Ausführungen von Chunks ist `CMD + Enter` in MacOS und `STRG + Enter` bei Windows.] @fig-rmdchunkex zeigt diesen Vorgang für zwei Chunks in standardmäßig bereitgestellten Minimalbeispiel. Die so ggf. erzeugten R-Objekte werden in der Arbeitsumgebung von RStudio zugeordnet.
+Das neue `.Rmd`-Dokument kann nun bearbeitet werden. Beachte, dass Code-Chunks (grau hinterlegt) direkt im Dokument ausgeführt werden können und das Ergebnis im Editor angezeigt wird. Dies erfolgt durch Klick auf den "Play"-Button im jeweiligen Chunk.^[Eine Keyboard-Shortcut zum Ausführungen von Chunks ist `CMD + Enter` in MacOS und `STRG + Enter` bei Windows.] @fig-rmdchunkex zeigt diesen Vorgang für zwei Chunks in standardmäßig bereitgestellten Minimalbeispiel. Die so ggf. erzeugten R-Objekte werden in der Arbeitsumgebung von RStudio zugeordnet.
 
 ![RStudio: Code-Chunks in `.Rmd`-Datei ausführen](img/ezgif-chunkec.gif){#fig-rmdchunkex width=80%}
 
 `.Rmd`-Dateien sind also eine Alternative zur Programmierung von R-Code in einem R-Skript (einer `.R`-Datei), die dem Nutzer mehr Komfort und die Möglichkeit zu [*Literate Programming*](https://de.wikipedia.org/wiki/Literate_Programming) bietet. Literate Programming meint die Praxis, Quellcode und erklärenden Text so zu kombinieren, dass der Code von Menschen besser verstanden werden kann. Der Fokus liegt dabei darauf, den Programmablauf verständlich zu dokumentieren, indem Code und dessen Beschreibung in einem einzigen Dokument integriert werden. So werden nicht nur die technischen Aspekte der Analyse dargestellt, sondern auch der *gedankliche Prozess* hinter der Analyse klar und nachvollziehbar.
 
-Nach erstmaligem abspeichern der `.Rmd`-Datei (hier unter dem namen `diamanten.rmd`) kann das Dokument kompiliert werden. Hierzu klicken wir in der Aktionsleiste unterhalb des Dokumenten-Tabs auf den Button "*Knit*", siehe @fig-rmdgifkomp.^[Eine Keyboard-Shurtcut zum Kompilieren der `.Rmd`-Datei ist `CMD + Shift + k` in MacOS und `STRG + Shift + k` bei Windows.] 
+Nach erstmaligem Abspeichern der `.Rmd`-Datei (hier unter dem Namen `diamanten.rmd`) kann das Dokument kompiliert werden. Hierzu klicken wir in der Aktionsleiste unterhalb des Dokumenten-Tabs auf den Button "*Knit*", siehe @fig-rmdgifkomp.^[Eine Keyboard-Shortcut zum Kompilieren der `.Rmd`-Datei ist `CMD + Shift + k` in MacOS und `STRG + Shift + k` bei Windows.] 
 
 ![RStudio: `.Rmd`-Datei kompilieren](img/ezgif-rmd-knit.gif){#fig-rmdgifkomp width=50% fig-align='center'}
 
@@ -138,7 +138,7 @@ Wenn dieser Prozess fehlerfrei abschließt, wird im Verzeichnis von `diamanten.r
 
 ### Ein Beispiel
 
-Das folgene Minimalbeispiel zeigt den Aufbau einer `.Rmd`-Datei für eine kurze Analyse des Datensatzes `ggplot2::diamonds` unter Verwendung der oben erläuterten Definitionen und Strukturelemente:
+Das folgende Minimalbeispiel zeigt den Aufbau einer `.Rmd`-Datei für eine kurze Analyse des Datensatzes `ggplot2::diamonds` unter Verwendung der oben erläuterten Definitionen und Strukturelemente:
 
 - Im `yaml`-Header definieren wir den Output als HTML-Dokument mit dem Titel "Diamanten" sowie einer Datumsangabe. 
 
@@ -172,7 +172,7 @@ Wir haben Beobachtungen für `r nrow(diamonds)` Diamanten.
 Lediglich `r nrow(diamonds) - nrow(kleiner)` sind **schwerer** 
 als 2.5 *Karat*. 
 
-Der nachfolgende Code zeigt, wie die Häufigeitsverteilung von `carat` mit 
+Der nachfolgende Code zeigt, wie die Häufigkeitsverteilung von `carat` mit 
 R geplottet werden kann.
 
 ```{r, echo = FALSE}\nkleiner %>% 
@@ -187,7 +187,7 @@ Die Formel für diese Berechnung ist $$\\max(\\textup{carat}).$$\n
 ')
 ```
 
-Eine `.rmd`-Datei mit dem obigen Code kann [hier](https://github.com/mca91/kasa_book/blob/main/misc/diamonds.rmd) herunterlagen werden. Alternativ kann in RStudio ein neues Dokument erstellt werden (siehe @sec-genrmd) und der Inhalt kopiert und eingefügt werden. 
+Eine `.rmd`-Datei mit dem obigen Code kann [hier](https://github.com/mca91/kasa_book/blob/main/misc/diamonds.rmd) heruntergeladen werden. Alternativ kann in RStudio ein neues Dokument erstellt werden (siehe @sec-genrmd) und der Inhalt kopiert und eingefügt werden. 
 
 ![RStudio: `diamonds.Rmd` kompilieren](img/ezgif-rmd-2.gif){#fig-diamondsknit width=80% fig-align='center'}
 

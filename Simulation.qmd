@@ -19,13 +19,13 @@ webr:
 
 Bei der Analyse quantitativer Methoden treten häufig Fragestellungen auf, die sich rein mathematisch nur schwer oder gar nicht lösen lassen. So ist es sogar in einfachsten ökonometrischen Modellen oft unmöglich, die exakte Verteilung von Koeffizientenschätzern unter “realistischen” Bedingungen (etwa eine endliche Stichprobengröße und schwache Annahmen über die Verteilung der Fehlerterme) formal zu bestimmen. Asymptotische Theorie kann dann helfen, indem eine Approximation der Stichproben-Eigenschaften eines Schätzers aus Eigenschaften der asymptotischen Verteilung abgeleitet werden. Häufig sind solche Approximationen jedoch nur bei großen Stichproben verlässlich. Wichtige Stichprobeneigenschaften von Schätzern kausaler Effekte in empirischen Anwendungen, wie die Varianz oder das zu erwartende Außmaß der Verzerrung bei Verletzungen von Modellannahmen hingegen können mit asymptotischer Theorie oftmals gar nicht approximiert werden.
 
-Um diese Schwierigkeiten zu begegnen, können wir Simulationstechniken (Monte-Carlo-Methoden) verwenden. In Monte-Carlo-Simulationen wird die Möglichkeit der Erzeugung von Pseudozufallszahlen mit Computern und ihre Rechenleistung genutzt, um eine Vielzahl von Datensätzen gemäß eines interessierenden datenerzeugenden Prozess (DGP) zu generieren. Anhand dieser simulierten Datensätze können wir die Stichprobenverteilung von Schätzern approximieren und so die statistischen Eigenschaften für verschiedene Parameterwerte des DGP analysieren. Insbesondere erlauben *Monte-Carlo-Studien* den Vergleich verschiedener Schätzfunktionen hinsichtlich ihrer Robustheit gegenüber Verletzungen zugrundeliegender Annahmen über den DGP. 
+Um diesen Schwierigkeiten zu begegnen, können wir Simulationstechniken (Monte-Carlo-Methoden) verwenden. In Monte-Carlo-Simulationen wird die Möglichkeit der Erzeugung von Pseudozufallszahlen mit Computern und ihre Rechenleistung genutzt, um eine Vielzahl von Datensätzen gemäß eines interessierenden datenerzeugenden Prozess (DGP) zu generieren. Anhand dieser simulierten Datensätze können wir die Stichprobenverteilung von Schätzern approximieren und so die statistischen Eigenschaften für verschiedene Parameterwerte des DGP analysieren. Insbesondere erlauben *Monte-Carlo-Studien* den Vergleich verschiedener Schätzfunktionen hinsichtlich ihrer Robustheit gegenüber Verletzungen zugrundeliegender Annahmen über den DGP. 
 
 In diesem Kapitel erläutern wir Grundlagen in der Anwendung von Simulations-Methoden mit R und diskutieren Beispiele für die Schätzung kausaler Effekte mit Regressionsmodellen. Wir erläutern weiterhin das Konzept und die Anwendung des *Bootstraps* [@Efron1979], eine simulations-basierte Methode, die für viele Schätzer gültige Inferenz in empirischen Anwendungen erlaubt, wenn Modellannahmen derart verletzt sind, dass asymptotische kritische Werte (sogar für sehr große Stichproben) ungültig sind.
 
 ## Simulation der Stichprobenverteilung eines Schätzers {#sec-simspv}
 
-Zur Illustration der Simulation von Stichprobenverteilungen eines Schätzers betrachten wir zunächst das kanonische Beispiel der Schätzung des Erwartungswerts $\mu_X$ einer normalverteilen Zufallsvariable $X$ anhand einer $n$-elementigen Stichprobe, \begin{align}
+Zur Illustration der Simulation von Stichprobenverteilungen eines Schätzers betrachten wir zunächst das kanonische Beispiel der Schätzung des Erwartungswerts $\mu_X$ einer normalverteilten Zufallsvariable $X$ anhand einer $n$-elementigen Stichprobe, \begin{align}
   X_i \sim\,u.i.v. N(\mu_X,\ \sigma_X^2), \quad i=1,\dots,n.\label{eq:distx}
 \end{align} Die Vorschrift \eqref{eq:distx} ist der *datenerzeugende Prozess* (DGP)[^simulation-1]. Das arithmetische Mittel der $X_i$, \begin{align*}
   \overline{X} := \sum_{i=1}^n X_i,
@@ -403,7 +403,7 @@ Anhand von `sim_function_conf()` können wir die Identifizierbarkeit des kausale
   Y = \beta_0 + \beta_1 X + \beta_2 U + \varepsilon
 \end{align*}
 ```
-überprüfen, in dem wir die Simulation unter Angabe dieses Modells über das Argument `formula` durchführen.
+überprüfen, indem wir die Simulation unter Angabe dieses Modells über das Argument `formula` durchführen.
 
 ```{webr-r}
 #| autorun: true
@@ -486,7 +486,7 @@ digraph COLSIM {
   X \sim& \, N(0,1),\\
   Y =& \, \beta_1 X + e,\\
   C =& \, N(0,1) + .25X + .25Y,
-\end{align*} wobei $e \sim N(0,3^2)$ erneut ein unsystematischer Fehlterterm für $Y$ ist. Wie im DGP aus @sec-simbiasconf wählen wir $\beta_1 = 2$ für den wahren kausalen Effekt von $X$ auf $Y$.
+\end{align*} wobei $e \sim N(0,3^2)$ erneut ein unsystematischer Fehlerterm für $Y$ ist. Wie im DGP aus @sec-simbiasconf wählen wir $\beta_1 = 2$ für den wahren kausalen Effekt von $X$ auf $Y$.
 
 ```{webr-r}
 #| autorun: true
@@ -634,7 +634,7 @@ In diesem linearen DGP bestimmt $B$ über die Zuteilung der Behandlung. $X$ ist 
   =&\, \frac{1}{2}(0 + 3) = 1.5.
 \end{align*}
 ```
-Wir verfizieren nachfolgend mit Monte-Carlo-Simulation für Stichproben von DGP \eqref{eq:dgpatesim} mit $n=150$, dass
+Wir verifizieren nachfolgend mit Monte-Carlo-Simulation für Stichproben von DGP \eqref{eq:dgpatesim} mit $n=150$, dass
 
 -   der KQ-Schätzer für $\beta_1$ im Modell $Y=\beta_0 + \beta_1 B + \epsilon$ ein erwartungstreuer Schätzer für den ATE ist und
 
@@ -765,10 +765,10 @@ Wir zeigen nachfolgend, wie die Konsequenzen von Heteroskedastizität für den K
 \end{align}
 ```
 wobei die Fehlerterm-Varianz $\sigma_e^2(X)$ eine Funktion von $X$ ist, \begin{align*}
-  \sigma_e^2(X) = \textup{Var}(e\vert X) = \lvert X-50 \rvert^{p}.
+  \sigma_e^2(X) = \textup{Var}(e\vert X) = \lvert X-50 \rvert^p.
 \end{align*} Der Parameter $p$ bestimmt die funktionale Form dieser bedingten Varianz.
 
-Der nächste Code-Chunk plottet die Funktion $f(x) = \lvert X-50 \rvert^{p}$ für verschiedene $p$ über den Wertebereich von $X$. Hierfür berechnen wir $f(x)$ für ein mit `expand_grid()` erstelltes Raster von Werten für $X$ und $p$.
+Der nächste Code-Chunk plottet die Funktion $f(x) = \lvert X-50 \rvert^p$ für verschiedene $p$ über den Wertebereich von $X$. Hierfür berechnen wir $f(x)$ für ein mit `expand_grid()` erstelltes Raster von Werten für $X$ und $p$.
 
 ```{webr-r}
 #| autorun: true
@@ -943,7 +943,7 @@ Die Simulationsergebnisse deuten darauf hin, dass ein Fehler erster Art für den
 
 In den zuvor diskutierten Simulationsstudien haben wir iterativ Stichproben basierend auf einem bekannten DGP generiert, um die Eigenschaften der Stichprobenverteilung eines Schätzers (für bestimmte Parameterwerte) zu untersuchen. Der Bootstrap [@Efron1979] ist eine Methode zur Approximation der unbekannten Stichprobenverteilung eines Schätzers, bei der zufällige Stichproben mit Zurücklegen aus einer beobachteten Stichprobe gezogen werden.[^simulation-11] Bootstrapping approximiert die Verteilung eines Schätzers aus beobachteten Datenpunkten und *ohne Kenntnis des wahren DGP*. Der Bootstrap ist daher eine Simulationsmethode, die in empirischen Anwendungen für die Bestimmung der Unsicherheit (Standardfehler) eines Schätzers genutzt werden kann. Bootstrapping ist hilfreich für Hypothesentests, wenn die beobachtete Stichprobe klein oder untypisch ist, was dazu führen kann, dass Standard-Inferenz für Behandlungseffekte nicht zuverlässig anwendbar oder ungültig ist. Insbesondere wenn Modellannahmen verletzt sind wird bootstrapping häufig in empirischen Studien eingesetzt, um Konfidenzintervalle, Standardfehler oder p-Werte zu berechnen.
 
-[^simulation-11]: Diese Vorgehensweise wird auch als *resampling* bezeichnet.
+[^simulation-11]: Diese Vorgehensweise wird auch als *Resampling* bezeichnet.
 
 Die nachfolgenden Key Facts fassen die wesentlichen Eigenschaften des Bootstraps und die grundsätzliche Vorgehensweise zusammen.
 

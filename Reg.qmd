@@ -22,22 +22,22 @@ webr:
 
 # Regression {#sec-regression}
 
-Viele der in diesem Companion behandelten Methoden basiert auf dem Konzept der Schätzung kausaler Effekte mit *Regression*. Als Regressionsansatz bezeichnet man eine Methode, welche die Beziehungen zwischen Variablen durch einen funktionalen Zusammenhang beschreibt und die Parameter der gewählten funktionalen Form anhand von beobachteten Daten schätzt. *Lineare Regression* nimmt eine lineare funktionale Form der Beziehung zwischen einer abhängigen Variable (Outcome-Varibale) und erklärenden Variablen (Regressoren) an. *Nicht-lineare Regressionsmethoden* modellieren die Beziehung etwa durch Polynome höherer Ordnung, exponentielle Funktionen oder andere komplexere Formen. Die Wahl der funktionalen Form hängt von der Natur des datenerzeugenden Prozesses (DGP) und somit stets von der spezifischen Beziehung ab, die untersucht wird. 
+Viele der in diesem Companion behandelten Methoden basiert auf dem Konzept der Schätzung kausaler Effekte mit *Regression*. Als Regressionsansatz bezeichnet man eine Methode, welche die Beziehungen zwischen Variablen durch einen funktionalen Zusammenhang beschreibt und die Parameter der gewählten funktionalen Form anhand von beobachteten Daten schätzt. *Lineare Regression* nimmt eine lineare funktionale Form der Beziehung zwischen einer abhängigen Variable (Outcome-Variable) und erklärenden Variablen (Regressoren) an. *Nicht-lineare Regressionsmethoden* modellieren die Beziehung etwa durch Polynome höherer Ordnung, exponentielle Funktionen oder andere komplexere Formen. Die Wahl der funktionalen Form hängt von der Natur des datenerzeugenden Prozesses (DGP) und somit stets von der spezifischen Beziehung ab, die untersucht wird. 
 
-Regressionsansätze gehören zu den am häufigsten verwendeten Methoden für Kausalanalysen, da so in vielen Forschungsdesigns kausale Effekte identifiziert werden können, indem Backdoors geschlossen werden: Regression kann die durch die Behandlungsvariable verursachte Variation in der Outcome-Variable isolieren, indem für gemeinsame Einflussfaktoren von Behandlungs- *und* Outcome-Variable kontrolliert wird. In diesem Kapitel erläutern wir erweiterungen der Spezifikation und Schätzung von Regressionsansätzen, die für spätere Kapitel relevant sind. Neben einer Motivation der Schätzung kausaler Effekte mit multipler Regression betrachten wir Modelle für verschiedene Kategorien von Outcome-Variablen und diskutieren deren Implementierung mit R.
+Regressionsansätze gehören zu den am häufigsten verwendeten Methoden für Kausalanalysen, da so in vielen Forschungsdesigns kausale Effekte identifiziert werden können, indem Backdoors geschlossen werden: Regression kann die durch die Behandlungsvariable verursachte Variation in der Outcome-Variable isolieren, indem für gemeinsame Einflussfaktoren von Behandlungs- *und* Outcome-Variable kontrolliert wird. In diesem Kapitel erläutern wir Erweiterungen der Spezifikation und Schätzung von Regressionsansätzen, die für spätere Kapitel relevant sind. Neben einer Motivation der Schätzung kausaler Effekte mit multipler Regression betrachten wir Modelle für verschiedene Kategorien von Outcome-Variablen und diskutieren deren Implementierung mit R.
 
 ```{r}
 library(tidyverse)
 library(cowplot)
 ```
 
-## Regression schließt Backdoors: Frish-Waugh-Lovell-Theorem
+## Regression schließt Backdoors: Frisch-Waugh-Lovell-Theorem
 
-Das Frisch-Waugh-Lovell-Theorem (FWL) besagt, dass in einer multiplen linearen Regression die geschätzten Koeffizienten für eine Teilmenge der Regressoren numerisch identisch zu Koeffizientenschätzungen aus folgenden Schritten sind 
+Das Frisch-Waugh-Lovell-Theorem (FWL) besagt, dass die geschätzten Koeffizienten für eine interessierende Teilmenge der Regressoren in einer multiplen linearen Regression numerisch identisch mit den Koeffizientenschätzungen aus folgenden Schritten sind: 
 
-1. Rechne die Effekte der übrigen Variablen auf (a) die Outcome-Variable und (b) die Teilmenge der erklärenden Variablen mit Regression heraus und 
+1. Rechne die Effekte der übrigen Regressoren auf (a) die Outcome-Variable und (b) die interessierende Teilmenge der Regressoren mit Regression heraus. 
 
-2. regressiere anschließend die Residuen von Schritt (a) auf die Residuen aus Schritt (b). 
+2. Regressiere anschließend die Residuen von Schritt (a) auf die Residuen aus Schritt (b). 
 
 In einem multiplen Modell mit zwei Regressoren $X_1,\ X_2$,
 \begin{align}
@@ -53,7 +53,7 @@ FWL ermöglicht daher eine Vereinfachung der Schätzung komplexer Modelle durch 
 
 Für das Verständnis der Schätzung kausaler Effekte mit linearer Regression ist FWL hilfreich, denn es zeigt, wie sowohl die Variation in der Outcome-Variable ($\widehat{u}_{Y,X_2}$) als auch die Variation in der Behandlungsvariable ($\widehat{u}_{X_1,X_2}$), die jeweils *nicht* durch Kovariablen ($X_2$) verursacht wird, mit multipler Regression isoliert werden kann, sodass Backdoors geschlossen werden.
 
-Wir illustrieren dieses Konzept anhand einer multiplen Regression für die Schnabeltiefe (`body_mass`) von Pinguinen aus dem Datensatz `palmerpenguins::penguins`,
+Wir illustrieren dieses Konzept anhand einer multiplen Regression für das Gewicht (`body_mass`) von Pinguinen aus dem Datensatz `palmerpenguins::penguins`,
 
 \begin{align}
   \textup{body\_mass} = \beta_0 + \beta_1\cdot\textup{bill\_length} + \beta_2\cdot \textup{flipper\_length} + \epsilon,\label{eq:billdepthmodel}
@@ -83,7 +83,7 @@ penguins_cleaned <- penguins %>%
 slice_head(penguins_cleaned, n = 10)
 ```
 
-Wir schätzen nun Modell \eqref{eq:billdepthmodel} mit `lm()` und erhalten eine Zusammenfassung der geschätzen Koeffizienten mit `broom::tidy()`.
+Wir schätzen nun Modell \eqref{eq:billdepthmodel} mit `lm()` und erhalten eine Zusammenfassung der geschätzten Koeffizienten mit `broom::tidy()`.
 
 ```{webr}
 library(broom)
@@ -226,7 +226,7 @@ Eine binäre Variable, auch als dichotome Variable oder Indikator-Variable bezei
   \end{cases}
 \end{align}
 
-Eine in späteren Kapiteln dieses Companions als verwendeter *binärer Regressor* ist der Indikator für die Zuordnung von Beobachtungen in Behandlungs- oder Kontrollgruppe (1 = Behandlungsgruppe, 0 = Kontrollgruppe). 
+Ein in späteren Kapiteln dieses Companions verwendeter *binärer Regressor* ist der Indikator für die Zuordnung von Beobachtungen in Behandlungs- oder Kontrollgruppe (1 = Behandlungsgruppe, 0 = Kontrollgruppe). 
 
 Für viele ökonomische Forschungsfragen ist es hilfreich, eine *binäre Outcome-Variable* mit Regression zu modellieren. Hierzu gibt es verschiedene Ansätze, die wir nachfolgend zusammenfassen und ihre Anwendung mit R zeigen.
 
@@ -258,7 +258,7 @@ Bei der Probit-Regression wird die Standardnormalverteilungsfunktion $\Phi(\cdot
 \begin{align}
   E(Y\vert X) = P(Y=1\vert X) = \Phi(\beta_0 + \beta_1 X), \label{eq:probitmodel}
 \end{align}
-sodass der mit der Verknüfungsfunktion (Link) $$\textup{probit}(\cdot) = \Phi^{-1}(\cdot)$$ transformierte Erwartungswert $P(Y=1\vert X)$ dem linearen Prädiktor $z=\beta_0 + \beta_1 X$ entspricht,
+sodass der mit der Verknüpfungsfunktion (Link-Funktion) $$\textup{probit}(\cdot) = \Phi^{-1}(\cdot)$$ transformierte Erwartungswert $P(Y=1\vert X)$ dem linearen Prädiktor $z=\beta_0 + \beta_1 X$ entspricht,
 \begin{align*}
   \Phi^{-1}\big[P(Y=1\vert X)\big] = \beta_0 + \beta_1 X.
 \end{align*}
@@ -311,7 +311,7 @@ Die Log-Likelihood-Funktion ergibt sich als
   \mathcal{L}(\boldsymbol{\beta}) = \sum_{i=1}^n \left[ y_i \log \Phi(\mathbf{X}_i^\top \boldsymbol{\beta}) + (1 - y_i) \log \left(1 - \Phi(\mathbf{X}_i^\top \boldsymbol{\beta})\right) \right]
 \end{align*}
 
-Um den Maximum-Likelihood-Schätzer $\widehat{\boldsymbol{\beta}}$ zu finden, muss die Log-Likelihood-Funktion $\mathcal{L}(\boldsymbol{\beta})$ maximiert werden. In der Praxis erfolgt dies häufig durch numerische Optimierung, da die Log-Likelihood-Funktion der Probit-Regression im Allgemeinen keine geschlossene Form hat damit eine analytische Lösung nicht möglich ist.
+Um den Maximum-Likelihood-Schätzer $\widehat{\boldsymbol{\beta}}$ zu finden, muss die Log-Likelihood-Funktion $\mathcal{L}(\boldsymbol{\beta})$ maximiert werden. In der Praxis erfolgt dies häufig durch numerische Optimierung, da die Log-Likelihood-Funktion der Probit-Regression im Allgemeinen keine geschlossene Form hat, sodass eine analytische Lösung nicht möglich ist.
 
 Für eine Anwendung in R und einen Vergleich mit dem linearen Wahrscheinlichkeitsmodell erzeugen wir einen Beispieldatensatz `simdata` für einen datenerzeugenden Prozess (DGP)^[Siehe @sec-sim für Erläuterungen von Simulationsmethoden in R.] mit einem normalverteilten Regressor $X\sim N(5,2^2)$ und
 \begin{align*}
@@ -454,7 +454,7 @@ als Link-Funktion genutzt, um die Wahrscheinlichkeitsfunktion von $Y$ gegeben $X
 \begin{align}
 E(Y\vert X) = P(Y=1\vert X) = \Lambda(\beta_0 + \beta_1 X). \label{eq:logitmodel}
 \end{align}
-In diesem Modell ist die Link-Funktion $\Lambda^{-1}(\cdot)$. Für $z=\beta_0 + \beta_1 X$ ist $\Lambda^{-1}(t)$ der sogenannte *logit*: Dass logarithmierte Verhältnis von $p := P(Y=1\vert X)$ und $1 - p = P(Y=0\vert X)$,
+In diesem Modell ist die Link-Funktion $\Lambda^{-1}(\cdot)$. Für $z=\beta_0 + \beta_1 X$ ist $\Lambda^{-1}(t)$ der sogenannte *logit*: Dass logarithmierte Verhältnis von $p := P(Y=1\vert X)$ zu $1 - p = P(Y=0\vert X)$,
 \begin{align*}
   \textup{logit(p)} = \log\bigg(\frac{p}{1-p}\bigg) = \beta_0 + \beta_1 X.
 \end{align*}
@@ -492,7 +492,7 @@ ggplot() +
   theme_cowplot()
 ```
 
-Die nachstehende interaktive Grafik zeigt, wie die Wahscheinlichkeitsfunktion der latenten Variable $z=\beta_0 + \beta_1 X$ von den Parametern $\beta_0$ und $\beta_1$ jeweils für Logit- und Probit-Regression beeinflusst wird.
+Die nachstehende interaktive Grafik illustriert, wie die Wahrscheinlichkeitsfunktion der latenten Variable $z=\beta_0 + \beta_1 X$ von den Parametern $\beta_0$ und $\beta_1$ jeweils für Logit- und Probit-Regression beeinflusst wird.
 
 <iframe class="obs-soft-box-shadow" width="100%" height="680" frameborder="0"
   src="https://observablehq.com/embed/@mca91/latent-variable-cdf?cells=plot%2Cviewof+beta0%2Cviewof+beta%2CMathJax"></iframe>
@@ -611,11 +611,11 @@ list(
 
 Die Deviance für das Probit-Modell ist tatsächlich etwas geringer als für das Logit-Modell. 
 
-Ähnlich wie $R^2$ für lineare Regression misst die Deviance $D$ lediglich die Anpassung des Modells an die beobachteten Daten. Daher eignet sich $D$ nur bedingt als Maß zur Einschätzung der Tauglichkeit eines Modells für Out-of-sample-Vorhersagen. Je nach Ziel der Modellierung kann es hilfreich sein, eine robuste Einschätzung der Vorhersage-Güte unter Berücksichtigung der Modellkomplexität vorzunehmen. Hierfür werden oft Informationskriterien verwendet. Das Akaike-Informationskriterium (AIC) 
+Ähnlich wie $R^2$ für lineare Regression misst die Deviance $D$ lediglich die Anpassung des Modells an die beobachteten Daten. Daher eignet sich $D$ nur bedingt als Maß zur Einschätzung der Tauglichkeit eines Modells für Out-of-sample-Vorhersagen. Abhängig vom Ziel der Modellierung kann es hilfreich sein, eine robuste Einschätzung der Vorhersage-Güte unter Berücksichtigung der Modellkomplexität vorzunehmen. Hierfür werden oft Informationskriterien verwendet. Das Akaike-Informationskriterium (AIC) 
 \begin{align*}
   \text{AIC} = 2k - 2 \log(\widehat{\mathcal{L}})
 \end{align*}
-ist ein Maß zur Bewertung der Güte eines Modells unter Berücksichtigung der Modellkomplexität. Das AIC wägt die Anpassung des Modells an die Daten (gemessen durch die maximierte Likelihood-Funktion $\widehat{\mathcal{L}}$^[$\widehat{\mathcal{L}}$ meint die Likelihood-Funktion für die geschätzen Koeffizienten.]) und die Komplexität (gemessen als Funktion der Regressoranzahl $k$) gegeneinander ab. Hierbei werden Modelle mit weniger Parametern bevorzugt, wenn sie die Daten ähnlich gut erklären, sodass eine Überanpassung und damit eine schlechte Vorhersage-Fähigkeit vermieden werden. In R können wir das AIC für Modell-Objekte mit `AIC()` berechnen. 
+ist ein Maß zur Bewertung der Güte eines Modells unter Berücksichtigung der Modellkomplexität. Das AIC wägt die Anpassung des Modells an die Daten (gemessen durch die maximierte Likelihood-Funktion $\widehat{\mathcal{L}}$^[$\widehat{\mathcal{L}}$ meint die Likelihood-Funktion für die geschätzten Koeffizienten.]) und die Komplexität (gemessen als Funktion der Regressoranzahl $k$) gegeneinander ab. Hierbei werden Modelle mit weniger Parametern bevorzugt, wenn sie die Daten ähnlich gut erklären, sodass eine Überanpassung und damit eine schlechte Vorhersagefähigkeit vermieden werden. In R können wir das AIC für Modell-Objekte mit `AIC()` berechnen. 
 
 ```{webr}
 # AIC berechnen
@@ -630,7 +630,7 @@ Auch das AIC zeigt an, dass die Schätzung des Probit-Modells in `mod_probit` be
 
 ### Beispiel: Klassifikation von Palmer-Piniguinen
 
-Anhand der in diesem Kapitel betrachteten Methoden können wir Modelle zur Klassifikation von Pinguinen in `palmerpenguins::penguins` hinsichtlich ihres Geschlechts konstruieren. Hierfür nutzen wir den bereinigten Datensatz `penguins_cleaned` und transformieren zunächst die abhängige Variable `sex` in ein numerisches Format.
+Mit den in diesem Kapitel betrachteten Methoden können wir Modelle zur Klassifikation von Pinguinen in `palmerpenguins::penguins` hinsichtlich ihres Geschlechts konstruieren. Hierfür nutzen wir den bereinigten Datensatz `penguins_cleaned` und transformieren zunächst die abhängige Variable `sex` in ein numerisches Format.
 
 ```{webr}
 # 'sex' transformieren
@@ -646,7 +646,7 @@ penguins_cleaned %>%
   slice_head(n = 10)
 ```
 
-Wir schätznen nachfolgend ein lineares Wahrscheinlichkeitsmodell `penguins_lp`, ein Probit-Modell `penguins_probit` sowie ein Logit-Modell `penguins_logit` die jeweils `sex` anhand der simplen Spezikation des linearen Prädiktors $$z = \beta_0 + \beta_1 \textup{bill\_depth}$$ erklären.
+Wir schätzen nachfolgend ein lineares Wahrscheinlichkeitsmodell `penguins_lp`, ein Probit-Modell `penguins_probit` sowie ein Logit-Modell `penguins_logit` die jeweils `sex` anhand der simplen Spezikation des linearen Prädiktors $$z = \beta_0 + \beta_1 \textup{bill\_depth}$$ erklären.
 
 ```{webr}
 # Lineares Modell
@@ -843,11 +843,11 @@ Eine weitere Klasse von $Y$ für die sich der Regressionsansatz von einfacher li
 
 ### Poisson-Verteilung
 
-Die Zufallsvariable $Y$ folgt einer Poisson-Verteilung mit Parameter $\lambda$, wenn:
+Die Zufallsvariable $Y$ folgt einer Poisson-Verteilung mit Parameter $\lambda$, wenn
 
-1. **Ereignisse unabhängig voneinander auftreten:** Das Auftreten eines Ereignisses beeinflusst nicht die Wahrscheinlichkeit, dass ein weiteres Ereignis auftritt.
+1. **die Ereignisse unabhängig voneinander auftreten:** Das Auftreten eines Ereignisses beeinflusst nicht die Wahrscheinlichkeit, dass ein weiteres Ereignis auftritt.
 
-2. **Ereignisse einzeln auftreten:** Die Wahrscheinlichkeit, dass in einem sehr kleinen Intervall (im Sinne von $[a,b]$ für $a \to b$) mehr als ein Ereignis auftritt, ist vernachlässigbar.
+2. **die Ereignisse einzeln auftreten:** Die Wahrscheinlichkeit, dass in einem sehr kleinen Intervall (im Sinne von $[a,b]$ für $a \to b$) mehr als ein Ereignis auftritt, ist vernachlässigbar.
 
 3. **die Rate der Ereignisse konstant ist:** Die durchschnittliche Anzahl der Ereignisse pro Zeiteinheit oder pro Raumeinheit $\lambda$ ist konstant.
 
@@ -920,12 +920,12 @@ Da $\lambda_i = \exp(\mathbf{X}_i^\top \boldsymbol{\beta})$, wird die Log-Likeli
 \mathcal{L}(\boldsymbol{\beta}) = \sum_{i=1}^n \left( y_i (\mathbf{X}_i^\top \boldsymbol{\beta}) - \exp(\mathbf{X}_i^\top \boldsymbol{\beta}) - \log(y_i!) \right)
 \end{align}
 
-Den ML-Schätzer $\widehat{\boldsymbol{\beta}}$ erhalten wir durch Maximierung der Log-Likelihoodfunktion $\mathcal{L}(\boldsymbol{\beta})$. Die R-Implementierung von Poisson-Regression in `stats::glm()` wird mit `family = poisson(link = "log")`
+Den ML-Schätzer $\widehat{\boldsymbol{\beta}}$ erhalten wir durch Maximierung der Log-Likelihoodfunktion $\mathcal{L}(\boldsymbol{\beta})$. Die R-Implementierung von Poisson-Regression in `stats::glm()` wird mittels `family = poisson(link = "log")`
 aufgerufen.
 
 ### Interpretation der Koeffizienten
 
-Die Koeffizienten $\boldsymbol{\beta}$ in der Poisson-Regression haben eine log-lineare Beziehung zur Zählvariable. Für einen bestimmten Koeffizienten $\beta_j$ ist die Interpretation wiefolgt:
+Die Koeffizienten $\boldsymbol{\beta}$ in der Poisson-Regression haben eine logarithmisch-lineare Beziehung zur Zählvariable. Für einen bestimmten Koeffizienten $\beta_j$ ist die Interpretation wie folgt:
 
 Eine Änderung der unabhängigen Variable $X_j$ um eine Einheit führt zu einer Änderung des *Logarithmus* des Erwartungswertes von $Y$ um $\beta_j$. Der Erwartungswert $\lambda$ ändert sich also *multiplikativ* um den Faktor $\exp(\beta_j)$.
 
@@ -977,7 +977,7 @@ Y <- map_dbl(
   )
 )
   
-# Danten in tibble sammeln
+# Daten in tibble sammeln
 dat <- tibble(
   Kampagnen = X, 
   Verkaeufe = Y
@@ -1067,4 +1067,3 @@ ggplot() +
 ## Zusammenfassung
 
 In diesem Kapitel haben wir erweiterte Konzepte der Regressionsanalyse diskutiert. Anhand des Frisch-Waugh-Lovell-Theorems wurde die Wirkungsweise der Kontrolle von Kovariablen mit multipler Regression auf den interessierenden Koeffizienten (Effekt) einer Variable veranschaulicht. Weiterhin haben wir gängige Typen generalisierter linearer Modelle für binäre und Poisson-verteilte Outcome-Variablen eingeführt. Anhand relevanter Beispiele wurde gezeigt, wie diese generalisierten Regressionsmodelle in R spezifiziert, geschätzt und der resultierende Output mit Paketen wie `broom`, `ggplot2` und `modelsummary` interpretiert werden kann.
-

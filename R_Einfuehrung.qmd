@@ -27,15 +27,15 @@ library(modelsummary)
 library(gt)
 ```
 
-Dieses Kapitel ist *nicht* als umfassende Einführung in R konzipiert, sondern behandelt Kernfunktionen aus der Paketsammlung [*tidyverse*](https://www.tidyverse.org). Wenngleich die Inhalte deutlich über ein Hallo-Welt-Beispiel^[https://de.wikipedia.org/wiki/Hallo-Welt-Programm] hinausgehen, betrachten wir hier grundlegene Funktionen für Datenmanipulation und Visualisierung unter dem Paradigma [*Funktionale Programmierung*](http://adv-r.had.co.nz/Functional-programming.html), mit einem starken Fokus auf Pipelines und Transformationen von Datenstrukturen. Diese Grundlagen sind Voraussetzung für das Verständnis fortgeschrittener Code-Bausteine in späteren Kapiteln. Falls Sie bereits über Grundkenntnisse im Umgang mit dem *tidyverse* verfügen, können Sie dieses Kapitel überspringen. Sollten Sie nicht oder nur teilweise mit den hier gezeigten Befehlen vertraut sein oder keinerlei Erfahrung mit R haben, empfiehlt sich vorab eine Erarbeitung bzw. Wiederholung dieser Inhalte. Nachstehede Ressourcen finden wir über dieses Kapitel hinaus hilfreich:
+Dieses Kapitel ist *nicht* als umfassende Einführung in R konzipiert, sondern behandelt Kernfunktionen aus der Paketsammlung [*tidyverse*](https://www.tidyverse.org). Wenngleich die Inhalte deutlich über ein Hallo-Welt-Beispiel^[https://de.wikipedia.org/wiki/Hallo-Welt-Programm] hinausgehen, betrachten wir hier grundlegende Funktionen für Datenmanipulation und Visualisierung unter dem Paradigma [*Funktionale Programmierung*](http://adv-r.had.co.nz/Functional-programming.html), mit einem starken Fokus auf Pipelines und Transformationen von Datenstrukturen. Diese Grundlagen sind Voraussetzung für das Verständnis fortgeschrittener Code-Bausteine in späteren Kapiteln. Falls Sie bereits über Grundkenntnisse im Umgang mit dem *tidyverse* verfügen, können Sie dieses Kapitel überspringen. Sollten Sie nicht oder nur teilweise mit den hier gezeigten Befehlen vertraut sein oder keinerlei Erfahrung mit R haben, empfiehlt sich vorab eine Erarbeitung bzw. Wiederholung dieser Inhalte. Nachstehende Ressourcen finden wir über dieses Kapitel hinaus hilfreich:
 
-- Feedbackgestütze interaktive Übungsaufgaben bei DataCamp^[Der überwiegende Teil des angebotenen Katalogs (exlusive *Einführung in R*!) ist kostenpflichtig.], bspw. 
+- Feedbackgestützte interaktive Übungsaufgaben bei DataCamp^[Der überwiegende Teil des angebotenen Katalogs (exklusive *Einführung in R*!) ist kostenpflichtig.], bspw. 
 
     - [Einführung in R](https://campus.datacamp.com/courses/einfuhrung-in-r/)
     - [Introduction to Data Visualization with ggplot2](https://www.datacamp.com/courses/introduction-to-data-visualization-with-ggplot2)
     - [Data Manipulation with dplyr](https://www.datacamp.com/courses/data-manipulation-with-dplyr)
 
-- Open-source-Literatur wie 
+- Open-Source-Literatur wie 
   
     - der umfangreiche Leitfaden von [Ellis und Mayer (2023)](https://methodenlehre.github.io/einfuehrung-in-R/)
     - [R for Data Science](https://r4ds.hadley.nz/)
@@ -92,7 +92,7 @@ gt(klausurergebnisse) %>%
 Der Datensatz ist noch nicht in der R-Arbeitsumgebung verfügbar. Mit der Funktion `tribble()` können wir @tbl-Klausurergebnisse händisch als R-Objekt der Klasse `tibble` definieren
 
 ```{webr-r}
-# 'klasurergebnisse' als tibble definieren
+# 'klausurergebnisse' als tibble definieren
 (
   klausurergebnisse <- tribble(
     ~Name,    ~Mikro, ~Makro, ~Mathe,
@@ -104,7 +104,7 @@ Der Datensatz ist noch nicht in der R-Arbeitsumgebung verfügbar. Mit der Funkti
 )
 ```
 
-`klausurergebnisse` enhält die Klausurnoten der vier Studierenden (Boebachtungen) spaltenweise *pro Modul*, d.h. die Spaltennamen `Mikro`, `Makro` und `Mathe` sind Ausprägungen der Variable *Modul*. Der Datensatz liegt also *nicht* im s.g. *Tidy-Format* vor.
+`klausurergebnisse` enthält die Klausurnoten der vier Studierenden (Beobachtungen) spaltenweise *pro Modul*, d.h. die Spaltennamen `Mikro`, `Makro` und `Mathe` sind Ausprägungen der Variable *Modul*. Der Datensatz liegt also *nicht* im s.g. *Tidy-Format* vor.
 
 ::: {.callout-tip}
 ## Tidy-Format
@@ -130,12 +130,12 @@ Beachte, dass die Spalte `Name` die Zugehörigkeit der Ausprägungen (`Note`) je
 ```{webr-r}
 # langes Format in das Ausgangsformat transformieren
 (
-  wide <- pivot_wider(
-    data = long,
-    id_cols = "Name",
-    names_from = "Modul", 
-    values_from = "Note"
-  )
+  wide <- long %>% 
+    pivot_wider(
+      id_cols = "Name",
+      names_from = "Modul", 
+      values_from = "Note"
+    )
 )
 ```
 
@@ -611,7 +611,7 @@ Offenbar ist die vorherige Analyse per Spezies sinnvoller: Die Regression über 
 *Facetting* mit `facet_wrap()` erlaubt eine Untersuchung des Zusammenhangs je Insel (`island`), auf der die Messung erfolgt ist.
 
 ```{webr-r}
-# Facettierung des per In
+# Facettierung des Zusammenhangs per Insel
 penguins_cleaned %>%
   ggplot(
     mapping = aes(
