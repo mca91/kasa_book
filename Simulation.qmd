@@ -403,7 +403,7 @@ Anhand von `sim_function_conf()` können wir die Identifizierbarkeit des kausale
   Y = \beta_0 + \beta_1 X + \beta_2 U + \varepsilon
 \end{align*}
 ```
-überprüfen, in dem wir die Simulation unter Angabe dieses Modells über das Argument `formula` durchführen.
+überprüfen, indem wir die Simulation unter Angabe dieses Modells über das Argument `formula` durchführen.
 
 ```{webr-r}
 #| autorun: true
@@ -486,7 +486,7 @@ digraph COLSIM {
   X \sim& \, N(0,1),\\
   Y =& \, \beta_1 X + e,\\
   C =& \, N(0,1) + .25X + .25Y,
-\end{align*} wobei $e \sim N(0,3^2)$ erneut ein unsystematischer Fehlterterm für $Y$ ist. Wie im DGP aus @sec-simbiasconf wählen wir $\beta_1 = 2$ für den wahren kausalen Effekt von $X$ auf $Y$.
+\end{align*} wobei $e \sim N(0,3^2)$ erneut ein unsystematischer Fehlerterm für $Y$ ist. Wie im DGP aus @sec-simbiasconf wählen wir $\beta_1 = 2$ für den wahren kausalen Effekt von $X$ auf $Y$.
 
 ```{webr-r}
 #| autorun: true
@@ -634,7 +634,7 @@ In diesem linearen DGP bestimmt $B$ über die Zuteilung der Behandlung. $X$ ist 
   =&\, \frac{1}{2}(0 + 3) = 1.5.
 \end{align*}
 ```
-Wir verfizieren nachfolgend mit Monte-Carlo-Simulation für Stichproben von DGP \eqref{eq:dgpatesim} mit $n=150$, dass
+Wir verifizieren nachfolgend mit Monte-Carlo-Simulation für Stichproben von DGP \eqref{eq:dgpatesim} mit $n=150$, dass
 
 -   der KQ-Schätzer für $\beta_1$ im Modell $Y=\beta_0 + \beta_1 B + \epsilon$ ein erwartungstreuer Schätzer für den ATE ist und
 
@@ -943,7 +943,7 @@ Die Simulationsergebnisse deuten darauf hin, dass ein Fehler erster Art für den
 
 In den zuvor diskutierten Simulationsstudien haben wir iterativ Stichproben basierend auf einem bekannten DGP generiert, um die Eigenschaften der Stichprobenverteilung eines Schätzers (für bestimmte Parameterwerte) zu untersuchen. Der Bootstrap [@Efron1979] ist eine Methode zur Approximation der unbekannten Stichprobenverteilung eines Schätzers, bei der zufällige Stichproben mit Zurücklegen aus einer beobachteten Stichprobe gezogen werden.[^simulation-11] Bootstrapping approximiert die Verteilung eines Schätzers aus beobachteten Datenpunkten und *ohne Kenntnis des wahren DGP*. Der Bootstrap ist daher eine Simulationsmethode, die in empirischen Anwendungen für die Bestimmung der Unsicherheit (Standardfehler) eines Schätzers genutzt werden kann. Bootstrapping ist hilfreich für Hypothesentests, wenn die beobachtete Stichprobe klein oder untypisch ist, was dazu führen kann, dass Standard-Inferenz für Behandlungseffekte nicht zuverlässig anwendbar oder ungültig ist. Insbesondere wenn Modellannahmen verletzt sind wird bootstrapping häufig in empirischen Studien eingesetzt, um Konfidenzintervalle, Standardfehler oder p-Werte zu berechnen.
 
-[^simulation-11]: Diese Vorgehensweise wird auch als *resampling* bezeichnet.
+[^simulation-11]: Diese Vorgehensweise wird auch als *Resampling* bezeichnet.
 
 Die nachfolgenden Key Facts fassen die wesentlichen Eigenschaften des Bootstraps und die grundsätzliche Vorgehensweise zusammen.
 
