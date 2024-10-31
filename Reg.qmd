@@ -33,11 +33,11 @@ library(cowplot)
 
 ## Regression schließt Backdoors: Frisch-Waugh-Lovell-Theorem
 
-Das Frisch-Waugh-Lovell-Theorem (FWL) besagt, dass in einer multiplen linearen Regression die geschätzten Koeffizienten für eine Teilmenge der Regressoren numerisch identisch zu Koeffizientenschätzungen aus folgenden Schritten sind 
+Das Frisch-Waugh-Lovell-Theorem (FWL) besagt, dass die geschätzten Koeffizienten für eine interessierende Teilmenge der Regressoren in einer multiplen linearen Regression numerisch identisch zu Koeffizientenschätzungen aus folgenden Schritten sind: 
 
-1. Rechne die Effekte der übrigen Variablen auf (a) die Outcome-Variable und (b) die Teilmenge der erklärenden Variablen mit Regression heraus und 
+1. Rechne die Effekte der übrigen Regressoren auf (a) die Outcome-Variable und (b) die interessierende Teilmenge der Regressoren mit Regression heraus. 
 
-2. regressiere anschließend die Residuen von Schritt (a) auf die Residuen aus Schritt (b). 
+2. Regressiere anschließend die Residuen von Schritt (a) auf die Residuen aus Schritt (b). 
 
 In einem multiplen Modell mit zwei Regressoren $X_1,\ X_2$,
 \begin{align}
@@ -53,7 +53,7 @@ FWL ermöglicht daher eine Vereinfachung der Schätzung komplexer Modelle durch 
 
 Für das Verständnis der Schätzung kausaler Effekte mit linearer Regression ist FWL hilfreich, denn es zeigt, wie sowohl die Variation in der Outcome-Variable ($\widehat{u}_{Y,X_2}$) als auch die Variation in der Behandlungsvariable ($\widehat{u}_{X_1,X_2}$), die jeweils *nicht* durch Kovariablen ($X_2$) verursacht wird, mit multipler Regression isoliert werden kann, sodass Backdoors geschlossen werden.
 
-Wir illustrieren dieses Konzept anhand einer multiplen Regression für die Schnabeltiefe (`body_mass`) von Pinguinen aus dem Datensatz `palmerpenguins::penguins`,
+Wir illustrieren dieses Konzept anhand einer multiplen Regression für das Gewicht (`body_mass`) von Pinguinen aus dem Datensatz `palmerpenguins::penguins`,
 
 \begin{align}
   \textup{body\_mass} = \beta_0 + \beta_1\cdot\textup{bill\_length} + \beta_2\cdot \textup{flipper\_length} + \epsilon,\label{eq:billdepthmodel}
@@ -226,7 +226,7 @@ Eine binäre Variable, auch als dichotome Variable oder Indikator-Variable bezei
   \end{cases}
 \end{align}
 
-Eine in späteren Kapiteln dieses Companions als verwendeter *binärer Regressor* ist der Indikator für die Zuordnung von Beobachtungen in Behandlungs- oder Kontrollgruppe (1 = Behandlungsgruppe, 0 = Kontrollgruppe). 
+Ein in späteren Kapiteln dieses Companions verwendeter *binärer Regressor* ist der Indikator für die Zuordnung von Beobachtungen in Behandlungs- oder Kontrollgruppe (1 = Behandlungsgruppe, 0 = Kontrollgruppe). 
 
 Für viele ökonomische Forschungsfragen ist es hilfreich, eine *binäre Outcome-Variable* mit Regression zu modellieren. Hierzu gibt es verschiedene Ansätze, die wir nachfolgend zusammenfassen und ihre Anwendung mit R zeigen.
 
@@ -492,7 +492,7 @@ ggplot() +
   theme_cowplot()
 ```
 
-Die nachstehende interaktive Grafik zeigt, wie die Wahscheinlichkeitsfunktion der latenten Variable $z=\beta_0 + \beta_1 X$ von den Parametern $\beta_0$ und $\beta_1$ jeweils für Logit- und Probit-Regression beeinflusst wird.
+Die nachstehende interaktive Grafik illustriert, wie die Wahrscheinlichkeitsfunktion der latenten Variable $z=\beta_0 + \beta_1 X$ von den Parametern $\beta_0$ und $\beta_1$ jeweils für Logit- und Probit-Regression beeinflusst wird.
 
 <iframe class="obs-soft-box-shadow" width="100%" height="680" frameborder="0"
   src="https://observablehq.com/embed/@mca91/latent-variable-cdf?cells=plot%2Cviewof+beta0%2Cviewof+beta%2CMathJax"></iframe>
@@ -611,7 +611,7 @@ list(
 
 Die Deviance für das Probit-Modell ist tatsächlich etwas geringer als für das Logit-Modell. 
 
-Ähnlich wie $R^2$ für lineare Regression misst die Deviance $D$ lediglich die Anpassung des Modells an die beobachteten Daten. Daher eignet sich $D$ nur bedingt als Maß zur Einschätzung der Tauglichkeit eines Modells für Out-of-sample-Vorhersagen. Je nach Ziel der Modellierung kann es hilfreich sein, eine robuste Einschätzung der Vorhersage-Güte unter Berücksichtigung der Modellkomplexität vorzunehmen. Hierfür werden oft Informationskriterien verwendet. Das Akaike-Informationskriterium (AIC) 
+Ähnlich wie $R^2$ für lineare Regression misst die Deviance $D$ lediglich die Anpassung des Modells an die beobachteten Daten. Daher eignet sich $D$ nur bedingt als Maß zur Einschätzung der Tauglichkeit eines Modells für Out-of-sample-Vorhersagen. Abhängig vom Ziel der Modellierung kann es hilfreich sein, eine robuste Einschätzung der Vorhersage-Güte unter Berücksichtigung der Modellkomplexität vorzunehmen. Hierfür werden oft Informationskriterien verwendet. Das Akaike-Informationskriterium (AIC) 
 \begin{align*}
   \text{AIC} = 2k - 2 \log(\widehat{\mathcal{L}})
 \end{align*}
@@ -630,7 +630,7 @@ Auch das AIC zeigt an, dass die Schätzung des Probit-Modells in `mod_probit` be
 
 ### Beispiel: Klassifikation von Palmer-Piniguinen
 
-Anhand der in diesem Kapitel betrachteten Methoden können wir Modelle zur Klassifikation von Pinguinen in `palmerpenguins::penguins` hinsichtlich ihres Geschlechts konstruieren. Hierfür nutzen wir den bereinigten Datensatz `penguins_cleaned` und transformieren zunächst die abhängige Variable `sex` in ein numerisches Format.
+Mit den in diesem Kapitel betrachteten Methoden können wir Modelle zur Klassifikation von Pinguinen in `palmerpenguins::penguins` hinsichtlich ihres Geschlechts konstruieren. Hierfür nutzen wir den bereinigten Datensatz `penguins_cleaned` und transformieren zunächst die abhängige Variable `sex` in ein numerisches Format.
 
 ```{webr}
 # 'sex' transformieren
