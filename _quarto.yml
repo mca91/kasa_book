@@ -48,6 +48,7 @@ book:
     #     - ex_RR.qmd
     #     - ex_simulation.qmd
     - Literatur.qmd
+  repo-url: https://github.com/mca91/kasa_book
   repo-branch: main
   repo-actions: [edit, issue]
   search:
