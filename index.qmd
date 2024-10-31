@@ -48,8 +48,9 @@ Der zweite Teil widmet sich etablierten Methoden zur Schätzung kausaler Effekte
 
 Der dritte Abschnitt behandelt Vorhersagen und Kausalanalysen mit ausgewählten Methoden des *Machine Learning*. Kapitel 13 stellt *regularisierte Regressionsschätzer* vor und zeigt unter anderem, wie Variablenselektion mit *Lasso* in linearen Regressionsmodellen für eine konsistente Schätzung von Behandlungseffekten bei vielen potentiellen Confoundern eingesetzt werden kann. Kapitel 14 erläutert, *Support Vector Machines* für nicht-lineare Klassifikationsprobleme mit hoch-dimensionalen Datensätzen. Kapitel 15 führt *Baum-basierte Methoden* wie *Entscheidungsbäume*, *Random Forests* und *Boosting* für Regression und Klassifikation bei nicht-linearen Zusammenhängen ein. Wir zeigen, wie diese Ansätze die Interpretierbarkeit und die Beurteilung der Relevanz von Regressoren erleichtern und diskutieren jüngere Weiterentwicklungen zur Anwendung für kausale Analysen (*Causal Trees* und *Causal Forests*). Kapitel 16 schließt mit einer Einführung in *neuronale Netzwerke*.
 
-## Konventionen und Hinweise
+Manche Kapitel enthalten Abschnitte, in denen anspruchsvollere mathematische oder statistische Konzepte besprochen werden und/oder fortgeschrittene R-Kompetenzen zum Einsatz kommen. Diese Abschnitte sind mit dem Symbol {{< fa stairs >}} gekennzeichnet.
 
+## Konventionen und Hinweise
 
 Wir verwenden folgende Konventionen hinsichtlich der Formatierung und Einbindung von R-Code:
 
