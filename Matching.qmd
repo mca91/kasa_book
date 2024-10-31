@@ -15,6 +15,8 @@ webr:
     - 'modelsummary'
     - 'sandwich'
     - 'tidyr'
+  repos:
+    - https://rstudio.r-universe.dev
 ---
 
 {{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
@@ -78,7 +80,7 @@ tabopts <- function(x) {
 
 In randomisierten kontrollierten Studien stellt eine zufällige Zuweisung der Behandlung sicher, dass die Individuen beider Gruppen im Mittel vergleichbar sind, dass heißt es gibt keine systematischen Unterschiede der Studiensubjekte hinsichtlich der Verteilung von Charakteristika zwischen den Gruppen. Dann ist es plausibel, eine beobachtete mittlere Differenz in der Outcome-Variable zwischen den Gruppen alleine auf die Behandlung zurückzuführen.
 
-In der Praxis, insbesondere in ökonomischen Studien, sind randomisierte kontrollierte Studien aus ethischen und/oder finanziellen Gründen nicht durchführbar. Stattdessen werden nicht-experimentelle Daten^[Nicht-experimentelle Daten sind Beobachtungsdaten, bei denen die Zuordnung zu Behandlungs- und Kontrollgruppen nicht zufällig erfolgt, wodurch Confounding entstehen kann.] genutzt, die jedoch nur sehr selten eine Vergleichbarkeit von Behandlungs- und Kontrollgruppe gewährleisten.
+In der Praxis, insbesondere in ökonomischen Studien, sind randomisierte kontrollierte Studien aus ethischen und/oder finanziellen Gründen nicht durchführbar. Stattdessen werden nicht-experimentelle Daten^[Nicht-experimentelle Daten sind Beobachtungsdaten, bei denen die Zuordnung zu Behandlungs- und Kontrollgruppen nicht zufällig erfolgt, wodurch Confounding entstehen kann.] genutzt, die jedoch nur selten eine unmittelbare Vergleichbarkeit von Behandlungs- und Kontrollgruppe gewährleisten.
 
 In diesem Kapitel betrachten wir Methoden, die in solchen Forschungsdesigns -- bei hinreichenden Informationen über die Studiensubjekte -- eine kosistente Schätzung kausaler Effekte ermöglichen können, indem eine statistische Vergleichbarkeit von Behandlungs- und Kontrollgruppe hergestellt wird. Dies kann durch eine gezielte Gewichtung von Beobachtungen anhand invididueller Merkmale erfolgen. Andere etablierte Methoden schätzen den kausalen Effekt nach Selektion von vergleichbaren Teilmengen von Subjekten beider Gruppen aus der ursprünglichen Stichprobe, sogenanntes *selektierendes Matching*.
 
@@ -192,7 +194,7 @@ Die Schätzung ergibt einen negativen Behandlungseffekt, mit der Interpreation, 
 Da die User sich beim Aufrufen der Seite aktiv für oder gegen den das neue Design entscheiden müssen (und somit selektieren, ob Sie in der Behandlungs- oder Kontrollgruppe landen), liegt wahrscheinlich *Confounding* vor: Unsere Hypothese ist zunächst, dass männliche User eine durchschnittlich längere Lesezeit aufweisen *und* mit größerer Wahrscheinlichkeit auf das neue Design wechseln als nicht-männliche Leser. Dann ist `male` eine Backdoor-Variable. Diese Situation ist unter der Annahme, dass nur diese Faktoren den DGP bestimmen, in @fig-maleCDdarkmode dargestellt.
 
 ```{dot}
-//| fig-width: 4
+//| fig-width: 5
 //| fig-height: 3
 //| fig-align: 'center'
 //| fig-cap: "Backdoor durch 'male' im Website-Design-Bespiel"
@@ -200,15 +202,14 @@ Da die User sich beim Aufrufen der Seite aktiv für oder gegen den das neue Desi
 digraph {
   layout=neato
   fontname="Helvetica,Arial,sans-serif"
-  node [fontname="Helvetica,Arial,sans-serif"]
+  node [fontname="Helvetica,Arial,sans-serif", shape=ellipse]
   edge [fontname="Helvetica,Arial,sans-serif"]
-  node [shape=none];
   "read_time" [pos="4,0.5!"]
   "dark_mode" [pos="0,0.5!"]
   "male" [pos="2,-1!"]
-  "dark_mode" -> "read_time" [color="green"]
-  "male" -> "dark_mode" [color="red"]
-  "male" -> "read_time" [color="red"]
+  "dark_mode" -> "read_time"
+  "male" -> "dark_mode"
+  "male" -> "read_time"
 }
 ```
 
@@ -309,12 +310,12 @@ lm(read_time ~ dark_mode, weights = w, data = darkmode_w) %>%
 
 Der geschätzte Koeffizient von `dark_mode` entspricht $\widehat{\tau}^w$.
 
-Da `male` eine binäre Variable ist, reduziert sich eine Beurteilung der Vergleichbarkeit der Verteilungen von `male` in Behandlungs- und Kontrollgruppe auf einen simplen Vergleich des Männeranteils beider Gruppen. In der Praxis gibt es meist eine Vielzahl potentieller Backdoor-Variablen, die zudem kontinuierlich verteilt sind. Es scheint plausibel, dass das Alter der Nutzer sowohl die Akzeptanz des Design-Updates als auch die Lesezeit beeinflusst. Die bisherige Verweildauer ist mindestens eine plausible Determinante der Lesezeit.
+Da `male` eine binäre Variable ist, reduziert sich eine Beurteilung der Vergleichbarkeit der Verteilungen von `male` in Behandlungs- und Kontrollgruppe auf einen simplen Vergleich des Männeranteils beider Gruppen. In der Praxis gibt es oft eine Vielzahl potentieller Backdoor-Variablen, die zudem kontinuierlich verteilt sind. Es scheint plausibel, dass das Alter der Nutzer sowohl die Akzeptanz des Design-Updates als auch die Lesezeit beeinflusst. Die bisherige Verweildauer ist mindestens eine plausible Determinante der Lesezeit.
 
-Der erweiterte DGP ist in Abbildung @fig-CDdarkmode dargestellt, wobei der zusätzliche Backdoor-Pfad durch `age` ebenfalls mit roten Pfeilen gekennzeichnet sind.
+Der erweiterte DGP ist in Abbildung @fig-CDdarkmode dargestellt, wobei ein zusätzlicher Backdoor-Pfad durch `age` verläuft.
 
 ```{dot}
-//| fig-width: 4
+//| fig-width: 5
 //| fig-height: 3
 //| fig-align: 'center'
 //| fig-cap: "Erweiterter DGP im Website-Design-Beispiel"
@@ -322,24 +323,25 @@ Der erweiterte DGP ist in Abbildung @fig-CDdarkmode dargestellt, wobei der zusä
 digraph {
   layout=neato
   fontname="Helvetica,Arial,sans-serif"
-  node [fontname="Helvetica,Arial,sans-serif"]
+  node [fontname="Helvetica,Arial,sans-serif", shape=ellipse]
   edge [fontname="Helvetica,Arial,sans-serif"]
-  node [shape=none];
+
   "read_time" [pos="4,0.5!"]
   "dark_mode" [pos="0,0.5!"]
   "male" [pos="2,-1!"]
   "age" [pos="2,2!"]
   "hours" [pos="4,2!"]
+
   "hours" -> "read_time"
-  "age" -> "dark_mode" [color="red"]
-  "age" -> "read_time" [color="red"]
-  "dark_mode" -> "read_time" [color="green"]
-  "male" -> "dark_mode" [color="red"]
-  "male" -> "read_time" [color="red"]
+  "age" -> "dark_mode"
+  "age" -> "read_time"
+  "dark_mode" -> "read_time"
+  "male" -> "dark_mode"
+  "male" -> "read_time"
 }
 ```
 
-Die Beurteilung der *Balance* von Kontrollgruppe und Behandlungsgruppe kann durch eine grafische Gegenüberstellung der empirischen Verteilungen der Kovariablen beider Gruppen erfolgen. Wir visualisieren die empirischen Verteilungen mit `ggplot2`. Hierzu standardisieren wir `age` und `hours` zunächst mit `scale()`.
+Die Beurteilung der *Balance* von Kontrollgruppe und Behandlungsgruppe kann durch eine grafische Gegenüberstellung der empirischen Verteilungen der Kovariablen beider Gruppen erfolgen. Wir visualisieren die empirischen Verteilungen mit `ggplot2`. Hierzu standardisieren wir `age` und `hours` zunächst mit `base::scale()`.
 
 ```{webr}
 # Datensatz für graphische Darstellung formatieren
@@ -354,7 +356,7 @@ darkmode_p <- darkmode %>%
 head(darkmode_p)
 ```
 
-Für `age` und `hours` eignen sich die geschätzten Dichtefunktionen für einen Vergleich der Verteilungen in Behandlungs- und Kontrollgruppe.
+Für die Kovariablen `age` und `hours` eignen sich die geschätzten Dichtefunktionen für einen Vergleich der Verteilungen in Behandlungs- und Kontrollgruppe.
 
 ```{webr}
 # Vergleich mit Dichteschätzungen
@@ -376,7 +378,7 @@ darkmode_p %>%
   theme(legend.position = "top")
 ```
 
-Die graphische Analyse zeigt deutliche Unterschiede in den Verteilungen von `age` zwischen Kontroll- und Behandlungsgruppe. Für einen Beurteilung mit deskriptiven Statistiken wird häufig eine sogenannte *Balance Table* herangezogen. Wir berechnen diese für `age`, `hours` und `male` mit `cobalt::bal.tab()`
+Die graphische Analyse zeigt deutliche Unterschiede in den Verteilungen von `age` zwischen Kontroll- und Behandlungsgruppe. Für eine Beurteilung mit deskriptiven Statistiken wird häufig eine sogenannte *Balance Table* herangezogen. Wir berechnen diese für `age`, `hours` und `male` mit `cobalt::bal.tab()`
 
 ```{webr}
 library(cobalt)
@@ -392,8 +394,9 @@ bal.tab(
 )
 ```
 
-Die Einträge `M.0.Un` und `M.1.Un` zeigen die jeweiligen Stichprobenmittelwerte der Variablen für Kontroll- und Behandlungsgruppe. `Diff.Un` gibt eine standardisierte Mittelwertdifferenz $SMD$ an, wobei \begin{align*}
-  SMD_j := \left(\overline{X}_{j,B} - \overline{X}_{j,K}\right) \bigg/ \sqrt{\frac{1}{2}\left(\widehat{\text{Var}}(X_{j,B}) + \widehat{\text{Var}}(X_{j,K})\right)},
+Die Einträge `M.0.Un` und `M.1.Un` zeigen die jeweiligen Stichprobenmittelwerte der Variablen für Kontroll- und Behandlungsgruppe. `Diff.Un` gibt eine standardisierte Mittelwertdifferenz $\textup{SMD}$ an, wobei 
+\begin{align*}
+  \textup{SMD}_j := \left(\overline{X}_{j,B} - \overline{X}_{j,K}\right) \bigg/ \sqrt{\frac{1}{2}\left(\widehat{\text{Var}}(X_{j,B}) + \widehat{\text{Var}}(X_{j,K})\right)},
 \end{align*} mit Stichprobenmitteln $\overline{X}_{j,B}$ und $\overline{X}_{j,K}$ und Stichprobenvarianzen $\widehat{\text{Var}}(X_{j,B})$ und $\widehat{\text{Var}}(X_{j,K})$ für eine kontinuierliche Kovariable $j$.[^matching-1] Obwohl es keinen einheitlichen Schwellenwert für die standardisierte Differenz gibt, der ein erhebliches Ungleichgewicht anzeigt, gilt für kontinuierliche Variablen eine standardisierte (absolute) Differenz von weniger als $0.1$ als Hinweis auf einen vernachlässigbaren Unterschied zwischen den Gruppen.
 
 [^matching-1]: Siehe @Austin2011 für einen Überblick zu Balance-Statistiken.
@@ -440,7 +443,7 @@ Beachte, dass die von `summary()` berechneten Standardfehler bei Entropy Balanci
 Bei mehreren Backdoor-Variablen kann eine Gewichtung anhand der Behandlungswahrscheinlichkeit (*Treatment Propensity*) erfolgen. Die Idee hierbei ist, dass der DGP wie in @fig-propCDdarkmode dargestellt werden kann.
 
 ```{dot}
-//| fig-width: 4
+//| fig-width: 5
 //| fig-height: 3
 //| fig-align: 'center'
 //| fig-cap: "Propensity im Website-Design-Beispiel"
@@ -448,9 +451,8 @@ Bei mehreren Backdoor-Variablen kann eine Gewichtung anhand der Behandlungswahrs
 digraph {
   layout=neato
   fontname="Helvetica,Arial,sans-serif"
-  node [fontname="Helvetica,Arial,sans-serif"]
+  node [fontname="Helvetica,Arial,sans-serif", shape=ellipse]
   edge [fontname="Helvetica,Arial,sans-serif"]
-  node [shape=none];
   "read_time" [pos="4,0.5!"]
   "dark_mode" [pos="0,0.5!"]
   "TreatmentPropensity" [pos="0,2!"]
@@ -458,12 +460,12 @@ digraph {
   "age" [pos="2,2!"]
   "hours" [pos="4,2!"]
   "hours" -> "read_time"
-  "age" -> "TreatmentPropensity" [color="red"]
-  "age" -> "read_time" [color="red"]
-  "dark_mode" -> "read_time" [color="green"]
-  "male" -> "TreatmentPropensity" [color="red"]
-  "male" -> "read_time" [color="red"]
-  "TreatmentPropensity" -> "dark_mode" [color="red"]
+  "age" -> "TreatmentPropensity"
+  "age" -> "read_time"
+  "dark_mode" -> "read_time"
+  "male" -> "TreatmentPropensity"
+  "male" -> "read_time"
+  "TreatmentPropensity" -> "dark_mode"
 }
 ```
 
@@ -568,7 +570,8 @@ ggplot(
   theme(legend.position = "top")
 ```
 
-IPWs anhand der *Propensity Scores* können schnell mit der Vorschrift \begin{align}
+IPWs anhand der *Propensity Scores* können leicht mit der Vorschrift 
+\begin{align}
   \text{IPW} = \frac{\text{dark\_mode}}{\text{PS}} + \frac{1 - \text{dark\_mode}}{1 - \text{PS}},
 \end{align} berechnet werden.
 
@@ -610,7 +613,7 @@ Unsere Schätzung des ATE ist der geschätzte Koeffizient von `dark_mode`. Die a
 
 ## Selektierende Matching-Verfahren
 
-Das grundsätzliche Konzept von selektierendem Matching wird in der nachstehenden interaktiven Grafik veranschaulicht. Hier betrachten wir beobachtete Ausprägungen von zwei (unabhängig und identisch verteilten) Matching-Variablen für Subjekte in der Behandlungsgruppe (blau) sowie Kontrollgruppe (rot). Als Matches qualifizieren sich sämtliche Beobachtungen der anderen Gruppe, deren [Euklidische Distanz](https://de.wikipedia.org/wiki/Euklidischer_Abstand) zu dem ausgewählten Punkt das über den Slider eingestellte Maximum *Caliper* nicht überschreitet.^[Es handelt sich hierbei um einen Spezialfall von Matching anhand der Mahalanobis-Distanz, siehe @sec-mmd.] Diese Region wird durch den gestrichelten Kreis gekennzeichnet und kann über den zugehörigen Slider angepasst werden. Per Klick auf eine Beobachtung werden Matches aus der anderen Gruppe durch eine verbindende Linie und farbliches Hervorheben kenntlich gemacht. Mit dem Slider für k wird festgelegt, dass nur die nahesten k qualifizierten Beobachtungen als Matches behandelt werden. Die Grafik illustriert inbesondere, dass Beobachtungen in Abhängigkeit von k und Caliper falls gewünscht mehrfach (s.g. Matching mit Zurücklegen) oder gar nicht gematcht werden können.
+Das grundsätzliche Konzept von selektierendem Matching wird in der nachstehenden interaktiven Grafik veranschaulicht. Hier betrachten wir beobachtete Ausprägungen von zwei (unabhängig und identisch verteilten) Matching-Variablen für Subjekte in der Behandlungsgruppe (blau) sowie Kontrollgruppe (rot). Als Matches qualifizieren sich sämtliche Beobachtungen der anderen Gruppe, deren [Euklidische Distanz](https://de.wikipedia.org/wiki/Euklidischer_Abstand) zu dem ausgewählten Punkt das über den Slider eingestellte maximale *Caliper* nicht überschreitet.^[Es handelt sich hierbei um einen Spezialfall von Matching anhand der Mahalanobis-Distanz, siehe @sec-mmd.] Diese Region wird durch den gestrichelten Kreis gekennzeichnet und kann über den zugehörigen Slider angepasst werden. Per Klick auf eine Beobachtung werden Matches aus der anderen Gruppe durch eine verbindende Linie und farbliches Hervorheben kenntlich gemacht. Mit dem Slider für $k$ wird festgelegt, dass lediglich die nahesten $k$ qualifizierten Beobachtungen als Matches behandelt werden. Die Grafik illustriert inbesondere, dass Beobachtungen in Abhängigkeit von $k$ und dem Caliper (falls gewünsch) mehrfach (s.g. Matching mit Zurücklegen) oder auch gar nicht gematcht werden können.
 
 ```{r}
 #| echo: false
@@ -713,7 +716,8 @@ In empirischen Anwendungen ersetzen wir die (unbekannten) Komponenten der Varian
 }.
 \end{align*}
 
-Die nachstehende interaktive Grafik zeigt Beobachtungen zweier Matching-Variablen, die aus einer bivariaten Normalverteilung mit positiver Korrelation generiert wurden. Diese bivariate Verteilung ist identisch für Beobachtungen aus der Kontrollgruppe (rot) und Beobachtungen aus der Behandlungsgruppe (blau). Für die ausgewählte Beobachtung aus der Behandlungsgruppe (schwarzer Rand) werden potentielle Matches in der Kontrollgruppe innerhalb der vorgegebenen Mahalanobis-Distanz in Cyan kenntlich gemacht. Beachte, dass die Mahalanobis-Distanz Varianzen und Kovarianzen der Daten berücksichtigt, sodass die gematchten Beobachtungen in einem elliptischen Bereich um die betrachtete behandelte Beobachtung liegen. Eine Euklidische Distanz hingegen (gestrichelte Linie) ignoriert die Skalierung der Daten.
+Die nachstehende interaktive Grafik zeigt Beobachtungen zweier Matching-Variablen, die aus einer bivariaten Normalverteilung mit positiver Korrelation generiert werden. Diese bivariate Verteilung ist identisch für Beobachtungen aus der Kontrollgruppe (rot) und Beobachtungen aus der Behandlungsgruppe (blau).^[Insbesondere ist die Varianz beider Matching-Variablen identisch.] Für eine ausgewählte Beobachtung aus der Behandlungsgruppe (schwarzer Rand) werden potentielle Matches in der Kontrollgruppe innerhalb der vorgegebenen Mahalanobis-Distanz in Cyan kenntlich gemacht (und umgekehrt). Beachte, dass die Mahalanobis-Distanz die Varianzen und Kovarianzen der Daten berücksichtigt, sodass die gematchten Beobachtungen in einem elliptischen Bereich um die betrachtete Beobachtung liegen. Die Form dieser Ellipse verändert sich mit der Korrelation zwischen den Matching-Variablen, die über den Slider *Correlation* festgelegt ist. Matching anhand der euklidische Distanz ignoriert die Skalierung und und die Abhängigkeit der Matching-Variablen: Die gematchten Beobachtungen liegen innerhalb eines entsprechenden Kreises (gestrichelte Linie) um die interessierende Beobachtung. Je nach Kovarianz-Struktur können die Mengen der gematchten Beobachtungen sich deutlich unterscheiden. Beachte, dass die euklidische Distanz hier der Spezialfall der Mahalanobis-Distanz bei unkorrelierten Daten ist.
+
 
 ```{r}
 #| echo: false
@@ -732,10 +736,10 @@ rsvg::rsvg_png(
 )
 knitr::include_graphics(path = "img/MDM_qr.png", dpi = 490)
 ```
-<iframe width="100%" height="648" frameborder="0" class="box-shadow"
-  src="https://observablehq.com/embed/1338355035acc056?cells=theplot%2Cviewof+caliper%2Cstyles"></iframe>
+<iframe width="100%" height="680" frameborder="0" class="box-shadow"
+  src="https://observablehq.com/embed/1338355035acc056?cells=theplot%2Cviewof+caliper%2Cviewof+corr%2Cstyles"></iframe>
 
-Für Eins-zu-Eins-Matching im Website-Beispiel anhand der Mahalanobis-Distanz mit `matchit()` setzen wir `distance = "mahalanobis"` und wählen `method = "nearest"`. Mit diesen Parametern wird jeder Behandlung aus der Behandlungsgruppe die gemäß $d_M$ am ehesten vergleichbarste Beobachtung aus der Kontrollgruppe zugewiesen, wobei keine mehrfachen Matches zulässig sind. 
+Für Eins-zu-Eins-Matching im Website-Beispiel anhand der Mahalanobis-Distanz mit `matchit()` setzen wir `distance = "mahalanobis"` und wählen `method = "nearest"`. Mit diesen Parametern wird jeder Beobachtung aus der Behandlungsgruppe die gemäß $d_M$ am ehesten vergleichbarste Beobachtung aus der Kontrollgruppe zugewiesen, wobei keine mehrfachen Matches zulässig sind. 
 
 ```{webr}
 # 1:1 Mahalanobis-Distanz-Matching
