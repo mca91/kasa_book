@@ -1,6 +1,7 @@
 ---
+format: live-html
+engine: knitr
 webr: 
-  show-startup-message: true
   packages: [
             'dplyr',
             'fwildclusterboot',
@@ -13,7 +14,21 @@ webr:
             ]
 ---
 
+{{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
+
 # IV-Regression {#sec-IV}
+
+```{webr}
+library(dplyr)
+
+# create dataset directory
+dir.create("datasets")
+# Download the datasets
+download.file(
+    "https://raw.githubusercontent.com/mca91/kausal_data/main/paneldata.csv",
+    'datasets/paneldata.csv',
+)
+```
 
 ```{r, echo=F, message=FALSE}
 library(gt)
