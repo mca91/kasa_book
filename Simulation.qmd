@@ -25,7 +25,7 @@ In diesem Kapitel erläutern wir Grundlagen in der Anwendung von Simulations-Met
 
 ## Simulation der Stichprobenverteilung eines Schätzers {#sec-simspv}
 
-Zur Illustration der Simulation von Stichprobenverteilungen eines Schätzers betrachten wir zunächst das kanonische Beispiel der Schätzung des Erwartungswerts $\mu_X$ einer normalverteilen Zufallsvariable $X$ anhand einer $n$-elementigen Stichprobe, \begin{align}
+Zur Illustration der Simulation von Stichprobenverteilungen eines Schätzers betrachten wir zunächst das kanonische Beispiel der Schätzung des Erwartungswerts $\mu_X$ einer normalverteilten Zufallsvariable $X$ anhand einer $n$-elementigen Stichprobe, \begin{align}
   X_i \sim\,u.i.v. N(\mu_X,\ \sigma_X^2), \quad i=1,\dots,n.\label{eq:distx}
 \end{align} Die Vorschrift \eqref{eq:distx} ist der *datenerzeugende Prozess* (DGP)[^simulation-1]. Das arithmetische Mittel der $X_i$, \begin{align*}
   \overline{X} := \sum_{i=1}^n X_i,
