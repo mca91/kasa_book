@@ -33,7 +33,7 @@ library(cowplot)
 
 ## Regression schließt Backdoors: Frisch-Waugh-Lovell-Theorem
 
-Das Frisch-Waugh-Lovell-Theorem (FWL) besagt, dass die geschätzten Koeffizienten für eine interessierende Teilmenge der Regressoren in einer multiplen linearen Regression numerisch identisch zu Koeffizientenschätzungen aus folgenden Schritten sind: 
+Das Frisch-Waugh-Lovell-Theorem (FWL) besagt, dass die geschätzten Koeffizienten für eine interessierende Teilmenge der Regressoren in einer multiplen linearen Regression numerisch identisch mit den Koeffizientenschätzungen aus folgenden Schritten sind: 
 
 1. Rechne die Effekte der übrigen Regressoren auf (a) die Outcome-Variable und (b) die interessierende Teilmenge der Regressoren mit Regression heraus. 
 
@@ -258,7 +258,7 @@ Bei der Probit-Regression wird die Standardnormalverteilungsfunktion $\Phi(\cdot
 \begin{align}
   E(Y\vert X) = P(Y=1\vert X) = \Phi(\beta_0 + \beta_1 X), \label{eq:probitmodel}
 \end{align}
-sodass der mit der Verknüfungsfunktion (Link) $$\textup{probit}(\cdot) = \Phi^{-1}(\cdot)$$ transformierte Erwartungswert $P(Y=1\vert X)$ dem linearen Prädiktor $z=\beta_0 + \beta_1 X$ entspricht,
+sodass der mit der Verknüpfungsfunktion (Link-Funktion) $$\textup{probit}(\cdot) = \Phi^{-1}(\cdot)$$ transformierte Erwartungswert $P(Y=1\vert X)$ dem linearen Prädiktor $z=\beta_0 + \beta_1 X$ entspricht,
 \begin{align*}
   \Phi^{-1}\big[P(Y=1\vert X)\big] = \beta_0 + \beta_1 X.
 \end{align*}
@@ -843,11 +843,11 @@ Eine weitere Klasse von $Y$ für die sich der Regressionsansatz von einfacher li
 
 ### Poisson-Verteilung
 
-Die Zufallsvariable $Y$ folgt einer Poisson-Verteilung mit Parameter $\lambda$, wenn:
+Die Zufallsvariable $Y$ folgt einer Poisson-Verteilung mit Parameter $\lambda$, wenn
 
-1. **Ereignisse unabhängig voneinander auftreten:** Das Auftreten eines Ereignisses beeinflusst nicht die Wahrscheinlichkeit, dass ein weiteres Ereignis auftritt.
+1. **die Ereignisse unabhängig voneinander auftreten:** Das Auftreten eines Ereignisses beeinflusst nicht die Wahrscheinlichkeit, dass ein weiteres Ereignis auftritt.
 
-2. **Ereignisse einzeln auftreten:** Die Wahrscheinlichkeit, dass in einem sehr kleinen Intervall (im Sinne von $[a,b]$ für $a \to b$) mehr als ein Ereignis auftritt, ist vernachlässigbar.
+2. **die Ereignisse einzeln auftreten:** Die Wahrscheinlichkeit, dass in einem sehr kleinen Intervall (im Sinne von $[a,b]$ für $a \to b$) mehr als ein Ereignis auftritt, ist vernachlässigbar.
 
 3. **die Rate der Ereignisse konstant ist:** Die durchschnittliche Anzahl der Ereignisse pro Zeiteinheit oder pro Raumeinheit $\lambda$ ist konstant.
 
@@ -977,7 +977,7 @@ Y <- map_dbl(
   )
 )
   
-# Danten in tibble sammeln
+# Daten in tibble sammeln
 dat <- tibble(
   Kampagnen = X, 
   Verkaeufe = Y
