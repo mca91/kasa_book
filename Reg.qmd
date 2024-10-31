@@ -226,7 +226,7 @@ Eine binäre Variable, auch als dichotome Variable oder Indikator-Variable bezei
   \end{cases}
 \end{align}
 
-Ein in späteren Kapiteln dieses Companions verwendeter *binärer Regressor* ist der Indikator für die Zuordnung von Beobachtungen in Behandlungs- oder Kontrollgruppe (1 = Behandlungsgruppe, 0 = Kontrollgruppe). 
+Ein in späteren Kapiteln dieses Companions verwendeter *binärer Regressor* ist der Indikator für die Zuordnung von Beobachtungen zur Behandlungs- oder Kontrollgruppe (1 = Behandlungsgruppe, 0 = Kontrollgruppe). 
 
 Für viele ökonomische Forschungsfragen ist es hilfreich, eine *binäre Outcome-Variable* mit Regression zu modellieren. Hierzu gibt es verschiedene Ansätze, die wir nachfolgend zusammenfassen und ihre Anwendung mit R zeigen.
 
@@ -243,9 +243,9 @@ $$ P(Y = 1 \vert X_1, X_2, \dots, X_k) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \
 
 Das lineare Wahrscheinlichkeitsmodell beschreibt also die *Wahrscheinlichkeit*, dass $Y=1$ als lineare Funktion der Regressoren: $\beta_j$ misst die Änderung in der Wahrscheinlichkeit für das Ereignis $Y_i=1$, unter der Bedingung, dass die anderen $k-1$ Regressoren konstant gehalten werden. Genau wie bei multipler Regression mit einer kontinuierlichen abhängigen Variablen können die $\beta_j$ mit der KQ-Methode geschätzt werden.
 
-Aufgrund der Beschränktheit der $Y_i$ auf $\{0,1\}$ sind die $u_i$ heteroskedastisch. Folglich sollten Inferenzstatistiken mit robusten Standardfehlern berechnet werden. Weiterhin ist zu beachten, dass $R^2$ in den meisten Anwendungen von linearen Wahrscheinlichkeitsmodellen keine hilfreiche Interpretation hat, da das geschätzte Modell die Daten nicht perfekt erklären kann, wenn die abhängige Variable binär, aber die Regressoren kontinuierlich verteilt sind.
+Aufgrund der Beschränktheit der $Y_i$ auf $\{0,1\}$ ist $u_i$ heteroskedastisch. Folglich sollten Inferenzstatistiken mit robusten Standardfehlern berechnet werden. Weiterhin ist zu beachten, dass $R^2$ in den meisten Anwendungen von linearen Wahrscheinlichkeitsmodellen keine hilfreiche Interpretation hat, da das geschätzte Modell die Daten nicht perfekt erklären kann, wenn die abhängige Variable binär, aber die Regressoren kontinuierlich verteilt sind.
 
-Das lineare Wahrscheinlichkeitsmodell hat einen wesentlichen Nachteil: Das Modell nimmt an, dass die bedingte Wahrscheinlichkeitsfunktion linear ist und $P(Y=1\vert X_1,\dots,X_k)$ nicht auf das für Wahrscheinlichkeiten definierte Intervall $[0,1]$ beschränkt ist. Ein angepasstes Modell hat dann für Regressorwerte, die zu Vorhersagen von $Y$ jenseits von $[0,1]$ führen keine sinnvolle Interpretation.
+Das lineare Wahrscheinlichkeitsmodell hat einen wesentlichen Nachteil: Das Modell nimmt an, dass die bedingte Wahrscheinlichkeitsfunktion linear ist und $P(Y=1\vert X_1,\dots,X_k)$ über das für Wahrscheinlichkeiten definierte Intervall $[0,1]$ hinausgehen kann. Ein angepasstes Modell hat dann für Regressorwerte, die zu Vorhersagen von $Y$ jenseits von $[0,1]$ führen keine sinnvolle Interpretation.
 
 Dieser Umstand verlangt nach Regressionsansätzen, die $P(Y=1)$ durch eine auf $[0,1]$ beschränkte (nicht-lineare) Funktion der Regressoren modellieren. Häufig verwendete Methoden sind Probit- und Logit-Regression.
 
@@ -689,7 +689,7 @@ penguins_logit %>%
   tidy()
 ```
 
-Mit `modelsummary::modelsummary()` können wir die wichtigsten Ergebnisse der Regressionen in einer pubplikationsfähigen Tabelle darstellen. Hierzu übergeben wir dem Argument `models` eine (benannte) Liste der geschätzten Modelle. Bei Angabe von `vcov = "HC1"` werden robuste Standardfehler ausgegeben.
+Mit `modelsummary::modelsummary()` können wir die wichtigsten Ergebnisse der Regressionen in einer publikationsfähigen Tabelle darstellen. Hierzu übergeben wir dem Argument `models` eine (benannte) Liste der geschätzten Modelle. Bei Angabe von `vcov = "HC1"` werden robuste Standardfehler ausgegeben.
 
 ```{webr}
 library(modelsummary)

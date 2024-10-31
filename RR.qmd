@@ -24,13 +24,13 @@ tabopts <- function(x) {
 }
 ```
 
-In viel empirischen Forschungsfeldern ist die *Reproduzierbarkeit* von Studienergebnissen von zentraler Bedeutung. Durch systematische Überprüfung und Bestätigung (oder Widerlegung) wird die Aussagekraft und Verlässlichkeit wissenschaftlicher Erkenntnisse gewährleistet. Dieser Validierungsprozess ist entscheidend für weiterführende Forschung: Auf verifizierbaren Ergebnissen können neue Hypothesen aufbauen und bestehende Theorien weiterentwickelt werden.
+In vielen empirischen Forschungsfeldern ist die *Reproduzierbarkeit* von Studienergebnissen von zentraler Bedeutung. Durch systematische Überprüfung und Bestätigung (oder Widerlegung) wird die Aussagekraft und Verlässlichkeit wissenschaftlicher Erkenntnisse gewährleistet. Dieser Validierungsprozess ist entscheidend für weiterführende Forschung: Auf verifizierbaren Ergebnissen können neue Hypothesen aufbauen und bestehende Theorien weiterentwickelt werden.
 
 Auch in mehrheitlich nicht-experimentellen Disziplinen wie den empirischen Wirtschaftswissenschaften ist die Reproduzierbarkeit von Forschung zunehmend relevant. In diesen Bereichen ist die datengetriebene Analyse mit statistischer Programmierung oft der zentrale Bestandteil wissenschaftlicher Studien. In vielen empirischen Forschungsarbeiten führt die Anwendung statistischer Methoden unmittelbar zu den Studienergebnissen, sodass eine transparente Dokumentation der Arbeitsweise und die Bereitstellung von reproduzierbaren Programm-Codes von großer Bedeutung ist.
 
 Das R-Ökosystem bietet diverse Tools zur Gewährleistung von Reproduzierbarkeit und Kommunikation von Forschungsergebnissen. [*RMarkdown*](https://rmarkdown.rstudio.com) [@Allaireetal2024] erlaubt es, Datenanalysen, Visualisierungen, Code und die dazugehörige Dokumentation nahtlos in einem einzigen Dokument zu kombinieren. Dies erleichtert nicht nur die Nachvollziehbarkeit von Analysen, sondern ermöglicht es auch, die Ergebnisse mühelos in verschiedene gängige Formate wie HTML, PDF oder Word zu konvertieren und verfügbar zu machen.^[Für eine ausführliche Erläuterungen vieler Funktionen von *RMarkdown* empfehlen wir @XieetalRmd.] Das R-Paket [*Shiny*](https://shiny.posit.co) [@Changetal2024] ermöglicht es Forschenden ohne umfangreiche Erfahrung in Webentwicklung interaktive Webanwendungen und Dashboards mit R zu erstellen.^[@Wickham2021 ist ein Standardwerk für Webapplikationen mit *Shiny*.]
 
-In diesem Kapitel erläutern wir Grundzüge der reproduzierbaren Forschung mit Rmarkdown und geben eine Einführung in die Entwicklung interaktiver Visualisierungen für Studienergebnisse mit Shiny. 
+In diesem Kapitel erläutern wir Grundzüge der reproduzierbaren Forschung mit RMarkdown und geben eine Einführung in die Entwicklung interaktiver Visualisierungen für Studienergebnisse mit Shiny. 
 
 ## RMarkdown
 
@@ -40,7 +40,7 @@ Reproduzierbare Forschung meint Prozesse, bei denen Forschende ihre Analysen und
 
 2. **Automatisierung**: Analysen sollten möglichst *automatisiert* durchgeführt werden, um das Risiko menschlicher Fehler (zum Beispiel bei der Datenverarbeitung oder bei Berechnungen) gering zu halten.
 
-3. **Teilbarkeit**: Die verwendeten Daten, der Code und die Ergebnisse sollten leicht geteilt und überprüft werden können, idealerweise anhand eines (Datei)Formats, dass geringe technische Anforderungen hinsichtlich der Reproduzierbarkeit der Inhalte voraussetzt.
+3. **Teilbarkeit**: Die verwendeten Daten, der Code und die Ergebnisse sollten leicht geteilt und überprüft werden können, idealerweise anhand eines (Datei)Formats, das geringe technische Anforderungen hinsichtlich der Reproduzierbarkeit der Inhalte voraussetzt.
 
 RMarkdown ist ein Dokumentationsformat im R-Ökosystem, das es Nutzern ermöglicht die oben genannten Anforderungen an reproduzierbare Forschung zu erfüllen. Es kombiniert die Funktionalitäten von [Markdown](https://markdown.de/), einer schlanken [Markup-Sprache](https://en.wikipedia.org/wiki/Markup_language) für Textformatierung, mit der Möglichkeit, direkt in R geschriebenen Code auszuführen und die Ergebnisse, einschließlich Tabellen und Grafiken in ein Ziel-Dokument einzubinden.
 
@@ -59,7 +59,7 @@ Ein typisches Rmarkdown-Dokument (eine `.rmd`-Datei) besteht aus drei Hauptkompo
   ---
   ```
 
-- **Code-Chunks und Inline-Code**: *Code-Chunks* enthalten *ausführbaren* R-Code (oder auch Code in anderen unterstützten Sprachen wie Python, SQL usw.), der *während der Erstellung* des Output-Dokument ausgeführt wird. Die Ergebnisse des Codes (z.B. Outputs von Schätzfunktionen wie `lm()`, Grafiken oder Tabellen) werden, gemeinsam mit dem Code, direkt im Dokument angezeigt. Ein einfacher Code-Chunk ist folgendermaßen aufgebaut:
+- **Code-Chunks und Inline-Code**: *Code-Chunks* enthalten *ausführbaren* R-Code (oder auch Code in anderen unterstützten Sprachen wie Python, SQL usw.), der *während der Erstellung* des Ausgabedokuments ausgeführt wird. Die Ergebnisse des Codes (z.B. Outputs von Schätzfunktionen wie `lm()`, Grafiken oder Tabellen) werden, gemeinsam mit dem Code, direkt im Dokument angezeigt. Ein einfacher Code-Chunk ist folgendermaßen aufgebaut:
 
   ```{{r}}
   # Ein einfacher Code-Chunk
@@ -89,7 +89,7 @@ Ein typisches Rmarkdown-Dokument (eine `.rmd`-Datei) besteht aus drei Hauptkompo
 
 Um eine `.Rmd`-Datei in das gewünschte Output-Format umzuwandeln (zu kompilieren), sind mehrere Software-Pakete und Schritte erforderlich:
 
-- ***RStudio*-Installation**: Obwohl RMarkdown auch über die Befehlszeile ([R-Konsole / R-GUI](https://cran.r-project.org)) ausgeführt werden kann, ist [*RStudio*](https://posit.co/download/rstudio-desktop/) die empfohlene Entwicklungsumgebung, da es eine benutzerfreundliche Schnittstelle bietet, mit der `.Rmd`-Dateien leicht erstellt, bearbeitet und kompiliert werden können. Beachte: *Für die Verwendung von RStudion muss die R-Konsole installiert sein*.
+- ***RStudio*-Installation**: Obwohl RMarkdown auch über die Befehlszeile ([R-Konsole / R-GUI](https://cran.r-project.org)) ausgeführt werden kann, ist [*RStudio*](https://posit.co/download/rstudio-desktop/) die empfohlene Entwicklungsumgebung, da es eine benutzerfreundliche Schnittstelle bietet, mit der `.Rmd`-Dateien leicht erstellt, bearbeitet und kompiliert werden können. Beachte: *Für die Verwendung von RStudio muss die R-Konsole installiert sein*.
 
 - **`rmarkdown`-Paket**: Um `.Rmd`-Dateien verarbeiten zu können, muss das R-Paket `rmarkdown` installiert sein. Dies erfolgt über die R-Konsole oder in RStudio mit folgendem Befehl:
 
@@ -108,15 +108,15 @@ Um eine `.Rmd`-Datei in das gewünschte Output-Format umzuwandeln (zu kompiliere
   tinytex::install_tinytex()
   ```
 
-Sind diese Komponenten der vorhanden, ist Rmarkdown in der Lage den Kompilierungsprozess durchzuführen. Der grobe Ablauf ist in @fig-rmdwf dargestellt und erfolgt so:  
+Sind diese Komponenten der vorhanden, ist RMarkdown in der Lage den Kompilierungsprozess durchzuführen. Der grobe Ablauf ist in @fig-rmdwf dargestellt und erfolgt so:  
 
 1. Die von R-Code abhängigen Komponenten des `.Rmd`-Dokuments werden ausgeführt. Sämtliche Strukturelemente und ihre Ergebnisse werden durch das Tool [`knitr`](https://yihui.org/knitr/) in ein Markdown-Dokument (Dateiendung `.md`) übersetzt.^[Dieser Prozess wird auch als *knitting* (engl. stricken) bezeichnet: sämtliche Komponenten werden nach Ausführung des R-Codes zusammengestrickt und in ein `.md`-Format überführt.]
 
-2. Das in Schritt 1 erzeugte Markdown-Dokument wird dem Tool [*pandoc*](https://pandoc.org) übergeben. Pandoc ist ein Open-Source-Tool zur Dokumentenkonvertierung, das Texte in zahlreiche verschiedene Formate transformiert, darunter HTML, PDF, Word, und viele weitere. Die Formatierung und Bereitstellung des Outputs erfolgt gemäß der im `yaml`-Header festgelegten Format-Funktion (`output: ...`).
+2. Das in Schritt 1 erzeugte Markdown-Dokument wird dem Tool [*pandoc*](https://pandoc.org) übergeben. Pandoc ist ein Open-Source-Tool zur Dokumentenkonvertierung, das Texte in zahlreiche verschiedene Formate transformiert, darunter HTML, PDF, Word, und viele weitere. Die Formatierung und Bereitstellung des Outputs erfolgt gemäß der im YAML-Header festgelegten Format-Funktion (`output: ...`).
 
 ![Workflow beim Kompilieren von Rmd-Dokumenten [Quelle: @Xieetal2020]](img/rmdworkflow.png){#fig-rmdwf width=80%}
 
-Um eine neue `.rmd-Datei` in RStudio zu erstellen und zu kompilieren, nutzen wir die Menü-Schaltflächen *Datei* $\rightarrow$ *Neue Datei* und wählen *R markdown* im Kontext-Menü aus. In dem sich anschließend öffnenden Dialog sind bereits Standard-Einstellungen für ein einfaches HTML-Dokument gesetzt.^[Die hier erfolgte Konfiguration setzt lediglich rudimentäre Optionen im `yaml`-Header, die später angepasst werden können.] Nach Bestätigung der Konfiguration mit "*OK*" wird ein `.Rmd`-Dokument mit Beispiel-Code geöffnet. @fig-rmdgif2 zeigt diesen Ablauf.
+Um eine neue `.rmd-Datei` in RStudio zu erstellen und zu kompilieren, nutzen wir die Menü-Schaltflächen *Datei* $\rightarrow$ *Neue Datei* und wählen *R markdown* im Kontextmenü aus. In dem sich anschließend öffnenden Dialog sind bereits Standard-Einstellungen für ein einfaches HTML-Dokument gesetzt.^[Die hier erfolgte Konfiguration setzt lediglich rudimentäre Optionen im YAML-Header, die später angepasst werden können.] Nach Bestätigung der Konfiguration mit "*OK*" wird ein `.Rmd`-Dokument mit Beispiel-Code geöffnet. @fig-rmdgif2 zeigt diesen Ablauf.
 
 ![RStudio: `.Rmd`-Datei erstellen](img/ezgif-rmd-1.gif){#fig-rmdgif2 width=80%}
 
@@ -140,7 +140,7 @@ Wenn dieser Prozess fehlerfrei abschließt, wird im Verzeichnis von `diamanten.r
 
 Das folgende Minimalbeispiel zeigt den Aufbau einer `.Rmd`-Datei für eine kurze Analyse des Datensatzes `ggplot2::diamonds` unter Verwendung der oben erläuterten Definitionen und Strukturelemente:
 
-- Im `yaml`-Header definieren wir den Output als HTML-Dokument mit dem Titel "Diamanten" sowie einer Datumsangabe. 
+- Im YAML-Header definieren wir den Output als HTML-Dokument mit dem Titel "Diamanten" sowie einer Datumsangabe. 
 
 - Die Datei enthält zwei Code-Chunks, die den Datensatz `ggplot2::diamonds` einlesen, unter Verwendung von `dplyr`-Funktionen transformieren und eine kleine graphische Auswertung mit `ggplot2` erstellen. 
 
@@ -208,7 +208,7 @@ Sofern eine $\LaTeX$-Distribution installiert ist, kann der Output ohne weiteren
 
 ### Tabellen
 
-In RMarkdown können einfache Tabellen durch Markup-Syntax erstellt werden. Hierbei werden die Zeichen "-", "|" und ":" kombiniert um die Dimensionen und die Formatierung der Tabelle zu definieren: Jede Spalte wird durch senkrechte Striche getrennt. Die Kopfzeile der Tabelle wird mit Bindestrichen unterhalb definiert. Um die Ausrichtung der Inhalte in den Spalten festzulegen, verwendet man unterhalb der Kopfzeile Doppelpunkte in den Spaltendefinitionen.
+In RMarkdown können einfache Tabellen durch Markup-Syntax erstellt werden. Hierbei werden die Zeichen "-", "|" und ":" kombiniert, um die Dimensionen und die Formatierung der Tabelle zu definieren: Jede Spalte wird durch senkrechte Striche getrennt. Die Kopfzeile der Tabelle wird mit Bindestrichen unterhalb definiert. Um die Ausrichtung der Inhalte in den Spalten festzulegen, verwendet man unterhalb der Kopfzeile Doppelpunkte in den Spaltendefinitionen.
 
 Der nachfolgende Markdown-Code-Chunk definiert eine Tabelle mit vier Zeilen und vier Spalten, deren Inhalte unterschiedliche Ausrichtungen haben. @tbl-simplemd ist das Ergebnis.
 
@@ -232,7 +232,7 @@ Der nachfolgende Markdown-Code-Chunk definiert eine Tabelle mit vier Zeilen und 
 Table: Eine einfache mit markdown erzeugte Tabelle {#tbl-simplemd}
 :::
 
-Oft ist es wünschenswert, die Ergebnisse statistischer Analysen in einer Tabelle darzustellen. Das R-Paket `knitr` bietet mit `knitr::kable()` eine rudimentäre Funktion, um den Inhalt eines "rechteckigen" R-Objekts^[Hierzu zählen typische Formate wie Vektoren, Matrizen, data.frames und tibbles.] für diverse Output-Formate zu formatieren. 
+Oft ist es wünschenswert, die Ergebnisse statistischer Analysen in einer Tabelle darzustellen. Das R-Paket `knitr` bietet mit `knitr::kable()` eine rudimentäre Funktion, um den Inhalt eines "rechteckigen" R-Objekts^[Hierzu zählen typische Formate wie Vektoren, Matrizen, data.frames und tibbles.] für diverse Output-Typen zu formatieren. 
 
 Im nächsten Code-Chunk definieren wir eine Matrix `m` mit den numerischen Werten aus @tbl-simplemd und nutzen `kable()` für eine Transformation in ein HTML-kompatibles tabellarisches Format.^[Bei Kompilierung zu PDF (@sec-genrmd) erzeugt `kable()` automatisch eine entsprechende $\LaTeX$-Tabelle.] @tbl-mkable zeigt das Ergebnis.
 

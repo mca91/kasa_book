@@ -104,7 +104,7 @@ Der Datensatz ist noch nicht in der R-Arbeitsumgebung verfügbar. Mit der Funkti
 )
 ```
 
-`klausurergebnisse` enthält die Klausurnoten der vier Studierenden (Beobachtungen) spaltenweise *pro Modul*, d.h. die Spaltennamen `Mikro`, `Makro` und `Mathe` sind Ausprägungen der Variable *Modul*. Der Datensatz liegt also *nicht* im s.g. *Tidy-Format* vor.
+`klausurergebnisse` enthält die Klausurnoten der vier Studierenden (Beobachtungen) spaltenweise *pro Modul*, d.h. die Spaltennamen `Mikro`, `Makro` und `Mathe` sind Ausprägungen der Variable *Modul*. Der Datensatz liegt also *nicht* im sog. *Tidy-Format* vor.
 
 ::: {.callout-tip}
 ## Tidy-Format
@@ -220,7 +220,7 @@ penguins %>%
 
 Mit `across()` kann die dieselbe Operation auf mehrere Variablen angewendet werden. 
 
-Im nachstehenden Beispiel ändern wir den typ (`type`) der Variablen `species`, `island`, `sex` und `year` zu `character`. 
+Im nachstehenden Beispiel ändern wir den Typ (`type`) der Variablen `species`, `island`, `sex` und `year` zu `character`. 
 
 ```{webr-r}
 # species, island, sex und year in Typ 'character' umwandeln
@@ -325,7 +325,7 @@ penguins %>%
   )
 ```
 
-Ähnlich wie bei `select()` verwenden wir häufig nützliche Funktionen, welche die Interpretation des Codes erleichtern. `dplyr::between()` erlaubt filtern innerhalb eines Intervals.
+Ähnlich wie bei `select()` verwenden wir häufig nützliche Funktionen, welche die Interpretation des Codes erleichtern. `dplyr::between()` erlaubt filtern innerhalb eines Intervalls.
 
 ```{webr-r}
 # Filtern mit Hilfsfunktion
@@ -376,7 +376,8 @@ penguins_cleaned %>%
 Durch die Verkettung mit `%>%` können wir sämtliche Schritte für die Bereinigung ohne das Abspeichern von Zwischenergebnissen durchführen.
 
 ```{webr-r}
-# Verketter Funktionsaufruf für Datensatzbereinigung
+# Verketteter Funktionsaufruf 
+# für Datensatzbereinigung
 penguins_cleaned <- penguins %>% 
   rename(
     bill_length = bill_length_mm,
@@ -514,7 +515,7 @@ penguins_sample %>%
   )
 ```
 
-Für den ungruppierten Datensatz berechnet `mutate()` das Stichprobenmittel von `bill_length_mm` über *alle* zehn Datenpunkte und weißt diesen Wert jeweils in der Variable `mean` zu.
+Für den ungruppierten Datensatz berechnet `mutate()` das Stichprobenmittel von `bill_length_mm` über *alle* zehn Datenpunkte und weist diesen Wert jeweils in der Variable `mean` zu.
 
 ```{webr-r}
 # mutate() -- gruppiert
@@ -580,7 +581,7 @@ penguins_cleaned %>%
 
 Die Schätzungen bekräftigen die Vermutung, dass der lineare Zusammenhang zwischen Gewicht und Schnabeltiefe sich nicht zwischen den verschiedenen Pinguinarten unterscheidet: Pinguine der Art *Gentoo* sind im Mittel schwerer als Pinguine der übrigen Arten, haben jedoch eine geringere Schnabeltiefe. 
 
-Der nachfolgende Code fügt der Grafik eine Regressionsline *über alle* Arten hinzu. Wir setzen hierbei das Argment `inherit_aes = FALSE` und legen damit fest, dass die Regression für `body_mass` und `bill_depth` ohne Differenzierung per `species` durchgeführt wird.
+Der nachfolgende Code fügt der Grafik eine Regressionslinie *über alle* Arten hinzu. Wir setzen hierbei das Argument `inherit_aes = FALSE` und legen damit fest, dass die Regression für `body_mass` und `bill_depth` ohne Differenzierung per `species` durchgeführt wird.
 
 ```{webr-r}
 # Zusatz: Globale Regression
