@@ -311,7 +311,7 @@ Die Log-Likelihood-Funktion ergibt sich als
   \mathcal{L}(\boldsymbol{\beta}) = \sum_{i=1}^n \left[ y_i \log \Phi(\mathbf{X}_i^\top \boldsymbol{\beta}) + (1 - y_i) \log \left(1 - \Phi(\mathbf{X}_i^\top \boldsymbol{\beta})\right) \right]
 \end{align*}
 
-Um den Maximum-Likelihood-Schätzer $\widehat{\boldsymbol{\beta}}$ zu finden, muss die Log-Likelihood-Funktion $\mathcal{L}(\boldsymbol{\beta})$ maximiert werden. In der Praxis erfolgt dies häufig durch numerische Optimierung, da die Log-Likelihood-Funktion der Probit-Regression im Allgemeinen keine geschlossene Form hat damit eine analytische Lösung nicht möglich ist.
+Um den Maximum-Likelihood-Schätzer $\widehat{\boldsymbol{\beta}}$ zu finden, muss die Log-Likelihood-Funktion $\mathcal{L}(\boldsymbol{\beta})$ maximiert werden. In der Praxis erfolgt dies häufig durch numerische Optimierung, da die Log-Likelihood-Funktion der Probit-Regression im Allgemeinen keine geschlossene Form hat, sodass eine analytische Lösung nicht möglich ist.
 
 Für eine Anwendung in R und einen Vergleich mit dem linearen Wahrscheinlichkeitsmodell erzeugen wir einen Beispieldatensatz `simdata` für einen datenerzeugenden Prozess (DGP)^[Siehe @sec-sim für Erläuterungen von Simulationsmethoden in R.] mit einem normalverteilten Regressor $X\sim N(5,2^2)$ und
 \begin{align*}
