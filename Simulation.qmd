@@ -765,10 +765,10 @@ Wir zeigen nachfolgend, wie die Konsequenzen von Heteroskedastizität für den K
 \end{align}
 ```
 wobei die Fehlerterm-Varianz $\sigma_e^2(X)$ eine Funktion von $X$ ist, \begin{align*}
-  \sigma_e^2(X) = \textup{Var}(e\vert X) = \lvert X-50 \rvert^{p}.
+  \sigma_e^2(X) = \textup{Var}(e\vert X) = \lvert X-50 \rvert^p.
 \end{align*} Der Parameter $p$ bestimmt die funktionale Form dieser bedingten Varianz.
 
-Der nächste Code-Chunk plottet die Funktion $f(x) = \lvert X-50 \rvert^{p}$ für verschiedene $p$ über den Wertebereich von $X$. Hierfür berechnen wir $f(x)$ für ein mit `expand_grid()` erstelltes Raster von Werten für $X$ und $p$.
+Der nächste Code-Chunk plottet die Funktion $f(x) = \lvert X-50 \rvert^p$ für verschiedene $p$ über den Wertebereich von $X$. Hierfür berechnen wir $f(x)$ für ein mit `expand_grid()` erstelltes Raster von Werten für $X$ und $p$.
 
 ```{webr-r}
 #| autorun: true
