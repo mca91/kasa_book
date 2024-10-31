@@ -454,7 +454,7 @@ als Link-Funktion genutzt, um die Wahrscheinlichkeitsfunktion von $Y$ gegeben $X
 \begin{align}
 E(Y\vert X) = P(Y=1\vert X) = \Lambda(\beta_0 + \beta_1 X). \label{eq:logitmodel}
 \end{align}
-In diesem Modell ist die Link-Funktion $\Lambda^{-1}(\cdot)$. Für $z=\beta_0 + \beta_1 X$ ist $\Lambda^{-1}(t)$ der sogenannte *logit*: Dass logarithmierte Verhältnis von $p := P(Y=1\vert X)$ und $1 - p = P(Y=0\vert X)$,
+In diesem Modell ist die Link-Funktion $\Lambda^{-1}(\cdot)$. Für $z=\beta_0 + \beta_1 X$ ist $\Lambda^{-1}(t)$ der sogenannte *logit*: Dass logarithmierte Verhältnis von $p := P(Y=1\vert X)$ zu $1 - p = P(Y=0\vert X)$,
 \begin{align*}
   \textup{logit(p)} = \log\bigg(\frac{p}{1-p}\bigg) = \beta_0 + \beta_1 X.
 \end{align*}
@@ -615,7 +615,7 @@ Die Deviance für das Probit-Modell ist tatsächlich etwas geringer als für das
 \begin{align*}
   \text{AIC} = 2k - 2 \log(\widehat{\mathcal{L}})
 \end{align*}
-ist ein Maß zur Bewertung der Güte eines Modells unter Berücksichtigung der Modellkomplexität. Das AIC wägt die Anpassung des Modells an die Daten (gemessen durch die maximierte Likelihood-Funktion $\widehat{\mathcal{L}}$^[$\widehat{\mathcal{L}}$ meint die Likelihood-Funktion für die geschätzten Koeffizienten.]) und die Komplexität (gemessen als Funktion der Regressoranzahl $k$) gegeneinander ab. Hierbei werden Modelle mit weniger Parametern bevorzugt, wenn sie die Daten ähnlich gut erklären, sodass eine Überanpassung und damit eine schlechte Vorhersage-Fähigkeit vermieden werden. In R können wir das AIC für Modell-Objekte mit `AIC()` berechnen. 
+ist ein Maß zur Bewertung der Güte eines Modells unter Berücksichtigung der Modellkomplexität. Das AIC wägt die Anpassung des Modells an die Daten (gemessen durch die maximierte Likelihood-Funktion $\widehat{\mathcal{L}}$^[$\widehat{\mathcal{L}}$ meint die Likelihood-Funktion für die geschätzten Koeffizienten.]) und die Komplexität (gemessen als Funktion der Regressoranzahl $k$) gegeneinander ab. Hierbei werden Modelle mit weniger Parametern bevorzugt, wenn sie die Daten ähnlich gut erklären, sodass eine Überanpassung und damit eine schlechte Vorhersagefähigkeit vermieden werden. In R können wir das AIC für Modell-Objekte mit `AIC()` berechnen. 
 
 ```{webr}
 # AIC berechnen
@@ -646,7 +646,7 @@ penguins_cleaned %>%
   slice_head(n = 10)
 ```
 
-Wir schätznen nachfolgend ein lineares Wahrscheinlichkeitsmodell `penguins_lp`, ein Probit-Modell `penguins_probit` sowie ein Logit-Modell `penguins_logit` die jeweils `sex` anhand der simplen Spezikation des linearen Prädiktors $$z = \beta_0 + \beta_1 \textup{bill\_depth}$$ erklären.
+Wir schätzen nachfolgend ein lineares Wahrscheinlichkeitsmodell `penguins_lp`, ein Probit-Modell `penguins_probit` sowie ein Logit-Modell `penguins_logit` die jeweils `sex` anhand der simplen Spezikation des linearen Prädiktors $$z = \beta_0 + \beta_1 \textup{bill\_depth}$$ erklären.
 
 ```{webr}
 # Lineares Modell
@@ -920,12 +920,12 @@ Da $\lambda_i = \exp(\mathbf{X}_i^\top \boldsymbol{\beta})$, wird die Log-Likeli
 \mathcal{L}(\boldsymbol{\beta}) = \sum_{i=1}^n \left( y_i (\mathbf{X}_i^\top \boldsymbol{\beta}) - \exp(\mathbf{X}_i^\top \boldsymbol{\beta}) - \log(y_i!) \right)
 \end{align}
 
-Den ML-Schätzer $\widehat{\boldsymbol{\beta}}$ erhalten wir durch Maximierung der Log-Likelihoodfunktion $\mathcal{L}(\boldsymbol{\beta})$. Die R-Implementierung von Poisson-Regression in `stats::glm()` wird mit `family = poisson(link = "log")`
+Den ML-Schätzer $\widehat{\boldsymbol{\beta}}$ erhalten wir durch Maximierung der Log-Likelihoodfunktion $\mathcal{L}(\boldsymbol{\beta})$. Die R-Implementierung von Poisson-Regression in `stats::glm()` wird mittels `family = poisson(link = "log")`
 aufgerufen.
 
 ### Interpretation der Koeffizienten
 
-Die Koeffizienten $\boldsymbol{\beta}$ in der Poisson-Regression haben eine log-lineare Beziehung zur Zählvariable. Für einen bestimmten Koeffizienten $\beta_j$ ist die Interpretation wiefolgt:
+Die Koeffizienten $\boldsymbol{\beta}$ in der Poisson-Regression haben eine logarithmisch-lineare Beziehung zur Zählvariable. Für einen bestimmten Koeffizienten $\beta_j$ ist die Interpretation wie folgt:
 
 Eine Änderung der unabhängigen Variable $X_j$ um eine Einheit führt zu einer Änderung des *Logarithmus* des Erwartungswertes von $Y$ um $\beta_j$. Der Erwartungswert $\lambda$ ändert sich also *multiplikativ* um den Faktor $\exp(\beta_j)$.
 
@@ -1067,4 +1067,3 @@ ggplot() +
 ## Zusammenfassung
 
 In diesem Kapitel haben wir erweiterte Konzepte der Regressionsanalyse diskutiert. Anhand des Frisch-Waugh-Lovell-Theorems wurde die Wirkungsweise der Kontrolle von Kovariablen mit multipler Regression auf den interessierenden Koeffizienten (Effekt) einer Variable veranschaulicht. Weiterhin haben wir gängige Typen generalisierter linearer Modelle für binäre und Poisson-verteilte Outcome-Variablen eingeführt. Anhand relevanter Beispiele wurde gezeigt, wie diese generalisierten Regressionsmodelle in R spezifiziert, geschätzt und der resultierende Output mit Paketen wie `broom`, `ggplot2` und `modelsummary` interpretiert werden kann.
-
