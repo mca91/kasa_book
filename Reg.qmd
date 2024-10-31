@@ -22,16 +22,16 @@ webr:
 
 # Regression {#sec-regression}
 
-Viele der in diesem Companion behandelten Methoden basiert auf dem Konzept der Schätzung kausaler Effekte mit *Regression*. Als Regressionsansatz bezeichnet man eine Methode, welche die Beziehungen zwischen Variablen durch einen funktionalen Zusammenhang beschreibt und die Parameter der gewählten funktionalen Form anhand von beobachteten Daten schätzt. *Lineare Regression* nimmt eine lineare funktionale Form der Beziehung zwischen einer abhängigen Variable (Outcome-Varibale) und erklärenden Variablen (Regressoren) an. *Nicht-lineare Regressionsmethoden* modellieren die Beziehung etwa durch Polynome höherer Ordnung, exponentielle Funktionen oder andere komplexere Formen. Die Wahl der funktionalen Form hängt von der Natur des datenerzeugenden Prozesses (DGP) und somit stets von der spezifischen Beziehung ab, die untersucht wird. 
+Viele der in diesem Companion behandelten Methoden basiert auf dem Konzept der Schätzung kausaler Effekte mit *Regression*. Als Regressionsansatz bezeichnet man eine Methode, welche die Beziehungen zwischen Variablen durch einen funktionalen Zusammenhang beschreibt und die Parameter der gewählten funktionalen Form anhand von beobachteten Daten schätzt. *Lineare Regression* nimmt eine lineare funktionale Form der Beziehung zwischen einer abhängigen Variable (Outcome-Variable) und erklärenden Variablen (Regressoren) an. *Nicht-lineare Regressionsmethoden* modellieren die Beziehung etwa durch Polynome höherer Ordnung, exponentielle Funktionen oder andere komplexere Formen. Die Wahl der funktionalen Form hängt von der Natur des datenerzeugenden Prozesses (DGP) und somit stets von der spezifischen Beziehung ab, die untersucht wird. 
 
-Regressionsansätze gehören zu den am häufigsten verwendeten Methoden für Kausalanalysen, da so in vielen Forschungsdesigns kausale Effekte identifiziert werden können, indem Backdoors geschlossen werden: Regression kann die durch die Behandlungsvariable verursachte Variation in der Outcome-Variable isolieren, indem für gemeinsame Einflussfaktoren von Behandlungs- *und* Outcome-Variable kontrolliert wird. In diesem Kapitel erläutern wir erweiterungen der Spezifikation und Schätzung von Regressionsansätzen, die für spätere Kapitel relevant sind. Neben einer Motivation der Schätzung kausaler Effekte mit multipler Regression betrachten wir Modelle für verschiedene Kategorien von Outcome-Variablen und diskutieren deren Implementierung mit R.
+Regressionsansätze gehören zu den am häufigsten verwendeten Methoden für Kausalanalysen, da so in vielen Forschungsdesigns kausale Effekte identifiziert werden können, indem Backdoors geschlossen werden: Regression kann die durch die Behandlungsvariable verursachte Variation in der Outcome-Variable isolieren, indem für gemeinsame Einflussfaktoren von Behandlungs- *und* Outcome-Variable kontrolliert wird. In diesem Kapitel erläutern wir Erweiterungen der Spezifikation und Schätzung von Regressionsansätzen, die für spätere Kapitel relevant sind. Neben einer Motivation der Schätzung kausaler Effekte mit multipler Regression betrachten wir Modelle für verschiedene Kategorien von Outcome-Variablen und diskutieren deren Implementierung mit R.
 
 ```{r}
 library(tidyverse)
 library(cowplot)
 ```
 
-## Regression schließt Backdoors: Frish-Waugh-Lovell-Theorem
+## Regression schließt Backdoors: Frisch-Waugh-Lovell-Theorem
 
 Das Frisch-Waugh-Lovell-Theorem (FWL) besagt, dass in einer multiplen linearen Regression die geschätzten Koeffizienten für eine Teilmenge der Regressoren numerisch identisch zu Koeffizientenschätzungen aus folgenden Schritten sind 
 
@@ -83,7 +83,7 @@ penguins_cleaned <- penguins %>%
 slice_head(penguins_cleaned, n = 10)
 ```
 
-Wir schätzen nun Modell \eqref{eq:billdepthmodel} mit `lm()` und erhalten eine Zusammenfassung der geschätzen Koeffizienten mit `broom::tidy()`.
+Wir schätzen nun Modell \eqref{eq:billdepthmodel} mit `lm()` und erhalten eine Zusammenfassung der geschätzten Koeffizienten mit `broom::tidy()`.
 
 ```{webr}
 library(broom)
@@ -615,7 +615,7 @@ Die Deviance für das Probit-Modell ist tatsächlich etwas geringer als für das
 \begin{align*}
   \text{AIC} = 2k - 2 \log(\widehat{\mathcal{L}})
 \end{align*}
-ist ein Maß zur Bewertung der Güte eines Modells unter Berücksichtigung der Modellkomplexität. Das AIC wägt die Anpassung des Modells an die Daten (gemessen durch die maximierte Likelihood-Funktion $\widehat{\mathcal{L}}$^[$\widehat{\mathcal{L}}$ meint die Likelihood-Funktion für die geschätzen Koeffizienten.]) und die Komplexität (gemessen als Funktion der Regressoranzahl $k$) gegeneinander ab. Hierbei werden Modelle mit weniger Parametern bevorzugt, wenn sie die Daten ähnlich gut erklären, sodass eine Überanpassung und damit eine schlechte Vorhersage-Fähigkeit vermieden werden. In R können wir das AIC für Modell-Objekte mit `AIC()` berechnen. 
+ist ein Maß zur Bewertung der Güte eines Modells unter Berücksichtigung der Modellkomplexität. Das AIC wägt die Anpassung des Modells an die Daten (gemessen durch die maximierte Likelihood-Funktion $\widehat{\mathcal{L}}$^[$\widehat{\mathcal{L}}$ meint die Likelihood-Funktion für die geschätzten Koeffizienten.]) und die Komplexität (gemessen als Funktion der Regressoranzahl $k$) gegeneinander ab. Hierbei werden Modelle mit weniger Parametern bevorzugt, wenn sie die Daten ähnlich gut erklären, sodass eine Überanpassung und damit eine schlechte Vorhersage-Fähigkeit vermieden werden. In R können wir das AIC für Modell-Objekte mit `AIC()` berechnen. 
 
 ```{webr}
 # AIC berechnen
