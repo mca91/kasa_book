@@ -3,15 +3,24 @@ format: live-html
 engine: knitr
 webr: 
   packages: [
+            'AER',
             'dplyr',
             'fwildclusterboot',
             'faux',
-            'ggplot2',
-            'modelsummary',
             'fixest',
-            'tidyr',
-            'readr'
+            'ggplot2',
+            'gt',
+            'ivreg',
+            'marginaleffects',
+            'modelsummary',
+            'readr',
+            'tidyr'
             ]
+  cell-options:
+    warning: false
+    message: false           
+  repos:
+    - https://rstudio.r-universe.dev
 ---
 
 {{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
@@ -19,20 +28,26 @@ webr:
 # IV-Regression {#sec-IV}
 
 ```{webr}
+#| echo: false
+#| output: false
+#| edit: false
+#| message: false
+#| warning: false
 library(dplyr)
+library(gt)
 
 # create dataset directory
 dir.create("datasets")
 # Download the datasets
 download.file(
-    "https://raw.githubusercontent.com/mca91/kausal_data/main/paneldata.csv",
-    'datasets/paneldata.csv',
+    "https://raw.githubusercontent.com/mca91/kausal_data/refs/heads/main/ADD_Mafia_municipality.csv",
+    'datasets/ADD_Mafia_municipality.csv'
 )
-```
+download.file(
+    "https://raw.githubusercontent.com/mca91/kausal_data/refs/heads/main/rainconflict.csv",
+    'datasets/rainconflict.csv'
+)
 
-```{r, echo=F, message=FALSE}
-library(gt)
-library(tidyverse)
 # Formatierung von gt-Tabellen
 tabopts <- function(x) {
   fmt_number(x, decimals = 3, drop_trailing_zeros = T) %>%
@@ -64,6 +79,45 @@ tabopts <- function(x) {
 }
 ```
 
+```{r, echo=F, message=FALSE}
+library(gt)
+
+# Formatierung von gt-Tabellen
+tabopts <- function(x) {
+  fmt_number(x, decimals = 3, drop_trailing_zeros = T) %>%
+    tab_options(
+      # general
+      table.width = "80%",
+      # fonts
+      table.font.color = "black", 
+      table.font.size = 16,
+      column_labels.font.weight = "bold", 
+      # table header  
+      column_labels.padding = 15,
+      column_labels.border.bottom.color = "black", 
+      column_labels.border.bottom.width = "1px", 
+      column_labels.border.top.color = "black",
+      # group labels
+      row_group.border.top.width = 0,
+      row_group.border.bottom.width = 0,
+      row_group.font.weight = "bold",
+      row_group.padding = 20,
+      # body
+      
+      table_body.hlines.width = 0, 
+      table_body.border.bottom.color = "black",
+      table_body.border.bottom.width = "1px",
+      table_body.border.top.width = "0px",
+      table.border.bottom.color = "black"
+    )
+}
+
+# ADD Datensatz einlesen
+ADD_dat <- readr::read_csv(
+  file = "datasets/ADD_Mafia_municipality.csv"
+  )
+```
+
 Wie in Kapitel @sec-regression erläutert, können Regressionsmodelle unter Endogenitätsproblemen leiden: Der Fehlerterm in unserem Regressionsmodell ist mit dem/den interessierenden Regressor(en) korreliert, sodass der zugehörige Koeffizient inkonsistent geschätzt wird und damit nicht als kausaler Effekt interpretiert werden darf. Die häufigsten Ursachen für Endogenität, die in empirischen Anwendungen auftreten, sind ausgelassene Variablen, Messfehler und simultane Kausalität.
 
 Durch Hinzufügen potenziell relevanter Variablen in die Regression kann das Risiko einer verzerrten Schätzung des interessierenden kausalen Effekts anhand multipler Regression verringert werden. Wenn jedoch wichtige ausgelassene Variablen unbeobachtbar (U) sind oder aus anderen Gründen nicht zur Verfügung stehen, kann multiple Regression die Endogenität nicht beheben. Diese Problematik ergibt sich insbesondere bei simultaner Kausalität: Wenn die Kausalität von der Behandlungsvariable (B) zur Outcomevariable (Y) und umgekehrt verläuft, gibt es Backdoors, die nicht durch das Hinzufügen von Kontrollvariablen zum Regressionsmodell geschlossen werden können.
@@ -75,7 +129,7 @@ Eine allgemeinere Technik, um Backdoors aufgrund unbeobachtbarer Variablen zu sc
 //| fig-width: 6
 //| fig-height: 4
 //| fig-align: 'center'
-//| fig-cap: "IV-Design bei Backdoor durch unb. Confounder-Variablen"
+//| fig-cap: "IV-Design bei Backdoor durch unbeobachtbare Confounder-Variablen"
 //| label: "fig-IVDAG1" 
 digraph IV_DAG {
   layout=neato
@@ -329,7 +383,7 @@ Die folgende Interaktive Grafik berechnet den 2SLS-Schätzer Analog zu der in @s
 Die Grafik illustriert das Verhalten des IV-Schätzers (lila Grade) im Vergleich zum KQ-Schätzer (gestrichelte Grade) und zum wahren Zusammenhang (grüne Grade) für *eine* simulierte Stichprobe (gegeben der gewählten Parameter) anhand der geschätzten Regressionslinien. Die voreingestellten Parameter-Kombinationen zeigen 
 
 - die Verzerrung von 2SLS, wenn $Z$ ein schwaches Instrument für $X$ ist, 
-- eine Situation in der $X$ exogen ist (KQ ist unverzerrt), was zu vergleichbaren Schätzungen führt (sofern $Z$ kein Schwaches Instrument ist)
+- eine Situation in der $X$ exogen ist (KQ ist unverzerrt), was zu vergleichbaren Schätzungen führt (sofern $Z$ kein schwaches Instrument ist)
 - eine starke Verzerrung von KQ, wenn $X$ endogen und irrelevant ($\beta_1 = 0$) ist.
 
 <iframe class="obs-soft-box-shadow" width="100%" height="910" frameborder="0"
@@ -344,7 +398,7 @@ Die voreingestellten Parameter-Kombinationen zeigen:
 
 - Wenn der interessierende Regressor (Behandlungsvariable) $X$ exogen ist, hat der IV-Schätzer eine größere Varianz als der KQ-Schätzer.
 
-- Wenn die Endogenität von $X$ "stark" ist (d.h. hohe Korrelation von $u$ und $v$), kann der IV-Schätzer auch in kleinen Stichproben hilfreich sein sofern das Instrument $Z$ nicht zu schwach ist: IV hat dann eine deutlich geringere Verzerrung als KQ, aber eine größere Varianz.
+- Wenn die Endogenität von $X$ "stark" ist (d.h. hohe Korrelation von $u$ und $v$), kann der IV-Schätzer auch in kleinen Stichproben hilfreich sein, sofern das Instrument $Z$ nicht zu schwach ist: IV hat dann eine deutlich geringere Verzerrung als KQ, aber eine größere Varianz.
 
 <iframe class="obs-soft-box-shadow" width="100%" height="1350" frameborder="0"
   src="https://observablehq.com/embed/@mca91/bias-and-variance-in-iv-regression?cells=webrinfo%2Cviewof+weak%2Cviewof+exogeneous%2Cviewof+beta1zero%2Cviewof+N%2Cviewof+n%2Cviewof+beta%2Cviewof+gamma%2Cviewof+cor%2Cchart%2Cloaded%2Csimcode">
@@ -353,31 +407,49 @@ Die voreingestellten Parameter-Kombinationen zeigen:
 
 ### Schätzung mit R
 
-```{r}
-#| message: false
-library(faux) # install.packages("faux")
+Wir zeigen nachfolgend, wie die Daten aus den vorherigen interaktiven Beispielen in R generiert, die IV-Regression durchgeführt und ein (grafischer) Vergleich mit der naiven KQ-Schätzung implementiert werden kann. 
 
+```{webr}
+#| message: false
+# install.packages("faux")
+library(faux) 
+
+# seed setzen
 set.seed(1234)
 
+# Stichprobengröße
 n <- 1000
 
+# bivariate normalverteilte
+# Fehlerterme simulieren
 errors <- rnorm_multi(
-    n, mu = c(0, 0), sd = c(1, 1),
-    r = -0.8, varnames = c("u", "v"), 
+    n, 
+    mu = c(0, 0), 
+    sd = c(1, 1),
+    r = -0.8, 
+    varnames = c("u", "v"), 
 )
 
+# Variablen festlegen
 Z <- rnorm(n, sd = .25)
 X <- 2 * Z + errors$v
 Y <- 0 * X + errors$u
 
+# Daten sammeln
 the_data <- data.frame(X, Y)
 ```
 
-```{r}
+```{webr}
+library(dplyr)
+library(ggplot2)
 library(cowplot)
 
+# Xhat berechnen und 
+# Regressionen plotten
 the_data %>%
-  mutate(Xhat = lm(X ~ Z)$fitted) %>%
+  mutate(
+    Xhat = lm(X ~ Z)$fitted
+  ) %>%
   
   ggplot(aes(x = X, y = Y)) + 
   geom_point() +
@@ -399,9 +471,10 @@ the_data %>%
   theme_cowplot()
 ```
 
-```{r}
+```{webr}
 library(AER)
 
+# 'Naive' KQ-Regression
 KQ_mod_sim <- lm(
   formula = Y ~ X,
   data = the_data
@@ -410,9 +483,11 @@ KQ_mod_sim <- lm(
 summary(KQ_mod_sim)
 ```
 
-```{r}
+```{webr}
 library(ivreg)
 
+# IV Regression mit Z
+# als Instrument
 iv_mod_sim <- ivreg(
   formula = Y ~ X | Z,
   data = the_data
@@ -476,29 +551,18 @@ digraph IV_DAG {
 
 ### Reproduktion der Kernergebnisse mit R
 
-Wir lesen zunächst den Datensatz `ADD_Mafia_municipality.dta`^[Der Datensatz stammt aus dem [MIT Economics Data Archive](https://economics.mit.edu/people/faculty/daron-acemoglu/data-archive) und liegt im STATA-Format `.dta` vor.] ein und verschaffen uns einen Überblick.
+Wir lesen zunächst den Datensatz `ADD_Mafia_municipality.csv`^[Der Datensatz stammt aus dem [MIT Economics Data Archive](https://economics.mit.edu/people/faculty/daron-acemoglu/data-archive) und liegt im STATA-Format `.dta` vor. Wir verwenden hier eine in das `.csv` formatierte Version.] ein und verschaffen uns einen Überblick.
 
-```{r}
-library(haven)
+```{webr}
+library(dplyr)
+library(readr)
 
 # Datensatz einlesen
-ADD_dat <- read_stata(
-  file = "datasets/ADD_Mafia_municipality.dta"
+ADD_dat <- read_csv(
+  file = "datasets/ADD_Mafia_municipality.csv"
   )
 
 glimpse(ADD_dat)
-```
-
-Das `tibble`-Objekt `ADD_dat` enthält Variablenbschreibungen im Attribut `label`. Mit Funktionen aus dem tidyverse-Paket `purrr` können wir diese Einträge auslesen.
-
-```{r}
-#| eval: true
-# Attribut 'label' für die ersten 5 Variablen anzeigen
-map_chr(
-  .x = ADD_dat, 
-  .f = ~ attr_getter("label")(.)
-) %>%
-  .[1:5]
 ```
 
 @tbl-ADD_dat gibt einen Überblick der in `ADD_dat` verfügbaren Variablen auf Gemeinde-Ebene und deren Definition.
@@ -506,6 +570,7 @@ map_chr(
 ```{r, echo = F}
 #| tbl-cap: "`ADD_dat` --- Charakteristika von sizilianischen Gemeinden im 19. Jahrhundert"
 #| label: tbl-ADD_dat
+library(tibble)
 tibble(
   Variable = colnames(ADD_dat),
   Beschreibung = c(
@@ -543,9 +608,9 @@ tibble(
   tabopts()
 ```
 
-Vor der Analyse filtern wir die Daten entsprechen der Vorgehensweise in @Acemogluetal2020: Es werden lediglich Gemeinden berücksichtigt, die in maximal 30km Entfernung zu einer Wetter-Station liegen (`!is.na(sp3m1893_n30)`) *und* für die eine Messung der Mafia-Aktivität gegen Ende des 19. Jahrhunderts (gemessen auf einer Skala von 0 bis 4, vgl. @Cutrera1900) vorliegt (`!is.na(Mafia1900)`).
+Vor der Analyse filtern wir die Daten entsprechend der Vorgehensweise in @Acemogluetal2020: Es werden lediglich Gemeinden berücksichtigt, die in maximal 30km Entfernung zu einer Wetter-Station liegen (`!is.na(sp3m1893_n30)`) *und* für die eine Messung der Mafia-Aktivität gegen Ende des 19. Jahrhunderts (gemessen auf einer Skala von 0 bis 4, vgl. @Cutrera1900) vorliegt (`!is.na(Mafia1900)`).
 
-```{r}
+```{webr}
 # Datensatz filtern
 ADD_dat <- ADD_dat %>%
   filter(
@@ -570,7 +635,7 @@ Tabelle 3 in @Acemogluetal2020 präsentiert First-Stage-Regressionen Für den en
 
 Wir schätzten nachfolgend sämtliche Regressionen mit `feols` und berechnen nach Distrikt-Zugehörigkeit (`distretto1853`) sowie nächstgelegener Wetterstation (`cl1_stn_sp1893_n30`) geclusterte Standardfehler.^[Siehe Kapitel @sec-paneldata für Erläuterungen zu Fixed-Effects und cluster-robusten Standardfehlern.] Hierzu setzen wir `vcov = ~ distretto1853 + cl1_stn_sp1893_n30`. Diese Spezifikation berücksichtigt, dass die Niederschlagsmenge in einer Gemeinde sowie viele Kovariablen eine Korrelation mit benachbarten Gemeinden aufweisen können. Cluster-robuste Standardfehler sind inbesondere nötig, weil die Niederschlagsdaten für viele Gemeinden aus benachbarten Wetterstationen interpoliert werden, was zu einer zusätzlichen Korrelation zwischen den Beobachtungen führt. Standardfehler mit Two-way-clustering sind eine gängige Methode zur Berücksichtigung derartiger Korrelation.
 
-```{r}
+```{webr}
 library(fixest)
 
 # First-Stage-Regression:
@@ -589,7 +654,7 @@ Der obige Code-Chunk führt die First-Stage-Regression *ohne* Kovariablen aus. W
 
 @Acemogluetal2020 verwenden Bootstrap cluster-robuste Standardfehler [@Cameronetal2008;@Cameronetal2011], die aufwendig zu implementieren sind, jedoch zu nahezu identischen Ergebnissen führen. Der nächste Code-Chunk zeigt, wie cluster-robuste Bootstrap-Inferenz für das geschätzte Modell `fasci_mod` berechnet werden können. Hierfür nutzen wir `fwildclusterboot::boottest()`.^[`fwildclusterboot` implementiert Varianten des *Wild Bootstrap* [@Liu1988].]
 
-```{r}
+```{webr}
 # Wild-Bootstrap-Standardfehler mit clustering
 library(fwildclusterboot)
 
@@ -598,7 +663,7 @@ fasci_mod_boot <- boottest(
   object = fasci_mod, 
   clustid = ~ distretto1853 + cl1_stn_sp1893_n30,
   param = "sp3m1893_n30", # Koeffizient
-  B = 999 # Bootstrap-Züge
+  B = 199 # Bootstrap-Züge
 )
 
 # Statistische Zusammenfassung des Bootstraps
@@ -607,14 +672,14 @@ summary(fasci_mod_boot)
 
 Die statistische Zusammenfassung umfasst die Punktschätzung, die robuste t-Statistik sowie das 95\%-Konfidenzintervall für den Koeffizienten von `sp3m1893_n30`. Mit diesen Komponenten können wir den Bootstrap-Standardfehler beispielsweise durch die folgende Transformation berechnen:
 
-```{r}
+```{webr}
 # Standardfehler über t-Statistik und
 # gesch. Koeffizienten berechnen
 1/fasci_mod_boot$t_stat * fasci_mod_boot$point_estimate
 ```
-Bei der Interpretation des geschätzten Koeffizienten (`r round(fasci_mod_boot$point_estimate,2)`) berückstigen wir, dass die abhängige Variable *binär* ist: Die First-Stage-Regression ist ein *lineares Wahrscheinlicheitsmodell*. Eine positive Änderung der relativen Regenmenge um eine Einheit (100\%) verringert die Wahrscheinlichkeit also um 100\%. Diese Interpretation ist jedoch wenig aussagekräftig für einen Einordnung des Effekts der Dürre. Stattdessen betrachten wir die Verteilung relativen Regenmengen und vergleichen den Effekt für eine von starker Dürre betroffenen Gemeinden (25\%-Quantil) und einer Gemeinde mit einem relativ geringen Rückgang des Niederschlags (75\%-Quantil)
+Bei der Interpretation des geschätzten Koeffizienten müssen wir berückstigen, dass die abhängige Variable *binär* ist: Die First-Stage-Regression ist ein *lineares Wahrscheinlicheitsmodell*. Eine positive Änderung der relativen Regenmenge um eine Einheit (100\%) verringert die Wahrscheinlichkeit also um 100\%. Diese Interpretation ist jedoch wenig aussagekräftig für einen Einordnung des Effekts der Dürre. Stattdessen betrachten wir die Verteilung relativen Regenmengen und vergleichen den Effekt für eine von starker Dürre betroffenen Gemeinden (25\%-Quantil) und einer Gemeinde mit einem relativ geringen Rückgang des Niederschlags (75\%-Quantil)
 
-```{r}
+```{webr}
 # Relativer Effekt der Dürre im Frühling 1893
 (
   ADD_dat %>% 
@@ -631,7 +696,7 @@ Für eine Gemeinde mit 75\% des langjährigen mittleren Niederschlags ist die ge
 
 Zur Vermeidung von Backdoors durch ausgelassene Variablen betrachten @Acemogluetal2020 weitere Spezifikationen für die First- und Second-Stage-Regressionen, die zusätzlich für Determinanten der Fasci, der Mafia, sowie für geographische Faktoren kontrollieren. Weiterhin werden diese Regressionen mit Fixed Effekts auf der Provinz-Ebene gemäß der Grenzen von 1853 (`provincia1853`) wiederholt, um für unbeobachtbare Heteogenitäten zwischen den verschiedenen Provinzen zu kontrollieren. Die nachfolgenden Code-Chunks zeigen die Implementierung dieser Regressionen mit `fixtest::feols()`. Für eine bessere Übersicht der Ergebnisse verwenden wir in `summary()` das Argument `n = 1`, sodass jeweils nur die Schätzung des ersten Koeffizienten (Effekt der relativen Regenmenge) ausgegeben wird.
 
-```{r}
+```{webr}
 # First-Stage-Regression:
 # + Fasci-Determinanten
 fasci_mod_F <- feols(
@@ -653,7 +718,7 @@ fasci_mod_F <- feols(
 summary(fasci_mod_F, n = 1)
 ```
 
-```{r}
+```{webr}
 # First-Stage-Regression:
 # + Fasci-Determinanten
 # + Mafia-Determinanten
@@ -682,7 +747,7 @@ fasci_mod_FM <- feols(
 summary(fasci_mod_FM, n = 1)
 ```
 
-```{r}
+```{webr}
 # First-Stage-Regression:
 # + Fasci-Determinanten
 # + Mafia-Determinanten
@@ -724,7 +789,7 @@ fasci_mod_FMG <- feols(
 summary(fasci_mod_FMG, n = 1)
 ```
 
-```{r}
+```{webr}
 # First Stage
 # + Provinz-Fixed-Effects
 fasci_mod_FE <- feols(
@@ -734,10 +799,11 @@ fasci_mod_FE <- feols(
   vcov = ~ distretto1853 + cl1_stn_sp1893_n30,
   data = ADD_dat,
   ) 
+
 summary(fasci_mod_FE, n = 1)
 ```
 
-```{r}
+```{webr}
 # First Stage
 # + Provinz-Fixed-Effects
 # + Fasci-Determinanten
@@ -760,7 +826,7 @@ fasci_mod_FE_F <-feols(
 summary(fasci_mod_FE_F, n = 1)
 ```
 
-```{r}
+```{webr}
 # First Stage
 # + Provinz-Fixed-Effects
 # + Fasci-Determinanten
@@ -790,7 +856,7 @@ fasci_mod_FE_FM <- feols(
 summary(fasci_mod_FE_FM, n = 1)
 ```
 
-```{r}
+```{webr}
 # First Stage
 # + Provinz-Fixed-Effects
 # + Fasci-Determinanten
@@ -832,11 +898,9 @@ fasci_mod_FE_FMG <- feols(
 summary(fasci_mod_FE_FMG, n = 1)
 ```
 
-Für eine tabellarische Übersicht fassen wir die interessierenden Komponenten der Schätzungen mit `modelsummary::modelsummary()` zusammen. Hierfür sammeln wir zunächst jeweils die Modelle mit und ohne Provinz-Fixed-Effects in benannten Listen, sodass die Ergebnisse später in separaten Panelen dargestellt werden können. Für die Formatierung von Labels für die Fixed Effects und Koeffizienten definieren wir das `tribble`-Objekt `gm` und übergeben reguläre Ausdrücke für eine Auswahl an zusammenfassenden Statistiken.
+Für eine tabellarische Übersicht fassen wir die interessierenden Komponenten der Schätzungen mit `modelsummary::modelsummary()` zusammen. Hierfür sammeln wir zunächst jeweils die Modelle mit und ohne Provinz-Fixed-Effects in benannten Listen, sodass die Ergebnisse später in separaten Panelen dargestellt werden können. Für die Formatierung von Labels für die Fixed Effects und Koeffizienten definieren wir mit `tibble::tribble()` das `tibble`-Objekt `gm` und übergeben reguläre Ausdrücke für eine Auswahl an zusammenfassenden Statistiken.
 
-```{r}
-#| label: tbl-addfs
-#| tbl-cap: "`ADD_dat` -- First-Stage-Regressionen aus @Acemogluetal2020"
+```{webr}
 library(modelsummary)
 
 # Modelle in benannten Listen sammeln
@@ -844,51 +908,74 @@ panels <- list(
   "Panel A" = list(
     "Keine Controls" = fasci_mod,
     "Fasci" = fasci_mod_F,
-    "Fasci + Mafia" = fasci_mod_FM,
-    "Fasci + Mafia + Geo" = fasci_mod_FMG
+    "Fasci Mafia" = fasci_mod_FM,
+    "Fasci Mafia Geo" = fasci_mod_FMG
   ),
-  "Panel B (Fixed Effects)" = list(
+  "Panel B" = list(
     "Keine Controls" = fasci_mod_FE,
     "Fasci" = fasci_mod_FE_F,
-    "Fasci + Mafia" = fasci_mod_FE_FM,
-    "Fasci + Mafia + Geo" = fasci_mod_FE_FMG
+    "Fasci Mafia" = fasci_mod_FE_FM,
+    "Fasci Mafia Geo" = fasci_mod_FE_FMG
   )
 )
+```
 
-# Format für FE-label
+```{webr}
+# Format-Definitionen für FE-label
 gm <- tribble(
   ~raw, ~clean, ~fmt,
   "FE: provincia1853", "FE: Provinz", ~fmt
 )
+```
 
+```{webr}
 # Tabellarische Zusammenfassung
+# Modelle ohne Fixed Effects
 modelsummary(
-  models = panels,
-  shape = "rbind",
+  models = panels[["Panel A"]],
+  coef_omit = "^(?!(sp3m1893\\_n30*)$).*",
+  stars = T,
+  coef_map = c(
+    "sp3m1893_n30" = "Rel. Niederschlag 1893"
+    ),
+  gof_map = gm,
+  notes = c(
+    "Abhängige Variable: Peasants Fasci",
+    "Cluster-robuste Standardfehler: Naheste Wetterstation + Distrikt"
+  ),
+  title = "Acemoglu et al. (2020) -- Panel A: 1st-Stage-Schätzungen ohne Fixed Effects",
+  output = "gt"
+) %>%
+  tabopts()
+
+# Modelle mit Fixed Effects
+modelsummary(
+  models = panels[["Panel B"]],
   coef_omit = "^(?!(sp3m1893\\_n30*)$).*",
   stars = T,
   gof_omit = "^(?!(FE.*)$).*",
   coef_map = c(
     "sp3m1893_n30" = "Rel. Niederschlag 1893"
     ),
-  gof_map = gm, 
+  gof_map = gm,
   notes = c(
-    "Abhängige Variable: Peasants Fasci", 
+    "Abhängige Variable: Peasants Fasci",
     "Cluster-robuste Standardfehler: Naheste Wetterstation + Distrikt"
   ),
+  title = "Acemoglu et al. (2020) -- Panel B: 1st-Stage-Schätzungen mit Fixed Effects",
   output = "gt"
 ) %>%
   tabopts()
 ```
 
-Die Ergebnisse in @tbl-addfs bestätigen die Vermutung der Autoren, dass der Effekt des relativen Niederschlags auf den Organisationsgrad der Bauern ohne Kontrolle für die betrachteten Kovariablen tendenziell überschätzt wird. Tatsächlich führt multiple Regression mit Fixed Effects und sämtlichen Kovariablen (letzte Spalte in Panel B) zu einem etwa 30\% kleineren geschätzten Effekt als für die einfache Regression in Panel A.
+Die Ergebnisse bestätigen die Vermutung der Autoren, dass der Effekt des relativen Niederschlags auf den Organisationsgrad der Bauern ohne Kontrolle für die betrachteten Kovariablen tendenziell überschätzt wird. Tatsächlich führt multiple Regression mit Fixed Effects und sämtlichen Kovariablen (letzte Spalte in Panel B) zu einem etwa 30\% kleineren geschätzten Effekt als für die einfache Regression in Panel A.
 
 
 #### Second-Stage-Regressionen
 
-Mit `fml = Mafia1900 ~ 1 | peasants_fasci ~ sp3m1893_n30` legen wir fest, dass `Mafia1900` auf eine Konstante sowie die angepassten Werte des endogenen Regressors `peasants_fasci` aus der ersten Stufe (instrumentiert durch `sp3m1893_n30`) regressiert werden soll. Wie für die Regressionen in @tbl-addfs schätzen wir jeweils vier verschiedene Spezfikationen, unterscheiden zwischen Modellen mit und ohne Provinz-Fixed-Effects und berechnen cluster-robuste Standardfehler.
+Mit `fml = Mafia1900 ~ 1 | peasants_fasci ~ sp3m1893_n30` legen wir fest, dass `Mafia1900` auf eine Konstante sowie die angepassten Werte des endogenen Regressors `peasants_fasci` aus der ersten Stufe (instrumentiert durch `sp3m1893_n30`) regressiert werden soll. Wie für die First-Stage-Regressionen schätzen wir jeweils vier verschiedene Spezfikationen, unterscheiden zwischen Modellen mit und ohne Provinz-Fixed-Effects und berechnen cluster-robuste Standardfehler.
 
-```{r}
+```{webr}
 # Second-Stage-Regression:
 # Keine Kontrollvariablen
 # (1)
@@ -903,7 +990,7 @@ fasciIV_mod <- feols(
 summary(fasciIV_mod, n = 1)
 ```
 
-```{r}
+```{webr}
 # Second-Stage-Regression:
 # + Fasci-Determinanten
 fasciIV_mod_F <- feols(
@@ -924,7 +1011,7 @@ fasciIV_mod_F <- feols(
 summary(fasciIV_mod_F, n = 1)
 ```
 
-```{r}
+```{webr}
 # Second-Stage-Regression:
 # + Fasci-Determinanten
 # + Mafia-Determinanten
@@ -952,7 +1039,7 @@ fasciIV_mod_FM <- feols(
 summary(fasciIV_mod_FM, n = 1)
 ```
 
-```{r}
+```{webr}
 # Second-Stage-Regression:
 # + Fasci-Determinanten
 # + Mafia-Determinanten
@@ -993,7 +1080,7 @@ fasciIV_mod_FMG <- feols(
 summary(fasciIV_mod_FMG, n = 1)
 ```
 
-```{r}
+```{webr}
 # Second-Stage-Regression:
 # + Provinz-FE
 fasciIV_mod_FE <- feols(
@@ -1009,7 +1096,7 @@ fasciIV_mod_FE <- feols(
 summary(fasciIV_mod_FE, n = 1)
 ```
 
-```{r}
+```{webr}
 # Second-Stage-Regression:
 # + Fasci-Determinanten
 # + Provinz-FE
@@ -1033,7 +1120,7 @@ fasciIV_mod_FE_F <- feols(
 summary(fasciIV_mod_FE_F, n = 1)
 ```
 
-```{r}
+```{webr}
 # Second-Stage-Regression:
 # + Fasci-Determinanten
 # + Mafia-Determinanten
@@ -1064,7 +1151,7 @@ fasciIV_mod_FE_FM <- feols(
 summary(fasciIV_mod_FE_FM, n = 1)
 ```
 
-```{r}
+```{webr}
 # Second-Stage-Regression:
 # + Fasci-Determinanten
 # + Mafia-Determinanten
@@ -1109,10 +1196,7 @@ summary(fasciIV_mod_FE_FMG, n = 1)
 ```
 
 
-```{r}
-#| label: tbl-addss
-#| tbl-cap: "`ADD_dat` -- Second-Stage-Regressionen aus @Acemogluetal2020"
-
+```{webr}
 # Modelle in benannten Listen sammeln
 panels <- list(
   "Panel A" = list(
@@ -1121,40 +1205,66 @@ panels <- list(
     "Fasci + Mafia" = fasciIV_mod_FM,
     "Fasci + Mafia + Geo" = fasciIV_mod_FMG
   ),
-  "Panel B (Fixed Effects)" = list(
+  "Panel B" = list(
     "Keine Controls" = fasciIV_mod_FE,
     "Fasci" = fasciIV_mod_FE_F,
     "Fasci + Mafia" = fasciIV_mod_FE_FM,
     "Fasci + Mafia + Geo" = fasciIV_mod_FE_FMG
   )
 )
+```
 
-# Tabellarische Zusammenfassung
+```{webr}
+# Tabellarische Zusammenfassungen
+
+# keine Fixed Effects
 modelsummary(
-  models = panels,
-  shape = "rbind",
+  models = panels[["Panel A"]],
   coef_omit = "^(?!(fit\\_peasants\\_fasci*)$).*",
   stars = T,
   gof_omit = "^(?!(FE.*)$).*",
   coef_map = c(
     "fit_peasants_fasci" = "Fasci"
     ),
-  gof_map = gm, 
+  gof_map = gm,
   notes = c(
-    "Abhängige Variable: Mafia-Präsenz in 1900", 
-    "Instrument: Rel. Niederschlag 1893", 
+    "Abhängige Variable: Mafia-Präsenz in 1900",
+    "Instrument: Rel. Niederschlag 1893",
     "Cluster-robuste Standardfehler: Naheste Wetterstation + Distrikt"
   ),
+  title = "Acemoglu et al. (2020) -- Panel A: 2SLS-Regressionen",
+  output = "gt"
+) %>%
+  tabopts()
+
+# mit Fixed Effects
+modelsummary(
+  models = panels[["Panel B"]],
+  coef_omit = "^(?!(fit\\_peasants\\_fasci*)$).*",
+  stars = T,
+  gof_omit = "^(?!(FE.*)$).*",
+  coef_map = c(
+    "fit_peasants_fasci" = "Fasci"
+    ),
+  gof_map = gm,
+  notes = c(
+    "Abhängige Variable: Mafia-Präsenz in 1900",
+    "Instrument: Rel. Niederschlag 1893",
+    "Cluster-robuste Standardfehler: Naheste Wetterstation + Distrikt"
+  ),
+  title = "Acemoglu et al. (2020) -- Panel B: 2SLS-Regressionen mit Fixed Effects",
   output = "gt"
 ) %>%
   tabopts()
 ```
 
-Die Ergebnisse für die IV-Schätzung des kausalen Effekts von Bauernorganisationen auf die Präsenz der Mafia zu Beginn des 20. Jahrhundert sind in @tbl-addss dargestellt. Die LATE-Schätzung in Spalte 4 von Panel B hat folgende Interpretation: Die Präsenz der Fasci in einer Gemeinde erhöht die Intensität der Mafia-Aktivität um etwa 1.56 Punkte.^[Nach @Cutrera1900 entspricht eine Erhöhung des Mafia-Index von 1 auf 2 einem Sprung von einer geringen Präsenz der Mafia zu einer signifikanten Präsenz.] 
+Die Ergebnisse für die IV-Schätzung des kausalen Effekts von Bauernorganisationen auf die Präsenz der Mafia zu Beginn des 20. Jahrhundert sind in der obigen Tabelle dargestellt. Die LATE-Schätzung in Spalte 4 von Panel B hat folgende Interpretation: Die Präsenz der Fasci in einer Gemeinde erhöht die Intensität der Mafia-Aktivität um etwa 1.56 Punkte.^[Nach @Cutrera1900 entspricht eine Erhöhung des Mafia-Index von 1 auf 2 einem Sprung von einer geringen Präsenz der Mafia zu einer signifikanten Präsenz.] 
 
 Wie ist dieser Effekt einzuordnen? Wir berechnen zunächst die *Anzahl* an Gemeinden, in denen es im Jahr 1900 Fasci gibt.
 
-```{r}
+```{webr}
+library(tidyr)
+
 # Anz. Gemeinden mit Fasci im Jahr 1900
 ADD_dat %>% 
   drop_na() %>% 
@@ -1166,14 +1276,14 @@ ADD_dat %>%
 
 Für diese 84 Gemeinden erwarten wir jeweils einen Effekt von 1.56 Punkten auf die im Jahr 1900 beobachtete *gesamte* Intensität des Einflusses der Mafia in Sizilien, gemessen als gewichtete Summe.
 
-```{r}
+```{webr}
 # Beitrag der Gemeinden mit Fasci im Jahr 1900
 84 * 1.56
 ```
 
 Die gesamte Mafia-Intensität für Sizilien zu Beginn des 20. Jahrhunderts berechnen wir analog.
 
-```{r}
+```{webr}
 # Mafia-Intensität in Sizilien im Jahr 1900
 ADD_dat %>% 
   drop_na() %>% 
@@ -1186,7 +1296,7 @@ ADD_dat %>%
 
 Der Anteil der Gemeinden mit Bauernorganisationen im Jahr 1900 an dieser Summe erlaubt eine Einordnung des Effekts der Fasci auf die Verbreitung der Mafia.
 
-```{r}
+```{webr}
 # Anteil des geschätzten Effekts
 84 * 1.56 / 342
 ```
@@ -1196,14 +1306,14 @@ Die Interpretation lautet, dass bis zu 38\% der Stärke der Mafia im Jahr 1900 i
 
 ## Case Study: Ökonomische Schocks und Bürgerkriege
 
-Ein Kernproblem bei der Schätzung der kausalen Beziehung zwischen wirtschaftlichen Schocks und dem Auftreten von kriegerischen Auseinandersetzungen ist die Endogenität von Variablen, die wirtschaftliche Stabilität messen [vgl. @FearonLaitin2003]. Beispielsweise kann eine Verschlechterung der wirtschaftlichen Bedingungen eines Landes die Wahrscheinlichkeit eines Konflikts im Inland erhöhen. Gleichermaßen beeinflussen kriegerische Handlung im Inland die wirtschaftliche Situation einer Volkswirtschaft negativ. 
+Ein Kernproblem bei der Schätzung der kausalen Beziehung zwischen wirtschaftlichen Schocks und dem Auftreten von kriegerischen Auseinandersetzungen ist die Endogenität von Variablen, die wirtschaftliche Stabilität messen [vgl. @FearonLaitin2003]. Beispielsweise kann eine Verschlechterung der wirtschaftlichen Bedingungen eines Landes die Wahrscheinlichkeit eines Konflikts im Inland erhöhen. Gleichermaßen beeinflussen kriegerische Handlung im Inland die wirtschaftliche Situation einer Volkswirtschaft negativ.
 
 ```{dot}
 //| fig-width: 6
 //| fig-height: 4
 //| fig-align: 'center'
 //| fig-cap: "Simultane Kausalität zw. Kriegsrisiko und Wirtschaftslage"
-//| label: "fig-IVDAGrain1" 
+//| label: "fig-IVDAGrain1"
 digraph IV_DAG {
   layout=neato
   fontname="Helvetica,Arial,sans-serif"
@@ -1212,8 +1322,8 @@ digraph IV_DAG {
   K [pos="3,5"];
   BIP [pos="0,0!"];
   Konflikt [pos="6,0!"];
-  K -> BIP; 
-  K -> Konflikt; 
+  K -> BIP;
+  K -> Konflikt;
   BIP -> Konflikt;
   Konflikt -> BIP;
 }
@@ -1229,7 +1339,7 @@ In der "Konfliktgleichung"
 
 liegt dann Endogenität des Regressors für "wirtschaftliche Stabilität", hier $\Delta\text{BIP}$, aufgrund von simultanter Kausalität vor. Die multiple Regression \eqref{eq:rainconf1} liefert dann eine verzerrte Schätzungen des interessierenden Effekts $\beta_1$.
 
-@Migueletal2004 untersuchen die kausale Beziehung zwischen wirtschaftlichen Schocks und dem Auftreten von Bürgerkriegen in 41 afrikanischen Sub-Sahara-Ländern für den Zeitraum von 1981 bis 1999.^[Siehe `rainconflict$country %>% unique()`.] Hierbei adressieren die Autoren das Endogenitätsproblem in einem IV-Ansatz mit Instrumenten, die mit wirtschaftlichen Schocks korreliert sind, aber nicht unmittelbar mit der Wahrscheinlichkeit eines Bürgerkriegs zusammenhängen. 
+@Migueletal2004 untersuchen die kausale Beziehung zwischen wirtschaftlichen Schocks und dem Auftreten von Bürgerkriegen in 41 afrikanischen Sub-Sahara-Ländern für den Zeitraum von 1981 bis 1999.^[Füge `rainconflict$country %>% unique()` im nächsten WebR-Chunk für eine Liste der Länder aus.] Hierbei adressieren die Autoren das Endogenitätsproblem in einem IV-Ansatz mit Instrumenten, die mit wirtschaftlichen Schocks korreliert sind, aber nicht unmittelbar mit der Wahrscheinlichkeit eines Bürgerkriegs zusammenhängen.
 
 Die Identifikationsstrategie basiert auf metereologischen Faktoren: In den betrachteten Agrarökonomien sind Schocks in den Niederschlägen entscheidend für die Entwicklung des Bruttoinlandsprodukts. Ungünstige Wetterbedingungen, die landwirtschaftliche Erträge negativ beeinflussen, haben einen direkten (negativen) Effekt auf die wirtschaftliche Situation. Variation in der Regenmenge ist jedoch keine unmittelbare Determinante der Konfliktwahrscheinlichkeit und folglich exogen in Modellgleichung \eqref{eq:rainconf1}. Maße für die Veränderungen in der Niederschlagsmenge sind somit plausible Instrumente für endogene Variablen, die Veränderungen im Bruttoinlandsprodukt messen.
 
@@ -1238,7 +1348,7 @@ Die Identifikationsstrategie basiert auf metereologischen Faktoren: In den betra
 //| fig-height: 4
 //| fig-align: 'center'
 //| fig-cap: "IV-Design bei simultaner Kausalität zw. Kriegsrisiko und Wirtschaftslage"
-//| label: "fig-IVDAGrain2" 
+//| label: "fig-IVDAGrain2"
 digraph IV_DAG {
   layout=neato
   fontname="Helvetica,Arial,sans-serif"
@@ -1248,10 +1358,10 @@ digraph IV_DAG {
   Niederschlag [pos="-2,0!"];
   BIP [pos="0,0!"];
   Konflikt [pos="3,0!"];
-  
+
   Niederschlag -> BIP;
-  C -> BIP; 
-  C -> Konflikt; 
+  C -> BIP;
+  C -> Konflikt;
   BIP -> Konflikt;
   Konflikt -> BIP;
 }
@@ -1261,7 +1371,7 @@ Anhand von Länder-Paneldaten mit Informationen über wirtschaftliche Indikatore
 
 Wir reproduzieren nachfolgend die zentralen Ergebnisse von @Migueletal2004 anhand eines Auszugs (`rainconflict.csv`) aus dem der Studie zugrundeliegenden Datensatz. Der vollständige Datensatz ist, nach Registrierung, [hier](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/27324) verfügbar.
 
-```{r}
+```{webr}
 library(readr)
 
 # Datensatz 'rainconflict' einlesen
@@ -1270,7 +1380,7 @@ rainconflict <- read_csv2(
 )
 ```
 
-```{r}
+```{webr}
 # Überblick verschaffen
 glimpse(rainconflict)
 ```
@@ -1304,30 +1414,31 @@ tribble(
   tabopts()
 ```
 
-```{r}
+```{webr}
 # ccode zu Typ 'factor' transformieren
-rainconflict <- rainconflict %>% 
+rainconflict <- rainconflict %>%
   mutate(
     ccode = as.factor(ccode)
   )
 ```
 
-```{r}
-#| tbl-cap: "`rainconflict` -- Statistische Zusammenfassung"
-#| label: tbl-rainconfdatasum
+```{webr}
 library(modelsummary)
 
 # Statistische Zusammenfassung
 datasummary(
-  formula = All( rainconflict %>% select(-ccode, -year) )   
-    ~ (mean + sd) * Arguments(na.rm = TRUE) 
-    + N, 
+  formula = All( rainconflict %>% select(-ccode, -year) )
+    ~ (mean + sd) * Arguments(na.rm = TRUE)
+    + N,
   fmt = 4,
-  data = rainconflict 
-) 
+  data = rainconflict,
+  title = "`rainconflict.csv` -- Statistische Zusammenfassung",
+  output = "gt"
+) %>%
+  tabopts()
 ```
 
-```{r}
+```{webr}
 library(fixest)
 
 # (1)
@@ -1340,92 +1451,92 @@ library(fixest)
 )
 ```
 
-```{r}
+```{webr}
 # (2)
 rncnf_mod2 <- feols(
   fml = gdp_g ~ GPCP_g + GPCP_g_l
   + gdp_1979
-  + polity2l 
-  + ethfrac 
-  + relfrac 
-  + oil 
-  + lmtnest 
+  + polity2l
+  + ethfrac
+  + relfrac
+  + oil
+  + lmtnest
   + lpopl1
   + year:ccode,
   data = rainconflict,
   vcov = ~ ccode
-) 
+)
 
-rncnf_mod2 %>% 
+rncnf_mod2 %>%
   print(n = 10)
 ```
 
-```{r}
+```{webr}
 # (3)
 rncnf_mod3 <- feols(
-  fml = gdp_g ~ GPCP_g + GPCP_g_l 
+  fml = gdp_g ~ GPCP_g + GPCP_g_l
   + year:ccode
   | ccode,
   data = rainconflict,
   vcov = ~ ccode
-) 
+)
 
-rncnf_mod3 %>% 
+rncnf_mod3 %>%
   print(n = 2)
 ```
 
-```{r}
+```{webr}
 # (4)
 rncnf_mod4 <- feols(
   fml = gdp_g ~ GPCP_g + GPCP_g_l + GPCP_g_fl
-  + year:ccode 
+  + year:ccode
   | ccode,
   data = rainconflict,
   vcov = ~ ccode
-) 
+)
 
-rncnf_mod4 %>% 
+rncnf_mod4 %>%
   print(n = 3)
 ```
 
-```{r}
+```{webr}
 # (5)
 rncnf_mod5 <- feols(
-  fml = gdp_g ~ GPCP_g + GPCP_g_l 
-  + tot_100_g 
-  + year:ccode 
+  fml = gdp_g ~ GPCP_g + GPCP_g_l
+  + tot_100_g
+  + year:ccode
   | ccode,
   data = rainconflict,
   vcov = ~ ccode
-) 
+)
 
 rncnf_mod5 %>%
   print(n = 3)
 ```
 
-```{r}
-#| tbl-cap: "First-Stage-Regressionen für `gdp_g`"
-#| label: tbl-blablabla
-
+```{webr}
 # Tabellarischer Vergleich mit modelsummary()
 # (Tabelle 3 in Ditella und Schargrodsky, 2004)
 modelsummary(
   models = list(
-    "(1)" = rncnf_mod1, 
-    "(2)" = rncnf_mod2, 
-    "(3)" = rncnf_mod3, 
-    "(4)" = rncnf_mod4, 
+    "(1)" = rncnf_mod1,
+    "(2)" = rncnf_mod2,
+    "(3)" = rncnf_mod3,
+    "(4)" = rncnf_mod4,
     "(5)" = rncnf_mod5
   ),
-  stars = T, 
+  stars = T,
   coef_omit = "^year.*$",
   gof_omit = "^(?!(R2|Num.Obs.|FE.*)$).*",
   output = "gt"
 ) %>%
+  tab_caption(
+    caption = "`rainconflict.csv` -- First-Stage-Regressionen für `gdp_g`"
+  ) %>%
   tabopts()
 ```
 
-```{r}
+```{webr}
 S1_res <- tibble(
 
   x = residuals(
@@ -1436,7 +1547,7 @@ S1_res <- tibble(
       data = rainconflict
     )
   ),
-  
+
   y = residuals(
     feols(
       fml = gdp_g ~ GPCP_g_l
@@ -1445,12 +1556,11 @@ S1_res <- tibble(
       data = rainconflict
     )
   )
-  
+
 )
 ```
 
-```{r}
-
+```{webr}
 library(ggplot2)
 library(cowplot)
 
@@ -1458,42 +1568,42 @@ ggplot(
   data = S1_res,
   mapping = aes(x = x, y = y)) +
   geom_point(
-    size = .75, 
+    size = .75,
     alpha = .5
   ) +
   geom_smooth(method = "loess", span = .5) +
   coord_cartesian(
-    xlim = c(-.4, .4), 
+    xlim = c(-.4, .4),
     ylim = c(-.1, .1)
   ) +
   theme_cowplot()
 ```
 
-```{r}
+```{webr}
 feols(
-  fml = any_prio ~ GPCP_g + GPCP_g_l 
+  fml = any_prio ~ GPCP_g + GPCP_g_l
   + year:ccode
   | ccode,
   data = rainconflict,
   vcov = ~ ccode
-) %>% 
+) %>%
   print(n = 2)
 ```
 
-```{r}
+```{webr}
 feols(
-  fml = war_prio ~ GPCP_g + GPCP_g_l 
+  fml = war_prio ~ GPCP_g + GPCP_g_l
   + year:ccode
   | ccode,
   data = rainconflict,
   vcov = ~ ccode
-) %>% 
+) %>%
   print(n = 2)
 ```
 
-```{r}
+```{webr}
 rf_res <- tibble(
-  
+
   x = residuals(
     feols(
       fml = GPCP_g_l ~ GPCP_g
@@ -1502,7 +1612,7 @@ rf_res <- tibble(
       data = rainconflict
     )
   ),
-  
+
   y = residuals(
     feols(
       fml = any_prio ~ GPCP_g
@@ -1511,145 +1621,209 @@ rf_res <- tibble(
       data = rainconflict
     )
   )
-  
+
 )
 ```
 
-```{r}
+```{webr}
 ggplot(
-  data = rf_res , 
+  data = rf_res ,
   mapping = aes(x = x, y = y)) +
   geom_point(pch = 19) +
   geom_smooth(method = "loess") +
   coord_cartesian(
-    xlim = c(-.4, .4), 
+    xlim = c(-.4, .4),
     ylim = c(-.2, .4)
   ) +
   theme_cowplot()
 ```
 
-```{r}
-
+```{webr}
 # (1)
 mod_conf_probit <- feglm(
   fml = any_prio ~
-    gdp_g + 
+    gdp_g +
     gdp_g_l
   + gdp_1979
-  + polity2l 
-  + ethfrac 
-  + relfrac 
-  + oil 
-  + lmtnest 
-  + lpopl1 
+  + polity2l
+  + ethfrac
+  + relfrac
+  + oil
+  + lmtnest
+  + lpopl1
   + year,
   data = rainconflict,
-  vcov = ~ ccode, 
+  vcov = ~ ccode,
   family = binomial(link = "probit")
-) 
+)
 
+#library(marginaleffects)
+
+#mod_conf_probit_avge <- mod_conf_probit %>%
+#  avg_slopes()
+```
+
+```{r, echo=F}
+library(readr)
+library(dplyr)
+library(fixest)
+
+
+# Datensatz 'rainconflict' einlesen
+rainconflict <- read_csv2(
+  file = "datasets/rainconflict.csv"
+)
+# ccode zu Typ 'factor' transformieren
+rainconflict <- rainconflict %>%
+  mutate(
+    ccode = as.factor(ccode)
+  )
+mod_conf_probit <- feglm(
+  fml = any_prio ~
+    gdp_g +
+    gdp_g_l
+  + gdp_1979
+  + polity2l
+  + ethfrac
+  + relfrac
+  + oil
+  + lmtnest
+  + lpopl1
+  + year,
+  data = rainconflict,
+  vcov = ~ ccode,
+  family = binomial(link = "probit")
+)
+```
+
+Mit dem Paket `marginaleffects` können wir durchschnittliche marginale Einflüsse von Regressoren in einem nicht-linearen Modell (hier ein Probit-Modell) berechnen. Für ein Probit-Modell lässt sich der marginale Effekt eines Regressors $X_j$ auf die Wahrscheinlichkeit, dass das Ereignis eintritt, wie folgt darstellen:
+
+Die Wahrscheinlichkeitsfunktion des Probit-Modells ist definiert als
+\begin{align*}
+  P(Y = 1 | \boldsymbol{x}) = \Phi(\boldsymbol{x}'\boldsymbol\beta),
+\end{align*}
+wobei $\Phi$ die kumulative Verteilungsfunktion der Standardnormalverteilung ist, $\boldsymbol{x}$ der Vektor der Regressoren und $\boldsymbol{\beta}$ der Vektor der Koeffizienten.
+
+Der marginale Effekt für den Regressor $j$ ist dann die Ableitung von $P(Y = 1 | \boldsymbol{x})$ bezüglich $x_j$,
+\begin{align*}
+  \frac{\partial P(Y = 1 | \boldsymbol{x})}{\partial x_j} = \phi(\boldsymbol{x}'\boldsymbol{\beta}) \cdot \beta_j,
+\end{align*}
+siehe auch @sec-probitreg. Hierbei ist $\phi(\cdot)$ die Dichtefunktion der Standardnormalverteilung und $\beta_j$ der Koeffizient des Regressors $x_j$.
+
+Die Funktion `marginaleffects::avg_slopes()` berechnet diesen Effekt anhand der geschätzten Koeffizienten $\widehat{\boldsymbol{\beta}}$ für jede Beobachtung $i=1,\dots,N$ und bestimmt den durchschnittlichen Effekt als das arithmetische Mittel über alle marginalen Effekte:
+\begin{align*}
+  \textup{Average Marginal Effect}(j) = \frac{1}{N} \sum_{i=1}^{N} \phi(\boldsymbol{x}_i' \widehat{\boldsymbol{\beta}}) \cdot \widehat\beta_j,
+\end{align*}
+
+wobei $N$ die Anzahl der Beobachtungen ist und $\boldsymbol{x}_i$ den Wert von $\boldsymbol{x}$ für die $i$-te Beobachtung darstellt.
+
+```{r}
+# Marginale Effekte berechnen
 library(marginaleffects)
 
-mod_conf_probit_avge <- mod_conf_probit %>% 
-  avg_slopes() 
+avg_slopes(mod_conf_probit)
+```
 
+```{webr}
 # (2)
 (
 mod_conf_ols <- feols(
   fml = any_prio ~
-    gdp_g + 
+    gdp_g +
     gdp_g_l
   + gdp_1979
-  + polity2l 
-  + ethfrac 
-  + relfrac 
-  + oil 
-  + lmtnest 
-  + lpopl1 
+  + polity2l
+  + ethfrac
+  + relfrac
+  + oil
+  + lmtnest
+  + lpopl1
   + year,
   data = rainconflict,
   vcov = ~ ccode
-) 
 )
-  
+)
+
 # (3)
 feols(
   fml = any_prio ~ -1
-  +  gdp_g + 
+  +  gdp_g +
     gdp_g_l
   + gdp_1979
-  + polity2l 
-  + ethfrac 
-  + relfrac 
-  + oil 
-  + lmtnest 
-  + lpopl1 
+  + polity2l
+  + ethfrac
+  + relfrac
+  + oil
+  + lmtnest
+  + lpopl1
   + i(ccode, year),
   data = rainconflict,
   vcov = ~ ccode
-) %>% 
+) %>%
   summary(n = 10)
 
 # (4)
 feols(
   fml = any_prio ~ -1
-  +  gdp_g 
+  +  gdp_g
   +  gdp_g_l
   + i(ccode, year)
   | ccode,
   data = rainconflict,
   vcov = ~ ccode
-) %>% 
+) %>%
   summary(n = 10)
+```
 
-
+```{webr}
 #### IV models ####
 
 # (5)
 feols(
   fml = any_prio ~
   + gdp_1979
-  + polity2l 
-  + ethfrac 
-  + relfrac 
-  + oil 
-  + lmtnest 
-  + lpopl1 
+  + polity2l
+  + ethfrac
+  + relfrac
+  + oil
+  + lmtnest
+  + lpopl1
   + i(ccode, year)
-  | gdp_g + gdp_g_l ~ GPCP_g + GPCP_g_l, 
+  | gdp_g + gdp_g_l ~ GPCP_g + GPCP_g_l,
   data = rainconflict,
   vcov = ~ ccode
-) %>% 
+) %>%
   summary(n = 10)
 
 # (6)
 feols(
-  fml = any_prio ~ 
+  fml = any_prio ~
   + i(ccode, year)
   | ccode
-  | gdp_g + gdp_g_l ~ GPCP_g + GPCP_g_l, 
+  | gdp_g + gdp_g_l ~ GPCP_g + GPCP_g_l,
   data = rainconflict,
   vcov = ~ ccode
-) %>% 
+) %>%
   summary(n = 10)
 
 # (7)
 feols(
-  fml = war_prio ~ 
+  fml = war_prio ~
     + i(ccode, year)
   | ccode
-  | gdp_g + gdp_g_l ~ GPCP_g + GPCP_g_l, 
+  | gdp_g + gdp_g_l ~ GPCP_g + GPCP_g_l,
   data = rainconflict,
   vcov = ~ ccode
-) %>% 
+) %>%
   summary(n = 10)
+```
 
-library(modelsummary)
-
+```{webr}
 modelsummary(
   models = list(
-    mod_conf_probit_avge, 
     mod_conf_ols
-    )
-  )
+    ),
+  output = "gt"
+  ) %>%
+  tabopts()
 ```

@@ -74,7 +74,7 @@ options(pillar.bold = TRUE, pillar.subtle = FALSE)
 
 Das Ziel dieses Kapitels ist es, ein Verständnis der Vor- und Nachteile von Panel-Daten-Modellen für die Schätzung kausaler Effekte mit R zu vermitteln. Durch die zusätzliche zeitliche Dimension $T > 1$ in Panel-Daten eröffnen sich erweiterte Möglichkeiten der Identifikation und Modellierung: Die Verfügbarkeit mehrerer Beobachtungen pro Beobachtungseinheit über die Zeit ermöglicht es, für *unbeobachtbare* Heterogenitäten zu korrigieren. So kann die Schätzung kausaler Effekte unter weniger restriktiven Annahmen erfolgen als bei Querschnittsdaten ($T = 1$), wo wir annehmen, dass Kontrollieren für eine Menge beobachtbarer Kovariablen ausreichend ist, um Confounding zu vermeiden.
 
-Darüber hinaus ermöglichen Panel-Ansätze oft eine präzisere statistische Inferenz im Vergleich zu Verfahren für Querschnittsdaten, da die zusätzliche Information in der Zeitdimension die Varianz der Schätzung verringert. Verschiedene Identifikationsstrategien wie Differenz-in-Differenzen (@sec-did) oder Instrumentvariablenansätze (@sec-IV), machen sich diese zusätzliche Informationen zunutze.
+Darüber hinaus ermöglichen Panel-Ansätze oft eine präzisere statistische Inferenz im Vergleich zu Verfahren für Querschnittsdaten, da die zusätzliche Information in der Zeitdimension die Varianz der Schätzung verringert. Verschiedene Identifikationsstrategien wie Differenz-in-Differenzen (@sec-did) oder Regressionsansätze mit Instrumentvariablen (@sec-IV), machen sich diese zusätzliche Informationen zunutze.
 
 ## Pooled Regression und unbeobachtbare Heterogenität {#sec-panel-uh}
 

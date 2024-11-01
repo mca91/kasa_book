@@ -1,9 +1,12 @@
 
+library(haven)
+library(dplyr)
+
 ##### Acemoglu paper #####
 
 # https://economics.mit.edu/people/faculty/daron-acemoglu/data-archive
 
-ADD_dat <- read_stata("~/Downloads/Supplementary/Datafortheweb/ADD_Mafia_district.dta")
+# ADD_dat <- read_stata("~/Downloads/Supplementary/Datafortheweb/ADD_Mafia_district.dta")
 
 # this one
 ADD_dat <- read_stata("~/Downloads/Supplementary/Datafortheweb/ADD_Mafia_municipality.dta")
@@ -40,7 +43,10 @@ ADD_dat <- ADD_dat %>%
   provincia1853
 )
 
-haven::write_dta(ADD_dat, path = "~/git_projects/kausalanalyse_book/datasets/ADD_Mafia_municipality.dta")
+readr::write_csv(ADD_dat, file = "~/git_projects/kausalanalyse_book/datasets/ADD_Mafia_municipality.csv")
+
+
+# haven::write_dta(ADD_dat, path = "~/git_projects/kausalanalyse_book/datasets/ADD_Mafia_municipality.dta")
 
 ADD_dat <- ADD_dat %>%
   filter(
