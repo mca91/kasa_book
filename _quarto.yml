@@ -7,7 +7,7 @@ project:
   output-dir: "docs"
 
 book:
-  announcement: 
+  announcement:
     icon: info-circle
     dismissable: true
     content: "**Alert** - this is some information that you should pay attention to"
@@ -83,6 +83,9 @@ format:
       file: 'mathjax.html' 
     code-tools: true
     css: custom_styles.css
+    cell-options:
+      completion: true
+      timelimit: 60
 
   pdf:
     pdf-engine: pdflatex

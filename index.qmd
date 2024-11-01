@@ -32,9 +32,9 @@ Dieses Online-Kompendium, *Kausalanalyse und Maschinelles Lernen mit R* (KMLR), 
 
 Als [offene Bildungsressource](https://github.com/mca91/kasa_book) (open educational ressource, OER) ermöglichen wir Dozierenden, ihre bestehenden Lehrveranstaltungen durch den Einsatz von KLMR um relevante Themen zu erweitern und ihren Studierenden eine innovative und praxisnahe Lernerfahrung zu bieten.
 
-## Inhalt
+## Aufbau des Kompendiums
 
-Dieses Lehrbuch ist in drei zentrale Abschnitte gegliedert: *Grundlagen*, *Kausale Inferenz* und *Machine Learning*.
+Dieses Lehrbuch ist in drei Abschnitte gegliedert: *Grundlagen*, *Kausale Inferenz* und *Machine Learning*.
 
 **Grundlagen (Kapitel 2–5)**
 
@@ -89,6 +89,7 @@ Der nachfolgende WebR-Chunk macht die Definition von `dat` und die Berechnung de
 
 ```{webr}
 #| autorun: false
+#| completion: true
 library(tibble)
 
 # Beispiel-Datensatz erzeugen  
@@ -140,7 +141,7 @@ Um die Qualität und Aktualität dieser Ressource zu verbessern, sind wir auf Hi
 
 KLMR und die verlinkten Lehrmaterialien sind im Rahmen des von der [*Stiftung Innovation in der Hochschullehre*](https://stiftung-hochschullehre.de) geförderten Projekts *Kausalanalyse, Maschinelles Lernen und Reproduzierbare Forschung* im Förderprogramm [*Freiraum 2022*](https://stiftung-hochschullehre.de/foerderung/freiraum/) entstanden. Wir bedanken uns herzlich für die finanzielle Unterstützung.
 
-Wir möchten Ilona Braun herzlich für ihre wertvolle Unterstützung in der Projektadministration danken. Jens Klenke und Lennard Maßmann gilt unser Dank für ihre inspirierenden Anregungen sowie ihre Mithilfe bei der Erprobung und Evaluation der Materialien im Lehrbetrieb. Ein großes Dankeschön auch an unsere wissenschaftlichen Hilfskräfte für ihre Unterstützung bei der Überarbeitung der Materialien. Besonders dankbar sind wir unseren Studierenden für ihr wertvolles Feedback.
+Wir danken Ilona Braun herzlich für ihre wertvolle Unterstützung in der Projektadministration. Jens Klenke und Lennard Maßmann gilt unser Dank für ihre inspirierenden Anregungen sowie ihre Mithilfe bei der Erprobung und Evaluation der Materialien im Lehrbetrieb. Ein großes Dankeschön geht auch an unsere wissenschaftlichen Hilfskräfte für ihre Unterstützung bei der Überarbeitung der Materialien. Besonders dankbar sind wir unseren Studierenden für ihr wertvolles Feedback.
 
 ::: {style="font-size: 0.9em; text-align: center; margin-top: 20px;"}
 &copy; `r Sys.Date() |> format("%Y")` Dieses Werk ist lizenziert unter der 
