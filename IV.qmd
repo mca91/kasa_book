@@ -122,7 +122,7 @@ Wie in Kapitel @sec-regression erläutert, können Regressionsmodelle unter Endo
 
 Durch Hinzufügen potenziell relevanter Variablen in die Regression kann das Risiko einer verzerrten Schätzung des interessierenden kausalen Effekts anhand multipler Regression verringert werden. Wenn jedoch wichtige ausgelassene Variablen unbeobachtbar (U) sind oder aus anderen Gründen nicht zur Verfügung stehen, kann multiple Regression die Endogenität nicht beheben. Diese Problematik ergibt sich insbesondere bei simultaner Kausalität: Wenn die Kausalität von der Behandlungsvariable (B) zur Outcomevariable (Y) und umgekehrt verläuft, gibt es Backdoors, die nicht durch das Hinzufügen von Kontrollvariablen zum Regressionsmodell geschlossen werden können.
 
-Eine allgemeinere Technik, um Backdoors aufgrund unbeobachtbarer Variablen zu schließen, ist die Regression mit Instrumentvariablen (IV). Bei IV-Regression wird exogene Variation in einer Instrumentvariablen (Z) verwendet, um den Teil der Variation in der Behandlungsvariable zu isolieren, der *nicht* durch unbeobachtbare Faktoren verursacht wird, die sowohl B als auch Y beeinflussion. Der kausale Effekt von B auf Y wird dann anhand dieser exogene Variation in B geschätzt. Ein Forschungsdesign, in dem der kausale Effekt von B auf Y mit IV-Regression geschätzt werden kann, ist in @fig-IVDAG1 dargestellt.
+Eine allgemeinere Technik, um Backdoors aufgrund unbeobachtbarer Variablen zu schließen, ist die Regression mit Instrumentvariablen (IV). Bei IV-Regression wird exogene Variation in einer Instrumentvariablen (Z) verwendet, um den Teil der Variation in der Behandlungsvariable zu isolieren, der *nicht* durch unbeobachtbare Faktoren verursacht wird, die sowohl B als auch Y beeinflussen. Der kausale Effekt von B auf Y wird dann anhand dieser exogene Variation in B geschätzt. Ein Forschungsdesign, in dem der kausale Effekt von B auf Y mit IV-Regression geschätzt werden kann, ist in @fig-IVDAG1 dargestellt.
 
 
 ```{dot}
@@ -226,7 +226,7 @@ bei Gültigkeit der IV-Annahmen \eqref{eq:ivassum1} und \eqref{eq:ivassum2}, d.h
 
 Beachte, dass die Annahme der Relevanz des Instruments für die Herleitung des Identifikationsprinzips und des Schätzers \eqref{eq:simpleivest} von entscheidender Bedeutung ist: Sind $Z$ und $B$ unkorreliert, so ist $\text{Cov}(B,Z) = 0$ und $\beta_1$ damit nicht identifizierbar. Weiterhin würde $\widehat{\text{Cov}}(B,Z)\to0$ wenn $n\to\infty$, sodass $\widehat{\beta}_{\textup{IV}}\to\infty$! 
 
-In empirischen Anwendungen ist $\text{Cov}(B,Z) = 0$ unwahrscheinlich. Die Kovarianz von $B$ und $Z$ kann jedoch gering sein. In diesem Fall bezeichnet man $Z$ als ein *schwaches Instrument*. Anhand von Gleichung \eqref{eq:simpleivest} können wir die Konsequenzen der Verwendung eines schachen Instruments ableiten: Ein sehr schwacher linearer Zusammenhang von $B$ und $Z$ --- und damit tendenziell $\widehat{\text{Cov}}(B,Z) \approx 0$ --- kann trotz Relevanz von $Z$ zu einem Schätzer mit großer Varianz führen.
+In empirischen Anwendungen ist $\text{Cov}(B,Z) = 0$ unwahrscheinlich. Die Kovarianz von $B$ und $Z$ kann jedoch gering sein. In diesem Fall bezeichnet man $Z$ als ein *schwaches Instrument*. Anhand von Gleichung \eqref{eq:simpleivest} können wir die Konsequenzen der Verwendung eines schwachen Instruments ableiten: Ein sehr schwacher linearer Zusammenhang von $B$ und $Z$ --- und damit tendenziell $\widehat{\text{Cov}}(B,Z) \approx 0$ --- kann trotz Relevanz von $Z$ zu einem Schätzer mit großer Varianz führen.
 
 Die Relevanz eines Instruments kann mit einem Hypothesentests geprüft werden. Wie die "Stärke" eines Instruments beurteilt werden sollte, ist eine nicht-triviale Frage. Wir betrachten diesen Aspekt näher in @sec-2SLS.
 
@@ -390,7 +390,7 @@ Die Grafik illustriert das Verhalten des IV-Schätzers (lila Grade) im Vergleich
   src="https://observablehq.com/embed/@mca91/ivreg?cells=webrinfo%2Cviewof+weak%2Cviewof+exogeneous%2Cviewof+beta1zero%2Cviewof+beta%2Cviewof+gamma%2Cviewof+cor%2Cviewof+showX_hat%2Cviewof+regtype%2Cchart%2Cloaded">
 </iframe>
 
-Anhand der obigen interaktiven Grafik lässt sich zwar die Verzerrung der Schätzer einschätzen, jedoch nicht die Unsicherheit der Schätzung. Um die gesamte Verteilung der Schätzer in endlichen Stichproben zu illustrieren, zeigt die nachstehende Grafik Kerndichteschätzungen basierend auf $N$ simulierte Stichproben der Größe $n$ für den gewählten DGP.^[Beachte, dass die Simulation insbesondere für große $N$ und $n$ einige Sekunden dauern kann (grauer Balken am linken Rand zeigt laufende Berechnung an).] Die Applikation gibt weiterhin den R-Code für eine Simulation der Daten gemäß der gewählten Parameter aus.
+Anhand der obigen interaktiven Grafik lässt sich zwar die Verzerrung der Schätzer einschätzen, jedoch nicht die Unsicherheit der Schätzung. Um die Verteilung der Schätzer in endlichen Stichproben zu illustrieren, zeigt die nachstehende Grafik Kerndichteschätzungen basierend auf $N$ simulierte Stichproben der Größe $n$ für den gewählten DGP.^[Beachte, dass die Simulation insbesondere für große $N$ und $n$ einige Sekunden dauern kann (grauer Balken am linken Rand zeigt laufende Berechnung an).] Die Applikation gibt weiterhin den R-Code für eine Simulation der Daten gemäß der gewählten Parameter aus.
 
 Die voreingestellten Parameter-Kombinationen zeigen:
 
@@ -503,18 +503,18 @@ summary(iv_mod_sim)
 
 ### Identifikationsstrategie
 
-Die Beziehung zwischen dem Aufkommen der Fasci und der Mafia-Aktivität im einfachen Regressionsmodell
+Die Beziehung zwischen dem Aufkommen der Fasci und der Mafiaaktivität im einfachen Regressionsmodell
 \begin{align}
-  \textup{Mafia-Aktivität} = \beta_0 + \beta_1 \textup{Fasci siciliani} + \varepsilon \label{eq:fascimafiamod1}
+  \textup{Mafiaaktivität} = \beta_0 + \beta_1 \textup{Fasci siciliani} + \varepsilon \label{eq:fascimafiamod1}
 \end{align}
 ist wahrscheinlich aufgrund mehrerer Faktoren endogen:
 
-1. **Externe Faktoren**, die sowohl die Entstehung der Fasci siciliani als auch der Mafia beeinflussen sind wahrscheinlich. Beispielsweise könnten wirtschaftliche Notlagen und politische Instabilität sowohl die Organisation der Bauern als auch die Etablierung der Mafia begünstigen.
+1. **Externe Faktoren**, die sowohl die Entstehung der Fasci siciliani als auch der Mafia beeinflussen, sind wahrscheinlich. Beispielsweise könnten wirtschaftliche Notlagen und politische Instabilität sowohl die Organisation der Bauern als auch die Etablierung der Mafia begünstigen.
 
-2. **Simultante Kasalität**: Die Präsenz der Fasci könnte die Mafia-Aktivitäten beeinflussen und umgekehrt: Intensive Mafia-Aktivitäten könnten die Notwendigkeit für Bauernorganisationen erhöhen, was wiederum die Mafia stärkt. Außerdem erschwert die zeitliche Nähe zwischen der Entstehung der Fasci und der Verbreitung der Mafia die Identifizierung der Kausalrichtung.
+2. **Simultante Kasalität**: Die Präsenz der Fasci könnte die Mafiaaktivitäten beeinflussen und umgekehrt: Intensive Mafiaaktivitäten könnten die Notwendigkeit für Bauernorganisationen erhöhen, was wiederum die Mafia stärkt. Außerdem erschwert die zeitliche Nähe zwischen der Entstehung der Fasci und der Verbreitung der Mafia die Identifizierung der Kausalrichtung.
 
 Wir können das Modell \eqref{eq:fascimafiamod1} um (messbare) unter 1. fallende Regressoren erweitern, um einer verzerrten Schätzung aufgrund relevanter ausgelassener Variablen vorzubeugen. Eine Verzerrung aufgrund der in 2. beschriebenen simultanen Kausalität kann jedoch *nicht* durch multiple Regression vermieden werden. 
-@Acemogluetal2020 nutzen die folgende Identifikationsstrategie: Eine extreme Dürre im Jahr 1893 (insbesondere Regenausfall im Frühling) hatte einen erheblichen negativen Einfluss auf die landwirtschaftliche Produktion in Sizilien und verursachte große Not unter den Bauern, was die Entstehung der Fasci beförderte. Die Dürre kann als natürliches Experiment betrachtet werden, wobei durch die Variation in der Niederschlagsmenge (das Instrument) die Variation im Aufkommen von Fasci-Organisationen in verschiedenen Gemeinden, die unabhängig von der späteren Mafia-Aktivität ist, isoliert werden kann. Anhand dieser exogenen Variation im Organisationsgrad der Bauern kann der (lokale) kausale Effekt auf die Entwicklung der Mafia identifiziert werden.
+@Acemogluetal2020 nutzen die folgende Identifikationsstrategie: Eine extreme Dürre im Jahr 1893 (insbesondere Regenausfall im Frühling) hatte einen erheblichen negativen Einfluss auf die landwirtschaftliche Produktion in Sizilien und verursachte große Not unter den Bauern, was die Entstehung der Fasci beförderte. Die Dürre kann als natürliches Experiment betrachtet werden, wobei durch die Variation in der Niederschlagsmenge (das Instrument) die Variation im Aufkommen von Fasci-Organisationen in verschiedenen Gemeinden, die unabhängig von der späteren Mafiaaktivität ist, isoliert werden kann. Anhand dieser exogenen Variation im Organisationsgrad der Bauern kann der (lokale) kausale Effekt auf die Entwicklung der Mafia identifiziert werden.
 
 ```{dot}
 //| fig-width: 5
@@ -608,7 +608,7 @@ tibble(
   tabopts()
 ```
 
-Vor der Analyse filtern wir die Daten entsprechend der Vorgehensweise in @Acemogluetal2020: Es werden lediglich Gemeinden berücksichtigt, die in maximal 30km Entfernung zu einer Wetter-Station liegen (`!is.na(sp3m1893_n30)`) *und* für die eine Messung der Mafia-Aktivität gegen Ende des 19. Jahrhunderts (gemessen auf einer Skala von 0 bis 4, vgl. @Cutrera1900) vorliegt (`!is.na(Mafia1900)`).
+Vor der Analyse filtern wir die Daten entsprechend der Vorgehensweise in @Acemogluetal2020: Es werden lediglich Gemeinden berücksichtigt, die in maximal 30km Entfernung zu einer Wetter-Station liegen (`!is.na(sp3m1893_n30)`) *und* für die eine Messung der Mafiaaktivität gegen Ende des 19. Jahrhunderts (gemessen auf einer Skala von 0 bis 4, vgl. @Cutrera1900) vorliegt (`!is.na(Mafia1900)`).
 
 ```{webr}
 # Datensatz filtern
@@ -1258,7 +1258,7 @@ modelsummary(
   tabopts()
 ```
 
-Die Ergebnisse für die IV-Schätzung des kausalen Effekts von Bauernorganisationen auf die Präsenz der Mafia zu Beginn des 20. Jahrhundert sind in der obigen Tabelle dargestellt. Die LATE-Schätzung in Spalte 4 von Panel B hat folgende Interpretation: Die Präsenz der Fasci in einer Gemeinde erhöht die Intensität der Mafia-Aktivität um etwa 1.56 Punkte.^[Nach @Cutrera1900 entspricht eine Erhöhung des Mafia-Index von 1 auf 2 einem Sprung von einer geringen Präsenz der Mafia zu einer signifikanten Präsenz.] 
+Die Ergebnisse für die IV-Schätzung des kausalen Effekts von Bauernorganisationen auf die Präsenz der Mafia zu Beginn des 20. Jahrhundert sind in der obigen Tabelle dargestellt. Die LATE-Schätzung in Spalte 4 von Panel B hat folgende Interpretation: Die Präsenz der Fasci in einer Gemeinde erhöht die Intensität der Mafiaaktivität um etwa 1.56 Punkte.^[Nach @Cutrera1900 entspricht eine Erhöhung des Mafia-Index von 1 auf 2 einem Sprung von einer geringen Präsenz der Mafia zu einer signifikanten Präsenz.] 
 
 Wie ist dieser Effekt einzuordnen? Wir berechnen zunächst die *Anzahl* an Gemeinden, in denen es im Jahr 1900 Fasci gibt.
 
