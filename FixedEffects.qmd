@@ -72,7 +72,7 @@ library(dplyr)
 options(pillar.bold = TRUE, pillar.subtle = FALSE)
 ```
 
-Das Ziel dieses Kapitels ist es, ein Verständnis der Vor- und Nachteile von Panel-Daten-Modellen für die Schätzung kausaler Effekte mit R zu vermitteln. Durch die zusätzliche zeitliche Dimension $T > 1$ in Panel-Daten eröffnen sich erweiterte Möglichkeiten der Identifikation und Modellierung: Die Verfügbarkeit mehrerer Beobachtungen pro Beobachtungseinheit über die Zeit ermöglicht es, für *unbeobachtbare* Heterogenitäten zu korrigieren. So kann die Schätzung kausaler Effekte unter weniger restriktiven Annahmen erfolgen als bei Querschnittsdaten ($T = 1$), wo wir annehmen, dass Kontrollieren für eine Menge beobachtbarer Kovariablen ausreichend ist, um Confounding zu vermeiden.
+Das Ziel dieses Kapitels ist es, ein Verständnis der Vor- und Nachteile von Panel-Daten-Modellen für die Schätzung kausaler Effekte mit R zu vermitteln. Durch die zusätzliche zeitliche Dimension $T > 1$ in Panel-Daten eröffnen sich erweiterte Möglichkeiten der Identifikation und Modellierung: Die Verfügbarkeit mehrerer Beobachtungen pro Beobachtungseinheit über die Zeit ermöglicht es, für *unbeobachtbare* Heterogenitäten zu korrigieren. So kann die Schätzung kausaler Effekte unter weniger restriktiven Annahmen erfolgen als bei Querschnittsdaten ($T = 1$), wo wir annehmen, dass Kontrollieren für eine Menge beobachtbarer Kontrollvariablen ausreichend ist, um Confounding zu vermeiden.
 
 Darüber hinaus ermöglichen Panel-Ansätze oft eine präzisere statistische Inferenz im Vergleich zu Verfahren für Querschnittsdaten, da die zusätzliche Information in der Zeitdimension die Varianz der Schätzung verringert. Verschiedene Identifikationsstrategien wie Differenz-in-Differenzen (@sec-did) oder Regressionsansätze mit Instrumentvariablen (@sec-IV), machen sich diese zusätzliche Informationen zunutze.
 
@@ -285,7 +285,7 @@ ggplot(
 
 Die obige Grafik zeigt einen negativen Verlauf des Zusammenhangs zwischen X und Y anhand der Variation der Beobachtungen *innerhalb* der farblich gekennzeichneten Gruppen. Dieser negative Zusammenhang kann aufgrund der Endogenität von $X$ nicht erfasst werden.
 
-Eine Erweiturung der Regression auf sämtliche Perioden (Pooling aller $n\times T = 12 \times 8 = 96$ Beobachtungen) erhöht lediglich die Präzision der Schätzung (geringerer Standardfehler von $\widehat{\beta}_1$), nicht aber die Endogenität.
+Eine Erweiterung der Regression auf sämtliche Perioden (Pooling aller $n\times T = 12 \times 8 = 96$ Beobachtungen) erhöht lediglich die Präzision der Schätzung (geringerer Standardfehler von $\widehat{\beta}_1$), nicht aber die Endogenität.
 
 ```{webr}
 # Naive KQ-Schätzung für t = 1,...,8
@@ -454,7 +454,7 @@ Wir betrachten erneut Modell \eqref{eq:unobshetmodel} und definieren \begin{alig
   \alpha_i = \beta_0 + \beta_3 U_i.
 \end{align*} Nach einsetzen in \eqref{eq:unobshetmodel} erhalten wir das Modell \begin{align}
   Y_{it} = \alpha_i + \beta_1 B_{it} + \beta_2 X_i + \epsilon_{it} \label{eq:femodel},
-\end{align} mit einheiten-spezifischen **Konstanten** ("feste Effekte") $\alpha_i$ für $i=1,\dots,n$, die als individuelle Achsenabschnitte nterpretieren werden können. Das Modell \eqref{eq:femodel} wird daher auch als *Fixed-Effects-Modell* bezeichnet.[^fixedeffects-9]
+\end{align} mit einheiten-spezifischen **Konstanten** ("fixe Effekte") $\alpha_i$ für $i=1,\dots,n$, die als individuelle Achsenabschnitte interpretieren werden können. Das Modell \eqref{eq:femodel} wird daher auch als *Fixed-Effects-Modell* bezeichnet.[^fixedeffects-9]
 
 [^fixedeffects-9]: Beachte, dass eine bessere Anpassung an die Daten bei der Modellierung von `paneldata.csv` mit einheiten-spezifischen Achsenabschnitten anhand der Grafik für die gepoolte Regression plausibel scheint.
 
@@ -1010,7 +1010,7 @@ Eine ähnliche Problematik besteht bei der Schätzung dynamischer Panel-Modelle 
 
 ### Verzerrung in dynamischen Modellen {#sec-vidp}
 
-Ein zentrales Problem bei der Schätzung dynamischer Panelmodelle ist der sogenannte *Nickell-Bias*. Dieser tritt auf, wenn die Within-Transformation in Anwesenheit von gelagten abhängigen Variablen verwendet wird. Die Mittelwert-Differenzen eliminieren zwar die zeit-invarianten Effekte, führt aber zu Korrelation zwischen den gelagten abhängigen Variablen und den transformierten Fehlertermen: Der Nickell-Bias entsteht bei der Within-Transformation, weil der Regressor ($Y_{i,t-1} - \overline{Y}_{i,-1}$)[^fixedeffects-21] mit dem transformierten Fehlerterm ($\epsilon_{it} - \overline{\epsilon}_i$) korreliert ist, was zu einer verzerrten Schätzung führt.
+Ein zentrales Problem bei der Schätzung dynamischer Panelmodelle ist der sogenannte *Nickell-Bias*. Dieser tritt auf, wenn die Within-Transformation in Anwesenheit von gelagten abhängigen Variablen verwendet wird. Die Mittelwert-Differenzen eliminieren zwar die zeit-invarianten Effekte, führt aber zu Korrelation zwischen den gelagten abhängigen Variablen und den transformierten Fehlertermen: Der Nickell-Bias tritt bei der Within-Transformation auf, weil der Regressor ($Y_{i,t-1} - \overline{Y}_{i,-1}$)[^fixedeffects-21] mit dem transformierten Fehlerterm ($\epsilon_{it} - \overline{\epsilon}_i$) korreliert ist, was zu einer verzerrten Schätzung führt.
 
 [^fixedeffects-21]: Hier ist $\overline{Y}_{i,-1} = \frac{1}{T-1}\sum_{t=2}^T y_{it-1}$.
 
@@ -1028,7 +1028,7 @@ Analog zu Anwendungen mit Querschnittsdaten können die hier betrachteten Panel-
 
 ## Case Study: Einkommen und Demokratie
 
-Eine Vielzahl polit-ökonomischer Standardwerke und Studien [bspw. @Dahl1971; @Huntington1991; @Rueschemeyer1992] liefert vermeindliche Belege für einen zentralen Grundsatz der [Modernisierungstheorie](https://de.wikipedia.org/wiki/Modernisierungstheorie): Ein höheres Pro-Kopf-Einkommen erhöht die Nachfrage der Bevölkerung nach politischer Freiheit und demokratischen Insitutionen. @Acemogluetal2008 argumentieren, dass der in derartigen länderübergreifenden Analysen mit Pooling häufig als positiv geschätzte Zusammenhang zwischen Einkommen und Demokratisierung nicht kausal interpetiert werden sollte. Ein Grund hierfür ist, dass (unbeobachtbare) ausgelassene länder-spezifische Faktoren, die sowohl die ökonomische Entwicklung als auch die Stärke demokratischer Institutionen beeinflussen, wahrscheinlich sind. Um diese mögliche Ursache für Endogenität des Einkommens im Modell \begin{align}
+Eine Vielzahl polit-ökonomischer Standardwerke und Studien [bspw. @Dahl1971; @Huntington1991; @Rueschemeyer1992] liefert vermeintliche Belege für einen zentralen Grundsatz der [Modernisierungstheorie](https://de.wikipedia.org/wiki/Modernisierungstheorie): Ein höheres Pro-Kopf-Einkommen erhöht die Nachfrage der Bevölkerung nach politischer Freiheit und demokratischen Insitutionen. @Acemogluetal2008 argumentieren, dass der in derartigen länderübergreifenden Analysen mit Pooling häufig als positiv geschätzte Zusammenhang zwischen Einkommen und Demokratisierung nicht kausal interpetiert werden sollte. Ein Grund hierfür ist, dass (unbeobachtbare) ausgelassene länder-spezifische Faktoren, die sowohl die ökonomische Entwicklung als auch die Stärke demokratischer Institutionen beeinflussen, wahrscheinlich sind. Um diese mögliche Ursache für Endogenität des Einkommens im Modell \begin{align}
   \text{Demokratisierung}_{it} = \beta_0 + \beta_1\,\text{PK-Einkommen}_{it-1} + \epsilon_{it}
 \end{align} zu adressieren, nutzen @Acemogluetal2008 Panel-Modelle und Schätzer, die insbesondere für länderspezifische zeit-invariante Einflüsse kontrollieren.
 
