@@ -83,9 +83,12 @@ format:
       file: 'mathjax.html' 
     code-tools: true
     css: custom_styles.css
-    cell-options:
-      completion: true
-      timelimit: 60
+    webr:
+      cell-options:
+        warning: false
+        message: false
+        completion: true
+        timelimit: 60
 
   pdf:
     pdf-engine: pdflatex
