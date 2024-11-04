@@ -1206,7 +1206,7 @@ set.seed(1234)
   b_IPW <- boot(
     data = darkmode,
     statistic = IPW_boot, 
-    R = 999
+    R = 199
   )
 )
 ```
@@ -1217,7 +1217,7 @@ mean(b_IPW$t)
 sd(b_IPW$t)
 ```
 
-In diesem Fall ist der Bootstrap-Standardfehler von ca. XXX gut mit dem anhand von `summary(model_ipw)` berechneten Standardfehler vergleichbar. Ein 95\%-Konfidenzintervall für den ATE erhalten wir wie zuvor mit `boot.ci()`.
+In diesem Fall ist der Bootstrap-Standardfehler gut mit dem anhand von `summary(model_ipw)` berechneten Standardfehler vergleichbar. Ein 95\%-Konfidenzintervall für den ATE erhalten wir wie zuvor mit `boot.ci()`.
 
 ```{webr}
 # 95% Bootstrap-KI für den ATE
