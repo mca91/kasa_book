@@ -237,7 +237,7 @@ ggplot(dat) +
     y = "Ridge-Schätzer von beta_1",
     title = "Shrinkage des OLS-Schätzers bei Ridge Regression"
   ) +
-  cowplot()
+  theme_cowplot()
 ```
 
 Die obige Grafik zeigt, dass der Ridge-Schätzer eine lineare Transformation des KQ-Schätzers (gestrichelte Linie) ist. Größere Werte des Regularisierungsparameters $\lambda$ führen zu stärkerer Shrinkage des Koeffizientenschätzers in Richtung 0. Die $\ell_2$-Norm führt zu proportional zum Absolutwert des KQ-Schätzers verlaufender Shrinkage: Größere Koeffizienten werden stärker bestraft als kleine Koeffizienten.
