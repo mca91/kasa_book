@@ -72,7 +72,7 @@ lsvm_data <- bind_rows(
 )
 ```
 
-Wir betrachten zunächst ein Klassifikationsproblem mit zwei Prädiktoren $X_1$, $X_2$ für die binäre Outcome-Variable $Y$. Die nächste Abbildung stellt diese Beobachtungen *im Prädiktorraum* graphisch dar. Mit `geom_function()` fügen wir dem Plot drei mögliche Trenneben hinzu, welche die Klassen perfekt seprarieren.
+Wir betrachten zunächst ein Klassifikationsproblem mit zwei Prädiktoren $X_1$, $X_2$ für die binäre Outcome-Variable $Y$. Die nächste Abbildung stellt diese Beobachtungen *im Prädiktorraum* graphisch dar. Mit `geom_function()` fügen wir dem Plot drei mögliche Trenneben hinzu, welche die Klassen perfekt separieren.
 
 ```{r}
 #| warning: false
@@ -151,7 +151,7 @@ Ein *Maximal Margin Classifier* (MMC) wählt die trennende Ebene wie folgt: Best
 
 wobei $M$, der *minimale Abstand aller Beobachtungen zur trennenden Ebene* -- die *Margin* -- maximiert wird.
 
-Beobachtungen, die exakt die Distanz $M$ zur Trennebene haben, sind die *Support-Vektoren* (SV). Beachte: Ausschließlich die SV definieren die angepasste Entschiedungsgrenze des MMC.
+Beobachtungen, die exakt die Distanz $M$ zur Trennebene haben, sind die *Support-Vektoren* (SV). Beachte: Ausschließlich die SV definieren die angepasste Entscheidungsgrenze des MMC.
 
 Wir trainieren nun einen MMC für `klasse` in `lsvm_data` mit `e1071::svm()`. Mit `kernel = "linear"` legen wir fest, dass eine lineare Entscheidungsgrenze im zwei-dimensionalen Raum von $(X_1,X_2)$ gefunden werden soll. Die Parameter `cost = 1e8` und `scale = F` erzwingen wir eine "harte" Margin (mehr dazu im Abschnitt zu SVMs unten) sowie keine Skalierung der Daten. Mit `coef()` lesen wir die trainierten Koeffizienten aus.
 
@@ -331,13 +331,13 @@ ggplot(
     theme(legend.position = "top")
 ```
 
-Eine Erweitung des MMC, die dieses Problem adressiert ist der *(Soft Margin) Support Vector Classifier*  (SVC). Der Ausreißer lässt bestimmte Fehlklassifizierungen zu, um eine bessere Balance zwischen Genauigkeit auf dem Trainingsdatensatz und Generalisierungsfähigkeit des Modells zu finden.
+Eine Erweiterung des MMC, die dieses Problem adressiert ist der *(Soft Margin) Support Vector Classifier*  (SVC). Der Ausreißer lässt bestimmte Fehlklassifizierungen zu, um eine bessere Balance zwischen Genauigkeit auf dem Trainingsdatensatz und Generalisierungsfähigkeit des Modells zu finden.
 
 ## Support Vector Classifier {#sec-scv}
 
 Ein MMC strebt eine strikte Trennung der Datenklassen durch eine Hyperebene mit einer "harten" Margin, deren Grenzen durch die Support-Vektoren definierten werden (*hard margin*). Ein SVC erlaubt eine "weiche" Margin (*soft margin*) die zu weniger Empfindlichkeit der ermittelten Enscheidungsgrenze gegenüber Rauschen und Ausreißern führt. Diese weiche Margin lässt zu, dass Beobachtungen innerhalb der Margin liegen und erlaubt auch Fehlklassifikationenen. Die *Support-Vektoren* des SVC sind sämtliche Beobachtungen, di im Bereich der Margin liegen.
 
-Wie beim MMC ist es das Ziel des SVC, die Parameter $\{\boldsymbol{w}, b\}$ so zu bestimmen, dass die Margin maximiert wird, jedoch dürfen einige Datenpunkte innerhalb der Margin oder sogar auf der *falschen Seite* der trennenden Hyperebene (Fehlerklassifizierung) liegen. Ein SVC kann so eine (nicht perfekt) trennende Hyperbene finden, wenn das Optimierungskalkühl des MMC aufgrund der Überlappung der Klassen unlösbar ist.
+Wie beim MMC ist es das Ziel des SVC, die Parameter $\{\boldsymbol{w}, b\}$ so zu bestimmen, dass die Margin maximiert wird, jedoch dürfen einige Datenpunkte innerhalb der Margin oder sogar auf der *falschen Seite* der trennenden Hyperebene (Fehlerklassifizierung) liegen. Ein SVC kann so eine (nicht perfekt) trennende Hyperbene finden, wenn das Optimierungskalkül des MMC aufgrund der Überlappung der Klassen unlösbar ist.
 
 Hierzu wird die Ebene unter Berücksichtigung einer weiteren Bedingung für die Optimierung ermittelt, die auf *Slack-Variablen* $\epsilon_i \geq 0$ basiert, 
 
@@ -397,7 +397,7 @@ ggplot(
 
 Ein MMC kann für den in @fig-mmcnonsep gezeigten Datensatz `lsvm_nonsep_data` keine Lösung finden: Der Algorithmus iteriert bis zu einer maximalen Anzahl an Durchläufen.
 
-Ein SVC hingegen kann angepasst werden: Mit `cost = 1` räumen wir ein  "Budget" für Verletzungen der Margin und Fehlklassifikationen ein.^[Der Parameter `cost` in `svm()` ist ein Langrange-Multiplikator und verhält sich daher invers zu $C$ in \eqref{eq:svcreg}: Große Werte für `cost` führen zu viel Regularisierung (kleine Margin) und umgekehrt.]
+Ein SVC hingegen kann angepasst werden: Mit `cost = 1` räumen wir ein  "Budget" für Verletzungen der Margin und Fehlklassifikationen ein.^[Der Parameter `cost` in `svm()` ist ein Lagrange-Multiplikator und verhält sich daher invers zu $C$ in \eqref{eq:svcreg}: Große Werte für `cost` führen zu viel Regularisierung (kleine Margin) und umgekehrt.]
 
 ```{r}
 # Trainiere ein SVC-Modell
@@ -482,7 +482,7 @@ model_svc %>%
 
 In empirischen Anwendungen gibt es selten exakt lineare Entscheidungsgrenzen. Wir präsentieren nun ein Beispiel für eine nicht-lineare Entscheidungsgrenze, bei der SVC dennoch eine hilfreiche Approximation der Entscheidungsgrenze liefern kann und diskutieren anschließend Support Vector Machines als Generalisierung von SVC zur Anpassung nicht-linearer Grenzen.
 
-Der Datensatz `data_wavy` enthält gleichverteilte Beobachtungen $(X_1, X_2)$ die gemäß der sinuidalen Entscheidungsgrenze
+Der Datensatz `data_wavy` enthält gleichverteilte Beobachtungen $(X_1, X_2)$ die gemäß der sinusoidalen Entscheidungsgrenze
 
 \begin{align*}
   g(x_1) =  x_1 + 3\cdot \sin(1.2 \cdot x_1),
@@ -526,7 +526,7 @@ ggplot(
   theme(legend.position = "top")
 ```
 
-Ein SVC kann die nicht-lineare Entscheidungsgrenze nicht abbilden, erreicht jedoch aufgrund der groben Teilbarkeit des Regressorraums hinsichtlich der Klassen durch eine (von links unten nach rechts oben verlaufende) Grade eine akzeptable Fehlklassifikationrate. Wir zeigen dies mit R.
+Ein SVC kann die nicht-lineare Entscheidungsgrenze nicht abbilden, erreicht jedoch aufgrund der groben Teilbarkeit des Regressorraums hinsichtlich der Klassen durch eine (von links unten nach rechts oben verlaufende) Grade eine akzeptable Fehlklassifikationsrate. Wir zeigen dies mit R.
 
 ```{r}
 #| error: true
@@ -557,7 +557,7 @@ grid <- grid %>%
 ```
 
 ```{r}
-#| fig-cap: "`data_wavy`: Mit SVC trainierte und deerministische Entscheidungsgrenze"
+#| fig-cap: "`data_wavy`: Mit SVC trainierte und deterministische Entscheidungsgrenze"
 #| label: fig-svcwavy
 #| fig-height: 6
 # Daten + Entscheidungsgrenze mit ggplot
@@ -625,12 +625,12 @@ Typische nicht-lineare Kernel-Funktionen sind
     K(\boldsymbol{x}_i,\boldsymbol{x}_j) = \tanh\bigg(\gamma\sum_{l=1}^k x_{lj} \cdot x_{li} + c \bigg), \quad c\in\mathbb{R}
   \end{align*}
 
-Zusätzlich zu dem Tuning-Parameter $C$ müssen also für das Training einer Entscheidungsgrenze die Skalierungs- bzw. Positions-Parameter $\gamma$ und $c$ für den Kernel gewählt werden. Letzteres erfolgt in empirischen Anwendungen häufig mit Cross Validation.
+Zusätzlich zu dem Tuning-Parameter $C$ müssen also für das Training einer Entscheidungsgrenze die Skalierungs- bzw. Positions-Parameter $\gamma$ und $c$ für den Kernel gewählt werden. Letzteres erfolgt in empirischen Anwendungen häufig mit Cross-Validation.
 
 
 ### Der Kernel-Trick
 
-Um den Kernel Trick zu veranschaulichen, betrachten wir ein binäres Klassifikationsproblem mit einer nicht-linearen Entscheidungsgrenze im Regressorraum für $(X_1,X_2)\in\mathbb{R}^2$, bei dem die Klassenzugehörigkeit der Beobachtungen konzentrisch ist. Wir lesen hierzu den Datensatz `data_concentric` ein.
+Um den Kernel Trick zu veranschaulichen, betrachten wir ein binäres Klassifikationsproblem mit einer nicht-linearen Entscheidungsgrenze im Regressorraum für $(X_1,X_2)\in\mathbb{R}^2$, bei dem die Klassenzugehörigkeit der Beobachtungen konzentrisch angeordnet ist. Wir lesen hierzu den Datensatz `data_concentric` ein.
 
 ```{r}
 # konzentrische Daten einlesen
@@ -947,7 +947,7 @@ ggplot() +
   theme(legend.position = "top")
 ```
 
-Ein Vergleich von @fig-rbfsvmwavy mit @fig-svcwavy zeigt, dass die SVM mit radialem Kernel im Objekt `radial_svm_model` den nicht-linearen Verlauf der sinuidalen Entscheidungsgrenze deutlich besser erfasst als der SVC in `svc_wavy`. Der Anteil fehlklassifizierter Beobachtungen liegt bei weniger als 10\%.
+Ein Vergleich von @fig-rbfsvmwavy mit @fig-svcwavy zeigt, dass die SVM mit radialem Kernel im Objekt `radial_svm_model` den nicht-linearen Verlauf der sinusoidalen Entscheidungsgrenze deutlich besser erfasst als der SVC in `svc_wavy`. Der Anteil fehlklassifizierter Beobachtungen liegt bei weniger als 10\%.
 
 ```{r}
 # Fehlerrate von 'radial_svm_model'
@@ -958,9 +958,9 @@ Ein Vergleich von @fig-rbfsvmwavy mit @fig-svcwavy zeigt, dass die SVM mit radia
 
 ### Overfitting
 
-Der in Abschnitt @sec-scv beschriebene Einfluss des `cost`-Parameters auf die Klassifikationsleistung von SVCs überträgt sich auch auf SVMs. Bei der Anpassung nichtlinearer Entscheidungsgrenzen mit nichtlinearen Kernelfunktionen müssen neben cost auch die Kernel-Parameter sorgfältig gewählt werden, um Overfitting zu vermeiden. Dabei bestehen Interdependenzen zwischen den Parametern. In den hier behandelten Beispielen mit einem zweidimensionalen Merkmalsraum lassen sich diese Effekte gut grafisch darstellen: Bei einer SVM mit radialem Kernel bewirken höhere `gamma`-Werte eine stärker lokal geprägte Entscheidungsgrenze, die sich enger um benachbarte Datenpunkte legt. Höhere `cost`-Werte führen zu engeren Margins, wodurch weniger Support-Vektoren zugelassen werden. Dies kann die Varianz der Entscheidungsgrenze erhöhen, da der Algorithmus sich stärker an einzelne Datenpunkte anpasst und die Schätzung tendenziell weiter von der wahren Grenze abweichen kann. Zu große Werte führen also jeweils zu einer Überanpassung an die Daten.
+Der in Abschnitt @sec-scv beschriebene Einfluss des `cost`-Parameters auf die Klassifikationsleistung von SVCs überträgt sich auch auf SVMs. Bei der Anpassung nichtlinearer Entscheidungsgrenzen mit nichtlinearen Kernel-Funktionen müssen neben cost auch die Kernel-Parameter sorgfältig gewählt werden, um Overfitting zu vermeiden. Dabei bestehen Interdependenzen zwischen den Parametern. In den hier behandelten Beispielen mit einem zweidimensionalen Merkmalsraum lassen sich diese Effekte gut grafisch darstellen: Bei einer SVM mit radialem Kernel bewirken höhere `gamma`-Werte eine stärker lokal geprägte Entscheidungsgrenze, die sich enger um benachbarte Datenpunkte legt. Höhere `cost`-Werte führen zu engeren Margins, wodurch weniger Support-Vektoren zugelassen werden. Dies kann die Varianz der Entscheidungsgrenze erhöhen, da der Algorithmus sich stärker an einzelne Datenpunkte anpasst und die Schätzung tendenziell weiter von der wahren Grenze abweichen kann. Zu große Werte führen also jeweils zu einer Überanpassung an die Daten.
 
-Wir illustrieren Overfitting durch eine ungünstige Parameterwahl für eine SVM mit Radial-Kernek und den Datensatz `data_wavy`.
+Wir illustrieren Overfitting durch eine ungünstige Parameterwahl für eine SVM mit Radial-Kernel und den Datensatz `data_wavy`.
 
 ```{r}
 # SVM mit ungünstiger Parameter-Kombination
@@ -1033,7 +1033,7 @@ ggplot() +
 
 Das Modell `radial_svm_overfit` leidet unter Overfiting: In @fig-rbfsvmof sehen wir, dass die gelernte Entscheidungsgrenze zu stark durch lokale Muster aufgrund der Überlappung der Klassen geprägt ist. Entsprechend ist die Klassifikation der für das Training genutzen Datenpunkte für `radial_svm_overfit` etwas genauer `radial_svm_model`. Diese Überanpassung resultiert tendentiell in einer schlechteren Generalisierung von `radial_svm_overfit` in Vorhersagen unbekannter Datenpunkte.
 
-Mit `e1071::tune()` können wir optimale Parameterwerte aus einem Grid mit Cross Validation schätzen. Wir übergeben hierzu die Methode (`METHOD`), die Spezifikation des Modells wie in `svm()` und dem Argument `ranges` die zu berücksichtigenden Parameter-Werte als Liste.
+Mit `e1071::tune()` können wir optimale Parameterwerte aus einem Grid mit Cross-Validation schätzen. Wir übergeben hierzu die Methode (`METHOD`), die Spezifikation des Modells wie in `svm()` und dem Argument `ranges` die zu berücksichtigenden Parameter-Werte als Liste.
 
 ```{r, cache=TRUE}
 set.seed(1234)
@@ -1068,7 +1068,7 @@ radial_svm_tuned$best.model
 
 ## Beispiel: Vorhersage von Kaufentscheidungen
 
-Der mit dem R-Paket `ISLR` [@Jamesetal2021] Datensatz `OJ` enthält Beobachtungen von 1070 Orangensaft-Verkäufen bei denen der Kunde entweder die Mark "Citrus Hill" (CH) oder "Minute Maid" (MM) gekauft hat. @tbl-varsoj enthält eine Beschreibung der verfügbaren Variablen.
+Der mit dem R-Paket `ISLR` [@Jamesetal2021] Datensatz `OJ` enthält Beobachtungen von 1070 Orangensaft-Verkäufen bei denen der Kunde entweder die Marke "Citrus Hill" (CH) oder "Minute Maid" (MM) gekauft hat. @tbl-varsoj enthält eine Beschreibung der verfügbaren Variablen.
 
 
 ```{r, echo=F}
@@ -1154,7 +1154,7 @@ library(ggcorrplot)
 # Datensatz OJ aus ISLR laden
 data(OJ, package = "ISLR")
 
-# Korellationsplot
+# Korrelationsplot
 ggcorrplot(
   corr = cor(
     OJ %>% select(
@@ -1166,7 +1166,7 @@ ggcorrplot(
   )
 ```
 
-Die Abbildung zeigt, dass es starke Korellation zwischen Discount-Indikatoren (`DiscCH`, `DiscMM`) und den jeweiligen Prozent-Beträgen (`PctDiscCH`, `PctDiscMM`) sowie der Preis-Differenz (`PriceDiff`) gibt. Die Variablen `STORE` und `Store7` enthalten redundante Informationen über das Geschäft, in dem der Verkauf stattfand. Wir entfernen diese Variablen bevor der Datensatz mit `rsample::initial_split()` in Trainings- und Test-Partitionen eingeteilt wird.
+Die Abbildung zeigt, dass es starke Korrelation zwischen Discount-Indikatoren (`DiscCH`, `DiscMM`) und den jeweiligen Prozent-Beträgen (`PctDiscCH`, `PctDiscMM`) sowie der Preis-Differenz (`PriceDiff`) gibt. Die Variablen `STORE` und `Store7` enthalten redundante Informationen über das Geschäft, in dem der Verkauf stattfand. Wir entfernen diese Variablen bevor der Datensatz mit `rsample::initial_split()` in Trainings- und Test-Partitionen eingeteilt wird.
 
 
 ```{webr}
@@ -1191,7 +1191,7 @@ oj_train <- training(oj_split)
 oj_test <- testing(oj_split)
 ```
 
-Mit `recipe::recipe()` können Datensätze systematisch für die Anwendung von Machine-Learning-Methoden vorbereitet werden. Im nachfolgenden Code-Chunk erstellen wir das recipe `blueprint`: Wir skalieren und zentrieren wir numerische Variablen, was sicherstellt, dass die Regresoren auf einer vergleichbaren Skala liegen, sodass distanzbasierte Algorithmen nicht durch unterschiedlliche Skalierungen Variablen beeinflusst werden. Kategorische Variablen mit mehr als zwei Ausprägungen werden mithilfe von *One-Hot-Encoding* in binäre Dummy-Variablen umgewandelt. Dieser Ansatz sorgt für eine konsistente und reproduzierbare Datenvorverarbeitung jenseits der Anwendungen mit SVMs.
+Mit `recipe::recipe()` können Datensätze systematisch für die Anwendung von Machine-Learning-Methoden vorbereitet werden. Im nachfolgenden Code-Chunk erstellen wir das recipe `blueprint`: Wir skalieren und zentrieren wir numerische Variablen, was sicherstellt, dass die Regresoren auf einer vergleichbaren Skala liegen, sodass distanzbasierte Algorithmen nicht durch unterschiedliche Skalierungen Variablen beeinflusst werden. Kategorische Variablen mit mehr als zwei Ausprägungen werden mithilfe von *One-Hot-Encoding* in binäre Dummy-Variablen umgewandelt. Dieser Ansatz sorgt für eine konsistente und reproduzierbare Datenvorverarbeitung jenseits der Anwendungen mit SVMs.
 
 ```{webr}
 # Recipe für Datenvorverarbeitung definieren
@@ -1206,7 +1206,7 @@ blueprint <- recipe(
 blueprint
 ```
 
-Mit `recipes::prep()` bestimmen wir die nötigen Parameter für die Vorbereitung von Datensätzen mit dem in `oj_train` enthaltenen. `recipes::bake()` wendet die Transformationen an. Wir zeugen eine Übersicht der transformierten Trainingsdaten mit `skimr::skim`.
+Mit `recipes::prep()` bestimmen wir die nötigen Parameter für die Vorbereitung von Datensätzen mit dem in `oj_train` enthaltenen. `recipes::bake()` wendet die Transformationen an. Wir erzeugen eine Übersicht der transformierten Trainingsdaten mit `skimr::skim`.
 
 ```{webr}
 # Vorbereiten:
@@ -1220,7 +1220,7 @@ baked_test <- bake(prepare, new_data = oj_test)
 skim(baked_train)
 ```
 
-Die nächsten Code chunks zeigen, wie `parsnip` SVMs mit lineare, polynomialen und radialen Kernel-funktionen für die Klassifikation der gekauften Orangensaft-Marke `Purchase` angepasst werden können. Hierbei wird die Implmentierung von `ksvm()` im Paket `kernlab` genutzt. Für jeden dieser drei Ansätze definieren wir einen separaten Workflow für 10-fache Cross Validation der jeweiligen Modellparameter.^[Aufgrund der geringen Rechenleistung der für die interaktiven Code-Chunks genutzen Webr-Implementierung betrachten wir hier beispielhafte, kleine Parameter-Gitter.] Als Kriterium für die Modellleistung verwernden wir `accuracy`, den Anteil korrekter Klassifikationen. Nach Anpassung des als optimal ermittelten Modells evaluieren wir die Vorhersagegüte der Modelle auf dem Testdatensatz `bake_train`.
+Die nächsten Code chunks zeigen, wie `parsnip` SVMs mit lineare, polynomialen und radialen Kernel-Funktionen für die Klassifikation der gekauften Orangensaft-Marke `Purchase` angepasst werden können. Dabei wird die Implentierung von `ksvm()` im Paket `kernlab` genutzt. Für jeden dieser drei Ansätze definieren wir einen separaten Workflow für 10-fache Cross-Validation der jeweiligen Modellparameter.^[Aufgrund der geringen Rechenleistung der für die interaktiven Code-Chunks genutzen Webr-Implementierung betrachten wir hier beispielhafte, kleine Parameter-Gitter.] Als Kriterium für die Modellleistung verwenden wir `accuracy`, den Anteil korrekter Klassifikationen. Nach Anpassung des als optimal ermittelten Modells evaluieren wir die Vorhersagegenauigkeit der Modelle auf dem Testdatensatz `bake_train`.
 
 **SVM: Linearer Kernel**
 
@@ -1442,11 +1442,11 @@ Die Auswertung zeigt, dass die hier betrachteten SVMs mit nicht-linearer Kernelf
 
 ## Zusammenfassung
 
-In diesem Kapitel haben wir Support Vector Machines (SVM) zur Klassifikation eingeführt, eine Machine-Learning-Methode, die sich besonders für komplexe und nicht-lineare Probleme in hochdimensionalen Datensätzen eignet. Das Ziel von SVMs ist es, eine Trennlinie oder -ebene im Regressor-Raum zu finden, die zwei Klassen von Datenpunkten optimal voneinander abgrenzt. Hierfür ermittelt ein Algorithmus sogenannte Support-Vektoren -- eine Teilmenge der Datenpunkte, welche die angepasste Entscheidungsgrenze bestimmen.
+In diesem Kapitel haben wir Support Vector Machines (SVM) zur Klassifikation eingeführt, eine Machine-Learning-Methode, die sich besonders für komplexe und nicht-lineare Probleme in hochdimensionalen Datensätzen eignet. Das Ziel von SVMs ist es, eine Trennlinie oder -ebene im Regressorraum zu finden, die zwei Klassen von Datenpunkten optimal voneinander abgrenzt. Hierfür ermittelt ein Algorithmus sogenannte Support-Vektoren -- eine Teilmenge der Datenpunkte, welche die angepasste Entscheidungsgrenze bestimmen.
 
 Support Vector Machines (SVMs) sind eine Weiterentwicklung des klassischen Maximal Margin Classifiers (MMC). Während der MMC eine harte Trennlinie sucht, die die Daten perfekt in zwei Klassen unterteilt, funktioniert dieser Ansatz nur dann gut, wenn die Klassen klar separierbar sind. Bei realen Datensätzen, in denen Überlappungen oder Ausreißer auftreten, scheitert der MMC-Algorithmus. Hier kann ein Soft Margin Classifier (SMC) angewendet werden, eine Verallgemeinerung des MMC, die Fehlklassifikationen zulässt. Diese zusätzliche Flexibilität erweitert die Anwendbarkeit auf reale, häufig nicht perfekt linear trennbare Klassen.
 
 Für Klassifikationsprobleme mit nicht-linearen Entscheidungsgrenzen wird das Prinzip des SMCs durch den sogenannten Kernel-Trick zu einer SVM erweitert. Hierbei werden die Daten implizit in einen höherdimensionalen Raum projiziert, ohne dass die Transformation explizit durchgeführt werden muss. In diesem Raum lassen sich ursprünglich komplexe Entscheidungsgrenzen durch eine (lineare) Hyperebene modellieren. Unterschiedliche Kernel-Funktionen wie der radiale Kernel oder der polynomiale Kernel erlauben es, verschiedene Formen nicht-linearer Entscheidungsgrenzen zu erfassen und anzupassen.
 
-Die Implementierung von SVMs in R erfolgt effizient durch Pakete wie `e1071` und `kernlab.` Wir haben gezeigt, wie Datensätze mithilfe von `parsnip` im `tidymodels`-Framework systematisch vorbereitet, SVM-Modelle spezifiziert, durch Cross-Validation optimiert und vergleichen werden können.
+Die Implementierung von SVMs in R erfolgt effizient durch Pakete wie `e1071` und `kernlab`. Wir haben gezeigt, wie Datensätze mithilfe von `parsnip` im `tidymodels`-Framework systematisch vorbereitet, SVM-Modelle spezifiziert, durch Cross-Validation optimiert und vergleichen werden können.
 
