@@ -666,7 +666,7 @@ ggplot(
 
 Obwohl erneut `lstat` und `rm` als die wichtigsten Prädiktoren gelistet sind, identifiziert Gradient Boosting im Gegensatz zu Bagging und Random Forests `lstat` als die Variable mit der größten Vorhersagekraft für `medv`. 
 
-## Causal Trees und Causal Forests^[Aus technischen Gründen verzichten wir in diesem Kapitel zur Zeit auf die Einbindung der WebR-Konsole.]
+## Causal Trees und Causal Forests
 
 Baum-Algorithmen sind vielversprechende Ansätze zur Schätzung kausaler Effekte, insbesondere in Situationen, in denen die Bestimmung heterogener Effekte gewünscht ist: Der Vorteil von Baum-Methoden liegt darin, dass sie nicht-parametrisch sind: Der Regressorraum wird adaptiv in Partitionen unterteilt, um auf Basis dieser Aufteilung differenzierte Vorhersagen für die Zielvariable zu treffen. Diese Eigenschaft kann für Kausalanalysen hilfreich sein, da wir in vielen empirischen Anwendungen die Effekte einer Behandlung nicht nur im Durchschnitt für die betrachtete Population, sondern *differenzierter* schätzen möchten: Ein durchschnittlicher Behandlungseffekt (engl. *average treatment effect*, ATE) kann nicht ausreichend informativ für unsere Forschungsfrage sein, bspw. wenn wir erwarten, dass eine politische Intervention unterschiedliche Auswirkungen auf verschiedene Bevölkerungsgruppen hat. Idealerweise möchten wir $\tau_i$ bestimmen, den individuellen Behandlungseffekt einer Beobachtung $i$. Das fundamentale Problem der Kausalinferenz ist, dass $\tau_i$ nicht ermittelt werden kann (s. u.), sodass wir unser Ziel abschwächen müssen. Statt $\tau_i$ suchen wir einen Behandlungseffekt in Abhängigkeit von beobachtbaren Charakteristiken $\boldsymbol{X}$ für Untergruppen der Population, einen *conditional average treatment effect* (CATE). Im Potential-Outcomes-Framework ist der CATE definiert als
 
@@ -746,6 +746,8 @@ Dies sorgt für konsistente Schätzungen. @AtheyImbens2016 zeigen, dass die Mini
 4. Schätze die Behandlungseffekte in jedem Blatt von $\Pi^*$ mit den Beobachtungen in $\mathcal{S}^{est}$.
 
 :::
+
+Datensatz einlesen.^[Aus technischen Gründen verzichten wir in diesem Kapitel zur Zeit auf die Einbindung der WebR-Konsole.]
 
 ```{r}
 nl_effects <- readRDS(file = "datasets/nl_effects.Rds")
