@@ -14,10 +14,15 @@ book:
     type: primary
     position: below-navbar
   title: "Kausalanalyse und maschinelles Lernen mit R"
+  description: '*Kausalanalyse und Maschinelles Lernen mit R* (KMLR) ist ein innovatives Online-Lehrbuch, das Studierende der Wirtschaftswissenschaften in moderne statistische Methoden und deren ökonometrische Anwendungen einführt. Das interaktive Kompendium verbindet theoretische Grundlagen mit praktischer Anwendung durch die Möglichkeit, R-Code direkt im Browser auszuführen. Von den statistischen Grundlagen über fortgeschrittene Methoden der Kausalanalyse bis hin zu Machine Learning-Techniken bietet das Buch einen umfassenden Einblick in fortschrittliche quantitative Forschungsmethoden. Besonders wertvoll für Studierende sind die zahlreichen interaktiven Visualisierungen und praxisnahen Fallstudien mit wirtschaftswissenschaftlichem Fokus, die ein tiefes Verständnis der ökonometrischen Methoden fördern.'
   reader-mode: true
   author: 
-    - Martin C. Arnold 
-    - Christoph Hanck
+    - name: Martin C. Arnold 
+      affiliation: University of Duisburg-Essen
+      affiliation-url: https://www.oek.wiwi.uni-due.de/team/martin-christopher-arnold/
+    - name: Christoph Hanck
+      affiliation: University of Duisburg-Essen
+      affiliation-url: https://www.oek.wiwi.uni-due.de/team/christoph-hanck/
   date: "09.10.2024"
   chapters:
     - index.qmd
@@ -59,6 +64,9 @@ book:
     title: "<a href='/index.html'>Kausalanalyse und maschinelles Lernen mit R</a>"
 
 bibliography: references.bib
+citation:
+  type: book
+google-scholar: true
 
 execute: 
   warning: false

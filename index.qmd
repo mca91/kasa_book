@@ -12,7 +12,6 @@ webr:
 
 ```{r}
 #| echo: false
-source("setup.R")
 
 # Formatierung von gt-Tabellen
 tabopts <- function(x) {

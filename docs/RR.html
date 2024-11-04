@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.5.56">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="description" content="Kausalanalyse und Maschinelles Lernen mit R (KMLR) ist ein innovatives Online-Lehrbuch, das Studierende der Wirtschaftswissenschaften in moderne statistische Methoden und deren ökonometrische Anwendungen einführt. Das interaktive Kompendium verbindet theoretische Grundlagen mit praktischer Anwendung durch die Möglichkeit, R-Code direkt im Browser auszuführen. Von den statistischen Grundlagen über fortgeschrittene Methoden der Kausalanalyse bis hin zu Machine Learning-Techniken bietet das Buch einen umfassenden Einblick in fortschrittliche quantitative Forschungsmethoden. Besonders wertvoll für Studierende sind die zahlreichen interaktiven Visualisierungen und praxisnahen Fallstudien mit wirtschaftswissenschaftlichem Fokus, die ein tiefes Verständnis der ökonometrischen Methoden fördern.">
 <title>3&nbsp; Reproduzierbarkeit – Kausalanalyse und maschinelles Lernen mit R</title>
 <style>
 code{white-space: pre-wrap;}
@@ -123,7 +124,6 @@ div.csl-indent {
     "search-label": "Suchen"
   }
 }</script><script type="module" src="site_libs/quarto-ojs/quarto-ojs-runtime.js"></script><link href="site_libs/quarto-ojs/quarto-ojs.css" rel="stylesheet">
-<meta name="robots" content="noindex">
 <script>
   MathJax = {
     tex: {
@@ -250,6 +250,91 @@ window.Quarto = {
   typesetMath
 };
 </script><link rel="stylesheet" href="custom_styles.css">
+<meta name="citation_title" content="[3]{.chapter-number}&nbsp; [Reproduzierbarkeit]{.chapter-title}">
+<meta name="citation_language" content="de">
+<meta name="citation_reference" content="citation_title=The credibility revolution in empirical economics: How better research design is taking the con out of econometrics;,citation_author=Joshua D Angrist;,citation_author=Jörn-Steffen Pischke;,citation_publication_date=2010;,citation_cover_date=2010;,citation_year=2010;,citation_issue=2;,citation_volume=24;,citation_journal_title=Journal of economic perspectives;,citation_publisher=American Economic Association;">
+<meta name="citation_reference" content="citation_title=A new data set of educational attainment in the world, 1950–2010;,citation_author=Robert J. Barro;,citation_author=Jong Wha Lee;,citation_publication_date=2013;,citation_cover_date=2013;,citation_year=2013;,citation_fulltext_html_url=https://www.sciencedirect.com/science/article/pii/S0304387812000855;,citation_doi=https://doi.org/10.1016/j.jdeveco.2012.10.001;,citation_issn=0304-3878;,citation_volume=104;,citation_journal_title=Journal of Development Economics;">
+<meta name="citation_reference" content="citation_title=Beyond work ethic: Religion, individual, and political preferences;,citation_author=Christoph Basten;,citation_author=Frank Betz;,citation_publication_date=2013;,citation_cover_date=2013;,citation_year=2013;,citation_issue=3;,citation_volume=5;,citation_journal_title=American Economic Journal: Economic Policy;,citation_publisher=American Economic Association;">
+<meta name="citation_reference" content="citation_title=The effect of alcohol consumption on mortality: Regression discontinuity evidence from the minimum drinking age;,citation_author=Christopher Carpenter;,citation_author=Carlos Dobkin;,citation_publication_date=2009;,citation_cover_date=2009;,citation_year=2009;,citation_issue=1;,citation_volume=1;,citation_journal_title=American Economic Journal: Applied Economics;,citation_publisher=American Economic Association;">
+<meta name="citation_reference" content="citation_title=Optimal bandwidth choice for the regression discontinuity estimator;,citation_author=Guido Imbens;,citation_author=Karthik Kalyanaraman;,citation_publication_date=2012;,citation_cover_date=2012;,citation_year=2012;,citation_issue=3;,citation_volume=79;,citation_journal_title=The Review of economic studies;,citation_publisher=Oxford University Press;">
+<meta name="citation_reference" content="citation_title=Regression discontinuity designs: A guide to practice;,citation_author=G. W. Imbens;,citation_author=Thomas Lemieux;,citation_publication_date=2008;,citation_cover_date=2008;,citation_year=2008;,citation_issue=2;,citation_volume=142;,citation_journal_title=Journal of econometrics;,citation_publisher=Elsevier;">
+<meta name="citation_reference" content="citation_title=Why high-order polynomials should not be used in regression discontinuity designs;,citation_author=Andrew Gelman;,citation_author=Guido Imbens;,citation_publication_date=2019;,citation_cover_date=2019;,citation_year=2019;,citation_issue=3;,citation_volume=37;,citation_journal_title=Journal of Business &amp;amp;amp; Economic Statistics;,citation_publisher=Taylor &amp;amp; Francis;">
+<meta name="citation_reference" content="citation_title=Randomized experiments from non-random selection in US house elections;,citation_author=David S Lee;,citation_publication_date=2008;,citation_cover_date=2008;,citation_year=2008;,citation_issue=2;,citation_volume=142;,citation_journal_title=Journal of Econometrics;,citation_publisher=Elsevier;">
+<meta name="citation_reference" content="citation_title=Die protestantische ethik und der geist des kapitalismus;,citation_author=Max Weber;,citation_publication_date=2004;,citation_cover_date=2004;,citation_year=2004;,citation_volume=1614;">
+<meta name="citation_reference" content="citation_title=Regularization and confounding in linear regression for treatment effect estimation;,citation_author=P Richard Hahn;,citation_author=Carlos M Carvalho;,citation_author=David Puelz;,citation_author=Jingyu He;,citation_publication_date=2018;,citation_cover_date=2018;,citation_year=2018;">
+<meta name="citation_reference" content="citation_title=Regression shrinkage and selection via the lasso;,citation_author=Robert Tibshirani;,citation_publication_date=1996;,citation_cover_date=1996;,citation_year=1996;,citation_issue=1;,citation_volume=58;,citation_journal_title=Journal of the Royal Statistical Society Series B: Statistical Methodology;,citation_publisher=Oxford University Press;">
+<meta name="citation_reference" content="citation_title=Least angle regression;,citation_author=Bradley Efron;,citation_author=Trevor Hastie;,citation_author=Iain Johnstone;,citation_author=Robert Tibshirani;,citation_publication_date=2004;,citation_cover_date=2004;,citation_year=2004;">
+<meta name="citation_reference" content="citation_title=Sparse models and methods for optimal instruments with an application to eminent domain;,citation_author=Alexandre Belloni;,citation_author=Daniel Chen;,citation_author=Victor Chernozhukov;,citation_author=Christian Hansen;,citation_publication_date=2012;,citation_cover_date=2012;,citation_year=2012;,citation_issue=6;,citation_volume=80;,citation_journal_title=Econometrica;,citation_publisher=Wiley Online Library;">
+<meta name="citation_reference" content="citation_title=Least squares after model selection in high-dimensional sparse models;,citation_author=Alexandre Belloni;,citation_author=Victor Chernozhukov;,citation_publication_date=2013;,citation_cover_date=2013;,citation_year=2013;,citation_journal_title=Bernoulli;,citation_publisher=JSTOR;">
+<meta name="citation_reference" content="citation_title=High-dimensional methods and inference on structural and treatment effects;,citation_author=Alexandre Belloni;,citation_author=Victor Chernozhukov;,citation_author=Christian Hansen;,citation_publication_date=2014;,citation_cover_date=2014;,citation_year=2014;,citation_issue=2;,citation_volume=28;,citation_journal_title=Journal of Economic Perspectives;,citation_publisher=American Economic Association 2014 Broadway, Suite 305, Nashville, TN 37203-2418;">
+<meta name="citation_reference" content="citation_title=Ridge regression: Biased estimation for nonorthogonal problems;,citation_author=Arthur E Hoerl;,citation_author=Robert W Kennard;,citation_publication_date=1970;,citation_cover_date=1970;,citation_year=1970;,citation_issue=1;,citation_volume=12;,citation_journal_title=Technometrics;,citation_publisher=Taylor &amp;amp;amp; Francis;">
+<meta name="citation_reference" content="citation_title=Using data mining to predict secondary school student performance;,citation_author=Paulo Cortez;,citation_author=Alice Maria Gonçalves Silva;,citation_publication_date=2008;,citation_cover_date=2008;,citation_year=2008;,citation_publisher=EUROSIS-ETI;">
+<meta name="citation_reference" content="citation_title=Manipulation of the running variable in the regression discontinuity design: A density test;,citation_author=Justin McCrary;,citation_publication_date=2008;,citation_cover_date=2008;,citation_year=2008;,citation_issue=2;,citation_volume=142;,citation_journal_title=Journal of Econometrics;,citation_publisher=Elsevier;">
+<meta name="citation_reference" content="citation_title=Simple local polynomial density estimators;,citation_author=Matias D Cattaneo;,citation_author=Michael Jansson;,citation_author=Xinwei Ma;,citation_publication_date=2020;,citation_cover_date=2020;,citation_year=2020;,citation_issue=531;,citation_volume=115;,citation_journal_title=Journal of the American Statistical Association;,citation_publisher=Taylor &amp;amp;amp; Francis;">
+<meta name="citation_reference" content="citation_title=An introduction to propensity score methods for reducing the effects of confounding in observational studies;,citation_author=P. Austin;,citation_publication_date=2011;,citation_cover_date=2011;,citation_year=2011;,citation_issue=3;,citation_doi=10.1080/00273171.2011.568786;,citation_issn=0027-3171;,citation_pmid=21818162;,citation_volume=46;,citation_journal_title=Multivariate Behavioral Research;,citation_publisher=Informa UK Limited;">
+<meta name="citation_reference" content="citation_title=The central role of the propensity score in observational studies for causal effects;,citation_author=Paul R. Rosenbaum;,citation_author=Donald R. Rubin;,citation_publication_date=1983;,citation_cover_date=1983;,citation_year=1983;,citation_issue=1;,citation_doi=10.1017/cbo9780511810725.016;,citation_issn=0006-3444;,citation_volume=70;,citation_journal_title=Biometrika;,citation_publisher=Cambridge University Press;">
+<meta name="citation_reference" content="citation_title=Efficient estimation of average treatment effects using the estimated propensity score.;,citation_author=Keisuke Hirano;,citation_author=Guido Imbens;,citation_author=Geert Ridder;,citation_publication_date=2003;,citation_cover_date=2003;,citation_year=2003;,citation_issue=4;,citation_doi=10.1111/1468-0262.00442;,citation_volume=71;,citation_journal_title=Econometrica;,citation_publisher=The Econometric Society;">
+<meta name="citation_reference" content="citation_title=Comment on “an essay on the logical foundations of survey sampling” by basu, d;,citation_author=J Hájek;,citation_publication_date=1971;,citation_cover_date=1971;,citation_year=1971;,citation_volume=236;,citation_journal_title=Foundations of Statistical Inference;">
+<meta name="citation_reference" content="citation_title=Graphical display of covariate balance;,citation_author=Thomas Love;,citation_publication_date=2004;,citation_cover_date=2004;,citation_year=2004;,citation_publisher=Presentation;">
+<meta name="citation_reference" content="citation_title=The use of bootstrapping when using propensity-score matching without replacement: A simulation study.;,citation_author=Peter C. Austin;,citation_author=Dylan S. Small;,citation_publication_date=2014;,citation_cover_date=2014;,citation_year=2014;,citation_issue=24;,citation_doi=10.1002/sim.6276;,citation_issn=0277-6715;,citation_volume=33;,citation_journal_title=Statistics in Medicine;,citation_publisher=Wiley;">
+<meta name="citation_reference" content="citation_title=Robust post-matching inference.;,citation_author=Alberto Abadie;,citation_author=Jann Spiess;,citation_publication_date=2022;,citation_cover_date=2022;,citation_year=2022;,citation_issue=538;,citation_doi=10.1080/01621459.2020.1840383;,citation_issn=0162-1459;,citation_volume=117;,citation_journal_title=Journal of the American Statistical Association;,citation_publisher=Informa UK Limited;">
+<meta name="citation_reference" content="citation_title=Matching on the estimated propensity score.;,citation_author=undefined Imbens;,citation_publication_date=2016;,citation_cover_date=2016;,citation_year=2016;,citation_issue=2;,citation_doi=10.3982/ecta11293;,citation_issn=0012-9682;,citation_volume=84;,citation_journal_title=Econometrica;,citation_publisher=The Econometric Society;">
+<meta name="citation_reference" content="citation_title=The finite sample performance of inference methods for propensity score matching and weighting estimators.;,citation_author=Hugo Bodory;,citation_author=Lorenzo Camponovo;,citation_author=Martin Huber;,citation_author=Michael Lechner;,citation_publication_date=2020;,citation_cover_date=2020;,citation_year=2020;,citation_doi=10.2139/ssrn.2731969;,citation_issn=1556-5068;,citation_journal_title=Journal of Business &amp;amp;amp; Economic Statistics;,citation_publisher=Elsevier BV;">
+<meta name="citation_reference" content="citation_title=Interval estimation for treatment effects using propensity score matching. Statistics in medicine;,citation_author=Jennifer Hill;,citation_author=Jerome P. Reiter;,citation_publication_date=2006;,citation_cover_date=2006;,citation_year=2006;,citation_issue=13;,citation_doi=10.1002/sim.2277;,citation_issn=0277-6715;,citation_volume=25;,citation_journal_title=Statistics in Medicine;,citation_publisher=Wiley;">
+<meta name="citation_reference" content="citation_title=On the failure of the bootstrap for matching estimators.;,citation_author=Alberto Abadie;,citation_author=Guido W. Imbens;,citation_publication_date=2008;,citation_cover_date=2008;,citation_year=2008;,citation_issue=6;,citation_doi=10.3982/ECTA6474;,citation_issn=0012-9682,1468-0262;,citation_volume=76;,citation_journal_title=Econometrica. Journal of the Econometric Society;">
+<meta name="citation_reference" content="citation_title=Estimating the effect of treatment on binary outcomes using full matching on the propensity score.;,citation_author=Peter C. Austin;,citation_author=Elizabeth A. Stuart;,citation_publication_date=2017;,citation_cover_date=2017;,citation_year=2017;,citation_issue=6;,citation_doi=10.1177/0962280215601134;,citation_issn=0962-2802,1477-0334;,citation_volume=26;,citation_journal_title=Statistical Methods in Medical Research;">
+<meta name="citation_reference" content="citation_title=Entropy balancing for causal effects: A multivariate reweighting method to produce balanced samples in observational studies;,citation_author=Jens Hainmueller;,citation_publication_date=2012;,citation_cover_date=2012;,citation_year=2012;,citation_issue=1;,citation_doi=10.1093/pan/mpr025;,citation_issn=1047-1987;,citation_volume=20;,citation_journal_title=Political Analysis;,citation_publisher=Cambridge University Press (CUP);">
+<meta name="citation_reference" content="citation_title=Econometric analysis of cross section and panel data;,citation_author=Jeffrey Wooldridge;,citation_publication_date=2010;,citation_cover_date=2010;,citation_year=2010;,citation_isbn=9780262232586;">
+<meta name="citation_reference" content="citation_title=Statistical inference;,citation_author=George Casella;,citation_author=Roger L. Berger;,citation_publication_date=2002;,citation_cover_date=2002;,citation_year=2002;,citation_isbn=9780534243128;">
+<meta name="citation_reference" content="citation_title=Synthetic control methods for comparative case studies: Estimating the effect of california’s tobacco control program.;,citation_author=Alexis Diamond Abadie;,citation_author=Jens Hainmueller;,citation_publication_date=2010;,citation_cover_date=2010;,citation_year=2010;,citation_issue=490;,citation_doi=10.1198/jasa.2009.ap08746;,citation_volume=105;,citation_journal_title=Journal of the American Statistical Association;,citation_publisher=Informa UK Limited;">
+<meta name="citation_reference" content="citation_title=Comparative politics and the synthetic control method: COMPARATIVE POLITICS AND THE SYNTHETIC CONTROL METHOD;,citation_author=Alberto Abadie;,citation_author=Alexis Diamond;,citation_author=Jens Hainmueller;,citation_publication_date=2014;,citation_cover_date=2014;,citation_year=2014;,citation_issue=2;,citation_doi=10.1111/ajps.12116;,citation_volume=59;,citation_journal_title=American Journal of Political Science;,citation_publisher=Wiley;">
+<meta name="citation_reference" content="citation_title=The costs of economic nationalism: Evidence from the brexit experiment*;,citation_author=Benjamin Born;,citation_author=Gernot J Müller;,citation_author=Moritz Schularick;,citation_author=Petr Sedláček;,citation_publication_date=2019;,citation_cover_date=2019;,citation_year=2019;,citation_issue=623;,citation_doi=10.1093/ej/uez020;,citation_volume=129;,citation_journal_title=The Economic Journal;,citation_publisher=Oxford University Press (OUP);">
+<meta name="citation_reference" content="citation_title=End-of-sample instability tests;,citation_author=D. W. K. Andrews;,citation_publication_date=2003;,citation_cover_date=2003;,citation_year=2003;,citation_issue=6;,citation_doi=10.1111/1468-0262.00466;,citation_volume=71;,citation_journal_title=Econometrica;,citation_publisher=The Econometric Society;">
+<meta name="citation_reference" content="citation_title=The effects of the 1993 earned income tax credit expansion on the labor supply of unmarried women;,citation_author=Kampon Adireksombat;,citation_publication_date=2010;,citation_cover_date=2010;,citation_year=2010;,citation_issue=1;,citation_doi=https://doi.org/10.1177/1091142109358626;,citation_issn=1552-7530;,citation_volume=38;,citation_journal_title=Public Finance Review;,citation_publisher=SAGE Publications;">
+<meta name="citation_reference" content="citation_title=Labor supply response to the earned income tax credit;,citation_author=N. Eissa;,citation_author=J. B. Liebman;,citation_publication_date=1996;,citation_cover_date=1996;,citation_year=1996;,citation_issue=2;,citation_doi=10.2307/2946689;,citation_issn=1531-4650;,citation_volume=111;,citation_journal_title=The Quarterly Journal of Economics;,citation_publisher=Oxford University Press (OUP);">
+<meta name="citation_reference" content="citation_title=Difference-in-differences with multiple time periods.;,citation_author=Brantly Callaway;,citation_author=Pedro H. C. Sant’Anna;,citation_publication_date=2021;,citation_cover_date=2021;,citation_year=2021;,citation_issue=2;,citation_doi=10.1016/j.jeconom.2020.12.001;,citation_volume=225;,citation_journal_title=Journal of Econometrics;">
+<meta name="citation_reference" content="citation_title=Difference-in-differences with variation in treatment timing.;,citation_author=Andrew Goodman-Bacon;,citation_publication_date=2021;,citation_cover_date=2021;,citation_year=2021;,citation_issue=2;,citation_doi=10.1016/j.jeconom.2021.03.014;,citation_volume=225;,citation_journal_title=Journal of Econometrics;,citation_publisher=Elsevier BV;">
+<meta name="citation_reference" content="citation_title=Do police reduce crime? Estimates using the allocation of police forces after a terrorist attack;,citation_author=Rafael Di Tella;,citation_author=Ernesto Schargrodsky;,citation_publication_date=2004;,citation_cover_date=2004;,citation_year=2004;,citation_issue=1;,citation_doi=10.1257/000282804322970733;,citation_volume=94;,citation_journal_title=American Economic Review;,citation_publisher=American Economic Association;">
+<meta name="citation_reference" content="citation_title=Economic shocks and civil conflict: An instrumental variables approach;,citation_author=Edward Miguel;,citation_author=Shanker Satyanath;,citation_author=Ernest Sergenti;,citation_publication_date=2004;,citation_cover_date=2004;,citation_year=2004;,citation_issue=4;,citation_doi=10.1086/421174;,citation_volume=112;,citation_journal_title=Journal of Political Economy;,citation_publisher=University of Chicago Press;">
+<meta name="citation_reference" content="citation_title=Ethnicity, insurgency, and civil war.;,citation_author=undefined Fearon;,citation_author=David D. Laitin;,citation_publication_date=2003;,citation_cover_date=2003;,citation_year=2003;,citation_issue=01;,citation_doi=10.1017/s0003055403000534;,citation_volume=97;,citation_journal_title=American Political Science Review;,citation_publisher=Cambridge University Press (CUP);">
+<meta name="citation_reference" content="citation_title=Weak states: Causes and consequences of the sicilian mafia;,citation_author=Daron Acemoglu;,citation_author=Giuseppe De Feo;,citation_author=Giacomo Davide De Luca;,citation_publication_date=2020;,citation_cover_date=2020;,citation_year=2020;,citation_doi=10.1093/restud/rdz009;,citation_journal_title=The Review of Economic Studies;,citation_publisher=Oxford University Press (OUP);">
+<meta name="citation_reference" content="citation_title=Income and democracy;,citation_author=Daron Acemoglu;,citation_author=Simon Johnson;,citation_author=James A. Robinson;,citation_author=Pierre Yared;,citation_publication_date=2008;,citation_cover_date=2008;,citation_year=2008;,citation_issue=3;,citation_doi=10.1257/aer.98.3.808;,citation_volume=98;,citation_journal_title=American Economic Review;,citation_publisher=American Economic Association;">
+<meta name="citation_reference" content="citation_title=Polyarchy: Participation and opposition: Participation and opposition;,citation_author=Robert Alan Dahl;,citation_publication_date=1971;,citation_cover_date=1971;,citation_year=1971;,citation_isbn=0300015658;">
+<meta name="citation_reference" content="citation_title=The third wave: Democratization in the late twentieth century: Democratization in the late twentieth century;,citation_author=Samuel P. Huntington;,citation_publication_date=1991;,citation_cover_date=1991;,citation_year=1991;,citation_isbn=0-8061-2516-0;">
+<meta name="citation_reference" content="citation_title=Capitalist development and democracy;,citation_author=Dietrich Rueschemeyer;,citation_author=Evelyne H. Stephens;,citation_author=John D. Stephens;,citation_publication_date=1992;,citation_cover_date=1992;,citation_year=1992;,citation_isbn=074560398X;">
+<meta name="citation_reference" content="citation_title=The effect: An introduction to research design and causality;,citation_author=Nick Huntington-Klein;,citation_publication_date=2021;,citation_cover_date=2021;,citation_year=2021;,citation_doi=10.1201/9781003226055;,citation_isbn=9781003226055;">
+<meta name="citation_reference" content="citation_title=Synth: An r package for synthetic control methods in comparative case studies;,citation_author=Jens Hainmueller;,citation_author=Alexis Diamond;,citation_author=Alberto Abadie;,citation_publication_date=2011;,citation_cover_date=2011;,citation_year=2011;,citation_fulltext_html_url=https://www.jstatsoft.org/v42/i13/;,citation_issue=13;,citation_volume=42;,citation_journal_title=Journal of Statistical Software;">
+<meta name="citation_reference" content="citation_title=Replication data for: Income and democracy;,citation_author=Daron Acemoglu;,citation_author=Simon Johnson;,citation_author=James A. Robinson;,citation_author=Pierre Yared;,citation_publication_date=2008;,citation_cover_date=2008;,citation_year=2008;,citation_doi=10.3886/E113251V1;,citation_publisher=ICPSR - Interuniversity Consortium for Political; Social Research;">
+<meta name="citation_reference" content="citation_title=Biases in dynamic models with fixed effects;,citation_author=Stephen Nickell;,citation_publication_date=1981;,citation_cover_date=1981;,citation_year=1981;,citation_issue=6;,citation_doi=10.2307/1911408;,citation_volume=49;,citation_journal_title=Econometrica;,citation_publisher=JSTOR;">
+<meta name="citation_reference" content="citation_title=Mostly harmless econometrics: An empiricist’s companion;,citation_author=J. Angrist;,citation_author=Jörn-Steffen Pischke;,citation_publication_date=2009;,citation_cover_date=2009;,citation_year=2009;,citation_isbn=9780691120355;">
+<meta name="citation_reference" content="citation_title=Some tests of specification for panel data: Monte carlo evidence and an application to employment equations;,citation_author=Manuel Arellano;,citation_author=Stephen Bond;,citation_publication_date=1991;,citation_cover_date=1991;,citation_year=1991;,citation_issue=2;,citation_doi=10.2307/2297968;,citation_volume=58;,citation_journal_title=The Review of Economic Studies;,citation_publisher=Oxford University Press (OUP);">
+<meta name="citation_reference" content="citation_title=Estimation of dynamic models with error components;,citation_author=T. W. Anderson;,citation_author=Cheng Hsiao;,citation_publication_date=1981;,citation_cover_date=1981;,citation_year=1981;,citation_issue=375;,citation_doi=10.2307/2287517;,citation_volume=76;,citation_journal_title=Journal of the American Statistical Association;,citation_publisher=Informa UK Limited;">
+<meta name="citation_reference" content="citation_title=The estimation of economic relationships using instrumental variables;,citation_author=J. D. Sargan;,citation_publication_date=1958;,citation_cover_date=1958;,citation_year=1958;,citation_issue=3;,citation_doi=10.2307/1907619;,citation_volume=26;,citation_journal_title=Econometrica;,citation_publisher=JSTOR;">
+<meta name="citation_reference" content="citation_title=Large sample properties of generalized method of moments estimators;,citation_author=Lars Peter Hansen;,citation_publication_date=1982;,citation_cover_date=1982;,citation_year=1982;,citation_issue=4;,citation_doi=10.2307/1912775;,citation_volume=50;,citation_journal_title=Econometrica;,citation_publisher=JSTOR;">
+<meta name="citation_reference" content="citation_title=Bootstrap procedures under some non-i.i.d. models;,citation_author=Regina Y. Liu;,citation_publication_date=1988;,citation_cover_date=1988;,citation_year=1988;,citation_issue=4;,citation_doi=10.1214/aos/1176351062;,citation_volume=16;,citation_journal_title=The Annals of Statistics;,citation_publisher=Institute of Mathematical Statistics;">
+<meta name="citation_reference" content="citation_title=Bootstrap-based improvements for inference with clustered errors;,citation_author=A. Colin Cameron;,citation_author=Jonah B. Gelbach;,citation_author=Douglas L. Miller;,citation_publication_date=2008;,citation_cover_date=2008;,citation_year=2008;,citation_issue=3;,citation_doi=10.1162/rest.90.3.414;,citation_volume=90;,citation_journal_title=Review of Economics and Statistics;,citation_publisher=MIT Press - Journals;">
+<meta name="citation_reference" content="citation_title=Robust inference with multiway clustering;,citation_author=A. Colin Cameron;,citation_author=Jonah B. Gelbach;,citation_author=Douglas L. Miller;,citation_publication_date=2011;,citation_cover_date=2011;,citation_year=2011;,citation_issue=2;,citation_doi=10.1198/jbes.2010.07136;,citation_volume=29;,citation_journal_title=Journal of Business &amp;amp;amp;amp; Economic Statistics;,citation_publisher=Informa UK Limited;">
+<meta name="citation_reference" content="citation_title=La Mafia E I Mafiosi;,citation_author=Antonino Cutrera;,citation_publication_date=1900;,citation_cover_date=1900;,citation_year=1900;">
+<meta name="citation_reference" content="citation_title=Estimating the deterrent effect of incarceration using sentencing enhancements;,citation_author=David S Abrams;,citation_publication_date=2012;,citation_cover_date=2012;,citation_year=2012;,citation_issue=4;,citation_doi=10.1257/app.4.4.32;,citation_volume=4;,citation_journal_title=American Economic Journal: Applied Economics;,citation_publisher=American Economic Association;">
+<meta name="citation_reference" content="citation_title=Replication data for: Estimating the deterrent effect of incarceration using sentencing enhancements;,citation_author=David S. Abrams;,citation_publication_date=2012;,citation_cover_date=2012;,citation_year=2012;,citation_doi=10.3886/E113838V1;,citation_publisher=ICPSR - Interuniversity Consortium for Political; Social Research;">
+<meta name="citation_reference" content="citation_title=Earnings losses of displaced workers;,citation_author=Louis S. Jacobson;,citation_author=Robert J. LaLonde;,citation_author=Daniel G. Sullivan;,citation_publication_date=1993;,citation_cover_date=1993;,citation_year=1993;,citation_fulltext_html_url=http://www.jstor.org/stable/2117574;,citation_issue=4;,citation_volume=83;,citation_journal_title=The American Economic Review;,citation_publisher=American Economic Association;">
+<meta name="citation_reference" content="citation_title=Bootstrap methods: Another look at the jackknife;,citation_author=B. Efron;,citation_publication_date=1979;,citation_cover_date=1979;,citation_year=1979;,citation_issue=1;,citation_doi=10.1214/aos/1176344552;,citation_volume=7;,citation_journal_title=The Annals of Statistics;,citation_publisher=Institute of Mathematical Statistics;">
+<meta name="citation_reference" content="citation_title=Pattern recognition and machine learning;,citation_author=Christopher M. Bishop;,citation_publication_date=2007;,citation_cover_date=2007;,citation_year=2007;,citation_isbn=9780387310732;,citation_series_title=Information science and statistics;">
+<meta name="citation_reference" content="citation_title=Deep learning;,citation_author=Ian Goodfellow;,citation_author=Yoshua Bengio;,citation_author=Aaron Courville;,citation_publication_date=2016;,citation_cover_date=2016;,citation_year=2016;">
+<meta name="citation_reference" content="citation_title=Deep learning with r;,citation_author=Francois Chollet;,citation_author=J. J. Allaire;,citation_publication_date=2018;,citation_cover_date=2018;,citation_year=2018;,citation_isbn=9781617295546;">
+<meta name="citation_reference" content="citation_title=Classification and regression trees;,citation_author=L. Breiman;,citation_author=J. Friedman;,citation_author=C. J. Stone;,citation_author=R. A. Olshen;,citation_publication_date=1984;,citation_cover_date=1984;,citation_year=1984;,citation_isbn=9780412048418;">
+<meta name="citation_reference" content="citation_title=The elements of statistical learning: Data mining, inference, and prediction;,citation_author=T. Hastie;,citation_author=R. Tibshirani;,citation_author=J. Friedman;,citation_publication_date=2013;,citation_cover_date=2013;,citation_year=2013;,citation_isbn=9780387216065;,citation_series_title=Springer series in statistics;">
+<meta name="citation_reference" content="citation_title=ISLR: Data for an introduction to statistical learning with applications in r;,citation_author=Gareth James;,citation_author=Daniela Witten;,citation_author=Trevor Hastie;,citation_author=Rob Tibshirani;,citation_publication_date=2021;,citation_cover_date=2021;,citation_year=2021;,citation_fulltext_html_url=https://CRAN.R-project.org/package=ISLR;">
+<meta name="citation_reference" content="citation_title=An introduction to statistical learning: With applications in r;,citation_author=Gareth James;,citation_author=Daniela Witten;,citation_author=Trevor Hastie;,citation_author=Robert Tibshirani;,citation_publication_date=2017;,citation_cover_date=2017;,citation_year=2017;,citation_isbn=9781461471370;,citation_series_title=Springer texts in statistics;">
+<meta name="citation_reference" content="citation_title=R markdown: The definitive guide: The definitive guide;,citation_author=Yihui Xie;,citation_author=J. J. Allaire;,citation_author=Garrett Grolemund;,citation_publication_date=2023;,citation_cover_date=2023;,citation_year=2023;,citation_doi=10.1201/9781138359444;">
+<meta name="citation_reference" content="citation_title=R markdown cookbook;,citation_author=Yihui Xie;,citation_author=Christophe Dervieux;,citation_author=Emily Riederer;,citation_publication_date=2020;,citation_cover_date=2020;,citation_year=2020;,citation_fulltext_html_url=https://bookdown.org/yihui/rmarkdown-cookbook;,citation_isbn=9780367563837;">
+<meta name="citation_reference" content="citation_title=Shiny: Web application framework for r;,citation_author=Winston Chang;,citation_author=Joe Cheng;,citation_author=JJ Allaire;,citation_author=Carson Sievert;,citation_author=Barret Schloerke;,citation_author=Yihui Xie;,citation_author=Jeff Allen;,citation_author=Jonathan McPherson;,citation_author=Alan Dipert;,citation_author=Barbara Borges;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_fulltext_html_url=https://CRAN.R-project.org/package=shiny;">
+<meta name="citation_reference" content="citation_title=Rmarkdown: Dynamic documents for r;,citation_author=JJ Allaire;,citation_author=Yihui Xie;,citation_author=Christophe Dervieux;,citation_author=Jonathan McPherson;,citation_author=Javier Luraschi;,citation_author=Kevin Ushey;,citation_author=Aron Atkins;,citation_author=Hadley Wickham;,citation_author=Joe Cheng;,citation_author=Winston Chang;,citation_author=Richard Iannone;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_fulltext_html_url=https://github.com/rstudio/rmarkdown;">
+<meta name="citation_reference" content="citation_title=Mastering shiny;,citation_author=H. Wickham;,citation_author=an O’Reilly Media Company Safari;,citation_publication_date=2021;,citation_cover_date=2021;,citation_year=2021;,citation_fulltext_html_url=https://books.google.de/books?id=ha1CzgEACAAJ;,citation_isbn=9781492047377;">
+<meta name="citation_reference" content="citation_title=Recursive partitioning for heterogeneous causal effects;,citation_author=Susan Athey;,citation_author=Guido Imbens;,citation_publication_date=2016;,citation_cover_date=2016;,citation_year=2016;,citation_issue=27;,citation_doi=10.1073/pnas.1510489113;,citation_volume=113;,citation_journal_title=Proceedings of the National Academy of Sciences;,citation_publisher=Proceedings of the National Academy of Sciences;">
+<meta name="citation_reference" content="citation_title=Grf: Generalized random forests;,citation_author=Julie Tibshirani;,citation_author=Susan Athey;,citation_author=Erik Sverdrup;,citation_author=Stefan Wager;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_fulltext_html_url=https://CRAN.R-project.org/package=grf;">
+<meta name="citation_reference" content="citation_title=Statistical inference in two-sample summary-data mendelian randomization using robust adjusted profile score;,citation_author=Qingyuan Zhao;,citation_author=Jingshu Wang;,citation_author=Gibran Hemani;,citation_author=Jack Bowden;,citation_author=Dylan S. Small;,citation_publication_date=2020-06;,citation_cover_date=2020-06;,citation_year=2020;,citation_issue=3;,citation_doi=0.1214/18-AOS1709;,citation_issn=0090-5364;,citation_volume=48;,citation_journal_title=The Annals of Statistics;,citation_publisher=Institute of Mathematical Statistics;">
+<meta name="citation_reference" content="citation_title=Generalized random forests;,citation_author=Susan Athey;,citation_author=Julie Tibshirani;,citation_author=Stefan Wager;,citation_publication_date=2019;,citation_cover_date=2019;,citation_year=2019;,citation_issue=2;,citation_doi=10.1214/18-aos1709;,citation_volume=47;,citation_journal_title=The Annals of Statistics;,citation_publisher=Institute of Mathematical Statistics;">
 </head>
 <body class="nav-sidebar floating slimcontent">
 
@@ -845,23 +930,23 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
 <div id="tbl-msgtex" class="cell quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
 <figure class="quarto-float quarto-float-tbl figure page-columns page-full"><div aria-describedby="tbl-msgtex-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="gccrhunoqo" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#gccrhunoqo table {
+<div id="jtblyhpghl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#jtblyhpghl table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#gccrhunoqo thead, #gccrhunoqo tbody, #gccrhunoqo tfoot, #gccrhunoqo tr, #gccrhunoqo td, #gccrhunoqo th {
+#jtblyhpghl thead, #jtblyhpghl tbody, #jtblyhpghl tfoot, #jtblyhpghl tr, #jtblyhpghl td, #jtblyhpghl th {
   border-style: none;
 }
 
-#gccrhunoqo p {
+#jtblyhpghl p {
   margin: 0;
   padding: 0;
 }
 
-#gccrhunoqo .gt_table {
+#jtblyhpghl .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -887,12 +972,12 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-left-color: #D3D3D3;
 }
 
-#gccrhunoqo .gt_caption {
+#jtblyhpghl .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#gccrhunoqo .gt_title {
+#jtblyhpghl .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -904,7 +989,7 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-bottom-width: 0;
 }
 
-#gccrhunoqo .gt_subtitle {
+#jtblyhpghl .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -916,7 +1001,7 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-top-width: 0;
 }
 
-#gccrhunoqo .gt_heading {
+#jtblyhpghl .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -928,13 +1013,13 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#gccrhunoqo .gt_bottom_border {
+#jtblyhpghl .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#gccrhunoqo .gt_col_headings {
+#jtblyhpghl .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -949,7 +1034,7 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#gccrhunoqo .gt_col_heading {
+#jtblyhpghl .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -969,7 +1054,7 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   overflow-x: hidden;
 }
 
-#gccrhunoqo .gt_column_spanner_outer {
+#jtblyhpghl .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -981,15 +1066,15 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   padding-right: 4px;
 }
 
-#gccrhunoqo .gt_column_spanner_outer:first-child {
+#jtblyhpghl .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#gccrhunoqo .gt_column_spanner_outer:last-child {
+#jtblyhpghl .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#gccrhunoqo .gt_column_spanner {
+#jtblyhpghl .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1001,11 +1086,11 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   width: 100%;
 }
 
-#gccrhunoqo .gt_spanner_row {
+#jtblyhpghl .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#gccrhunoqo .gt_group_heading {
+#jtblyhpghl .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1031,7 +1116,7 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   text-align: left;
 }
 
-#gccrhunoqo .gt_empty_group_heading {
+#jtblyhpghl .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1046,15 +1131,15 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   vertical-align: middle;
 }
 
-#gccrhunoqo .gt_from_md > :first-child {
+#jtblyhpghl .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#gccrhunoqo .gt_from_md > :last-child {
+#jtblyhpghl .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#gccrhunoqo .gt_row {
+#jtblyhpghl .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1073,7 +1158,7 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   overflow-x: hidden;
 }
 
-#gccrhunoqo .gt_stub {
+#jtblyhpghl .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1086,7 +1171,7 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   padding-right: 5px;
 }
 
-#gccrhunoqo .gt_stub_row_group {
+#jtblyhpghl .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1100,15 +1185,15 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   vertical-align: top;
 }
 
-#gccrhunoqo .gt_row_group_first td {
+#jtblyhpghl .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#gccrhunoqo .gt_row_group_first th {
+#jtblyhpghl .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#gccrhunoqo .gt_summary_row {
+#jtblyhpghl .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1118,16 +1203,16 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   padding-right: 5px;
 }
 
-#gccrhunoqo .gt_first_summary_row {
+#jtblyhpghl .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#gccrhunoqo .gt_first_summary_row.thick {
+#jtblyhpghl .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#gccrhunoqo .gt_last_summary_row {
+#jtblyhpghl .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1137,7 +1222,7 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#gccrhunoqo .gt_grand_summary_row {
+#jtblyhpghl .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1147,7 +1232,7 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   padding-right: 5px;
 }
 
-#gccrhunoqo .gt_first_grand_summary_row {
+#jtblyhpghl .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1157,7 +1242,7 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-top-color: #D3D3D3;
 }
 
-#gccrhunoqo .gt_last_grand_summary_row_top {
+#jtblyhpghl .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1167,11 +1252,11 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#gccrhunoqo .gt_striped {
+#jtblyhpghl .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#gccrhunoqo .gt_table_body {
+#jtblyhpghl .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1180,7 +1265,7 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#gccrhunoqo .gt_footnotes {
+#jtblyhpghl .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1194,7 +1279,7 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#gccrhunoqo .gt_footnote {
+#jtblyhpghl .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1203,7 +1288,7 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   padding-right: 5px;
 }
 
-#gccrhunoqo .gt_sourcenotes {
+#jtblyhpghl .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1217,7 +1302,7 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#gccrhunoqo .gt_sourcenote {
+#jtblyhpghl .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1225,72 +1310,72 @@ F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16</code></pre>
   padding-right: 5px;
 }
 
-#gccrhunoqo .gt_left {
+#jtblyhpghl .gt_left {
   text-align: left;
 }
 
-#gccrhunoqo .gt_center {
+#jtblyhpghl .gt_center {
   text-align: center;
 }
 
-#gccrhunoqo .gt_right {
+#jtblyhpghl .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#gccrhunoqo .gt_font_normal {
+#jtblyhpghl .gt_font_normal {
   font-weight: normal;
 }
 
-#gccrhunoqo .gt_font_bold {
+#jtblyhpghl .gt_font_bold {
   font-weight: bold;
 }
 
-#gccrhunoqo .gt_font_italic {
+#jtblyhpghl .gt_font_italic {
   font-style: italic;
 }
 
-#gccrhunoqo .gt_super {
+#jtblyhpghl .gt_super {
   font-size: 65%;
 }
 
-#gccrhunoqo .gt_footnote_marks {
+#jtblyhpghl .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#gccrhunoqo .gt_asterisk {
+#jtblyhpghl .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#gccrhunoqo .gt_indent_1 {
+#jtblyhpghl .gt_indent_1 {
   text-indent: 5px;
 }
 
-#gccrhunoqo .gt_indent_2 {
+#jtblyhpghl .gt_indent_2 {
   text-indent: 10px;
 }
 
-#gccrhunoqo .gt_indent_3 {
+#jtblyhpghl .gt_indent_3 {
   text-indent: 15px;
 }
 
-#gccrhunoqo .gt_indent_4 {
+#jtblyhpghl .gt_indent_4 {
   text-indent: 20px;
 }
 
-#gccrhunoqo .gt_indent_5 {
+#jtblyhpghl .gt_indent_5 {
   text-indent: 25px;
 }
 
-#gccrhunoqo .katex-display {
+#jtblyhpghl .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#gccrhunoqo div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#jtblyhpghl div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>

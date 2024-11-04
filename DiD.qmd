@@ -65,7 +65,6 @@ tabopts <- function(x) {
       row_group.font.weight = "bold",
       row_group.padding = 20,
       # body
-      
       table_body.hlines.width = 0, 
       table_body.border.bottom.color = "black",
       table_body.border.bottom.width = "1px",

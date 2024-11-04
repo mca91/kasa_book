@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.5.56">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="description" content="Kausalanalyse und Maschinelles Lernen mit R (KMLR) ist ein innovatives Online-Lehrbuch, das Studierende der Wirtschaftswissenschaften in moderne statistische Methoden und deren ökonometrische Anwendungen einführt. Das interaktive Kompendium verbindet theoretische Grundlagen mit praktischer Anwendung durch die Möglichkeit, R-Code direkt im Browser auszuführen. Von den statistischen Grundlagen über fortgeschrittene Methoden der Kausalanalyse bis hin zu Machine Learning-Techniken bietet das Buch einen umfassenden Einblick in fortschrittliche quantitative Forschungsmethoden. Besonders wertvoll für Studierende sind die zahlreichen interaktiven Visualisierungen und praxisnahen Fallstudien mit wirtschaftswissenschaftlichem Fokus, die ein tiefes Verständnis der ökonometrischen Methoden fördern.">
 <title>16&nbsp; Neuronale Netzwerke – Kausalanalyse und maschinelles Lernen mit R</title>
 <style>
 code{white-space: pre-wrap;}
@@ -118,7 +119,6 @@ div.csl-indent {
     "search-label": "Suchen"
   }
 }</script><script type="module" src="site_libs/quarto-ojs/quarto-ojs-runtime.js"></script><link href="site_libs/quarto-ojs/quarto-ojs.css" rel="stylesheet">
-<meta name="robots" content="noindex">
 <script>
   MathJax = {
     tex: {
@@ -245,6 +245,91 @@ window.Quarto = {
   typesetMath
 };
 </script><link rel="stylesheet" href="custom_styles.css">
+<meta name="citation_title" content="[16]{.chapter-number}&nbsp; [Neuronale Netzwerke]{.chapter-title}">
+<meta name="citation_language" content="de">
+<meta name="citation_reference" content="citation_title=The credibility revolution in empirical economics: How better research design is taking the con out of econometrics;,citation_author=Joshua D Angrist;,citation_author=Jörn-Steffen Pischke;,citation_publication_date=2010;,citation_cover_date=2010;,citation_year=2010;,citation_issue=2;,citation_volume=24;,citation_journal_title=Journal of economic perspectives;,citation_publisher=American Economic Association;">
+<meta name="citation_reference" content="citation_title=A new data set of educational attainment in the world, 1950–2010;,citation_author=Robert J. Barro;,citation_author=Jong Wha Lee;,citation_publication_date=2013;,citation_cover_date=2013;,citation_year=2013;,citation_fulltext_html_url=https://www.sciencedirect.com/science/article/pii/S0304387812000855;,citation_doi=https://doi.org/10.1016/j.jdeveco.2012.10.001;,citation_issn=0304-3878;,citation_volume=104;,citation_journal_title=Journal of Development Economics;">
+<meta name="citation_reference" content="citation_title=Beyond work ethic: Religion, individual, and political preferences;,citation_author=Christoph Basten;,citation_author=Frank Betz;,citation_publication_date=2013;,citation_cover_date=2013;,citation_year=2013;,citation_issue=3;,citation_volume=5;,citation_journal_title=American Economic Journal: Economic Policy;,citation_publisher=American Economic Association;">
+<meta name="citation_reference" content="citation_title=The effect of alcohol consumption on mortality: Regression discontinuity evidence from the minimum drinking age;,citation_author=Christopher Carpenter;,citation_author=Carlos Dobkin;,citation_publication_date=2009;,citation_cover_date=2009;,citation_year=2009;,citation_issue=1;,citation_volume=1;,citation_journal_title=American Economic Journal: Applied Economics;,citation_publisher=American Economic Association;">
+<meta name="citation_reference" content="citation_title=Optimal bandwidth choice for the regression discontinuity estimator;,citation_author=Guido Imbens;,citation_author=Karthik Kalyanaraman;,citation_publication_date=2012;,citation_cover_date=2012;,citation_year=2012;,citation_issue=3;,citation_volume=79;,citation_journal_title=The Review of economic studies;,citation_publisher=Oxford University Press;">
+<meta name="citation_reference" content="citation_title=Regression discontinuity designs: A guide to practice;,citation_author=G. W. Imbens;,citation_author=Thomas Lemieux;,citation_publication_date=2008;,citation_cover_date=2008;,citation_year=2008;,citation_issue=2;,citation_volume=142;,citation_journal_title=Journal of econometrics;,citation_publisher=Elsevier;">
+<meta name="citation_reference" content="citation_title=Why high-order polynomials should not be used in regression discontinuity designs;,citation_author=Andrew Gelman;,citation_author=Guido Imbens;,citation_publication_date=2019;,citation_cover_date=2019;,citation_year=2019;,citation_issue=3;,citation_volume=37;,citation_journal_title=Journal of Business &amp;amp;amp; Economic Statistics;,citation_publisher=Taylor &amp;amp; Francis;">
+<meta name="citation_reference" content="citation_title=Randomized experiments from non-random selection in US house elections;,citation_author=David S Lee;,citation_publication_date=2008;,citation_cover_date=2008;,citation_year=2008;,citation_issue=2;,citation_volume=142;,citation_journal_title=Journal of Econometrics;,citation_publisher=Elsevier;">
+<meta name="citation_reference" content="citation_title=Die protestantische ethik und der geist des kapitalismus;,citation_author=Max Weber;,citation_publication_date=2004;,citation_cover_date=2004;,citation_year=2004;,citation_volume=1614;">
+<meta name="citation_reference" content="citation_title=Regularization and confounding in linear regression for treatment effect estimation;,citation_author=P Richard Hahn;,citation_author=Carlos M Carvalho;,citation_author=David Puelz;,citation_author=Jingyu He;,citation_publication_date=2018;,citation_cover_date=2018;,citation_year=2018;">
+<meta name="citation_reference" content="citation_title=Regression shrinkage and selection via the lasso;,citation_author=Robert Tibshirani;,citation_publication_date=1996;,citation_cover_date=1996;,citation_year=1996;,citation_issue=1;,citation_volume=58;,citation_journal_title=Journal of the Royal Statistical Society Series B: Statistical Methodology;,citation_publisher=Oxford University Press;">
+<meta name="citation_reference" content="citation_title=Least angle regression;,citation_author=Bradley Efron;,citation_author=Trevor Hastie;,citation_author=Iain Johnstone;,citation_author=Robert Tibshirani;,citation_publication_date=2004;,citation_cover_date=2004;,citation_year=2004;">
+<meta name="citation_reference" content="citation_title=Sparse models and methods for optimal instruments with an application to eminent domain;,citation_author=Alexandre Belloni;,citation_author=Daniel Chen;,citation_author=Victor Chernozhukov;,citation_author=Christian Hansen;,citation_publication_date=2012;,citation_cover_date=2012;,citation_year=2012;,citation_issue=6;,citation_volume=80;,citation_journal_title=Econometrica;,citation_publisher=Wiley Online Library;">
+<meta name="citation_reference" content="citation_title=Least squares after model selection in high-dimensional sparse models;,citation_author=Alexandre Belloni;,citation_author=Victor Chernozhukov;,citation_publication_date=2013;,citation_cover_date=2013;,citation_year=2013;,citation_journal_title=Bernoulli;,citation_publisher=JSTOR;">
+<meta name="citation_reference" content="citation_title=High-dimensional methods and inference on structural and treatment effects;,citation_author=Alexandre Belloni;,citation_author=Victor Chernozhukov;,citation_author=Christian Hansen;,citation_publication_date=2014;,citation_cover_date=2014;,citation_year=2014;,citation_issue=2;,citation_volume=28;,citation_journal_title=Journal of Economic Perspectives;,citation_publisher=American Economic Association 2014 Broadway, Suite 305, Nashville, TN 37203-2418;">
+<meta name="citation_reference" content="citation_title=Ridge regression: Biased estimation for nonorthogonal problems;,citation_author=Arthur E Hoerl;,citation_author=Robert W Kennard;,citation_publication_date=1970;,citation_cover_date=1970;,citation_year=1970;,citation_issue=1;,citation_volume=12;,citation_journal_title=Technometrics;,citation_publisher=Taylor &amp;amp;amp; Francis;">
+<meta name="citation_reference" content="citation_title=Using data mining to predict secondary school student performance;,citation_author=Paulo Cortez;,citation_author=Alice Maria Gonçalves Silva;,citation_publication_date=2008;,citation_cover_date=2008;,citation_year=2008;,citation_publisher=EUROSIS-ETI;">
+<meta name="citation_reference" content="citation_title=Manipulation of the running variable in the regression discontinuity design: A density test;,citation_author=Justin McCrary;,citation_publication_date=2008;,citation_cover_date=2008;,citation_year=2008;,citation_issue=2;,citation_volume=142;,citation_journal_title=Journal of Econometrics;,citation_publisher=Elsevier;">
+<meta name="citation_reference" content="citation_title=Simple local polynomial density estimators;,citation_author=Matias D Cattaneo;,citation_author=Michael Jansson;,citation_author=Xinwei Ma;,citation_publication_date=2020;,citation_cover_date=2020;,citation_year=2020;,citation_issue=531;,citation_volume=115;,citation_journal_title=Journal of the American Statistical Association;,citation_publisher=Taylor &amp;amp;amp; Francis;">
+<meta name="citation_reference" content="citation_title=An introduction to propensity score methods for reducing the effects of confounding in observational studies;,citation_author=P. Austin;,citation_publication_date=2011;,citation_cover_date=2011;,citation_year=2011;,citation_issue=3;,citation_doi=10.1080/00273171.2011.568786;,citation_issn=0027-3171;,citation_pmid=21818162;,citation_volume=46;,citation_journal_title=Multivariate Behavioral Research;,citation_publisher=Informa UK Limited;">
+<meta name="citation_reference" content="citation_title=The central role of the propensity score in observational studies for causal effects;,citation_author=Paul R. Rosenbaum;,citation_author=Donald R. Rubin;,citation_publication_date=1983;,citation_cover_date=1983;,citation_year=1983;,citation_issue=1;,citation_doi=10.1017/cbo9780511810725.016;,citation_issn=0006-3444;,citation_volume=70;,citation_journal_title=Biometrika;,citation_publisher=Cambridge University Press;">
+<meta name="citation_reference" content="citation_title=Efficient estimation of average treatment effects using the estimated propensity score.;,citation_author=Keisuke Hirano;,citation_author=Guido Imbens;,citation_author=Geert Ridder;,citation_publication_date=2003;,citation_cover_date=2003;,citation_year=2003;,citation_issue=4;,citation_doi=10.1111/1468-0262.00442;,citation_volume=71;,citation_journal_title=Econometrica;,citation_publisher=The Econometric Society;">
+<meta name="citation_reference" content="citation_title=Comment on “an essay on the logical foundations of survey sampling” by basu, d;,citation_author=J Hájek;,citation_publication_date=1971;,citation_cover_date=1971;,citation_year=1971;,citation_volume=236;,citation_journal_title=Foundations of Statistical Inference;">
+<meta name="citation_reference" content="citation_title=Graphical display of covariate balance;,citation_author=Thomas Love;,citation_publication_date=2004;,citation_cover_date=2004;,citation_year=2004;,citation_publisher=Presentation;">
+<meta name="citation_reference" content="citation_title=The use of bootstrapping when using propensity-score matching without replacement: A simulation study.;,citation_author=Peter C. Austin;,citation_author=Dylan S. Small;,citation_publication_date=2014;,citation_cover_date=2014;,citation_year=2014;,citation_issue=24;,citation_doi=10.1002/sim.6276;,citation_issn=0277-6715;,citation_volume=33;,citation_journal_title=Statistics in Medicine;,citation_publisher=Wiley;">
+<meta name="citation_reference" content="citation_title=Robust post-matching inference.;,citation_author=Alberto Abadie;,citation_author=Jann Spiess;,citation_publication_date=2022;,citation_cover_date=2022;,citation_year=2022;,citation_issue=538;,citation_doi=10.1080/01621459.2020.1840383;,citation_issn=0162-1459;,citation_volume=117;,citation_journal_title=Journal of the American Statistical Association;,citation_publisher=Informa UK Limited;">
+<meta name="citation_reference" content="citation_title=Matching on the estimated propensity score.;,citation_author=undefined Imbens;,citation_publication_date=2016;,citation_cover_date=2016;,citation_year=2016;,citation_issue=2;,citation_doi=10.3982/ecta11293;,citation_issn=0012-9682;,citation_volume=84;,citation_journal_title=Econometrica;,citation_publisher=The Econometric Society;">
+<meta name="citation_reference" content="citation_title=The finite sample performance of inference methods for propensity score matching and weighting estimators.;,citation_author=Hugo Bodory;,citation_author=Lorenzo Camponovo;,citation_author=Martin Huber;,citation_author=Michael Lechner;,citation_publication_date=2020;,citation_cover_date=2020;,citation_year=2020;,citation_doi=10.2139/ssrn.2731969;,citation_issn=1556-5068;,citation_journal_title=Journal of Business &amp;amp;amp; Economic Statistics;,citation_publisher=Elsevier BV;">
+<meta name="citation_reference" content="citation_title=Interval estimation for treatment effects using propensity score matching. Statistics in medicine;,citation_author=Jennifer Hill;,citation_author=Jerome P. Reiter;,citation_publication_date=2006;,citation_cover_date=2006;,citation_year=2006;,citation_issue=13;,citation_doi=10.1002/sim.2277;,citation_issn=0277-6715;,citation_volume=25;,citation_journal_title=Statistics in Medicine;,citation_publisher=Wiley;">
+<meta name="citation_reference" content="citation_title=On the failure of the bootstrap for matching estimators.;,citation_author=Alberto Abadie;,citation_author=Guido W. Imbens;,citation_publication_date=2008;,citation_cover_date=2008;,citation_year=2008;,citation_issue=6;,citation_doi=10.3982/ECTA6474;,citation_issn=0012-9682,1468-0262;,citation_volume=76;,citation_journal_title=Econometrica. Journal of the Econometric Society;">
+<meta name="citation_reference" content="citation_title=Estimating the effect of treatment on binary outcomes using full matching on the propensity score.;,citation_author=Peter C. Austin;,citation_author=Elizabeth A. Stuart;,citation_publication_date=2017;,citation_cover_date=2017;,citation_year=2017;,citation_issue=6;,citation_doi=10.1177/0962280215601134;,citation_issn=0962-2802,1477-0334;,citation_volume=26;,citation_journal_title=Statistical Methods in Medical Research;">
+<meta name="citation_reference" content="citation_title=Entropy balancing for causal effects: A multivariate reweighting method to produce balanced samples in observational studies;,citation_author=Jens Hainmueller;,citation_publication_date=2012;,citation_cover_date=2012;,citation_year=2012;,citation_issue=1;,citation_doi=10.1093/pan/mpr025;,citation_issn=1047-1987;,citation_volume=20;,citation_journal_title=Political Analysis;,citation_publisher=Cambridge University Press (CUP);">
+<meta name="citation_reference" content="citation_title=Econometric analysis of cross section and panel data;,citation_author=Jeffrey Wooldridge;,citation_publication_date=2010;,citation_cover_date=2010;,citation_year=2010;,citation_isbn=9780262232586;">
+<meta name="citation_reference" content="citation_title=Statistical inference;,citation_author=George Casella;,citation_author=Roger L. Berger;,citation_publication_date=2002;,citation_cover_date=2002;,citation_year=2002;,citation_isbn=9780534243128;">
+<meta name="citation_reference" content="citation_title=Synthetic control methods for comparative case studies: Estimating the effect of california’s tobacco control program.;,citation_author=Alexis Diamond Abadie;,citation_author=Jens Hainmueller;,citation_publication_date=2010;,citation_cover_date=2010;,citation_year=2010;,citation_issue=490;,citation_doi=10.1198/jasa.2009.ap08746;,citation_volume=105;,citation_journal_title=Journal of the American Statistical Association;,citation_publisher=Informa UK Limited;">
+<meta name="citation_reference" content="citation_title=Comparative politics and the synthetic control method: COMPARATIVE POLITICS AND THE SYNTHETIC CONTROL METHOD;,citation_author=Alberto Abadie;,citation_author=Alexis Diamond;,citation_author=Jens Hainmueller;,citation_publication_date=2014;,citation_cover_date=2014;,citation_year=2014;,citation_issue=2;,citation_doi=10.1111/ajps.12116;,citation_volume=59;,citation_journal_title=American Journal of Political Science;,citation_publisher=Wiley;">
+<meta name="citation_reference" content="citation_title=The costs of economic nationalism: Evidence from the brexit experiment*;,citation_author=Benjamin Born;,citation_author=Gernot J Müller;,citation_author=Moritz Schularick;,citation_author=Petr Sedláček;,citation_publication_date=2019;,citation_cover_date=2019;,citation_year=2019;,citation_issue=623;,citation_doi=10.1093/ej/uez020;,citation_volume=129;,citation_journal_title=The Economic Journal;,citation_publisher=Oxford University Press (OUP);">
+<meta name="citation_reference" content="citation_title=End-of-sample instability tests;,citation_author=D. W. K. Andrews;,citation_publication_date=2003;,citation_cover_date=2003;,citation_year=2003;,citation_issue=6;,citation_doi=10.1111/1468-0262.00466;,citation_volume=71;,citation_journal_title=Econometrica;,citation_publisher=The Econometric Society;">
+<meta name="citation_reference" content="citation_title=The effects of the 1993 earned income tax credit expansion on the labor supply of unmarried women;,citation_author=Kampon Adireksombat;,citation_publication_date=2010;,citation_cover_date=2010;,citation_year=2010;,citation_issue=1;,citation_doi=https://doi.org/10.1177/1091142109358626;,citation_issn=1552-7530;,citation_volume=38;,citation_journal_title=Public Finance Review;,citation_publisher=SAGE Publications;">
+<meta name="citation_reference" content="citation_title=Labor supply response to the earned income tax credit;,citation_author=N. Eissa;,citation_author=J. B. Liebman;,citation_publication_date=1996;,citation_cover_date=1996;,citation_year=1996;,citation_issue=2;,citation_doi=10.2307/2946689;,citation_issn=1531-4650;,citation_volume=111;,citation_journal_title=The Quarterly Journal of Economics;,citation_publisher=Oxford University Press (OUP);">
+<meta name="citation_reference" content="citation_title=Difference-in-differences with multiple time periods.;,citation_author=Brantly Callaway;,citation_author=Pedro H. C. Sant’Anna;,citation_publication_date=2021;,citation_cover_date=2021;,citation_year=2021;,citation_issue=2;,citation_doi=10.1016/j.jeconom.2020.12.001;,citation_volume=225;,citation_journal_title=Journal of Econometrics;">
+<meta name="citation_reference" content="citation_title=Difference-in-differences with variation in treatment timing.;,citation_author=Andrew Goodman-Bacon;,citation_publication_date=2021;,citation_cover_date=2021;,citation_year=2021;,citation_issue=2;,citation_doi=10.1016/j.jeconom.2021.03.014;,citation_volume=225;,citation_journal_title=Journal of Econometrics;,citation_publisher=Elsevier BV;">
+<meta name="citation_reference" content="citation_title=Do police reduce crime? Estimates using the allocation of police forces after a terrorist attack;,citation_author=Rafael Di Tella;,citation_author=Ernesto Schargrodsky;,citation_publication_date=2004;,citation_cover_date=2004;,citation_year=2004;,citation_issue=1;,citation_doi=10.1257/000282804322970733;,citation_volume=94;,citation_journal_title=American Economic Review;,citation_publisher=American Economic Association;">
+<meta name="citation_reference" content="citation_title=Economic shocks and civil conflict: An instrumental variables approach;,citation_author=Edward Miguel;,citation_author=Shanker Satyanath;,citation_author=Ernest Sergenti;,citation_publication_date=2004;,citation_cover_date=2004;,citation_year=2004;,citation_issue=4;,citation_doi=10.1086/421174;,citation_volume=112;,citation_journal_title=Journal of Political Economy;,citation_publisher=University of Chicago Press;">
+<meta name="citation_reference" content="citation_title=Ethnicity, insurgency, and civil war.;,citation_author=undefined Fearon;,citation_author=David D. Laitin;,citation_publication_date=2003;,citation_cover_date=2003;,citation_year=2003;,citation_issue=01;,citation_doi=10.1017/s0003055403000534;,citation_volume=97;,citation_journal_title=American Political Science Review;,citation_publisher=Cambridge University Press (CUP);">
+<meta name="citation_reference" content="citation_title=Weak states: Causes and consequences of the sicilian mafia;,citation_author=Daron Acemoglu;,citation_author=Giuseppe De Feo;,citation_author=Giacomo Davide De Luca;,citation_publication_date=2020;,citation_cover_date=2020;,citation_year=2020;,citation_doi=10.1093/restud/rdz009;,citation_journal_title=The Review of Economic Studies;,citation_publisher=Oxford University Press (OUP);">
+<meta name="citation_reference" content="citation_title=Income and democracy;,citation_author=Daron Acemoglu;,citation_author=Simon Johnson;,citation_author=James A. Robinson;,citation_author=Pierre Yared;,citation_publication_date=2008;,citation_cover_date=2008;,citation_year=2008;,citation_issue=3;,citation_doi=10.1257/aer.98.3.808;,citation_volume=98;,citation_journal_title=American Economic Review;,citation_publisher=American Economic Association;">
+<meta name="citation_reference" content="citation_title=Polyarchy: Participation and opposition: Participation and opposition;,citation_author=Robert Alan Dahl;,citation_publication_date=1971;,citation_cover_date=1971;,citation_year=1971;,citation_isbn=0300015658;">
+<meta name="citation_reference" content="citation_title=The third wave: Democratization in the late twentieth century: Democratization in the late twentieth century;,citation_author=Samuel P. Huntington;,citation_publication_date=1991;,citation_cover_date=1991;,citation_year=1991;,citation_isbn=0-8061-2516-0;">
+<meta name="citation_reference" content="citation_title=Capitalist development and democracy;,citation_author=Dietrich Rueschemeyer;,citation_author=Evelyne H. Stephens;,citation_author=John D. Stephens;,citation_publication_date=1992;,citation_cover_date=1992;,citation_year=1992;,citation_isbn=074560398X;">
+<meta name="citation_reference" content="citation_title=The effect: An introduction to research design and causality;,citation_author=Nick Huntington-Klein;,citation_publication_date=2021;,citation_cover_date=2021;,citation_year=2021;,citation_doi=10.1201/9781003226055;,citation_isbn=9781003226055;">
+<meta name="citation_reference" content="citation_title=Synth: An r package for synthetic control methods in comparative case studies;,citation_author=Jens Hainmueller;,citation_author=Alexis Diamond;,citation_author=Alberto Abadie;,citation_publication_date=2011;,citation_cover_date=2011;,citation_year=2011;,citation_fulltext_html_url=https://www.jstatsoft.org/v42/i13/;,citation_issue=13;,citation_volume=42;,citation_journal_title=Journal of Statistical Software;">
+<meta name="citation_reference" content="citation_title=Replication data for: Income and democracy;,citation_author=Daron Acemoglu;,citation_author=Simon Johnson;,citation_author=James A. Robinson;,citation_author=Pierre Yared;,citation_publication_date=2008;,citation_cover_date=2008;,citation_year=2008;,citation_doi=10.3886/E113251V1;,citation_publisher=ICPSR - Interuniversity Consortium for Political; Social Research;">
+<meta name="citation_reference" content="citation_title=Biases in dynamic models with fixed effects;,citation_author=Stephen Nickell;,citation_publication_date=1981;,citation_cover_date=1981;,citation_year=1981;,citation_issue=6;,citation_doi=10.2307/1911408;,citation_volume=49;,citation_journal_title=Econometrica;,citation_publisher=JSTOR;">
+<meta name="citation_reference" content="citation_title=Mostly harmless econometrics: An empiricist’s companion;,citation_author=J. Angrist;,citation_author=Jörn-Steffen Pischke;,citation_publication_date=2009;,citation_cover_date=2009;,citation_year=2009;,citation_isbn=9780691120355;">
+<meta name="citation_reference" content="citation_title=Some tests of specification for panel data: Monte carlo evidence and an application to employment equations;,citation_author=Manuel Arellano;,citation_author=Stephen Bond;,citation_publication_date=1991;,citation_cover_date=1991;,citation_year=1991;,citation_issue=2;,citation_doi=10.2307/2297968;,citation_volume=58;,citation_journal_title=The Review of Economic Studies;,citation_publisher=Oxford University Press (OUP);">
+<meta name="citation_reference" content="citation_title=Estimation of dynamic models with error components;,citation_author=T. W. Anderson;,citation_author=Cheng Hsiao;,citation_publication_date=1981;,citation_cover_date=1981;,citation_year=1981;,citation_issue=375;,citation_doi=10.2307/2287517;,citation_volume=76;,citation_journal_title=Journal of the American Statistical Association;,citation_publisher=Informa UK Limited;">
+<meta name="citation_reference" content="citation_title=The estimation of economic relationships using instrumental variables;,citation_author=J. D. Sargan;,citation_publication_date=1958;,citation_cover_date=1958;,citation_year=1958;,citation_issue=3;,citation_doi=10.2307/1907619;,citation_volume=26;,citation_journal_title=Econometrica;,citation_publisher=JSTOR;">
+<meta name="citation_reference" content="citation_title=Large sample properties of generalized method of moments estimators;,citation_author=Lars Peter Hansen;,citation_publication_date=1982;,citation_cover_date=1982;,citation_year=1982;,citation_issue=4;,citation_doi=10.2307/1912775;,citation_volume=50;,citation_journal_title=Econometrica;,citation_publisher=JSTOR;">
+<meta name="citation_reference" content="citation_title=Bootstrap procedures under some non-i.i.d. models;,citation_author=Regina Y. Liu;,citation_publication_date=1988;,citation_cover_date=1988;,citation_year=1988;,citation_issue=4;,citation_doi=10.1214/aos/1176351062;,citation_volume=16;,citation_journal_title=The Annals of Statistics;,citation_publisher=Institute of Mathematical Statistics;">
+<meta name="citation_reference" content="citation_title=Bootstrap-based improvements for inference with clustered errors;,citation_author=A. Colin Cameron;,citation_author=Jonah B. Gelbach;,citation_author=Douglas L. Miller;,citation_publication_date=2008;,citation_cover_date=2008;,citation_year=2008;,citation_issue=3;,citation_doi=10.1162/rest.90.3.414;,citation_volume=90;,citation_journal_title=Review of Economics and Statistics;,citation_publisher=MIT Press - Journals;">
+<meta name="citation_reference" content="citation_title=Robust inference with multiway clustering;,citation_author=A. Colin Cameron;,citation_author=Jonah B. Gelbach;,citation_author=Douglas L. Miller;,citation_publication_date=2011;,citation_cover_date=2011;,citation_year=2011;,citation_issue=2;,citation_doi=10.1198/jbes.2010.07136;,citation_volume=29;,citation_journal_title=Journal of Business &amp;amp;amp;amp; Economic Statistics;,citation_publisher=Informa UK Limited;">
+<meta name="citation_reference" content="citation_title=La Mafia E I Mafiosi;,citation_author=Antonino Cutrera;,citation_publication_date=1900;,citation_cover_date=1900;,citation_year=1900;">
+<meta name="citation_reference" content="citation_title=Estimating the deterrent effect of incarceration using sentencing enhancements;,citation_author=David S Abrams;,citation_publication_date=2012;,citation_cover_date=2012;,citation_year=2012;,citation_issue=4;,citation_doi=10.1257/app.4.4.32;,citation_volume=4;,citation_journal_title=American Economic Journal: Applied Economics;,citation_publisher=American Economic Association;">
+<meta name="citation_reference" content="citation_title=Replication data for: Estimating the deterrent effect of incarceration using sentencing enhancements;,citation_author=David S. Abrams;,citation_publication_date=2012;,citation_cover_date=2012;,citation_year=2012;,citation_doi=10.3886/E113838V1;,citation_publisher=ICPSR - Interuniversity Consortium for Political; Social Research;">
+<meta name="citation_reference" content="citation_title=Earnings losses of displaced workers;,citation_author=Louis S. Jacobson;,citation_author=Robert J. LaLonde;,citation_author=Daniel G. Sullivan;,citation_publication_date=1993;,citation_cover_date=1993;,citation_year=1993;,citation_fulltext_html_url=http://www.jstor.org/stable/2117574;,citation_issue=4;,citation_volume=83;,citation_journal_title=The American Economic Review;,citation_publisher=American Economic Association;">
+<meta name="citation_reference" content="citation_title=Bootstrap methods: Another look at the jackknife;,citation_author=B. Efron;,citation_publication_date=1979;,citation_cover_date=1979;,citation_year=1979;,citation_issue=1;,citation_doi=10.1214/aos/1176344552;,citation_volume=7;,citation_journal_title=The Annals of Statistics;,citation_publisher=Institute of Mathematical Statistics;">
+<meta name="citation_reference" content="citation_title=Pattern recognition and machine learning;,citation_author=Christopher M. Bishop;,citation_publication_date=2007;,citation_cover_date=2007;,citation_year=2007;,citation_isbn=9780387310732;,citation_series_title=Information science and statistics;">
+<meta name="citation_reference" content="citation_title=Deep learning;,citation_author=Ian Goodfellow;,citation_author=Yoshua Bengio;,citation_author=Aaron Courville;,citation_publication_date=2016;,citation_cover_date=2016;,citation_year=2016;">
+<meta name="citation_reference" content="citation_title=Deep learning with r;,citation_author=Francois Chollet;,citation_author=J. J. Allaire;,citation_publication_date=2018;,citation_cover_date=2018;,citation_year=2018;,citation_isbn=9781617295546;">
+<meta name="citation_reference" content="citation_title=Classification and regression trees;,citation_author=L. Breiman;,citation_author=J. Friedman;,citation_author=C. J. Stone;,citation_author=R. A. Olshen;,citation_publication_date=1984;,citation_cover_date=1984;,citation_year=1984;,citation_isbn=9780412048418;">
+<meta name="citation_reference" content="citation_title=The elements of statistical learning: Data mining, inference, and prediction;,citation_author=T. Hastie;,citation_author=R. Tibshirani;,citation_author=J. Friedman;,citation_publication_date=2013;,citation_cover_date=2013;,citation_year=2013;,citation_isbn=9780387216065;,citation_series_title=Springer series in statistics;">
+<meta name="citation_reference" content="citation_title=ISLR: Data for an introduction to statistical learning with applications in r;,citation_author=Gareth James;,citation_author=Daniela Witten;,citation_author=Trevor Hastie;,citation_author=Rob Tibshirani;,citation_publication_date=2021;,citation_cover_date=2021;,citation_year=2021;,citation_fulltext_html_url=https://CRAN.R-project.org/package=ISLR;">
+<meta name="citation_reference" content="citation_title=An introduction to statistical learning: With applications in r;,citation_author=Gareth James;,citation_author=Daniela Witten;,citation_author=Trevor Hastie;,citation_author=Robert Tibshirani;,citation_publication_date=2017;,citation_cover_date=2017;,citation_year=2017;,citation_isbn=9781461471370;,citation_series_title=Springer texts in statistics;">
+<meta name="citation_reference" content="citation_title=R markdown: The definitive guide: The definitive guide;,citation_author=Yihui Xie;,citation_author=J. J. Allaire;,citation_author=Garrett Grolemund;,citation_publication_date=2023;,citation_cover_date=2023;,citation_year=2023;,citation_doi=10.1201/9781138359444;">
+<meta name="citation_reference" content="citation_title=R markdown cookbook;,citation_author=Yihui Xie;,citation_author=Christophe Dervieux;,citation_author=Emily Riederer;,citation_publication_date=2020;,citation_cover_date=2020;,citation_year=2020;,citation_fulltext_html_url=https://bookdown.org/yihui/rmarkdown-cookbook;,citation_isbn=9780367563837;">
+<meta name="citation_reference" content="citation_title=Shiny: Web application framework for r;,citation_author=Winston Chang;,citation_author=Joe Cheng;,citation_author=JJ Allaire;,citation_author=Carson Sievert;,citation_author=Barret Schloerke;,citation_author=Yihui Xie;,citation_author=Jeff Allen;,citation_author=Jonathan McPherson;,citation_author=Alan Dipert;,citation_author=Barbara Borges;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_fulltext_html_url=https://CRAN.R-project.org/package=shiny;">
+<meta name="citation_reference" content="citation_title=Rmarkdown: Dynamic documents for r;,citation_author=JJ Allaire;,citation_author=Yihui Xie;,citation_author=Christophe Dervieux;,citation_author=Jonathan McPherson;,citation_author=Javier Luraschi;,citation_author=Kevin Ushey;,citation_author=Aron Atkins;,citation_author=Hadley Wickham;,citation_author=Joe Cheng;,citation_author=Winston Chang;,citation_author=Richard Iannone;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_fulltext_html_url=https://github.com/rstudio/rmarkdown;">
+<meta name="citation_reference" content="citation_title=Mastering shiny;,citation_author=H. Wickham;,citation_author=an O’Reilly Media Company Safari;,citation_publication_date=2021;,citation_cover_date=2021;,citation_year=2021;,citation_fulltext_html_url=https://books.google.de/books?id=ha1CzgEACAAJ;,citation_isbn=9781492047377;">
+<meta name="citation_reference" content="citation_title=Recursive partitioning for heterogeneous causal effects;,citation_author=Susan Athey;,citation_author=Guido Imbens;,citation_publication_date=2016;,citation_cover_date=2016;,citation_year=2016;,citation_issue=27;,citation_doi=10.1073/pnas.1510489113;,citation_volume=113;,citation_journal_title=Proceedings of the National Academy of Sciences;,citation_publisher=Proceedings of the National Academy of Sciences;">
+<meta name="citation_reference" content="citation_title=Grf: Generalized random forests;,citation_author=Julie Tibshirani;,citation_author=Susan Athey;,citation_author=Erik Sverdrup;,citation_author=Stefan Wager;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_fulltext_html_url=https://CRAN.R-project.org/package=grf;">
+<meta name="citation_reference" content="citation_title=Statistical inference in two-sample summary-data mendelian randomization using robust adjusted profile score;,citation_author=Qingyuan Zhao;,citation_author=Jingshu Wang;,citation_author=Gibran Hemani;,citation_author=Jack Bowden;,citation_author=Dylan S. Small;,citation_publication_date=2020-06;,citation_cover_date=2020-06;,citation_year=2020;,citation_issue=3;,citation_doi=0.1214/18-AOS1709;,citation_issn=0090-5364;,citation_volume=48;,citation_journal_title=The Annals of Statistics;,citation_publisher=Institute of Mathematical Statistics;">
+<meta name="citation_reference" content="citation_title=Generalized random forests;,citation_author=Susan Athey;,citation_author=Julie Tibshirani;,citation_author=Stefan Wager;,citation_publication_date=2019;,citation_cover_date=2019;,citation_year=2019;,citation_issue=2;,citation_doi=10.1214/18-aos1709;,citation_volume=47;,citation_journal_title=The Annals of Statistics;,citation_publisher=Institute of Mathematical Statistics;">
 </head>
 <body class="nav-sidebar floating slimcontent">
 
@@ -692,105 +777,105 @@ ________________________________________________________________________________
 <span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Epoch 1/50
-25/25 - 0s - loss: 17.5160 - val_loss: 16.4464 - 447ms/epoch - 18ms/step
+25/25 - 0s - loss: 18.8368 - val_loss: 17.7275 - 424ms/epoch - 17ms/step
 Epoch 2/50
-25/25 - 0s - loss: 15.9878 - val_loss: 14.9655 - 108ms/epoch - 4ms/step
+25/25 - 0s - loss: 17.3148 - val_loss: 16.2388 - 121ms/epoch - 5ms/step
 Epoch 3/50
-25/25 - 0s - loss: 14.4755 - val_loss: 13.4764 - 110ms/epoch - 4ms/step
+25/25 - 0s - loss: 15.7909 - val_loss: 14.7584 - 109ms/epoch - 4ms/step
 Epoch 4/50
-25/25 - 0s - loss: 12.9450 - val_loss: 12.0043 - 100ms/epoch - 4ms/step
+25/25 - 0s - loss: 14.2743 - val_loss: 13.2721 - 106ms/epoch - 4ms/step
 Epoch 5/50
-25/25 - 0s - loss: 11.4333 - val_loss: 10.5129 - 102ms/epoch - 4ms/step
+25/25 - 0s - loss: 12.7541 - val_loss: 11.7912 - 104ms/epoch - 4ms/step
 Epoch 6/50
-25/25 - 0s - loss: 9.9056 - val_loss: 9.0389 - 103ms/epoch - 4ms/step
+25/25 - 0s - loss: 11.2317 - val_loss: 10.3162 - 98ms/epoch - 4ms/step
 Epoch 7/50
-25/25 - 0s - loss: 8.3944 - val_loss: 7.5470 - 102ms/epoch - 4ms/step
+25/25 - 0s - loss: 9.7127 - val_loss: 8.8350 - 96ms/epoch - 4ms/step
 Epoch 8/50
-25/25 - 0s - loss: 6.8666 - val_loss: 6.0733 - 100ms/epoch - 4ms/step
+25/25 - 0s - loss: 8.1925 - val_loss: 7.3526 - 104ms/epoch - 4ms/step
 Epoch 9/50
-25/25 - 0s - loss: 5.3536 - val_loss: 4.5841 - 101ms/epoch - 4ms/step
+25/25 - 0s - loss: 6.6678 - val_loss: 5.8770 - 103ms/epoch - 4ms/step
 Epoch 10/50
-25/25 - 0s - loss: 3.8264 - val_loss: 3.1125 - 103ms/epoch - 4ms/step
+25/25 - 0s - loss: 5.1540 - val_loss: 4.3847 - 100ms/epoch - 4ms/step
 Epoch 11/50
-25/25 - 0s - loss: 2.3372 - val_loss: 1.7170 - 104ms/epoch - 4ms/step
+25/25 - 0s - loss: 3.6244 - val_loss: 2.9148 - 99ms/epoch - 4ms/step
 Epoch 12/50
-25/25 - 0s - loss: 1.3020 - val_loss: 1.2191 - 99ms/epoch - 4ms/step
+25/25 - 0s - loss: 2.1455 - val_loss: 1.5555 - 96ms/epoch - 4ms/step
 Epoch 13/50
-25/25 - 0s - loss: 1.1290 - val_loss: 1.1774 - 99ms/epoch - 4ms/step
+25/25 - 0s - loss: 1.1963 - val_loss: 1.1307 - 100ms/epoch - 4ms/step
 Epoch 14/50
-25/25 - 0s - loss: 1.1043 - val_loss: 1.1549 - 99ms/epoch - 4ms/step
+25/25 - 0s - loss: 1.0608 - val_loss: 1.1016 - 95ms/epoch - 4ms/step
 Epoch 15/50
-25/25 - 0s - loss: 1.0804 - val_loss: 1.1293 - 99ms/epoch - 4ms/step
+25/25 - 0s - loss: 1.0376 - val_loss: 1.0857 - 94ms/epoch - 4ms/step
 Epoch 16/50
-25/25 - 0s - loss: 1.0567 - val_loss: 1.1086 - 107ms/epoch - 4ms/step
+25/25 - 0s - loss: 1.0181 - val_loss: 1.0624 - 94ms/epoch - 4ms/step
 Epoch 17/50
-25/25 - 0s - loss: 1.0357 - val_loss: 1.0836 - 100ms/epoch - 4ms/step
+25/25 - 0s - loss: 1.0017 - val_loss: 1.0374 - 100ms/epoch - 4ms/step
 Epoch 18/50
-25/25 - 0s - loss: 1.0140 - val_loss: 1.0538 - 99ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.9803 - val_loss: 1.0186 - 115ms/epoch - 5ms/step
 Epoch 19/50
-25/25 - 0s - loss: 0.9935 - val_loss: 1.0315 - 100ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.9634 - val_loss: 0.9953 - 114ms/epoch - 5ms/step
 Epoch 20/50
-25/25 - 0s - loss: 0.9737 - val_loss: 1.0088 - 103ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.9468 - val_loss: 0.9730 - 108ms/epoch - 4ms/step
 Epoch 21/50
-25/25 - 0s - loss: 0.9556 - val_loss: 0.9821 - 101ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.9312 - val_loss: 0.9510 - 105ms/epoch - 4ms/step
 Epoch 22/50
-25/25 - 0s - loss: 0.9375 - val_loss: 0.9602 - 101ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.9177 - val_loss: 0.9317 - 106ms/epoch - 4ms/step
 Epoch 23/50
-25/25 - 0s - loss: 0.9218 - val_loss: 0.9351 - 99ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.9017 - val_loss: 0.9122 - 102ms/epoch - 4ms/step
 Epoch 24/50
-25/25 - 0s - loss: 0.9057 - val_loss: 0.9161 - 101ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.8875 - val_loss: 0.8926 - 98ms/epoch - 4ms/step
 Epoch 25/50
-25/25 - 0s - loss: 0.8899 - val_loss: 0.8974 - 102ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.8755 - val_loss: 0.8734 - 104ms/epoch - 4ms/step
 Epoch 26/50
-25/25 - 0s - loss: 0.8767 - val_loss: 0.8764 - 101ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.8616 - val_loss: 0.8638 - 98ms/epoch - 4ms/step
 Epoch 27/50
-25/25 - 0s - loss: 0.8626 - val_loss: 0.8589 - 101ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.8502 - val_loss: 0.8381 - 94ms/epoch - 4ms/step
 Epoch 28/50
-25/25 - 0s - loss: 0.8500 - val_loss: 0.8441 - 101ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.8388 - val_loss: 0.8276 - 103ms/epoch - 4ms/step
 Epoch 29/50
-25/25 - 0s - loss: 0.8368 - val_loss: 0.8235 - 101ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.8274 - val_loss: 0.8105 - 101ms/epoch - 4ms/step
 Epoch 30/50
-25/25 - 0s - loss: 0.8263 - val_loss: 0.8082 - 103ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.8194 - val_loss: 0.8018 - 99ms/epoch - 4ms/step
 Epoch 31/50
-25/25 - 0s - loss: 0.8183 - val_loss: 0.7976 - 101ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.8090 - val_loss: 0.7865 - 98ms/epoch - 4ms/step
 Epoch 32/50
-25/25 - 0s - loss: 0.8096 - val_loss: 0.7869 - 101ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.8027 - val_loss: 0.7764 - 96ms/epoch - 4ms/step
 Epoch 33/50
-25/25 - 0s - loss: 0.8025 - val_loss: 0.7743 - 102ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7958 - val_loss: 0.7710 - 98ms/epoch - 4ms/step
 Epoch 34/50
-25/25 - 0s - loss: 0.7944 - val_loss: 0.7695 - 102ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7903 - val_loss: 0.7638 - 96ms/epoch - 4ms/step
 Epoch 35/50
-25/25 - 0s - loss: 0.7896 - val_loss: 0.7608 - 102ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7865 - val_loss: 0.7569 - 95ms/epoch - 4ms/step
 Epoch 36/50
-25/25 - 0s - loss: 0.7841 - val_loss: 0.7543 - 102ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7809 - val_loss: 0.7528 - 99ms/epoch - 4ms/step
 Epoch 37/50
-25/25 - 0s - loss: 0.7834 - val_loss: 0.7517 - 100ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7772 - val_loss: 0.7464 - 97ms/epoch - 4ms/step
 Epoch 38/50
-25/25 - 0s - loss: 0.7790 - val_loss: 0.7449 - 101ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7746 - val_loss: 0.7418 - 100ms/epoch - 4ms/step
 Epoch 39/50
-25/25 - 0s - loss: 0.7735 - val_loss: 0.7407 - 101ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7710 - val_loss: 0.7392 - 103ms/epoch - 4ms/step
 Epoch 40/50
-25/25 - 0s - loss: 0.7725 - val_loss: 0.7385 - 102ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7689 - val_loss: 0.7337 - 99ms/epoch - 4ms/step
 Epoch 41/50
-25/25 - 0s - loss: 0.7696 - val_loss: 0.7332 - 101ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7669 - val_loss: 0.7308 - 101ms/epoch - 4ms/step
 Epoch 42/50
-25/25 - 0s - loss: 0.7659 - val_loss: 0.7284 - 100ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7664 - val_loss: 0.7290 - 99ms/epoch - 4ms/step
 Epoch 43/50
-25/25 - 0s - loss: 0.7646 - val_loss: 0.7263 - 100ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7638 - val_loss: 0.7243 - 102ms/epoch - 4ms/step
 Epoch 44/50
-25/25 - 0s - loss: 0.7647 - val_loss: 0.7269 - 100ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7628 - val_loss: 0.7251 - 101ms/epoch - 4ms/step
 Epoch 45/50
-25/25 - 0s - loss: 0.7653 - val_loss: 0.7229 - 99ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7643 - val_loss: 0.7203 - 98ms/epoch - 4ms/step
 Epoch 46/50
-25/25 - 0s - loss: 0.7621 - val_loss: 0.7205 - 99ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7621 - val_loss: 0.7219 - 102ms/epoch - 4ms/step
 Epoch 47/50
-25/25 - 0s - loss: 0.7623 - val_loss: 0.7178 - 99ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7614 - val_loss: 0.7193 - 97ms/epoch - 4ms/step
 Epoch 48/50
-25/25 - 0s - loss: 0.7649 - val_loss: 0.7205 - 99ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7606 - val_loss: 0.7161 - 101ms/epoch - 4ms/step
 Epoch 49/50
-25/25 - 0s - loss: 0.7618 - val_loss: 0.7177 - 99ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7603 - val_loss: 0.7168 - 104ms/epoch - 4ms/step
 Epoch 50/50
-25/25 - 0s - loss: 0.7626 - val_loss: 0.7163 - 102ms/epoch - 4ms/step</code></pre>
+25/25 - 0s - loss: 0.7606 - val_loss: 0.7135 - 102ms/epoch - 4ms/step</code></pre>
 </div>
 </div>
 <p>Der Output zeigt die Enwicklung des Loss (MAE) für Vorhersagen des Trainingsdatensatzes (<code>loss</code>) und für den Test-Datensatz (<code>val_loss</code>) für alle 25 Epochen. Diese Informationen können mit <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code> einfach visualisiert werden.</p>
@@ -830,7 +915,7 @@ Abbildung&nbsp;16.3: Einfaches lineares NN: Entwicklung des Loss für 25 Epochen
 <span>  <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     w_1     bias 
-3.004865 4.925180 </code></pre>
+3.013462 4.931683 </code></pre>
 </div>
 </div>
 <p>Das NN hat den funktionalen Zusammengang zwischen <code>x</code> und <code>y</code> erfolgreich gelernt: Die optimierten Parameter-Werte <code>bias</code> und <code>w_1</code> liegen nahe der wahren Parameter. Bei Parameter sind mit ihren KQ-Schätzungen vergleichbar.<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a></p>
@@ -882,7 +967,7 @@ F-statistic: 8.411e+04 on 1 and 998 DF,  p-value: &lt; 2.2e-16</code></pre>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">.5</span>, color <span class="op">=</span> <span class="st">"steelblue"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_cowplot</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>32/32 - 0s - 78ms/epoch - 2ms/step</code></pre>
+<pre><code>32/32 - 0s - 74ms/epoch - 2ms/step</code></pre>
 </div>
 <div class="cell-output-display page-columns page-full">
 <div id="fig-res-nn" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full">
@@ -986,55 +1071,55 @@ ________________________________________________________________________________
 <span>  <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Epoch 1/25
-7/7 - 0s - loss: 38.3893 - val_loss: 32.6544 - 334ms/epoch - 48ms/step
+7/7 - 0s - loss: 38.4326 - val_loss: 32.8775 - 322ms/epoch - 46ms/step
 Epoch 2/25
-7/7 - 0s - loss: 29.3341 - val_loss: 25.5581 - 42ms/epoch - 6ms/step
+7/7 - 0s - loss: 29.4647 - val_loss: 25.4598 - 39ms/epoch - 6ms/step
 Epoch 3/25
-7/7 - 0s - loss: 22.9051 - val_loss: 19.7411 - 41ms/epoch - 6ms/step
+7/7 - 0s - loss: 22.7766 - val_loss: 19.8477 - 38ms/epoch - 5ms/step
 Epoch 4/25
-7/7 - 0s - loss: 17.6386 - val_loss: 15.2533 - 41ms/epoch - 6ms/step
+7/7 - 0s - loss: 17.6738 - val_loss: 15.3941 - 38ms/epoch - 5ms/step
 Epoch 5/25
-7/7 - 0s - loss: 13.5346 - val_loss: 11.9086 - 41ms/epoch - 6ms/step
+7/7 - 0s - loss: 13.6390 - val_loss: 11.9357 - 38ms/epoch - 5ms/step
 Epoch 6/25
-7/7 - 0s - loss: 10.5061 - val_loss: 9.4301 - 44ms/epoch - 6ms/step
+7/7 - 0s - loss: 10.5009 - val_loss: 9.4330 - 38ms/epoch - 5ms/step
 Epoch 7/25
-7/7 - 0s - loss: 8.2496 - val_loss: 7.5327 - 44ms/epoch - 6ms/step
+7/7 - 0s - loss: 8.2185 - val_loss: 7.5134 - 37ms/epoch - 5ms/step
 Epoch 8/25
-7/7 - 0s - loss: 6.4914 - val_loss: 5.9113 - 46ms/epoch - 7ms/step
+7/7 - 0s - loss: 6.4648 - val_loss: 6.0727 - 38ms/epoch - 5ms/step
 Epoch 9/25
-7/7 - 0s - loss: 4.9750 - val_loss: 4.9046 - 49ms/epoch - 7ms/step
+7/7 - 0s - loss: 5.1330 - val_loss: 4.9972 - 38ms/epoch - 5ms/step
 Epoch 10/25
-7/7 - 0s - loss: 4.0583 - val_loss: 4.0690 - 45ms/epoch - 6ms/step
+7/7 - 0s - loss: 4.1513 - val_loss: 4.1510 - 38ms/epoch - 5ms/step
 Epoch 11/25
-7/7 - 0s - loss: 3.2940 - val_loss: 3.4857 - 42ms/epoch - 6ms/step
+7/7 - 0s - loss: 3.3833 - val_loss: 3.5703 - 38ms/epoch - 5ms/step
 Epoch 12/25
-7/7 - 0s - loss: 2.7464 - val_loss: 3.0614 - 41ms/epoch - 6ms/step
+7/7 - 0s - loss: 2.8533 - val_loss: 3.0954 - 37ms/epoch - 5ms/step
 Epoch 13/25
-7/7 - 0s - loss: 2.3445 - val_loss: 2.7452 - 41ms/epoch - 6ms/step
+7/7 - 0s - loss: 2.4276 - val_loss: 2.7332 - 40ms/epoch - 6ms/step
 Epoch 14/25
-7/7 - 0s - loss: 2.0200 - val_loss: 2.4743 - 40ms/epoch - 6ms/step
+7/7 - 0s - loss: 2.0749 - val_loss: 2.4474 - 37ms/epoch - 5ms/step
 Epoch 15/25
-7/7 - 0s - loss: 1.7812 - val_loss: 2.2903 - 41ms/epoch - 6ms/step
+7/7 - 0s - loss: 1.8065 - val_loss: 2.2466 - 38ms/epoch - 5ms/step
 Epoch 16/25
-7/7 - 0s - loss: 1.6129 - val_loss: 2.1401 - 41ms/epoch - 6ms/step
+7/7 - 0s - loss: 1.6099 - val_loss: 2.0947 - 38ms/epoch - 5ms/step
 Epoch 17/25
-7/7 - 0s - loss: 1.4794 - val_loss: 2.0296 - 41ms/epoch - 6ms/step
+7/7 - 0s - loss: 1.4598 - val_loss: 1.9848 - 38ms/epoch - 5ms/step
 Epoch 18/25
-7/7 - 0s - loss: 1.3727 - val_loss: 1.9372 - 41ms/epoch - 6ms/step
+7/7 - 0s - loss: 1.3557 - val_loss: 1.9221 - 38ms/epoch - 5ms/step
 Epoch 19/25
-7/7 - 0s - loss: 1.2912 - val_loss: 1.8660 - 41ms/epoch - 6ms/step
+7/7 - 0s - loss: 1.2772 - val_loss: 1.8683 - 38ms/epoch - 5ms/step
 Epoch 20/25
-7/7 - 0s - loss: 1.2255 - val_loss: 1.8172 - 41ms/epoch - 6ms/step
+7/7 - 0s - loss: 1.2159 - val_loss: 1.8142 - 37ms/epoch - 5ms/step
 Epoch 21/25
-7/7 - 0s - loss: 1.1723 - val_loss: 1.7740 - 40ms/epoch - 6ms/step
+7/7 - 0s - loss: 1.1696 - val_loss: 1.7985 - 38ms/epoch - 5ms/step
 Epoch 22/25
-7/7 - 0s - loss: 1.1392 - val_loss: 1.7471 - 40ms/epoch - 6ms/step
+7/7 - 0s - loss: 1.1362 - val_loss: 1.7648 - 39ms/epoch - 6ms/step
 Epoch 23/25
-7/7 - 0s - loss: 1.1114 - val_loss: 1.7342 - 45ms/epoch - 6ms/step
+7/7 - 0s - loss: 1.1057 - val_loss: 1.7501 - 38ms/epoch - 5ms/step
 Epoch 24/25
-7/7 - 0s - loss: 1.0937 - val_loss: 1.7211 - 42ms/epoch - 6ms/step
+7/7 - 0s - loss: 1.0856 - val_loss: 1.7139 - 38ms/epoch - 5ms/step
 Epoch 25/25
-7/7 - 0s - loss: 1.0781 - val_loss: 1.7056 - 41ms/epoch - 6ms/step</code></pre>
+7/7 - 0s - loss: 1.0745 - val_loss: 1.7127 - 38ms/epoch - 5ms/step</code></pre>
 </div>
 </div>
 <div class="cell page-columns page-full">
@@ -1068,7 +1153,7 @@ Abbildung&nbsp;16.6: NN für mult. Regression: Entwicklung des Loss für 25 Epoc
 <span>  <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      w_1       w_2       w_3      bias 
- 2.924234  1.906852 -1.453687  4.805505 </code></pre>
+ 2.925661  1.920067 -1.445772  4.800885 </code></pre>
 </div>
 </div>
 <div class="cell">
@@ -1203,9 +1288,9 @@ ________________________________________________________________________________
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Final epoch (plot to see history):
-        loss: 0.399
-    accuracy: 0.805
-    val_loss: 0.3416
+        loss: 0.3991
+    accuracy: 0.8025
+    val_loss: 0.3415
 val_accuracy: 0.87 </code></pre>
 </div>
 </div>
@@ -1238,8 +1323,8 @@ Abbildung&nbsp;16.8: NN für Logit-Regression: Entwicklung der Metriken für 25 
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"w_1"</span>, <span class="st">"bias"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>      w_1      bias 
- 0.964950 -5.352392 </code></pre>
+<pre><code>       w_1       bias 
+ 0.9635032 -5.3509579 </code></pre>
 </div>
 </div>
 <p>Für einen Vergleich der Vorhersagegüter mit logistischer Regression schätzen wir zunächst ein entsprechendes GLM mit <code><a href="https://rdrr.io/r/stats/glm.html">glm()</a></code>.</p>
@@ -1290,7 +1375,7 @@ Number of Fisher Scoring iterations: 6</code></pre>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">data_new</span><span class="op">$</span><span class="va">X</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>8/8 - 0s - 47ms/epoch - 6ms/step</code></pre>
+<pre><code>8/8 - 0s - 46ms/epoch - 6ms/step</code></pre>
 </div>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">predictions_glm_logit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span></span>
 <span>    <span class="va">glm_mod</span>, </span>
@@ -1310,15 +1395,15 @@ Number of Fisher Scoring iterations: 6</code></pre>
 <pre><code># A tibble: 10 × 5
        X      P     Y nn_logit glm_logit
    &lt;dbl&gt;  &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt;     &lt;dbl&gt;
- 1  4.15 0.136      1    0.206    0.132 
- 2  4.55 0.208      0    0.277    0.206 
- 3  6.44 0.693      1    0.702    0.755 
- 4  6.68 0.751      1    0.750    0.810 
- 5  4.74 0.248      0    0.315    0.250 
+ 1  4.15 0.136      1    0.205    0.132 
+ 2  4.55 0.208      0    0.276    0.206 
+ 3  6.44 0.693      1    0.700    0.755 
+ 4  6.68 0.751      1    0.748    0.810 
+ 5  4.74 0.248      0    0.314    0.250 
  6  8.22 0.960      1    0.929    0.970 
- 7  4.41 0.180      0    0.250    0.177 
- 8  5.39 0.411      0    0.463    0.439 
- 9  7.48 0.892      0    0.866    0.924 
+ 7  4.41 0.180      0    0.249    0.177 
+ 8  5.39 0.411      0    0.461    0.439 
+ 9  7.48 0.892      0    0.865    0.924 
 10  3.56 0.0660     0    0.128    0.0661</code></pre>
 </div>
 </div>
@@ -1546,7 +1631,7 @@ Abbildung&nbsp;16.9: ROC-Kurve für logistische Modelle
 <span><span class="va">nn_pred</span> <span class="op">&lt;-</span> <span class="va">model</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">test_x</span><span class="op">)</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>4/4 - 0s - 68ms/epoch - 17ms/step</code></pre>
+<pre><code>4/4 - 0s - 67ms/epoch - 17ms/step</code></pre>
 </div>
 <div class="sourceCode" id="cb56"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Testdaten erweitern</span></span>
 <span><span class="va">nn_predictions</span> <span class="op">&lt;-</span> <span class="va">test_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
@@ -1570,8 +1655,8 @@ Abbildung&nbsp;16.9: ROC-Kurve für logistische Modelle
 <span>  <span class="st">"MSE NN"</span> <span class="op">=</span> <span class="va">nn_mse</span></span>
 <span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>   MSE KQ    MSE NN 
-28.797729  9.801154 </code></pre>
+<pre><code>  MSE KQ   MSE NN 
+28.79773 12.84939 </code></pre>
 </div>
 </div>
 <p>Da das NN ist in der Lage ist, nicht-lineare Zusammenhänge zwischen den Prädiktoren und der Zielvariablen zu modellieren, liefert hat es eine höhere Vorhersagegenauigkeit auf dem Testdatensatz.</p>
@@ -1807,63 +1892,65 @@ Abbildung&nbsp;16.10: Boston Housing: KQ vs.&nbsp;NN
 <span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Epoch 1/30
-59/59 - 2s - loss: 2.6806 - mae: 66506.5703 - val_loss: 0.3970 - val_mae: 80262.6641 - lr: 0.0100 - 2s/epoch - 31ms/step
+59/59 - 2s - loss: 2.6285 - mae: 66522.6328 - val_loss: 0.5658 - val_mae: 190941.7344 - lr: 0.0100 - 2s/epoch - 30ms/step
 Epoch 2/30
-59/59 - 1s - loss: 0.3129 - mae: 99603.9062 - val_loss: 0.2391 - val_mae: 95954.9688 - lr: 0.0100 - 658ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.3418 - mae: 104418.3828 - val_loss: 0.0971 - val_mae: 42466.8203 - lr: 0.0100 - 600ms/epoch - 10ms/step
 Epoch 3/30
-59/59 - 1s - loss: 0.2334 - mae: 83409.6875 - val_loss: 0.1443 - val_mae: 56677.2734 - lr: 0.0100 - 683ms/epoch - 12ms/step
+59/59 - 1s - loss: 0.2338 - mae: 83909.6641 - val_loss: 0.1489 - val_mae: 76107.8359 - lr: 0.0100 - 594ms/epoch - 10ms/step
 Epoch 4/30
-59/59 - 1s - loss: 0.1518 - mae: 64165.8789 - val_loss: 0.2070 - val_mae: 89366.2266 - lr: 0.0100 - 653ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.1660 - mae: 68891.6250 - val_loss: 0.1450 - val_mae: 57994.9805 - lr: 0.0100 - 637ms/epoch - 11ms/step
 Epoch 5/30
-59/59 - 1s - loss: 0.1296 - mae: 58406.7188 - val_loss: 0.1307 - val_mae: 50539.7695 - lr: 0.0100 - 652ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.1304 - mae: 57689.1211 - val_loss: 0.0912 - val_mae: 58741.6172 - lr: 0.0100 - 661ms/epoch - 11ms/step
 Epoch 6/30
-59/59 - 1s - loss: 0.1017 - mae: 48341.8750 - val_loss: 0.0333 - val_mae: 26364.4180 - lr: 0.0100 - 651ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.1016 - mae: 51302.3828 - val_loss: 0.0479 - val_mae: 30162.2734 - lr: 0.0100 - 659ms/epoch - 11ms/step
 Epoch 7/30
-59/59 - 1s - loss: 0.0806 - mae: 42422.4375 - val_loss: 0.0500 - val_mae: 33736.0742 - lr: 0.0100 - 652ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0862 - mae: 46278.1406 - val_loss: 0.0544 - val_mae: 39507.8633 - lr: 0.0100 - 650ms/epoch - 11ms/step
 Epoch 8/30
-59/59 - 1s - loss: 0.0781 - mae: 43716.4336 - val_loss: 0.0697 - val_mae: 42559.5195 - lr: 0.0100 - 648ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0754 - mae: 41316.2344 - val_loss: 0.0783 - val_mae: 41748.5664 - lr: 0.0100 - 638ms/epoch - 11ms/step
 Epoch 9/30
-59/59 - 1s - loss: 0.0639 - mae: 38148.1211 - val_loss: 0.0487 - val_mae: 36207.6445 - lr: 0.0100 - 649ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0673 - mae: 40278.7695 - val_loss: 0.0660 - val_mae: 40964.4766 - lr: 0.0100 - 643ms/epoch - 11ms/step
 Epoch 10/30
-59/59 - 1s - loss: 0.0655 - mae: 37725.8086 - val_loss: 0.0204 - val_mae: 16569.7168 - lr: 0.0100 - 708ms/epoch - 12ms/step
+59/59 - 1s - loss: 0.0606 - mae: 38127.9531 - val_loss: 0.0252 - val_mae: 17707.6191 - lr: 0.0100 - 646ms/epoch - 11ms/step
 Epoch 11/30
-59/59 - 1s - loss: 0.0561 - mae: 33260.6523 - val_loss: 0.1131 - val_mae: 62676.7109 - lr: 0.0100 - 670ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0532 - mae: 30784.2988 - val_loss: 0.0761 - val_mae: 51893.6719 - lr: 0.0100 - 619ms/epoch - 10ms/step
 Epoch 12/30
-59/59 - 1s - loss: 0.0519 - mae: 33403.4727 - val_loss: 0.0602 - val_mae: 39288.3320 - lr: 0.0100 - 672ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0489 - mae: 32618.1211 - val_loss: 0.0423 - val_mae: 29096.1562 - lr: 0.0100 - 634ms/epoch - 11ms/step
 Epoch 13/30
-59/59 - 1s - loss: 0.0507 - mae: 33413.1055 - val_loss: 0.0224 - val_mae: 18654.2930 - lr: 0.0100 - 663ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0481 - mae: 34162.6875 - val_loss: 0.0515 - val_mae: 36147.5195 - lr: 0.0100 - 611ms/epoch - 10ms/step
 Epoch 14/30
-59/59 - 1s - loss: 0.0456 - mae: 29967.1758 - val_loss: 0.0677 - val_mae: 36623.9844 - lr: 0.0100 - 648ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0446 - mae: 31009.5430 - val_loss: 0.0462 - val_mae: 30531.2871 - lr: 0.0100 - 604ms/epoch - 10ms/step
 Epoch 15/30
-59/59 - 1s - loss: 0.0120 - mae: 13380.5186 - val_loss: 0.0198 - val_mae: 15620.8535 - lr: 0.0020 - 655ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0102 - mae: 13163.1768 - val_loss: 0.0186 - val_mae: 15423.4961 - lr: 0.0020 - 650ms/epoch - 11ms/step
 Epoch 16/30
-59/59 - 1s - loss: 0.0096 - mae: 12478.9609 - val_loss: 0.0204 - val_mae: 16368.3916 - lr: 0.0020 - 672ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0088 - mae: 12464.0859 - val_loss: 0.0219 - val_mae: 17571.2734 - lr: 0.0020 - 656ms/epoch - 11ms/step
 Epoch 17/30
-59/59 - 1s - loss: 0.0088 - mae: 12202.9658 - val_loss: 0.0203 - val_mae: 16138.4961 - lr: 0.0020 - 638ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0082 - mae: 12001.7822 - val_loss: 0.0192 - val_mae: 15275.0898 - lr: 0.0020 - 656ms/epoch - 11ms/step
 Epoch 18/30
-59/59 - 1s - loss: 0.0085 - mae: 12030.7832 - val_loss: 0.0197 - val_mae: 15390.3955 - lr: 0.0020 - 645ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0072 - mae: 11221.4189 - val_loss: 0.0186 - val_mae: 14432.3203 - lr: 0.0020 - 670ms/epoch - 11ms/step
 Epoch 19/30
-59/59 - 1s - loss: 0.0078 - mae: 11404.8770 - val_loss: 0.0191 - val_mae: 15514.5098 - lr: 0.0020 - 642ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0070 - mae: 11004.2012 - val_loss: 0.0187 - val_mae: 14830.7764 - lr: 0.0020 - 635ms/epoch - 11ms/step
 Epoch 20/30
-59/59 - 1s - loss: 0.0076 - mae: 11306.3535 - val_loss: 0.0214 - val_mae: 17289.0039 - lr: 0.0020 - 644ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0053 - mae: 9478.4395 - val_loss: 0.0181 - val_mae: 14325.2793 - lr: 4.0000e-04 - 631ms/epoch - 11ms/step
 Epoch 21/30
-59/59 - 1s - loss: 0.0074 - mae: 11417.2012 - val_loss: 0.0208 - val_mae: 17050.9551 - lr: 0.0020 - 640ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0051 - mae: 9234.6963 - val_loss: 0.0190 - val_mae: 14913.2432 - lr: 4.0000e-04 - 640ms/epoch - 11ms/step
 Epoch 22/30
-59/59 - 1s - loss: 0.0066 - mae: 10781.1514 - val_loss: 0.0227 - val_mae: 19155.9727 - lr: 0.0020 - 641ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0051 - mae: 9161.7549 - val_loss: 0.0181 - val_mae: 14281.9570 - lr: 4.0000e-04 - 666ms/epoch - 11ms/step
 Epoch 23/30
-59/59 - 1s - loss: 0.0069 - mae: 10835.6299 - val_loss: 0.0198 - val_mae: 15367.2129 - lr: 0.0020 - 647ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0050 - mae: 9059.0537 - val_loss: 0.0181 - val_mae: 14368.4775 - lr: 4.0000e-04 - 655ms/epoch - 11ms/step
 Epoch 24/30
-59/59 - 1s - loss: 0.0047 - mae: 8805.8252 - val_loss: 0.0191 - val_mae: 14737.0498 - lr: 4.0000e-04 - 643ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0049 - mae: 8944.0264 - val_loss: 0.0181 - val_mae: 14311.4346 - lr: 4.0000e-04 - 650ms/epoch - 11ms/step
 Epoch 25/30
-59/59 - 1s - loss: 0.0045 - mae: 8698.4463 - val_loss: 0.0192 - val_mae: 14724.8340 - lr: 4.0000e-04 - 645ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0046 - mae: 8704.1309 - val_loss: 0.0181 - val_mae: 14304.5977 - lr: 8.0000e-05 - 664ms/epoch - 11ms/step
 Epoch 26/30
-59/59 - 1s - loss: 0.0044 - mae: 8577.7539 - val_loss: 0.0193 - val_mae: 14715.0234 - lr: 4.0000e-04 - 640ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0046 - mae: 8667.4824 - val_loss: 0.0182 - val_mae: 14346.7402 - lr: 8.0000e-05 - 617ms/epoch - 10ms/step
 Epoch 27/30
-59/59 - 1s - loss: 0.0043 - mae: 8495.7764 - val_loss: 0.0193 - val_mae: 14779.6152 - lr: 4.0000e-04 - 659ms/epoch - 11ms/step
+59/59 - 1s - loss: 0.0046 - mae: 8647.0186 - val_loss: 0.0182 - val_mae: 14323.5908 - lr: 8.0000e-05 - 591ms/epoch - 10ms/step
 Epoch 28/30
-59/59 - 1s - loss: 0.0041 - mae: 8241.4814 - val_loss: 0.0193 - val_mae: 14737.3047 - lr: 8.0000e-05 - 680ms/epoch - 12ms/step
+59/59 - 1s - loss: 0.0046 - mae: 8635.7168 - val_loss: 0.0182 - val_mae: 14327.1475 - lr: 8.0000e-05 - 601ms/epoch - 10ms/step
 Epoch 29/30
-59/59 - 1s - loss: 0.0040 - mae: 8233.9463 - val_loss: 0.0193 - val_mae: 14722.3604 - lr: 8.0000e-05 - 603ms/epoch - 10ms/step</code></pre>
+59/59 - 1s - loss: 0.0045 - mae: 8573.3193 - val_loss: 0.0182 - val_mae: 14332.8125 - lr: 1.6000e-05 - 596ms/epoch - 10ms/step
+Epoch 30/30
+59/59 - 1s - loss: 0.0045 - mae: 8566.7393 - val_loss: 0.0182 - val_mae: 14322.7090 - lr: 1.6000e-05 - 645ms/epoch - 11ms/step</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -1871,11 +1958,11 @@ Epoch 29/30
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Final epoch (plot to see history):
-    loss: 0.004049
-     mae: 8,234
-val_loss: 0.01926
- val_mae: 14,722
-      lr: 0.00008 </code></pre>
+    loss: 0.004543
+     mae: 8,567
+val_loss: 0.01821
+ val_mae: 14,323
+      lr: 0.000016 </code></pre>
 </div>
 </div>
 <div class="cell">
