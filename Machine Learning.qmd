@@ -194,8 +194,8 @@ In empirischen Anwendungen ist es für eine hohe Modellgüte eines neuronalen Ne
 
 In Software-Implementierungen für Machine und Deep Learning wie `tensorflow` und `keras` werden fortgeschrittene Techniken wie Momentum Tuning oder Stochastic [Gradient Descent](https://en.wikipedia.org/wiki/Stochastic_gradient_descent) (SGD) eingesetzt, um die Wahrscheinlichkeit zu erhöhen, dass der Algorithmus nicht in einem (ungünstigen) lokalen Minimum endet. Ein für die Anpassung von NN häufig verwendeter Algorithmus, der SGD verwendet, ist [Adaptive Moment Estimation (Adam)](https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Adam). Wir verwenden u.a. den Adam-Optimizer in den empirischen Beispielen. 
 
-<iframe class="obs-soft-box-shadow" width="100%" height="761" frameborder="0"
-  src="https://observablehq.com/embed/@mca91/gradient-descent-in-2d?cells=plot%2Cviewof+startAnimation%2Cviewof+startPoint%2Cviewof+alpha%2Cviewof+eta%2CoptimalReached%2CMathJax%2Cstyles"></iframe>
+<iframe class="obs-soft-box-shadow" width="100%" height="880" frameborder="0"
+  src="https://observablehq.com/embed/@mca91/gradient-descent-in-2d@759?cells=plot%2Clabels%2Cviewof+startAnimation%2Cviewof+startPoint%2Cviewof+alpha%2Cviewof+eta"></iframe>
 
 In empirischen Anwendungen sind die zu lernenden Zusammenhänge komplex und damit die Anzahl der zu optimierenden Parameter eines NN häufig groß. Der oben erläuterte Algorithmus für Gradient Descent mit Momentum kann einfach auf Optimierungsprobleme mit $k$ Parametern generalisiert werden. Dann ist $\boldsymbol{w}_t$ ein Vektor mit $k$ Gewichten, $\boldsymbol{v}_{t+1}$ eine vektorwertige Funktion von $\boldsymbol{v}_t$ und $\nabla f(\boldsymbol{w}_t)$ mit Dimension $k$ und $f(\boldsymbol{w}_t)$ ist eine Oberfläche in einem $k+1$-dimensionalen Raum. 
 
@@ -203,7 +203,7 @@ Die nachfolgende interaktive Grafik illustriert Gradient Descent mit Momentum f�
 
 Die Animation verdeutlicht, dass lokale Minima insbesondere in höheren Dimensionen herausfordernd für Optimierungsalgorithmen sind: Durch Variation der Extrema lassen sich leicht Funktionen $f(w_1,w_1)$ konstruieren, für die Gradient Descent mit den voreingestellten Parametern nicht gegen das globale Minimum konvergiert, sofern vorhanden. Ein günstiger Initialwert für $\boldsymbol{w}_t$ kann die Wahrscheinlichkeit von Stops in lokalen Minima verringern: *Grid Search Initialization* wertet die Funktion über ein gleichmäßiges Gitter von Werten für $\boldsymbol{w}_t$ aus und wählt als Startwert $\boldsymbol{w}_{0,\textup{init}}$ den Punkt mit dem minimalen Funktionswert von $f$ über alle Punkte im Gitter.
 
-<iframe class="obs-soft-box-shadow" width="100%" height="1172" frameborder="0"
+<iframe class="obs-soft-box-shadow" width="100%" height="1220" frameborder="0"
   src="https://observablehq.com/embed/@mca91/gradient-descent-in-3d-three-js?cells=renderer%2Cviewof+restart%2Cviewof+gridinit%2Cviewof+themin%2Cviewof+themin2%2Cviewof+themin3%2Cviewof+themin4%2Cviewof+themin5%2Cviewof+themin6%2Cscene%2Ccamera"></iframe>
 
 
