@@ -4,5 +4,9 @@
 .Ruserdata
 .DS_Store
 .Rproj
+.Rprofile
+*.tex
+ex_*
 
 /.quarto/
+*_cache/
