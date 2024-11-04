@@ -18,7 +18,7 @@ book:
   author: 
     - Martin C. Arnold 
     - Christoph Hanck
-  date: "November 2023"
+  date: "09.10.2024"
   chapters:
     - index.qmd
     - part: "Grundlagen"
