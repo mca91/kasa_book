@@ -261,8 +261,9 @@ window.Quarto = {
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./"></a><a href="./index.html">Kausalanalyse und machinelles Lernen mit R</a> 
+      <a href="./"></a><a href="./index.html">Kausalanalyse und maschinelles Lernen mit R</a> 
         <div class="sidebar-tools-main">
+    <a href="https://github.com/mca91/kasa_book" title="Quellcode" class="quarto-navigation-tool px-1" aria-label="Quellcode"><i class="bi bi-github"></i></a>
   <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Lesemodus umschalten">
   <div class="quarto-reader-toggle-btn">
   <i class="bi"></i>
@@ -356,7 +357,7 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./RDD.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Regression Discontiniuty Designs</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Regression Discontinuity Designs</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -425,7 +426,7 @@ window.Quarto = {
   <li><a href="#nicht-lineare-zusammenh%C3%A4nge" id="toc-nicht-lineare-zusammenhänge" class="nav-link" data-scroll-target="#nicht-lineare-zusammenh%C3%A4nge"><span class="header-section-number">16.5</span> Nicht-Lineare Zusammenhänge</a></li>
   <li><a href="#empirisches-beispiel-boston-housing" id="toc-empirisches-beispiel-boston-housing" class="nav-link" data-scroll-target="#empirisches-beispiel-boston-housing"><span class="header-section-number">16.6</span> Empirisches Beispiel: Boston Housing</a></li>
   <li><a href="#case-study-vorhersage-von-immobilienpreisen" id="toc-case-study-vorhersage-von-immobilienpreisen" class="nav-link" data-scroll-target="#case-study-vorhersage-von-immobilienpreisen"><span class="header-section-number">16.7</span> Case Study: Vorhersage von Immobilienpreisen</a></li>
-  </ul></nav>
+  </ul><div class="toc-actions"><ul><li><a href="https://github.com/mca91/kasa_book/edit/main/Machine Learning.qmd" class="toc-action"><i class="bi bi-github"></i>Seite editieren</a></li><li><a href="https://github.com/mca91/kasa_book/issues/new" class="toc-action"><i class="bi empty"></i>Problem melden</a></li></ul></div></nav>
 </nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
@@ -691,105 +692,105 @@ ________________________________________________________________________________
 <span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Epoch 1/50
-25/25 - 0s - loss: 17.4493 - val_loss: 16.3791 - 419ms/epoch - 17ms/step
+25/25 - 1s - loss: 26.9742 - val_loss: 25.6117 - 1s/epoch - 58ms/step
 Epoch 2/50
-25/25 - 0s - loss: 15.9267 - val_loss: 14.8964 - 97ms/epoch - 4ms/step
+25/25 - 0s - loss: 25.4487 - val_loss: 24.1358 - 98ms/epoch - 4ms/step
 Epoch 3/50
-25/25 - 0s - loss: 14.4136 - val_loss: 13.4081 - 88ms/epoch - 4ms/step
+25/25 - 0s - loss: 23.9352 - val_loss: 22.6464 - 90ms/epoch - 4ms/step
 Epoch 4/50
-25/25 - 0s - loss: 12.8847 - val_loss: 11.9392 - 85ms/epoch - 3ms/step
+25/25 - 0s - loss: 22.4132 - val_loss: 21.1652 - 91ms/epoch - 4ms/step
 Epoch 5/50
-25/25 - 0s - loss: 11.3714 - val_loss: 10.4542 - 84ms/epoch - 3ms/step
+25/25 - 0s - loss: 20.8920 - val_loss: 19.6856 - 89ms/epoch - 4ms/step
 Epoch 6/50
-25/25 - 0s - loss: 9.8430 - val_loss: 8.9833 - 87ms/epoch - 3ms/step
+25/25 - 0s - loss: 19.3739 - val_loss: 18.2035 - 89ms/epoch - 4ms/step
 Epoch 7/50
-25/25 - 0s - loss: 8.3326 - val_loss: 7.4892 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 17.8524 - val_loss: 16.7256 - 90ms/epoch - 4ms/step
 Epoch 8/50
-25/25 - 0s - loss: 6.8056 - val_loss: 6.0124 - 87ms/epoch - 3ms/step
+25/25 - 0s - loss: 16.3328 - val_loss: 15.2460 - 89ms/epoch - 4ms/step
 Epoch 9/50
-25/25 - 0s - loss: 5.2863 - val_loss: 4.5325 - 85ms/epoch - 3ms/step
+25/25 - 0s - loss: 14.8113 - val_loss: 13.7703 - 89ms/epoch - 4ms/step
 Epoch 10/50
-25/25 - 0s - loss: 3.7661 - val_loss: 3.0508 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 13.2953 - val_loss: 12.2836 - 90ms/epoch - 4ms/step
 Epoch 11/50
-25/25 - 0s - loss: 2.2770 - val_loss: 1.6876 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 11.7754 - val_loss: 10.7981 - 90ms/epoch - 4ms/step
 Epoch 12/50
-25/25 - 0s - loss: 1.2858 - val_loss: 1.2269 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 10.2533 - val_loss: 9.3194 - 89ms/epoch - 4ms/step
 Epoch 13/50
-25/25 - 0s - loss: 1.1312 - val_loss: 1.1798 - 87ms/epoch - 3ms/step
+25/25 - 0s - loss: 8.7319 - val_loss: 7.8446 - 89ms/epoch - 4ms/step
 Epoch 14/50
-25/25 - 0s - loss: 1.1029 - val_loss: 1.1570 - 85ms/epoch - 3ms/step
+25/25 - 0s - loss: 7.2170 - val_loss: 6.3609 - 89ms/epoch - 4ms/step
 Epoch 15/50
-25/25 - 0s - loss: 1.0803 - val_loss: 1.1328 - 87ms/epoch - 3ms/step
+25/25 - 0s - loss: 5.7014 - val_loss: 4.8818 - 89ms/epoch - 4ms/step
 Epoch 16/50
-25/25 - 0s - loss: 1.0584 - val_loss: 1.1086 - 87ms/epoch - 3ms/step
+25/25 - 0s - loss: 4.1963 - val_loss: 3.4103 - 94ms/epoch - 4ms/step
 Epoch 17/50
-25/25 - 0s - loss: 1.0368 - val_loss: 1.0852 - 85ms/epoch - 3ms/step
+25/25 - 0s - loss: 2.7029 - val_loss: 1.9733 - 89ms/epoch - 4ms/step
 Epoch 18/50
-25/25 - 0s - loss: 1.0149 - val_loss: 1.0538 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 1.3472 - val_loss: 0.9058 - 89ms/epoch - 4ms/step
 Epoch 19/50
-25/25 - 0s - loss: 0.9948 - val_loss: 1.0335 - 85ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.8137 - val_loss: 0.7576 - 89ms/epoch - 4ms/step
 Epoch 20/50
-25/25 - 0s - loss: 0.9749 - val_loss: 1.0075 - 91ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7843 - val_loss: 0.7561 - 90ms/epoch - 4ms/step
 Epoch 21/50
-25/25 - 0s - loss: 0.9560 - val_loss: 0.9841 - 87ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7811 - val_loss: 0.7530 - 90ms/epoch - 4ms/step
 Epoch 22/50
-25/25 - 0s - loss: 0.9385 - val_loss: 0.9590 - 87ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7783 - val_loss: 0.7503 - 89ms/epoch - 4ms/step
 Epoch 23/50
-25/25 - 0s - loss: 0.9218 - val_loss: 0.9400 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7760 - val_loss: 0.7471 - 89ms/epoch - 4ms/step
 Epoch 24/50
-25/25 - 0s - loss: 0.9068 - val_loss: 0.9180 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7741 - val_loss: 0.7446 - 92ms/epoch - 4ms/step
 Epoch 25/50
-25/25 - 0s - loss: 0.8907 - val_loss: 0.8966 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7723 - val_loss: 0.7416 - 94ms/epoch - 4ms/step
 Epoch 26/50
-25/25 - 0s - loss: 0.8770 - val_loss: 0.8782 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7709 - val_loss: 0.7391 - 91ms/epoch - 4ms/step
 Epoch 27/50
-25/25 - 0s - loss: 0.8628 - val_loss: 0.8619 - 87ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7699 - val_loss: 0.7373 - 90ms/epoch - 4ms/step
 Epoch 28/50
-25/25 - 0s - loss: 0.8499 - val_loss: 0.8433 - 88ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7682 - val_loss: 0.7332 - 89ms/epoch - 4ms/step
 Epoch 29/50
-25/25 - 0s - loss: 0.8394 - val_loss: 0.8217 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7676 - val_loss: 0.7310 - 90ms/epoch - 4ms/step
 Epoch 30/50
-25/25 - 0s - loss: 0.8271 - val_loss: 0.8102 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7656 - val_loss: 0.7314 - 89ms/epoch - 4ms/step
 Epoch 31/50
-25/25 - 0s - loss: 0.8171 - val_loss: 0.7957 - 85ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7648 - val_loss: 0.7278 - 90ms/epoch - 4ms/step
 Epoch 32/50
-25/25 - 0s - loss: 0.8089 - val_loss: 0.7853 - 85ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7641 - val_loss: 0.7265 - 90ms/epoch - 4ms/step
 Epoch 33/50
-25/25 - 0s - loss: 0.8012 - val_loss: 0.7771 - 93ms/epoch - 4ms/step
+25/25 - 0s - loss: 0.7631 - val_loss: 0.7256 - 90ms/epoch - 4ms/step
 Epoch 34/50
-25/25 - 0s - loss: 0.7951 - val_loss: 0.7688 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7630 - val_loss: 0.7228 - 89ms/epoch - 4ms/step
 Epoch 35/50
-25/25 - 0s - loss: 0.7898 - val_loss: 0.7614 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7637 - val_loss: 0.7216 - 88ms/epoch - 4ms/step
 Epoch 36/50
-25/25 - 0s - loss: 0.7836 - val_loss: 0.7571 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7616 - val_loss: 0.7215 - 89ms/epoch - 4ms/step
 Epoch 37/50
-25/25 - 0s - loss: 0.7819 - val_loss: 0.7475 - 85ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7613 - val_loss: 0.7199 - 89ms/epoch - 4ms/step
 Epoch 38/50
-25/25 - 0s - loss: 0.7765 - val_loss: 0.7458 - 85ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7609 - val_loss: 0.7179 - 90ms/epoch - 4ms/step
 Epoch 39/50
-25/25 - 0s - loss: 0.7735 - val_loss: 0.7404 - 83ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7613 - val_loss: 0.7192 - 89ms/epoch - 4ms/step
 Epoch 40/50
-25/25 - 0s - loss: 0.7698 - val_loss: 0.7366 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7610 - val_loss: 0.7179 - 89ms/epoch - 4ms/step
 Epoch 41/50
-25/25 - 0s - loss: 0.7674 - val_loss: 0.7324 - 85ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7604 - val_loss: 0.7157 - 90ms/epoch - 4ms/step
 Epoch 42/50
-25/25 - 0s - loss: 0.7662 - val_loss: 0.7292 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7603 - val_loss: 0.7152 - 89ms/epoch - 4ms/step
 Epoch 43/50
-25/25 - 0s - loss: 0.7660 - val_loss: 0.7281 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7599 - val_loss: 0.7189 - 89ms/epoch - 4ms/step
 Epoch 44/50
-25/25 - 0s - loss: 0.7663 - val_loss: 0.7240 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7593 - val_loss: 0.7139 - 89ms/epoch - 4ms/step
 Epoch 45/50
-25/25 - 0s - loss: 0.7650 - val_loss: 0.7230 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7603 - val_loss: 0.7152 - 89ms/epoch - 4ms/step
 Epoch 46/50
-25/25 - 0s - loss: 0.7627 - val_loss: 0.7214 - 85ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7603 - val_loss: 0.7141 - 90ms/epoch - 4ms/step
 Epoch 47/50
-25/25 - 0s - loss: 0.7616 - val_loss: 0.7172 - 85ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7622 - val_loss: 0.7126 - 90ms/epoch - 4ms/step
 Epoch 48/50
-25/25 - 0s - loss: 0.7613 - val_loss: 0.7164 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7608 - val_loss: 0.7125 - 89ms/epoch - 4ms/step
 Epoch 49/50
-25/25 - 0s - loss: 0.7616 - val_loss: 0.7191 - 86ms/epoch - 3ms/step
+25/25 - 0s - loss: 0.7593 - val_loss: 0.7137 - 90ms/epoch - 4ms/step
 Epoch 50/50
-25/25 - 0s - loss: 0.7601 - val_loss: 0.7155 - 86ms/epoch - 3ms/step</code></pre>
+25/25 - 0s - loss: 0.7611 - val_loss: 0.7137 - 88ms/epoch - 4ms/step</code></pre>
 </div>
 </div>
 <p>Der Output zeigt die Enwicklung des Loss (MAE) für Vorhersagen des Trainingsdatensatzes (<code>loss</code>) und für den Test-Datensatz (<code>val_loss</code>) für alle 25 Epochen. Diese Informationen können mit <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code> einfach visualisiert werden.</p>
@@ -829,7 +830,7 @@ Abbildung&nbsp;16.3: Einfaches lineares NN: Entwicklung des Loss für 25 Epochen
 <span>  <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     w_1     bias 
-3.008101 4.924770 </code></pre>
+2.997358 4.964357 </code></pre>
 </div>
 </div>
 <p>Das NN hat den funktionalen Zusammengang zwischen <code>x</code> und <code>y</code> erfolgreich gelernt: Die optimierten Parameter-Werte <code>bias</code> und <code>w_1</code> liegen nahe der wahren Parameter. Bei Parameter sind mit ihren KQ-Schätzungen vergleichbar.<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a></p>
@@ -985,55 +986,55 @@ ________________________________________________________________________________
 <span>  <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Epoch 1/25
-7/7 - 0s - loss: 38.3905 - val_loss: 32.7356 - 307ms/epoch - 44ms/step
+7/7 - 1s - loss: 38.3578 - val_loss: 32.6038 - 772ms/epoch - 110ms/step
 Epoch 2/25
-7/7 - 0s - loss: 29.3786 - val_loss: 25.1954 - 36ms/epoch - 5ms/step
+7/7 - 0s - loss: 29.2195 - val_loss: 25.2139 - 40ms/epoch - 6ms/step
 Epoch 3/25
-7/7 - 0s - loss: 22.5195 - val_loss: 19.3879 - 35ms/epoch - 5ms/step
+7/7 - 0s - loss: 22.5625 - val_loss: 19.4600 - 36ms/epoch - 5ms/step
 Epoch 4/25
-7/7 - 0s - loss: 17.3129 - val_loss: 15.1332 - 34ms/epoch - 5ms/step
+7/7 - 0s - loss: 17.3213 - val_loss: 15.1209 - 36ms/epoch - 5ms/step
 Epoch 5/25
-7/7 - 0s - loss: 13.4103 - val_loss: 11.8057 - 35ms/epoch - 5ms/step
+7/7 - 0s - loss: 13.3392 - val_loss: 11.6571 - 36ms/epoch - 5ms/step
 Epoch 6/25
-7/7 - 0s - loss: 10.3898 - val_loss: 9.1894 - 35ms/epoch - 5ms/step
+7/7 - 0s - loss: 10.1736 - val_loss: 9.2218 - 36ms/epoch - 5ms/step
 Epoch 7/25
-7/7 - 0s - loss: 8.0201 - val_loss: 7.2339 - 34ms/epoch - 5ms/step
+7/7 - 0s - loss: 7.9694 - val_loss: 7.3035 - 36ms/epoch - 5ms/step
 Epoch 8/25
-7/7 - 0s - loss: 6.2253 - val_loss: 5.8595 - 35ms/epoch - 5ms/step
+7/7 - 0s - loss: 6.2450 - val_loss: 5.9499 - 36ms/epoch - 5ms/step
 Epoch 9/25
-7/7 - 0s - loss: 4.9764 - val_loss: 4.8528 - 35ms/epoch - 5ms/step
+7/7 - 0s - loss: 5.0053 - val_loss: 4.8685 - 36ms/epoch - 5ms/step
 Epoch 10/25
-7/7 - 0s - loss: 4.0437 - val_loss: 4.0504 - 34ms/epoch - 5ms/step
+7/7 - 0s - loss: 4.0220 - val_loss: 4.0708 - 36ms/epoch - 5ms/step
 Epoch 11/25
-7/7 - 0s - loss: 3.3104 - val_loss: 3.4789 - 34ms/epoch - 5ms/step
+7/7 - 0s - loss: 3.3063 - val_loss: 3.4883 - 36ms/epoch - 5ms/step
 Epoch 12/25
-7/7 - 0s - loss: 2.7748 - val_loss: 2.9960 - 34ms/epoch - 5ms/step
+7/7 - 0s - loss: 2.7649 - val_loss: 3.0551 - 36ms/epoch - 5ms/step
 Epoch 13/25
-7/7 - 0s - loss: 2.3315 - val_loss: 2.6592 - 35ms/epoch - 5ms/step
+7/7 - 0s - loss: 2.3691 - val_loss: 2.7228 - 37ms/epoch - 5ms/step
 Epoch 14/25
-7/7 - 0s - loss: 2.0093 - val_loss: 2.3985 - 35ms/epoch - 5ms/step
+7/7 - 0s - loss: 2.0599 - val_loss: 2.4903 - 36ms/epoch - 5ms/step
 Epoch 15/25
-7/7 - 0s - loss: 1.7653 - val_loss: 2.2088 - 35ms/epoch - 5ms/step
+7/7 - 0s - loss: 1.8230 - val_loss: 2.2599 - 36ms/epoch - 5ms/step
 Epoch 16/25
-7/7 - 0s - loss: 1.5860 - val_loss: 2.0859 - 37ms/epoch - 5ms/step
+7/7 - 0s - loss: 1.6055 - val_loss: 2.1166 - 36ms/epoch - 5ms/step
 Epoch 17/25
-7/7 - 0s - loss: 1.4453 - val_loss: 1.9906 - 34ms/epoch - 5ms/step
+7/7 - 0s - loss: 1.4597 - val_loss: 2.0137 - 36ms/epoch - 5ms/step
 Epoch 18/25
-7/7 - 0s - loss: 1.3416 - val_loss: 1.9086 - 33ms/epoch - 5ms/step
+7/7 - 0s - loss: 1.3620 - val_loss: 1.9435 - 36ms/epoch - 5ms/step
 Epoch 19/25
-7/7 - 0s - loss: 1.2629 - val_loss: 1.8457 - 37ms/epoch - 5ms/step
+7/7 - 0s - loss: 1.2918 - val_loss: 1.8761 - 37ms/epoch - 5ms/step
 Epoch 20/25
-7/7 - 0s - loss: 1.2032 - val_loss: 1.8069 - 34ms/epoch - 5ms/step
+7/7 - 0s - loss: 1.2284 - val_loss: 1.8211 - 36ms/epoch - 5ms/step
 Epoch 21/25
-7/7 - 0s - loss: 1.1609 - val_loss: 1.7969 - 35ms/epoch - 5ms/step
+7/7 - 0s - loss: 1.1765 - val_loss: 1.7804 - 36ms/epoch - 5ms/step
 Epoch 22/25
-7/7 - 0s - loss: 1.1269 - val_loss: 1.7767 - 35ms/epoch - 5ms/step
+7/7 - 0s - loss: 1.1328 - val_loss: 1.7561 - 36ms/epoch - 5ms/step
 Epoch 23/25
-7/7 - 0s - loss: 1.1030 - val_loss: 1.7572 - 34ms/epoch - 5ms/step
+7/7 - 0s - loss: 1.0991 - val_loss: 1.7529 - 36ms/epoch - 5ms/step
 Epoch 24/25
-7/7 - 0s - loss: 1.0870 - val_loss: 1.7448 - 34ms/epoch - 5ms/step
+7/7 - 0s - loss: 1.0806 - val_loss: 1.7510 - 40ms/epoch - 6ms/step
 Epoch 25/25
-7/7 - 0s - loss: 1.0700 - val_loss: 1.7339 - 34ms/epoch - 5ms/step</code></pre>
+7/7 - 0s - loss: 1.0682 - val_loss: 1.7478 - 36ms/epoch - 5ms/step</code></pre>
 </div>
 </div>
 <div class="cell page-columns page-full">
@@ -1067,7 +1068,7 @@ Abbildung&nbsp;16.6: NN für mult. Regression: Entwicklung des Loss für 25 Epoc
 <span>  <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      w_1       w_2       w_3      bias 
- 2.946030  1.925088 -1.457486  4.794597 </code></pre>
+ 2.958470  1.918696 -1.444356  4.791152 </code></pre>
 </div>
 </div>
 <div class="cell">
@@ -1202,10 +1203,10 @@ ________________________________________________________________________________
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Final epoch (plot to see history):
-        loss: 0.3992
-    accuracy: 0.8025
-    val_loss: 0.3415
-val_accuracy: 0.87 </code></pre>
+        loss: 0.4007
+    accuracy: 0.805
+    val_loss: 0.3436
+val_accuracy: 0.84 </code></pre>
 </div>
 </div>
 <div class="cell page-columns page-full">
@@ -1238,7 +1239,7 @@ Abbildung&nbsp;16.8: NN für Logit-Regression: Entwicklung der Metriken für 25 
 <span>  <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       w_1       bias 
- 0.9631591 -5.3512850 </code></pre>
+ 0.9766494 -5.3363032 </code></pre>
 </div>
 </div>
 <p>Für einen Vergleich der Vorhersagegüter mit logistischer Regression schätzen wir zunächst ein entsprechendes GLM mit <code><a href="https://rdrr.io/r/stats/glm.html">glm()</a></code>.</p>
@@ -1289,7 +1290,7 @@ Number of Fisher Scoring iterations: 6</code></pre>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">data_new</span><span class="op">$</span><span class="va">X</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>8/8 - 0s - 43ms/epoch - 5ms/step</code></pre>
+<pre><code>8/8 - 0s - 57ms/epoch - 7ms/step</code></pre>
 </div>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">predictions_glm_logit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span></span>
 <span>    <span class="va">glm_mod</span>, </span>
@@ -1309,16 +1310,16 @@ Number of Fisher Scoring iterations: 6</code></pre>
 <pre><code># A tibble: 10 × 5
        X      P     Y nn_logit glm_logit
    &lt;dbl&gt;  &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt;     &lt;dbl&gt;
- 1  4.15 0.136      1    0.205    0.132 
- 2  4.55 0.208      0    0.276    0.206 
- 3  6.44 0.693      1    0.700    0.755 
- 4  6.68 0.751      1    0.748    0.810 
- 5  4.74 0.248      0    0.314    0.250 
- 6  8.22 0.960      1    0.929    0.970 
- 7  4.41 0.180      0    0.248    0.177 
- 8  5.39 0.411      0    0.461    0.439 
- 9  7.48 0.892      0    0.865    0.924 
-10  3.56 0.0660     0    0.128    0.0661</code></pre>
+ 1  4.15 0.136      1    0.216    0.132 
+ 2  4.55 0.208      0    0.291    0.206 
+ 3  6.44 0.693      1    0.721    0.755 
+ 4  6.68 0.751      1    0.767    0.810 
+ 5  4.74 0.248      0    0.331    0.250 
+ 6  8.22 0.960      1    0.936    0.970 
+ 7  4.41 0.180      0    0.262    0.177 
+ 8  5.39 0.411      0    0.482    0.439 
+ 9  7.48 0.892      0    0.878    0.924 
+10  3.56 0.0660     0    0.135    0.0661</code></pre>
 </div>
 </div>
 <p>Für eine erste Beurteilung anhand der Vorhersagen auf dem Testdatensatz plotten wir die vorhergesagten Wahrscheinlichkeiten als Funktion von <code>X</code> gemeinsam mit den tatsächlichen Ausprägungen der Outcome-Variable <code>Y</code>.</p>
@@ -1545,7 +1546,7 @@ Abbildung&nbsp;16.9: ROC-Kurve für logistische Modelle
 <span><span class="va">nn_pred</span> <span class="op">&lt;-</span> <span class="va">model</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">test_x</span><span class="op">)</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>4/4 - 0s - 70ms/epoch - 17ms/step</code></pre>
+<pre><code>4/4 - 0s - 277ms/epoch - 69ms/step</code></pre>
 </div>
 <div class="sourceCode" id="cb56"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Testdaten erweitern</span></span>
 <span><span class="va">nn_predictions</span> <span class="op">&lt;-</span> <span class="va">test_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
@@ -1570,7 +1571,7 @@ Abbildung&nbsp;16.9: ROC-Kurve für logistische Modelle
 <span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  MSE KQ   MSE NN 
-28.79773 16.88401 </code></pre>
+28.79773 10.66532 </code></pre>
 </div>
 </div>
 <p>Da das NN ist in der Lage ist, nicht-lineare Zusammenhänge zwischen den Prädiktoren und der Zielvariablen zu modellieren, liefert hat es eine höhere Vorhersagegenauigkeit auf dem Testdatensatz.</p>
@@ -1806,63 +1807,55 @@ Abbildung&nbsp;16.10: Boston Housing: KQ vs.&nbsp;NN
 <span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Epoch 1/30
-59/59 - 2s - loss: 2.6801 - mae: 68863.8047 - val_loss: 0.2711 - val_mae: 77059.9766 - lr: 0.0100 - 2s/epoch - 29ms/step
+59/59 - 2s - loss: 2.6445 - mae: 65339.1836 - val_loss: 0.7098 - val_mae: 236160.9062 - lr: 0.0100 - 2s/epoch - 38ms/step
 Epoch 2/30
-59/59 - 0s - loss: 0.3143 - mae: 98887.8047 - val_loss: 0.4397 - val_mae: 161632.1250 - lr: 0.0100 - 499ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.3402 - mae: 102844.2031 - val_loss: 0.1725 - val_mae: 58892.4492 - lr: 0.0100 - 561ms/epoch - 10ms/step
 Epoch 3/30
-59/59 - 0s - loss: 0.2246 - mae: 76933.0938 - val_loss: 0.1350 - val_mae: 55139.1758 - lr: 0.0100 - 498ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.2258 - mae: 82230.2188 - val_loss: 0.3394 - val_mae: 132267.4062 - lr: 0.0100 - 581ms/epoch - 10ms/step
 Epoch 4/30
-59/59 - 0s - loss: 0.1730 - mae: 70248.9609 - val_loss: 0.0686 - val_mae: 42032.3672 - lr: 0.0100 - 492ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.1556 - mae: 64390.2969 - val_loss: 0.1580 - val_mae: 57553.5195 - lr: 0.0100 - 584ms/epoch - 10ms/step
 Epoch 5/30
-59/59 - 0s - loss: 0.1217 - mae: 56412.5195 - val_loss: 0.1327 - val_mae: 55897.4141 - lr: 0.0100 - 487ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.1346 - mae: 58944.6641 - val_loss: 0.0608 - val_mae: 36465.7070 - lr: 0.0100 - 555ms/epoch - 9ms/step
 Epoch 6/30
-59/59 - 0s - loss: 0.1111 - mae: 51840.2422 - val_loss: 0.0468 - val_mae: 32525.9043 - lr: 0.0100 - 491ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.1006 - mae: 48540.6680 - val_loss: 0.0349 - val_mae: 28581.0430 - lr: 0.0100 - 556ms/epoch - 9ms/step
 Epoch 7/30
-59/59 - 0s - loss: 0.0850 - mae: 44002.2148 - val_loss: 0.0963 - val_mae: 50788.2852 - lr: 0.0100 - 485ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.0940 - mae: 45278.5508 - val_loss: 0.0286 - val_mae: 23812.6445 - lr: 0.0100 - 554ms/epoch - 9ms/step
 Epoch 8/30
-59/59 - 0s - loss: 0.0819 - mae: 44281.1836 - val_loss: 0.1088 - val_mae: 67397.4844 - lr: 0.0100 - 481ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.0811 - mae: 44536.4336 - val_loss: 0.0593 - val_mae: 37105.0586 - lr: 0.0100 - 552ms/epoch - 9ms/step
 Epoch 9/30
-59/59 - 0s - loss: 0.0696 - mae: 40577.3477 - val_loss: 0.0743 - val_mae: 40895.9688 - lr: 0.0100 - 483ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.0719 - mae: 41652.0977 - val_loss: 0.0213 - val_mae: 17758.5566 - lr: 0.0100 - 554ms/epoch - 9ms/step
 Epoch 10/30
-59/59 - 0s - loss: 0.0596 - mae: 36760.8672 - val_loss: 0.0261 - val_mae: 22681.9336 - lr: 0.0100 - 485ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.0634 - mae: 37703.1328 - val_loss: 0.0447 - val_mae: 32602.2461 - lr: 0.0100 - 553ms/epoch - 9ms/step
 Epoch 11/30
-59/59 - 0s - loss: 0.0580 - mae: 36272.9648 - val_loss: 0.0180 - val_mae: 15472.0615 - lr: 0.0100 - 489ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.0582 - mae: 37215.1250 - val_loss: 0.0931 - val_mae: 47808.9297 - lr: 0.0100 - 550ms/epoch - 9ms/step
 Epoch 12/30
-59/59 - 0s - loss: 0.0570 - mae: 35091.3867 - val_loss: 0.0754 - val_mae: 51871.4961 - lr: 0.0100 - 479ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.0516 - mae: 32891.6133 - val_loss: 0.0253 - val_mae: 22737.9004 - lr: 0.0100 - 549ms/epoch - 9ms/step
 Epoch 13/30
-59/59 - 0s - loss: 0.0440 - mae: 29530.9336 - val_loss: 0.0862 - val_mae: 44767.3125 - lr: 0.0100 - 482ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.0474 - mae: 30063.2969 - val_loss: 0.0710 - val_mae: 47606.8750 - lr: 0.0100 - 551ms/epoch - 9ms/step
 Epoch 14/30
-59/59 - 0s - loss: 0.0479 - mae: 32043.8887 - val_loss: 0.0805 - val_mae: 54268.2891 - lr: 0.0100 - 479ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.0138 - mae: 13672.6924 - val_loss: 0.0184 - val_mae: 16638.7578 - lr: 0.0020 - 555ms/epoch - 9ms/step
 Epoch 15/30
-59/59 - 0s - loss: 0.0412 - mae: 29175.3594 - val_loss: 0.0269 - val_mae: 22318.1484 - lr: 0.0100 - 495ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.0108 - mae: 12561.4287 - val_loss: 0.0162 - val_mae: 14677.8623 - lr: 0.0020 - 558ms/epoch - 9ms/step
 Epoch 16/30
-59/59 - 0s - loss: 0.0086 - mae: 12245.5010 - val_loss: 0.0170 - val_mae: 14487.9668 - lr: 0.0020 - 485ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.0095 - mae: 12598.3350 - val_loss: 0.0195 - val_mae: 17016.0586 - lr: 0.0020 - 551ms/epoch - 9ms/step
 Epoch 17/30
-59/59 - 0s - loss: 0.0078 - mae: 11720.7324 - val_loss: 0.0196 - val_mae: 16752.9180 - lr: 0.0020 - 484ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.0081 - mae: 11562.0527 - val_loss: 0.0167 - val_mae: 14475.1484 - lr: 0.0020 - 555ms/epoch - 9ms/step
 Epoch 18/30
-59/59 - 0s - loss: 0.0070 - mae: 11038.4990 - val_loss: 0.0167 - val_mae: 14753.1855 - lr: 0.0020 - 485ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.0075 - mae: 11513.8477 - val_loss: 0.0167 - val_mae: 14290.4570 - lr: 0.0020 - 565ms/epoch - 10ms/step
 Epoch 19/30
-59/59 - 0s - loss: 0.0069 - mae: 11079.9805 - val_loss: 0.0160 - val_mae: 14316.6523 - lr: 0.0020 - 485ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.0074 - mae: 11410.3320 - val_loss: 0.0177 - val_mae: 14524.3525 - lr: 0.0020 - 555ms/epoch - 9ms/step
 Epoch 20/30
-59/59 - 0s - loss: 0.0067 - mae: 10853.2559 - val_loss: 0.0171 - val_mae: 14301.3926 - lr: 0.0020 - 486ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.0054 - mae: 9329.8848 - val_loss: 0.0171 - val_mae: 14490.3535 - lr: 4.0000e-04 - 552ms/epoch - 9ms/step
 Epoch 21/30
-59/59 - 0s - loss: 0.0062 - mae: 10195.1113 - val_loss: 0.0175 - val_mae: 14863.8672 - lr: 0.0020 - 483ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.0052 - mae: 9256.9863 - val_loss: 0.0169 - val_mae: 14182.3584 - lr: 4.0000e-04 - 548ms/epoch - 9ms/step
 Epoch 22/30
-59/59 - 0s - loss: 0.0063 - mae: 10472.6641 - val_loss: 0.0174 - val_mae: 14883.5322 - lr: 0.0020 - 481ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.0050 - mae: 9135.6562 - val_loss: 0.0168 - val_mae: 14184.0381 - lr: 4.0000e-04 - 547ms/epoch - 9ms/step
 Epoch 23/30
-59/59 - 0s - loss: 0.0059 - mae: 9997.8916 - val_loss: 0.0186 - val_mae: 15775.3262 - lr: 0.0020 - 479ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.0049 - mae: 9028.4990 - val_loss: 0.0177 - val_mae: 14852.2842 - lr: 4.0000e-04 - 553ms/epoch - 9ms/step
 Epoch 24/30
-59/59 - 0s - loss: 0.0042 - mae: 8284.0127 - val_loss: 0.0164 - val_mae: 14226.6836 - lr: 4.0000e-04 - 498ms/epoch - 8ms/step
+59/59 - 1s - loss: 0.0047 - mae: 8782.3926 - val_loss: 0.0170 - val_mae: 14320.1172 - lr: 8.0000e-05 - 601ms/epoch - 10ms/step
 Epoch 25/30
-59/59 - 0s - loss: 0.0041 - mae: 8079.7988 - val_loss: 0.0164 - val_mae: 14222.3291 - lr: 4.0000e-04 - 485ms/epoch - 8ms/step
-Epoch 26/30
-59/59 - 0s - loss: 0.0040 - mae: 7974.5630 - val_loss: 0.0164 - val_mae: 14259.8604 - lr: 4.0000e-04 - 488ms/epoch - 8ms/step
-Epoch 27/30
-59/59 - 0s - loss: 0.0039 - mae: 7852.2417 - val_loss: 0.0164 - val_mae: 14279.8174 - lr: 4.0000e-04 - 485ms/epoch - 8ms/step
-Epoch 28/30
-59/59 - 0s - loss: 0.0037 - mae: 7661.8911 - val_loss: 0.0164 - val_mae: 14294.8623 - lr: 8.0000e-05 - 488ms/epoch - 8ms/step
-Epoch 29/30
-59/59 - 0s - loss: 0.0037 - mae: 7651.1865 - val_loss: 0.0164 - val_mae: 14320.3291 - lr: 8.0000e-05 - 489ms/epoch - 8ms/step</code></pre>
+59/59 - 1s - loss: 0.0046 - mae: 8719.3418 - val_loss: 0.0168 - val_mae: 14180.6289 - lr: 8.0000e-05 - 555ms/epoch - 9ms/step</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -1870,10 +1863,10 @@ Epoch 29/30
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Final epoch (plot to see history):
-    loss: 0.003737
-     mae: 7,651
-val_loss: 0.01637
- val_mae: 14,320
+    loss: 0.004627
+     mae: 8,719
+val_loss: 0.01683
+ val_mae: 14,181
       lr: 0.00008 </code></pre>
 </div>
 </div>
@@ -3586,4 +3579,4 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 
 
 
-</body></html>
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/mca91/kasa_book/edit/main/Machine Learning.qmd" class="toc-action"><i class="bi bi-github"></i>Seite editieren</a></li><li><a href="https://github.com/mca91/kasa_book/issues/new" class="toc-action"><i class="bi empty"></i>Problem melden</a></li></ul></div></div></div></footer></body></html>

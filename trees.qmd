@@ -747,111 +747,98 @@ Dies sorgt für konsistente Schätzungen. @AtheyImbens2016 zeigen, dass die Mini
 
 :::
 
-Datensatz einlesen.^[Aus technischen Gründen verzichten wir in diesem Kapitel zur Zeit auf die Einbindung der WebR-Konsole.]
+Zur Illustration der Anpassung eines Causal Trees mit R lesen wir zunächst den Datensatz `nl_effects` ein. Der Datensatz enhält 10000 Beobachtungen für 
+
+- 10 Regressoren `X1`, `X2`, ...,  `X10`
+- die Behandlungsvariable `B`
+- das Outcome `Y`
+- tatsächliche individuelle Behandlungseffekte `tau`
+
+Die Daten wurden so erzeugt, dass lediglich die Regressoren `X1`, `X2` und `X3` Vorhersagekraft für `Y` haben *und* mit der Behandlungsvariable `B` korreliert sind. Der durchschnittliche Behandlungseffekt (ATE) beträgt 2.5.
+
+Wie lesen Datensatz zunächst ein und verschaffen uns einen Überblick.^[Aus technischen Gründen verzichten wir in diesem Kapitel zur Zeit auf die Einbindung der WebR-Konsole.]
 
 ```{r}
-nl_effects <- readRDS(file = "datasets/nl_effects.Rds")
+library(dplyr)
+
+# 'nl_effects' einlesen
+nl_effects <- readRDS(
+  file = "datasets/nl_effects.Rds"
+)
+
+# Überblick
+glimpse(nl_effects)
 ```
 
-@grfPackage
+Für die Schätzung nutzen wir das R-Paket `grf` [@grfPackage]. Mit `grf::causal_forest()` kann ein Ensemble-Modell mit vielen Causal Trees (Causal Forest) geschätzt werden. Über die Argumente `num.trees = 1` und `ci.group.size = 1` legen wir fest, dass lediglich ein Causal Tree angepasst werden soll. Beachte, dass die Regressoren dem Argument `X` als `matrix`-Objekt übergeben werden müssen. Mit `min.node.size = 50` legen wir eine Mindestanzahl an Beobachtungen für die Knoten des Baums fest. Da die Aufteilung von `nl_effects` in Trainings-, Schätz- und Validierungsdatensatz zufällig generiert und Cross-Validation zu Bestimmung der Baum-Tiefe eingesetzt wird, setzen wir mit `seed = 1234` einen Seed für Reproduzierbarkeit.
 
 ```{r}
 library(dplyr)
 library(grf)
-# Fit a causal tree (one single tree)
+
+# Causal Tree Anpassen
 causal_tree <- causal_forest(
-  X = nl_effects %>% select(X1:X3) %>% as.matrix(),
+  X = nl_effects %>% 
+    dplyr::select(-Y, -B, -tau, -ps) %>% 
+    as.matrix(),
   Y = nl_effects$Y,
   W = nl_effects$B, 
+  min.node.size = 100,
   num.trees = 1, 
-  honesty = FALSE, 
-  min.node.size = 150
+  ci.group.size = 1,
+  seed = 1234
 )
 
+# Zusammenfassung:
 causal_tree
 ```
 
-@fig-ct
+Den angepassten Causal Tree lesen wir mit `grf::get_tree()` aus und nutzen die zugehörige `plot()`-Methode für eine grafische Darstellung, siehe @fig-ct.
 
 ```{r}
 #| eval: false
+# Trainierten Causal Tree auslesen
 the_tree <- get_tree(causal_tree, index = 1)
 
+# Tree plotten
 plot(the_tree)
 ```
 
-![Mit `grf::causal_forest` geschätzter Causal Tree](img/causal_tree.svg){#fig-ct width=70%}
-
-
+![Mit `grf::causal_forest` geschätzter Causal Tree](img/causal_tree.png){#fig-ct width=70%}
 
 
 ### Causal Forests
 
-*Causal Forests* sind eine Erweiterung von Random Forests, die speziell entwickelt wurden, um individuelle Behandlungseffekte*(engl. Individual Treatment Effects, ITE) zu schätzen. Der Hauptunterschied zu Random Forests besteht darin, dass Causal Forests nicht nur Vorhersagen treffen, sondern auch den **kausalen Effekt** einer Behandlung $B$ auf das Outcome $Y$ schätzen. Der kausale Effekt wird oft als Differenz der Ergebnisse unter verschiedenen Bedingungen (z. B. mit und ohne Behandlung) modelliert.
+*Causal Forests* erweitern das Konzept der Causal Trees zu einem Ensemble-Verfahren, ähnlich wie Random Forests klassische Regressionsbäume erweitern. Bei Causal Forests werden viele Causal Trees auf Bootstrap-Stichproben der Daten trainiert, wobei für jeden Baum nur eine zufällige Teilmenge der Kovariaten für potentielle Splits berücksichtigt wird. Das "Honest Splitting"-Prinzip wird beibehalten: Für jeden Baum wird die Bootstrap-Stichprobe in eine Trainings- und eine Schätzstichprobe aufgeteilt. Der finale geschätzte Behandlungseffekt für eine neue Beobachtung ergibt sich aus dem Durchschnitt der Vorhersagen aller Bäume. Diese Ensemble-Methode reduziert die Varianz der Schätzungen im Vergleich zu einzelnen Causal Trees. Zusätzlich ermöglicht die Forest-Struktur die Berechnung von Konfidenzintervallen für die geschätzten Behandlungseffekte durch die Analyse der Verteilung der Vorhersagen über alle Bäume. Causal Forests zielen dabei primär darauf ab, den Conditional Average Treatment Effect (CATE), auch bekannt als heterogener Behandlungseffekt $\tau(x)$, zu schätzen. Der CATE ist definiert als
+\begin{align*}
+  \tau(x) = \textup{E}[Y(1) - Y(0)|X = x],
+\end{align*}
+wobei $Y(1)$ und $Y(0)$ die potentiellen Outcomes unter Behandlung bzw. Kontrolle sind, und $X$ die verfügbaren Kovariablen darstellt. Im Gegensatz zum durchschnittlichen Behandlungseffekt (ATE), der über die gesamte Population gemittelt wird, oder zum durchschnittlichen Behandlungseffekt der Behandelten (ATT), ermöglicht der CATE die *Schätzung individualisierter Behandlungseffekte für spezifische Kovariatenwerte*. Causal Forests sind dabei besonders geeignet, nicht-lineare und komplexe Heterogenitätsmuster in den Behandlungseffekten zu erfassen. Sie erlauben es uns:
 
+- Für jede individuelle Beobachtung $i$ einen spezifischen bedingten Behandlungseffekt $\tau(x_i)$ zu schätzen
+- Diese individuellen Schätzungen zu validen Gruppendurchschnitten zu aggregieren
+- Die Unsicherheit dieser Schätzungen durch Konfidenzintervalle zu quantifizieren
 
-| Aspekt                 | Random Forests                              | Causal Forests                                 |
-|------------------------|---------------------------------------------|------------------------------------------------|
-| **Ziel**                | Vorhersage von Zielvariablen                | Schätzung individueller Behandlungseffekte     |
-| **Ergebnisse**          | Globale Vorhersagen                         | Heterogene, individuelle Effekte               |
-| **Trainingsdaten**      | Outcome und Prädiktoren               | Behandlung, Outcome und Prädiktoren           |
-| **Beispiel**            | Einkommensvorhersage auf Basis von Merkmalen| Effekt einer Werbekampagne auf verschiedene Kunden |
-| **Schätzung**           | Bedingte Erwartung $\textup{E}[Y|X]$               | Bedingter Behandlungseffekt $\textup{E}[Y(1) - Y(0)|X]$ |
-| **Verwendung**          | Klassifikation und Regression               | Kausalanalyse und individuelle Wirkungsschätzung|
+Die Ensemble-Struktur ermöglicht dabei nicht nur die Punktschätzung des CATE, sondern auch die Berechnung asymptotisch valider Konfidenzintervalle für diese bedingten Effekte: @Atheyetal2019 zeigen, dass Causal Forests unter bestimmten Regularitätsbedingungen asymptotisch normalverteilte und konsistente Schätzer für die bedingten durchschnittlichen Behandlungseffekte liefern.
+
+Causal Forests eignen sich insbesondere für polit-ökonomische Fragestellungen, bei denen die Wirkung von Maßnahmen zwischen verschiedenen Gruppen oder Regionen variiert. Die Berechnung von CATEs mit Causal Forests könnte beispielsweise ein besseres Verständnis darüber ermöglichen, welche Arbeitssuchenden besonders von bestimmten Weiterbildungsprogrammen profitieren oder wie Subventionen oder Infrastrukturinvestitionen je nach lokalen Gegebenheiten unterschiedlich wirken.
+
+@tbl-rfcfcomp vergleicht die wesentlichen Aspekte von Random Forests und Causal Forests.
+
+| Aspekt | Random Forests | Causal Forests |
+|--------|---------------|----------------|
+| **Zielfunktion** | Minimierung MSE der Outcome-Vorhersage | Minimierung MSE der gesch. Behandlungseffekte |
+| **Split-Kriterium** | Minimierung der Varianz von Y in Knoten | Maximierung der Behandlungseffekt-Heterogenität zwischen Knoten |
+| **Datennutzung** | Gleiche Daten für Anpassung und Vorhersage | "Honest Splitting": Separate Daten für Baumstruktur und Effektschätzung |
+| **Schätzung** | Bedingte Erwartung $\textup{E}[Y|X]$ | Bedingter Behandlungseffekt $\textup{E}[Y(1) - Y(0)|X]$ |
+| **Inferenz** | Punktschätzungen | Asymptotische Verteilung und Konfidenzintervalle |
+| **Balancierung** | Keine Behandlung-Kontroll-Balancierung | Mindestanzahl von Behandlungs- und Kontrolleinheiten pro Knoten |
+| **Bootstrap** | Zufällige Stichprobe mit Zurücklegen | Doppelte Stichprobe: Split-Sample und Estimation-Sample |
+| **Modellkomplexität** | Durch Cross-Validation optimiert | Durch "honest" Cross-Validation mit separaten Schätzstichproben optimiert |
 
 Table: Vergleich von Random Forests und Causal Forests {#tbl-rfcfcomp}
 
 In diesem Beispiel verwenden wir das Paket `grf` (Generalized Random Forests) in R, um einen Causal Forest zu trainieren und die individuellen Behandlungseffekte zu schätzen.
-
-Naive Methode mit Random Forest
-
-
-```{r}
-#| fig-cap: "Zusammenhang zwischen X1, X2, X3 und dem wahren Behandlungseffekt tau"
-#| label: fig-xvstau
-library(tidyverse)
-# Daten ins Long-Format umwandeln für einfachere Facettierung
-nl_long <- nl_effects %>% 
-  select(X1, X2, X3, tau) %>% 
-  pivot_longer(cols = starts_with("X"), names_to = "Variable", values_to = "Value")
-
-# Erstelle den facettierten Plot
-ggplot(
-  data = nl_long,
-  mapping = aes(x = Value, y = tau)) + 
-  geom_point(alpha = 0.3, size = .5) + 
-  facet_wrap(~Variable, scales = "free") + 
-  theme_minimal() + 
-  labs(
-    x = "Wert der Prädiktoren",
-    y = "Wahrer Behandlungseffekt (tau)"
-  )
-```
-
-```{r}
-#| fig-cap: "Korrelation zwischen Behandlungsindikator (B) und relevanten Kovariablen"
-#| label: fig-bvsvars
-# In langes Format überführen
-df_long <- nl_effects %>% 
-    select(X1, X2, X3, B) %>% 
-    pivot_longer(
-      cols = starts_with("X"),
-      names_to = "Variable",
-      values_to = "Value"
-    )
-
-# Facetting nach Variable
-ggplot(df_long, aes(x = Value, fill = factor(B))) + 
-    geom_density(alpha = 0.5) + 
-    facet_wrap(~Variable, scales = "free") + 
-    labs(
-      x = "Prädiktoren-Werte",
-      fill = "Behandlung (B)"
-    ) +
-    theme_minimal() + 
-    theme(legend.position = "top")
-```
-
 
 ```{r}
 library(grf)
@@ -871,12 +858,16 @@ Y <- nl_effects_train %>% pull(Y)
 tau <- nl_effects_train %>% pull(tau)
 ```
 
+Bevor wir den Causal Forest trainieren, schätzen wir zunächst den Propensity Score und das Outcome-Modell. Diese Vorschätzungen werden verwendet, um die Effizienz des Causal Forests zu verbessern. Der Propensity Score modelliert die Wahrscheinlichkeit der Behandlungszuweisung, während das Outcome-Modell den grundlegenden Zusammenhang zwischen den Kovariablen und der Zielvariable erfasst. 
+
+Während der Propensity Score zur Verbesserung der Balancierung der Behandlungs- und Kontrollgruppen im Causal Forest beiträgt, ermöglicht die Outcome-Schätzung dem Causal Forest, sich auf die *Heterogenität der Behandlungseffekte* zu konzentrieren, statt den gemeinsamen Effekt der Kovariaten auf $Y$ mitschätzen zu müssen. Dies ist analog zur Regression mit Kontrolle für Kovariablen: Der "gemeinsame" Effekt der Regressoren wird durch die Schätzung des Outcomes mit einem Regression Forest bereits herausgerechnet.^[Dies wird auch als *Orthogonoalisierung* bezeichnet.] Obwohl `grf()` diese Schätzungen auch intern vornehmen kann, bietet die explizite Schätzung mehr Kontrolle über den Prozess. Wir nutzen hierzu `grf::regression_forest()`, die Implementierung eines Random-Forest-Algorithmus für Regression.
 
 ```{r, cache=T}
 # Propensity Score Schätzen
 B_hat_mod <- regression_forest(
   X = X,
   Y = B,
+  num.trees = 4000,
   tune.parameters = "all"
 )
 
@@ -886,77 +877,156 @@ B_hat <- B_hat_mod$predictions
 Y_hat_mod <- regression_forest(
   X = X,
   Y = Y,
+  num.trees = 4000,
   tune.parameters = "all"
 )
 
 Y_hat <- Y_hat_mod$predictions
+```
 
+Den Causal Forest schätzen wir mit `grf::causal_forest()` unter Übergabe der zuvor geschätzten Propensity-Scores und Outcomes.
+
+```{r, cache=TRUE}
 # Causal Forest trainieren
 cf <- causal_forest(
-  X = X, 
+  X = X,
   Y = Y, 
   W = B, 
   Y.hat = Y_hat,
-  W.hat = B_hat
+  W.hat = B_hat, 
+  num.trees = 4000,   
+  tune.parameters = "all"
 )
 ```
 
+Als ersten Analyseschritt berechnen wir den durchschnittlichen Behandlungseffekt (ATE). Dieser gibt uns einen ersten Eindruck der Genauigkeit der Schätzung des Behandlungseffekts
+
 ```{r}
-# Schritt 4: Vorhersage des durchschnittlichen Behandlungseffekts
-# Causal Forest
-tau.cf <- average_treatment_effect(cf)
-cat("Durchschnittlicher Behandlungseffekt mit Causal Forest:", tau.cf[1], "\n")
+# Vorhersage des durchschnittlichen Behandlungseffekts
+# (ATT) mit Causal Forest
+(
+  tau.cf <- average_treatment_effect(cf)
+)
 ```
 
+Die geschätzen heterogenen Behandlungseffekte erhalten wir mit `predict()`.
+
 ```{r}
-# Schritt 5: Individuelle Schätzungen der Behandlungseffekte
-# Causal Forest - Individuelle Behandlungseffekte (CATE)
+# Schätzungen der bedingte Behandlungseffekte (CATE)
+# auslesen
 tau.hat.cf <- predict(cf)$predictions
 
-# Wahrer Behandlungseffekt tau
+# Überblick
 head(tau.hat.cf)
 ```
 
+Da wir in diesem simulierten Datensatz die wahren Behandlungseffekte kennen, können wir die Qualität unserer Schätzungen visuell überprüfen. In der folgenden Grafik vergleichen wir die tatsächlichen individuellen Behandlungseffelte mit dem CATE-Schätzungen. Die rote Linie ist die Referenz für eine perfekte Übereinstimmung zwischen geschätzten und wahren Effekten. Je näher die Punkte an dieser Linie liegen, desto besser ist unsere Schätzung.
+
 ```{r}
+# CATE-Schätzungen vs. ITE plotten
 tibble(
-    x = nl_effects_train$tau,
-    y = predict(cf)$predictions
+    true_effect = nl_effects_train$tau,
+    estimated_effect = predict(cf)$predictions,
 ) %>%
-    ggplot(aes(x  =x, y = y)) +
-    geom_point(alpha= .3, size = 1) +
+    ggplot(aes(x = true_effect, y = estimated_effect)) +
+    geom_point(alpha = 0.3, size = 1) +
     geom_abline(intercept = 0, slope = 1, col = "red") +
+    labs(
+        x = "Wahrer Behandlungseffekt (ITE)",
+        y = "Geschätzter Behandlungseffekt (CATE)",
+        title = "Vergleich von wahren und geschätzten Behandlungseffekten"
+    ) +
     theme_minimal()
 ```
 
+Anschließend quantifizieren wir die Genauigkeit unserer Schätzungen durch den RMSE (Root Mean Square Error). Wir berechnen diesen sowohl für die Trainings- als auch für die Testdaten, um die Generalisierbarkeit unseres Modells zu überprüfen.
 
 ```{r}
-# ATE CF
-mean(tau.hat.cf)
+# RMSE für Causal Forest
+(
+  mse.cf <- sqrt(mean((tau.hat.cf - tau)^2))
+)
 ```
+
+Der RMSE auf den Trainingsdaten zeigt die Schätzgenauigkeit unseres Modells an. Durch das "honest splitting" Verfahren des Causal Forests, bei dem separate Teilstichproben für die Anpassung des Baums und die Effektschätzung verwendet werden, erwarten wir keine substantielle Verschlechterung der Performanz auf den Testdaten `nl_effects_test`.
 
 ```{r}
-# Schritt 6: Evaluierung - Vergleich der Genauigkeit der beiden Modelle
-# MSE für Causal Forest
-mse.cf <- sqrt(mean((tau.hat.cf - tau)^2))
-cat("MSE des Causal Forest:", mse.cf, "\n")
+# RMSE für separaten Test-Datensatz
+sqrt(
+  mean(
+    (
+      predict(object = cf, newdata = nl_effects_test %>% select(-Y, -tau, -B, -ps))$predictions 
+      - nl_effects_test$tau
+      )^2
+    )
+  )
 ```
 
-Test set
+Ein ähnlicher RMSE auf den Testdaten bestätigt die inhärente Generalisierungsfähigkeit des Causal Forest Algorithmus.
+
+#### Inferenz für Effekt-Schätzungen
+
+Zunächst berechnen wir die Konfidenzintervalle für die geschätzten Behandlungseffekte in `cf`. Die `predict()`-Funktion für `grf`-Objekte kann diese direkt mit ausgeben.
 
 ```{r}
-sqrt(mean((predict(object = cf, newdata = nl_effects_test %>% select(-Y, -tau, -B))$predictions - nl_effects_test$tau)^2))
+# Vorhersage mit Konfidenzintervallen
+predictions_with_ci <- predict(cf, estimate.variance = TRUE)
+
+# In tibble umwandeln 
+cate_estimates <- tibble(
+  cate = predictions_with_ci$predictions,
+  stderr = sqrt(predictions_with_ci$variance.estimates),
+  lower_ci = cate - 1.96 * stderr,
+  upper_ci = cate + 1.96 * stderr,
+  true_effect = nl_effects_train$tau
+)
 ```
 
+Um die Präzision unserer Schätzungen zu visualisieren, erstellen wir einen Plot, der die Konfidenzintervalle für eine Stichprobe von Beobachtungen zeigt. Wir sortieren nach der Größe der geschätzten Effekte, um eine übersichtlichere Darstellung zu erhalten.
+
 ```{r}
-# ATE CF pred
-mean(predict(object = cf, newdata = nl_effects_test %>% select(-Y, -tau, -B))$predictions)
+# Sample von 100 Beobachtungen für übersichtlichere Visualisierung
+set.seed(123)
+
+cate_estimates %>%
+  sample_n(100) %>%
+  mutate(id = row_number()) %>%
+  arrange(cate) %>%
+  ggplot(aes(x = id, y = cate)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = lower_ci, ymax = upper_ci), width = 0.2, alpha = 0.5) +
+  geom_point(aes(y = true_effect), color = "red", size = 1, alpha = 0.5) +
+  labs(
+    x = "Beobachtung (sortiert nach geschätztem Effekt)",
+    y = "Behandlungseffekt",
+    title = "Geschätzte Behandlungseffekte mit 95% Konfidenzintervallen",
+    subtitle = "Rote Punkte zeigen wahre Effekte"
+  ) +
+  theme_minimal()
 ```
+
+Die roten Punkte zeigen die wahren Effekte, während die schwarzen Punkte mit den Konfidenzintervallen unsere Schätzungen darstellen. 
+
+<!-- Ein gut kalibriertes Modell sollte etwa 95% der wahren Effekte innerhalb der Konfidenzintervalle haben.^[In der englischsprachigen Literatur wird dies als *coverage* bezeichnet.] Wir können dies mit R-Code prüfen. -->
+
+<!-- ```{r} -->
+<!-- # Überprüfung der Coverage der Konfidenzintervalle -->
+<!-- ( -->
+<!--   coverage <- cate_estimates %>% -->
+<!--   summarise( -->
+<!--     coverage = mean(true_effect >= lower_ci & true_effect <= upper_ci), -->
+<!--     avg_ci_width = mean(upper_ci - lower_ci) -->
+<!--   ) -->
+<!-- ) -->
+<!-- ``` -->
+
+
 
 ## Zusammenfassung
 
-In diesem Kapitel haben wir die Anwendung baum-basierter Methoden in R diskutiert. Darunter Entscheidungsbäume, Bagging, Random Forests und Boosting. Entscheidungsbäume sind Modelle, die die Daten anhand binärer Entscheidungsregeln sukzessiv in kleinere, homogene Gruppen aufgeteilt werden. Baum-Modelle bieten intuitive Interpretierbarkeit, neigen jedoch zur Überanpassung, was durch Beschneiden (Pruning) vermieden werden kann. Die Vorhersage einzelner Bäume ist tendentiell mit hoher Varianz verbunden. Random Forests kombinieren mit Bagging viele Entscheidungsbäume, die auf zufälligen Teilmengen der Daten und Merkmale trainiert werden. Durch die Aggregation der Vorhersagen vieler Bäume reduziert der Random Forest die Varianz und verbessert so die Vorhersagegenauigkeit. Boosting-Methoden mit Entscheidungsbäumen trainieren kleine Bäume sukzessive, wobei jeder weitere Baum zur Korrektur der gegenwärtigen Fehler des Ensembles trainiert wird. Gradient Boosting nutzt den Gradienten der Verlustfunktion, um die Vorhersagequalität des Ensembles optimieren. 
+In diesem Kapitel haben wir die Anwendung baum-basierter Methoden in R diskutiert. Darunter Entscheidungsbäume, Bagging, Random Forests, Boosting und Causal Forests. Entscheidungsbäume sind Modelle, die die Daten anhand binärer Entscheidungsregeln sukzessiv in kleinere, homogene Gruppen aufgeteilt werden. Baum-Modelle bieten intuitive Interpretierbarkeit, neigen jedoch zur Überanpassung, was durch Beschneiden (Pruning) vermieden werden kann. Die Vorhersage einzelner Bäume ist tendentiell mit hoher Varianz verbunden. Random Forests kombinieren mit Bagging viele Entscheidungsbäume, die auf zufälligen Teilmengen der Daten und Merkmale trainiert werden. Durch die Aggregation der Vorhersagen vieler Bäume reduziert der Random Forest die Varianz und verbessert so die Vorhersagegenauigkeit. Boosting-Methoden mit Entscheidungsbäumen trainieren kleine Bäume sukzessive, wobei jeder weitere Baum zur Korrektur der gegenwärtigen Fehler des Ensembles trainiert wird. Gradient Boosting nutzt den Gradienten der Verlustfunktion, um die Vorhersagequalität des Ensembles zu optimieren. Diese prädiktiven Methoden wurden im `parsnip`-Framework in R implementiert.
 
+Causal Forests erweitern das Random Forest-Konzept für die Schätzung heterogener Behandlungseffekte. Dabei wird das "Honest Splitting"-Prinzip angewandt, bei dem separate Datenstichproben für die Strukturbestimmung der Bäume und die Effektschätzung verwendet werden. Die Implementierung erfolgt mit dem `grf`-Paket, wobei zur Effizienzsteigerung Propensity Scores und Outcomes vorgeschätzt werden. Diese Orthogonalisierung ermöglicht es dem Causal Forest, sich auf die Heterogenität der Behandlungseffekte zu konzentrieren.
 
-
-Für alle Methoden wurden Implementierungen im `parsnip`-Framework in R vorgestellt. Zudem wurde gezeigt, wie die Vorhersagegüte durch Testdatensätze beurteilt und die Bedeutung einzelner Variablen mit Variable-Importance-Metriken analysiert werden kann.
+Für alle Methoden wurde gezeigt, wie die Vorhersagegüte durch Testdatensätze beurteilt und die Bedeutung einzelner Variablen mit Variable-Importance-Metriken analysiert werden kann.
 

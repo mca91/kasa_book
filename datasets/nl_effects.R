@@ -1,32 +1,42 @@
-
 # Notwendige Pakete
 library(tibble)
 library(dplyr)
 
 # Schritt 1: Datengenerierung
-n <- 5000
+set.seed(1234)
+n <- 20000
 p <- 10
 
-# Prädiktoren
-set.seed(1234)
+# Prädiktoren - weniger Noise-Variablen
 X <- matrix(rnorm(n * p), n, p)
 colnames(X) <- paste0("X", 1:p)
 
-# Behandlungsindikator B in Abhängigkeit von X1 und X2 (mit PS)
-propensity_score <- 1 / (1 + exp(X[, 1] + X[, 2] + X[, 3]))
-B <- rbinom(n, 1, propensity_score) 
+# Schritt 2: Vereinfachter Propensity Score
+# Nur von X1 abhängig und weniger extrem
+propensity_score <- plogis(0.5 * X[, 1])
+B <- rbinom(n, 1, propensity_score)
 
-# Schritt 3: Wahrer ITE ist eine nicht-lineare Funktion von X1, X2 und X3
-tau <- (sin(X[, 1] * X[, 2]) + X[, 3]) * 3
+# Schritt 3: Einfacherer Treatment Effect
+# Linear in X1, quadratisch in X2
+tau <- 2 + X[, 1] + 0.5 * X[, 2]^2 + X[,3]
 
-# sim. durchschnittlicher Behandlungseffekt
-mean(tau)
+# Schritt 4: Einfacheres Outcome-Modell
+# Weniger Interaktionen, klarer strukturiert
+Y <- tau * B +                    # Behandlungseffekt
+  1 + X[, 1] + X[, 2] + X[, 3] +       # Haupteffekte
+  rnorm(n, sd = 0.5)           # Reduziertes Rauschen
 
-# Outcome
-Y <- tau * B + X[, 1] + X[, 2] + X[, 3] + 0.5 * rnorm(n, sd = 1)
+# Datensatz erstellen
+df <- as_tibble(X) %>% 
+  mutate(
+    Y = Y,
+    B = B,
+    tau = tau,
+    ps = propensity_score
+  ) %>%
+  # Weniger extreme PS-Trimming
+  #filter(between(ps, .2, .8)) %>%
+  sample_n(size = 10000)
 
-# sammeln
-df <- as_tibble(X) %>% mutate(Y = Y, B = B, tau = tau)
-
-# speichern
+# Speichern
 saveRDS(object = df, file = "datasets/nl_effects.Rds")
