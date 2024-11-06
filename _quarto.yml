@@ -7,12 +7,6 @@ project:
   output-dir: "docs"
 
 book:
-  announcement:
-    icon: info-circle
-    dismissable: true
-    content: "**Alert** - this is some information that you should pay attention to"
-    type: primary
-    position: below-navbar
   title: "Kausalanalyse und maschinelles Lernen mit R"
   description: '*Kausalanalyse und Maschinelles Lernen mit R* (KMLR) ist ein innovatives Online-Lehrbuch, das Studierende der Wirtschaftswissenschaften in moderne statistische Methoden und deren ökonometrische Anwendungen einführt. Das interaktive Kompendium für quantitative Lehrveranstaltungen verbindet theoretische Grundlagen mit praktischer Anwendung durch die Möglichkeit, R-Code direkt im Browser auszuführen. Von den statistischen Grundlagen über fortgeschrittene Methoden der Kausalanalyse bis hin zu Machine Learning-Techniken bietet das Buch einen umfassenden Einblick in fortschrittliche quantitative Forschungsmethoden. Besonders wertvoll für Studierende sind die zahlreichen interaktiven Visualisierungen und praxisnahen Fallstudien mit wirtschaftswissenschaftlichem Fokus, die ein tiefes Verständnis der ökonometrischen Methoden fördern und Kompetenzen in reproduzierbarer Forschung mit dem R-Ökosystem vermitteln.'
   reader-mode: true
@@ -24,6 +18,20 @@ book:
       affiliation: University of Duisburg-Essen
       affiliation-url: https://www.oek.wiwi.uni-due.de/team/christoph-hanck/
   date: "09.10.2024"
+  body-header: |
+    <div class="callout callout-style-simple callout-note">
+    <div class="callout-body d-flex">
+    <div class="callout-icon-container">
+    <i class="callout-icon"></i>
+    </div>
+    <div class="callout-body-container">
+    <p><strong>Hinweis</strong></p>
+    <p>Für eine optimale technische Stabilität empfehlen wir, dieses Online-Lehrbuch auf einem Notebook oder Desktop-Computer zu nutzen. Die interaktiven Komponente, insbesondere die R-Konsole (WebR), sind rechenintensiv und funktionieren auf mobilen Geräten nur eingeschränkt.</p>
+    </div>
+    </div>
+    </div>
+  sharing: [twitter, facebook, linkedin]
+  twitter-card: true
   chapters:
     - index.qmd
     - part: "Grundlagen"
@@ -55,11 +63,11 @@ book:
     - Literatur.qmd
   repo-url: https://github.com/mca91/kasa_book
   repo-branch: main
-  repo-actions: [edit, issue]
-  search:
-    location: navbar
-    type: overlay
+  repo-actions: [edit, issue, source]
+  search: true
   cookie-consent: false
+  navbar:
+    background: light
   sidebar:
     title: "<a href='/index.html'>Kausalanalyse und maschinelles Lernen mit R</a>"
 
@@ -68,23 +76,22 @@ citation:
   type: book
 google-scholar: true
 
-execute: 
-  warning: false
-
 format:
   live-html:
     engine: knitr
     grid: 
+      gutter-width: 50px
       body-width: 920px
       margin-width: 350px
     fontsize: "20px"
-    theme: cosmo
+    theme: 
+      light: [cosmo, theme-dark.scss]
     cap-location: margin
     code-link: true
     linkcolor: darkgreen
     toc: true
     toc-depth: 4
-    toc-location: left
+    toc-location: right
     toc-title: "<a href='/index.html'>Übersicht</a>"
     reference-location: margin
     include-in-header:
