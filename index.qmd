@@ -29,7 +29,7 @@ Die zunehmende Verfügbarkeit großer Datenmengen und entsprechend komplexer wer
 
 Dieses Online-Kompendium, *Kausalanalyse und Maschinelles Lernen mit R* (KMLR), bietet Studierenden eine interaktive Lernplattform, die es erlaubt in quantitativen Lehrveranstaltungen vermittelte Inhalte im Selbststudium zu vertiefen und praktisch anzuwenden. KMLR bietet eine Vielzahl dynamischer Elemente, darunter interaktive Grafiken und Anwendungen mit Illustrationen statistischer Konzepte in [Observable](https://observablehq.com/), sowie eine mit [webR](https://docs.r-wasm.org/webr) erzeugte R-Konsole.^[KMLR wird mit dem Publikationssystem [Quarto](https://quarto.org/) erzeugt.] Hiermit können Studierende R-Code direkt im Browser ausführen, um statistische Analysen in Fallstudien eigenständig zu replizieren, die Ergebnisse nachzuvollziehen und zu lernen, wie datengetriebene Forschung reproduzierbar dokumentiert werden kann – ein wesentlicher Bestandteil moderner wissenschaftlicher Praxis. Für ein besseres Verständnis quantitativer Konzepte kann der vorgegebene R-Code modifiziert werden (beispielsweise zur Anpassung der Parameter von Schätzfunktionen oder Simulationen), um durch eigenständiges Experimentieren ein tieferes Verständnis der behandelten Methoden zu erlangen.
 
-Als [offene Bildungsressource](https://github.com/mca91/kasa_book) (open educational ressource, OER) ermöglichen wir Dozierenden, ihre bestehenden Lehrveranstaltungen durch den Einsatz von KLMR um relevante Themen zu erweitern und ihren Studierenden eine innovative und praxisnahe Lernerfahrung zu bieten.
+Als [offene Bildungsressource](https://github.com/mca91/kasa_book) (open educational ressource, OER) ermöglichen wir Dozierenden, ihre bestehenden Lehrveranstaltungen durch den Einsatz von KMLR um relevante Themen zu erweitern und ihren Studierenden eine innovative und praxisnahe Lernerfahrung zu bieten.
 
 ## Aufbau des Kompendiums
 
@@ -102,7 +102,7 @@ mean(dat$Alter)
 
 Bei der Interkation mit WebR-Chunks ist Folgendes zu beachten:
 
-Die WebR-Session wird lokal im Browser ausgeführt. Die Performanz bei komplexeren Berechnungen ist daher von dem verwendeten Browser und der Hardware des genutzten Endgerätes abghängig. Auch hinsichtlich typischer Limitationen von Mobilgeräten empfehlen wir, KLMR auf einem Notebook oder PC aufzurufen. 
+Die WebR-Session wird lokal im Browser ausgeführt. Die Performanz bei komplexeren Berechnungen ist daher von dem verwendeten Browser und der Hardware des genutzten Endgerätes abghängig. Auch hinsichtlich typischer Limitationen von Mobilgeräten empfehlen wir, KMLR auf einem Notebook oder PC aufzurufen. 
 
 Die WebR-Chunks werden bei jeder Aktualisierung des Browser-Tabs auf den durch uns (die Autoren) definierten Zustand zurückgesetzt. Das Bedeutet, dass durch den Nutzer geschriebener Code, berechnete Ergebnisse und definierte Objekte *bei einer Aktualisierung gelöscht werden*.
   
@@ -122,7 +122,7 @@ Hier ein Beispiel: Der nächste Code-Chunk simuliert (nach einem Klick auf *Run 
 Sys.sleep(time = 5) # 5 Sekunden nichts tun
 
 # Leser*innen begrüßen
-cat("Hey, willkommen bei KLMR!")
+cat("Hey, willkommen bei KMLR!")
 ```
 
 **Interaktive Visualisierungen**
@@ -138,7 +138,7 @@ Oftmals geben wir detaillierte Erläuterungen zu der voreingestellten Parameterk
 
 Um die Qualität und Aktualität dieser Ressource zu verbessern, sind wir auf Hinweise unserer Leser angewiesen. Sollten Ihnen beim Lesen Tippfehler, Unstimmigkeiten oder technische Fehler auffallen, oder möchten Sie uns anderweitige Anregungen zur Verbesserung des Materials mitteilen, freuen wir uns über die Erstellung eines [Issues auf GitHub](https://github.com/mca91/kasa_book/issues), oder ggf. eines Verbesserungsvorschlags im Quellcode als [Pull Request](https://github.com/mca91/kasa_book/pulls). So tragen Sie dazu bei, das Material für alle Nutzer zu optimieren.^[Mit einem Klick auf "<i class="fa-brands fa-github"></i> Seite editieren" links unten im Scroll-Menü gelangen Sie direkt zu der entsprechenden Datei im GitHub-Repository.]
 
-KLMR und die verlinkten Lehrmaterialien sind im Rahmen des von der [*Stiftung Innovation in der Hochschullehre*](https://stiftung-hochschullehre.de) geförderten Projekts *Kausalanalyse, Maschinelles Lernen und Reproduzierbare Forschung* im Förderprogramm [*Freiraum 2022*](https://stiftung-hochschullehre.de/foerderung/freiraum/) entstanden. Wir bedanken uns herzlich für die finanzielle Unterstützung.
+KMLR und die verlinkten Lehrmaterialien sind im Rahmen des von der [*Stiftung Innovation in der Hochschullehre*](https://stiftung-hochschullehre.de) geförderten Projekts *Kausalanalyse, Maschinelles Lernen und Reproduzierbare Forschung* im Förderprogramm [*Freiraum 2022*](https://stiftung-hochschullehre.de/foerderung/freiraum/) entstanden. Wir bedanken uns herzlich für die finanzielle Unterstützung.
 
 Wir danken Ilona Braun herzlich für ihre unverzichtbare Unterstützung in der Projektadministration. Jens Klenke und Lennard Maßmann gilt unser Dank für ihre inspirierenden Anregungen sowie ihre Mithilfe bei der Erprobung und Evaluation der Materialien im Lehrbetrieb. Ein großes Dankeschön geht auch an unsere wissenschaftlichen Hilfskräfte für ihre Unterstützung bei der Überarbeitung der Materialien. Besonders dankbar sind wir unseren Studierenden für ihr wertvolles Feedback.
 
