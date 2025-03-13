@@ -1,18 +1,18 @@
 # Load necessary libraries
 library(ggplot2)
 library(reshape2)
-library(grf)  # For causal forest
+library(grf)
 
 # Define grid for x1 and x2 (covariates)
 x1 <- seq(0, 1, length.out = 100)
 x2 <- seq(0, 1, length.out = 100)
 
-# More complicated function to define treatment effect
+# Complicated function to define treatment effect
 true_treatment_effect <- function(x1, x2) {
-  term1 <- 5 * (1 - exp(-(2 * x1^2 + 2 * x2^2))) + 2  # Original term
-  term2 <- sin(3 * pi * x1) + cos(3 * pi * x2)         # Non-linear sine and cosine
-  term4 <- exp(-x1 * x2)                               # Exponential interaction
-  return(term1 + term2 + term4)                # Sum of all terms
+  term1 <- 5 * (1 - exp(-(2 * x1^2 + 2 * x2^2))) + 2  
+  term2 <- sin(3 * pi * x1) + cos(3 * pi * x2)        
+  term4 <- exp(-x1 * x2)                       
+  return(term1 + term2 + term4)
 }
 # Simulate treatment assignment and random points
 set.seed(123)
@@ -39,8 +39,9 @@ df_random <- data.frame(
 X_random <- as.matrix(df_random[, c("x1", "x2")])
 Y_random <- df_random$outcome
 W_random <- df_random$treatment
-causal_forest_tuned <- causal_forest(X_random, Y_random, W_random,
-                                     tune.parameters = "all")
+causal_forest_tuned <- causal_forest(
+  X_random, Y_random, W_random,
+  tune.parameters = "all")
 
 # Fit causal forest without tuning
 causal_forest_untuned <- causal_forest(X_random, Y_random, W_random)
@@ -69,25 +70,40 @@ grid_data$pred_CATE_lm <- predict(linear_model, newdata = data.frame(
 ))
 
 # Plot function to avoid code repetition
-plot_CATE <- function(data, CATE_col, title) {
+plot_CATE <- function(data, CATE_col, title, legendpos = "none") {
   ggplot(data, aes(x1, x2, fill = !!sym(CATE_col))) +
     geom_tile() +
     scale_fill_viridis_c(option = "mako") +
     labs(title = title, x = "Variable x1", y = "Variable x2", fill = "Predicted CATE") +
     theme_minimal() +
-    theme(legend.position = "top")
+    theme(legend.position = legendpos, 
+          axis.title.y = element_blank(), 
+          axis.title.x = element_blank()
+    )
 }
 
 # Plot the true treatment effects
-ggplot(melt(outer(x1, x2, true_treatment_effect)), aes(Var1 / 100, Var2 / 100, fill = value)) +
+p_truth <- ggplot(melt(outer(x1, x2, true_treatment_effect)), aes(Var1 / 100, Var2 / 100, fill = value)) +
   geom_hex(stat = "identity") +
   scale_fill_viridis_c(option = "mako") +
-  labs(title = "True Treatment Effects", x = "Variable x1", y = "Variable x2", fill = "TE") +
+  labs(title = "True Treatment Effects", fill = "TE") +
   theme_minimal() +
-  theme(legend.position = "top")
+  theme(legend.position = "none", 
+        axis.title.y = element_blank(), 
+        axis.title.x = element_blank()
+  )
 
 # Plot predicted CATEs with and without tuning, and from the linear model
-plot_CATE(grid_data, "pred_CATE_untuned", "Predicted CATE without Tuning")
-plot_CATE(grid_data, "pred_CATE_tuned", "Predicted CATE with Tuning")
-plot_CATE(grid_data, "pred_CATE_lm", "Predicted CATE from Linear Model")
+p_CF_untuned <- plot_CATE(grid_data, "pred_CATE_untuned", "Est. CATE without Tuning")
+p_CF_tuned <- plot_CATE(grid_data, "pred_CATE_tuned", "Est. CATE with Tuning")
+p_lm <- plot_CATE(grid_data, "pred_CATE_lm", "Est. CATE from Linear Model")
+
+library(cowplot)
+
+plot_grid(
+ plotlist = list(
+   p_truth, p_lm, p_CF_untuned, p_CF_tuned
+),
+  ncol = 2
+)
 

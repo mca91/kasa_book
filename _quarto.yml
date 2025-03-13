@@ -2,6 +2,9 @@ lang: "de"
 
 engine: knitr
 
+filters: 
+  - lua_filters/last-modified.lua
+
 project:
   type: book
   output-dir: "docs"
