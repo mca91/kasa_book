@@ -3,6 +3,11 @@ format: live-html
 engine: knitr
 ---
 
+```{r}
+library(tensorflow)
+tfversion <- tf$`__version__`
+```
+
 # Neuronale Netzwerke
 
 Neuronale Netze (NN) sind leistungsstarke Modelle, die darauf spezialisiert sind, komplexe Muster in Daten zu erkennen und sind damit insbesondere ein hilfeiches Tool für Prognosen. Ein Nachteil neuronaler Netze ist die mangelnde Fähigkeit, kausale Zusammenhänge zu identifizieren und abzuleiten. Diese Limitation stellt eine signifikante Einschränkung dar, insbesondere für den Einsatz in empirischen Disziplinen, in denen das Verständnis kausaler Beziehungen von entscheidender Bedeutung ist. Während NN effektiv komplizierte Strukturen abbilden können, sind sie nicht mit den notwendigen Mechanismen ausgestattet, um Kausalität zu modellieren oder gar zu identifizieren. Grund hierfür ist die fehlende explizite Berücksichtigung kausaler Beziehungen und des zugrunde liegenden datenerzeugenden Prozesses: NN lernen lediglich funktionale Zusammenhänge in den Trainingsdaten. Auch wenn hierdurch komplexeste Relationen abgebildet werden können, erlaubt ein angepasstes Netz keine Differenzierung zwischen einer Korrelation und einer tatsächlichen kausalen Beziehung zwischen Variablen.
@@ -192,7 +197,7 @@ Folgende Eigenschaften der Optimierung mit Gradient Descent können anhand der P
 
 In empirischen Anwendungen ist es für eine hohe Modellgüte eines neuronalen Netzwerks nicht unbedingt erforderlich, das globale Minimum zu finden: Viele Optimierungsprobleme weisen zahlreiche lokale Minima auf, die eine ausreichend gute Annäherung an das Optimum bieten können. Besonders bei hochdimensionalen Optimierungsproblemen mit komplexen Loss-Funktionen können diese lokalen Minima zufriedenstellende Lösungen darstellen. In einigen Fällen existiert möglicherweise kein globales Minimum, und der Algorithmus konvergiert zwangsläufig zu einem stabilen lokalen Minimum, das dennoch eine gute Performance gewährleistet. Daher kann es sinnvoller sein, Algorithmen zu verwenden, die das Erreichen einer robusten Lösung legen, anstatt strikt nach dem globalen Minimum zu suchen.
 
-In Software-Implementierungen für Machine und Deep Learning wie `tensorflow` und `keras` werden fortgeschrittene Techniken wie Momentum Tuning oder Stochastic [Gradient Descent](https://en.wikipedia.org/wiki/Stochastic_gradient_descent) (SGD) eingesetzt, um die Wahrscheinlichkeit zu erhöhen, dass der Algorithmus nicht in einem (ungünstigen) lokalen Minimum endet. Ein für die Anpassung von NN häufig verwendeter Algorithmus, der SGD verwendet, ist [Adaptive Moment Estimation (Adam)](https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Adam). Wir verwenden u.a. den Adam-Optimizer in den empirischen Beispielen. 
+In Software-Implementierungen für Machine und Deep Learning wie `tensorflow`^[Wir nutzen die tensorflow-Version `r tfversion`] und `keras` werden fortgeschrittene Techniken wie Momentum Tuning oder Stochastic [Gradient Descent](https://en.wikipedia.org/wiki/Stochastic_gradient_descent) (SGD) eingesetzt, um die Wahrscheinlichkeit zu erhöhen, dass der Algorithmus nicht in einem (ungünstigen) lokalen Minimum endet. Ein für die Anpassung von NN häufig verwendeter Algorithmus, der SGD verwendet, ist [Adaptive Moment Estimation (Adam)](https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Adam). Wir verwenden u.a. den Adam-Optimizer in den empirischen Beispielen. 
 
 <iframe class="obs-soft-box-shadow" width="100%" height="880" frameborder="0"
   src="https://observablehq.com/embed/@mca91/gradient-descent-in-2d@759?cells=plot%2Clabels%2Cviewof+startAnimation%2Cviewof+startPoint%2Cviewof+alpha%2Cviewof+eta"></iframe>
