@@ -79,6 +79,10 @@ citation:
   type: book
 google-scholar: true
 
+execute: 
+  warning: false
+  echo: false
+
 format:
   live-html:
     engine: knitr

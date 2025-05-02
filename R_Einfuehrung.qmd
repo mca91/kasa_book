@@ -11,6 +11,8 @@ webr:
             'readr'
             ]
   cell-options:
+    message: false
+    warning: false
     editor-font-scale: .85
     autorun: true
 ---
@@ -20,6 +22,8 @@ webr:
 ```{r}
 #| results: "asis"
 #| echo: false
+#| warning: false
+#| message: false
 library(tidyverse)
 library(kableExtra)
 library(modelsummary)
