@@ -81,7 +81,6 @@ google-scholar: true
 
 execute: 
   warning: false
-  echo: false
 
 format:
   live-html:
@@ -154,4 +153,7 @@ format:
           }
           
 editor: source
+
+website: 
+  site-url: "https://www.kausalmlr.de"
   
