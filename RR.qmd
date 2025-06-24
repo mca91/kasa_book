@@ -2,7 +2,6 @@
 format: live-html
 filters:
   - shinylive
-engine: knitr
 ---
 
 # Reproduzierbarkeit
@@ -478,7 +477,10 @@ server <- function(input, output) {
         bins <- seq(min(x), max(x), length.out = input$bins + 1)
 
         # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white',
+        hist(x, 
+             breaks = bins, 
+             col = 'darkgray', 
+             border = 'white',
              xlab = 'Waiting time to next eruption (in mins)',
              main = 'Histogram of waiting times')
     })
@@ -490,13 +492,17 @@ shinyApp(ui = ui, server = server)
 
 Um die App auszuführen, genügt ein Klick auf "*Run App*" oben im Dokumenten-Tab, siehe @fig-shinygif2. 
 
-![RStudio: *Shiny*-App erstellen](img/shiny-gif2.gif){#fig-shinygif2 width=80% fig-align='center'}
+![RStudio: *Shiny*-App ausführen](img/shiny-gif2.gif){#fig-shinygif2 width=80% fig-align='center'}
 
-`app.R` wird nun ausgeführt, indem ein lokaler *Shiny*-Server gestartet wird. Die App wird anschließend entweder im integrierten Vorschaufenster von *RStudio* oder in einem externen Browser automatisch geöffnet. Zuerst wird die in `ui` definierte Benutzeroberfläche geladen und angezeigt, sodass interaktive Elemente wie Schieberegler oder Schaltflächen verfügbar werden. Gleichzeitig wird die in der `server`-Funktion definierte Logik aktiv, in der festgelegt ist, wie Benutzereingaben über das interaktive Elemente verarbeitet und die Ausgaben in Echtzeit aktualisiert werden.^[Je nach Komplexität der Berechnung kann es hierbei zu Verzögerungen bei der erstmaligen Anzeige oder Aktualisierungen kommen.] Das nachfolgende Widget zeigt das Resultat für die Standard-App.
+`app.R` wird nun ausgeführt, indem ein lokaler *Shiny*-Server gestartet wird. Die App wird anschließend entweder im integrierten Vorschaufenster von *RStudio* oder in einem externen Browser automatisch geöffnet. Zuerst wird die in `ui` definierte Benutzeroberfläche geladen und angezeigt, sodass interaktive Elemente wie Schieberegler oder Schaltflächen verfügbar werden. Gleichzeitig wird die in der `server`-Funktion definierte Logik aktiv, in der festgelegt ist, wie Benutzereingaben über das interaktive Elemente verarbeitet und die Ausgaben in Echtzeit aktualisiert werden.^[Je nach Komplexität der Berechnung kann es hierbei zu Verzögerungen bei der erstmaligen Anzeige oder Aktualisierungen kommen.] 
+
+Das nachfolgende Widget zeigt das Resultat für die Standard-Shiny-App. In diesem Widget ist zusätzlich zu der Shiny-App ein verknüpfter interaktiver Editor eingebunden. Dieser Editor ist *nicht* Teil der App, sondern wird von uns mithilfe von [shinylive](https://posit-dev.github.io/r-shinylive/) eingebunden. So kann -- ähnlich wie in RStudio -- der Quellcode für die dargestellte App im Widget modifiziert und unmittelbar ausgeführt werden (klick auf das 'Play'-Symbol).^[Zum Beispiel kann die Füllfarbe der Histogramm-Balken hier mit `col = 'red'` von dunkel-grau zu rot geändert werden.]
 
 ```{shinylive-r}
 #| standalone: true
 #| viewerHeight: 650
+#| components: [editor, viewer]
+#| layout: vertical
 #
 # This is a Shiny web application. You can run the application by clicking
 # the 'Run App' button above.
@@ -585,7 +591,7 @@ Anschließend richten wir die Server-Logik ein. Mit `shiny::renderPlot()` erreic
 
 1. In der Definition der Sequenz `x`. Wir modifizieren die Argumente `from` und `to` so, dass Start- und Endwerte in `x` entsprechend der gewählten Standardabweichung den relevanten Bereich der X-Achse abdecken.
 
-2. Bei der Berechnung der Dichte mit `dnorm()`. So stellen wir sicher, dass die Grafik die neu berechnete Normalverteilung mit der jeweils gewählten Standardabweichung in anzeigt. 
+2. Bei der Berechnung der Dichte mit `dnorm()`. So stellen wir sicher, dass die Grafik die neu berechnete Normalverteilung mit der jeweils gewählten Standardabweichung anzeigt. 
 
 Beachte, dass die X-Achse auf einen festen Bereich von -10 bis 10 begrenzt ist, damit die Änderungen in der "Breite" der Dichtefunktion erkennbar sind. Andernfalls skaliert `ggplot2` die Achse automatisch, um für den gewählten Wert der Standardabweichung die bestmögliche Darstellung zu gewährleisten.^["Bestmöglich" meint hier eine "hinreichend große" Skalierung der Achse. Dies ist hinderlich, wenn wir den Effekt der Skalierung der Verteilung beobachten wollen.]
 
@@ -638,11 +644,13 @@ shinyApp(ui = ui, server = server)
 
 ```{shinylive-r}
 #| standalone: true
-#| viewerHeight: 600
+#| viewerHeight: 650
+#| components: [editor, viewer]
+#| layout: vertical
 library(shiny)
 library(ggplot2)
 
-# Define your Shiny UI here
+# Benutzeroberfläche definieren
 ui <- fluidPage(
   titlePanel("Normalverteilung"),
       sliderInput(
@@ -659,21 +667,20 @@ ui <- fluidPage(
     )
 )
 
-# Define your Shiny server logic here
+# Server-Logik
 server <- function(input, output, session) {
   output$distPlot <- renderPlot({
-    # Generate a sequence of x values
+    # Sequenz von X-Werten
     x <- seq(
       from = - 4 * input$sd,
       to = 4 * input$sd,
       length.out = 1000
     )
-    # Compute the normal distribution density
+    # Normalverteilungsdichte-Werte berechnen
     y <- dnorm(x, sd = input$sd)
-    # Create a data frame
     data <- data.frame(x = x, y = y)
 
-    # Plot using ggplot2
+    # Plot mit ggplot2
     ggplot(data, aes(x = x, y = y)) +
       geom_line(color = "steelblue", lwd = 1) +
       labs(x = "X", y = "Dichte") +
@@ -682,7 +689,7 @@ server <- function(input, output, session) {
   })
 }
 
-# Create and launch the Shiny app
+# Shiny-App erzeugen
 shinyApp(ui = ui, server = server)
 ```
 
