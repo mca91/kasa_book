@@ -1548,7 +1548,7 @@ lm(
 )$coefficients["B"]
 ```
 
-Die Methoden von @BelloniChernozhukov2013 und @Bellonietal2014 sind im R-Paket `hdm` implementiert. Mit den Funktionen `hrm::rlasso()` und `hdm::rlassoEffect` kann Lasso-Regression sowie Post- und Double-Post-Selection durchgeführt werden.^[Diese Funktionen ermitteln ein optimales $\lambda$ mit dem in @Bellonietal2012 vorgeschlagenen Algorithmus.]
+Die Methoden von @BelloniChernozhukov2013 und @Bellonietal2014 sind im R-Paket `hdm` implementiert. Mit den Funktionen `hdm::rlasso()` und `hdm::rlassoEffect` kann Lasso-Regression sowie Post- und Double-Post-Selection durchgeführt werden.^[Diese Funktionen ermitteln ein optimales $\lambda$ mit dem in @Bellonietal2012 vorgeschlagenen Algorithmus.]
 
 Wir berechnen zunächst den naiven Lasso-Schätzer in einem Modell mit allen Variablen.
 

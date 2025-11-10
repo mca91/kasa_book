@@ -213,7 +213,7 @@ p + geom_point(
   )
 ```
 
-Der grafische Vergleich beider Vorgehensweisen zeigt den Effekt der Kontrolle für `flipper_length`: Die geschätzte (schwarze) Regressionslinie für die bereinigten Daten hat eine deutlich geringere Steigung als die anhand der ursprünglichen Daten geschätzte (lilane) Linie. Der Effekt von `bill_length` auf `body_mass` wird mit der einfachen Regression `lm(body_mass ~ bill_length)` vermutlich *überschätzt*, weil es andere Faktoren (wie `flipper_length` gibt, die mit `bill_length` und `body_mass` korrelieren. Kontrollieren für `flipper_length` in der multiplen Regression `lm(body_mass ~ bill_length + flipper_length)` schließt die Backdoor durch `flipper_length`. Die Konsequenz ist eine deutlich geringere Steigung der lilanen Regressionslinie.
+Der grafische Vergleich beider Vorgehensweisen zeigt den Effekt der Kontrolle für `flipper_length`: Die geschätzte (lila) Regressionslinie für die bereinigten Daten hat eine deutlich geringere Steigung als die anhand der ursprünglichen Daten geschätzte (schwarze) Linie. Der Effekt von `bill_length` auf `body_mass` wird mit der einfachen Regression `lm(body_mass ~ bill_length)` vermutlich *überschätzt*, weil es andere Faktoren (wie `flipper_length` gibt, die mit `bill_length` und `body_mass` korrelieren. Kontrollieren für `flipper_length` in der multiplen Regression `lm(body_mass ~ bill_length + flipper_length)` schließt die Backdoor durch `flipper_length`. Die Konsequenz ist eine deutlich geringere Steigung der lilanen Regressionslinie.
 
 ## Binäre Outcome-Variable {#sec-bov}
 
