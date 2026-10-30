@@ -15,8 +15,6 @@ format:
         - 'skimr'
       cell-options:
         fig-width: 8
-      repos:
-      - https://rstudio.r-universe.dev
 engine: knitr
 ---
 

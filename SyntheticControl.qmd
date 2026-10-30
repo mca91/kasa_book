@@ -12,14 +12,13 @@ format:
             'dplyr',
             'ggplot2',
             'gt',
+            'nloptr',
             'purrr',
             'sandwich',
             'tidyr',
             'readr',
             'Synth'
             ]
-      repos:
-      - https://rstudio.r-universe.dev
 ---
 
 {{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
@@ -61,9 +60,6 @@ tabopts <- function(x) {
       table.border.bottom.color = "black"
     )
 }
-
-# install wabassem nlopt from astamm's repository
-install.packages('nloptr', repos = 'https://astamm.r-universe.dev')
 
 # create dataset directory
 dir.create("datasets")

@@ -19,8 +19,6 @@ webr:
   cell-options:
     warning: false
     message: false           
-  repos:
-    - https://rstudio.r-universe.dev
 ---
 
 {{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
